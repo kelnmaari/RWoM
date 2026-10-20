@@ -14,8 +14,10 @@ namespace TorannMagic
     /// <summary>
     /// Native Multiplayer (rwmt) compatibility layer.
     /// Activated from <see cref="TorannMagicMod"/> only when the Multiplayer mod is loaded,
-    /// so the mod keeps working without it. The AbilityUser sync mirrors the upstream
-    /// rwmt/Multiplayer-Compatibility JecsTools patch, which this replaces for RWoM.
+    /// so the mod keeps working without it. The AbilityUser sync mirrors the
+    /// Multiplayer-Compatibility mod's JecsTools patch: when that mod is present and
+    /// already syncs PawnAbility (JecsLite loaded), we defer to it instead of
+    /// double-registering.
     /// </summary>
     public static class TMPCompat
     {
@@ -42,20 +44,55 @@ namespace TorannMagic
             }
             Initialized = true;
 
+            // The steps are independent — one broken registration must not take
+            // down the others (this exact cascade happened when a newer fork made
+            // a duplicate registration throw and killed the verb hooks below).
+            int failed = 0;
+
             try
             {
                 PatchAbilityUserFramework();
+            }
+            catch (Exception ex)
+            {
+                failed++;
+                Log.Error("[TMPCompat] AbilityUser framework setup failed: " + ex);
+            }
+
+            try
+            {
                 PatchGizmoToggles();
+            }
+            catch (Exception ex)
+            {
+                failed++;
+                Log.Error("[TMPCompat] Gizmo toggle sync setup failed: " + ex);
+            }
+
+            try
+            {
                 PatchGolemCommands();
+            }
+            catch (Exception ex)
+            {
+                failed++;
+                Log.Error("[TMPCompat] Golem command sync setup failed: " + ex);
+            }
+
+            try
+            {
                 PatchJobVerbRegistration();
             }
             catch (Exception ex)
             {
-                Log.Error("[TMPCompat] Multiplayer compatibility setup failed: " + ex);
-                return;
+                failed++;
+                Log.Error("[TMPCompat] Job/verb registration setup failed: " + ex);
             }
 
-            Log.Message("[TMPCompat] Multiplayer compatibility initialized.");
+            if (failed == 0)
+            {
+                Log.Message("[TMPCompat] Multiplayer compatibility initialized.");
+            }
         }
 
         // MP sync of TryTakeOrderedJob serializes the Job via ExposeData; verbToUse is
@@ -160,12 +197,35 @@ namespace TorannMagic
 
         private static void PatchAbilityUserFramework()
         {
+            // With JecsLite active, the Multiplayer-Compatibility mod syncs the
+            // JecsTools ability framework itself (its JecsTools class triggers on
+            // zal.jecsliterwom) — including PawnAbility.UseAbility and a sync
+            // worker. A second registration makes newer MP forks reject it with
+            // "already registered as a SyncMethod" (returning null or throwing),
+            // which used to abort our whole setup. Probe first and defer to the
+            // compat mod whenever it already owns the method; when it is absent
+            // (or too old to know JecsLite), our registration below is the only one.
+            ISyncMethod useAbility;
+            try
+            {
+                useAbility = MP.RegisterSyncMethod(typeof(PawnAbility), nameof(PawnAbility.UseAbility));
+            }
+            catch (Exception ex)
+            {
+                Log.Message("[TMPCompat] PawnAbility.UseAbility is already synced by Multiplayer-Compatibility — deferring to it (" + ex.GetType().Name + ").");
+                return;
+            }
+            if (useAbility == null)
+            {
+                Log.Message("[TMPCompat] PawnAbility.UseAbility is already synced by Multiplayer-Compatibility — deferring to it.");
+                return;
+            }
+
             // Casting an ability is the core interaction; sync the job creation call
             // and stop local targeting afterwards so the client does not re-enter it.
-            MP.RegisterSyncMethod(typeof(PawnAbility), nameof(PawnAbility.UseAbility))
-                .SetPostInvoke(StopTargeting);
+            useAbility.SetPostInvoke(StopTargeting);
             // NOTE: if the Multiplayer API is present but uninitialized (e.g. only the
-            // API assembly got loaded), MP.* throws and Setup's caller catches it —
+            // API assembly got loaded), MP.* throws and Setup's step handler catches it —
             // the rest of the mod is unaffected.
 
             // CreateDelegate at runtime instead of a method-group conversion: the
@@ -176,7 +236,14 @@ namespace TorannMagic
                 (SyncWorkerDelegate<PawnAbility>)Delegate.CreateDelegate(
                     typeof(SyncWorkerDelegate<PawnAbility>),
                     AccessTools.Method(typeof(TMPCompat), nameof(SyncPawnAbility)));
-            MP.RegisterSyncWorker<PawnAbility>(workerDelegate, typeof(PawnAbility));
+            try
+            {
+                MP.RegisterSyncWorker<PawnAbility>(workerDelegate, typeof(PawnAbility));
+            }
+            catch (Exception ex)
+            {
+                Log.Warning("[TMPCompat] PawnAbility sync worker registration skipped: " + ex.Message);
+            }
         }
 
         private static void StopTargeting(object instance, object[] args)
