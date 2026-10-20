@@ -143,6 +143,11 @@
 			<steamWorkshopUrl>https://steamcommunity.com/sharedfiles/filedetails/?id=2009463077</steamWorkshopUrl>
 			<downloadUrl>https://github.com/pardeike/HarmonyRimWorld/releases/latest</downloadUrl>
 		  </li>
+		  <li>
+			<packageId>zal.jecsliterwom</packageId>
+			<displayName>JecsLite - A RimWorld of Magic</displayName>
+			<steamWorkshopUrl>https://steamcommunity.com/sharedfiles/filedetails/?id=3312959701</steamWorkshopUrl>
+		  </li>
 		</v1.7>
     </modDependenciesByVersion>
 	<loadAfter>
@@ -175,7 +180,7 @@ Unofficial continuation of TorannD's "A RimWorld of Magic" for RimWorld 1.7. All
 
 [olist]
 [*]HugsLib dependency removed — its duties (147 Harmony patches, update notes) are handled by the mod itself.
-[*]JecsLite framework (AbilityUser, AbilityUserAI, CompDeflector, etc.) rebuilt for 1.7 and bundled — no separate JecsLite needed.
+[*]The JecsTools-family libraries (AbilityUser, AbilityUserAI, CompDeflector, etc.) are no longer bundled — the mod now depends on Zaljerem's [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3312959701]JecsLite - A RimWorld of Magic[/url] (rebuilt for 1.7).
 [*]Fixed 1.7 regressions: LineOfSight default flip (autocast, Blink/Summon through walls, missing cooldowns), greyed-out ability icons, broken reflected shots, attribute patches (117 classes / 153 methods).
 [*][b]Multiplayer support[/b] built in — needs the 1.7 MP fork: [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3820003322](1.7)Multiplayer-temp[/url]. Ability casts, cooldowns and gizmos are synced.
 [*][b]Isekai family integration[/b] (optional, coexists cleanly):
@@ -190,7 +195,7 @@ Unofficial continuation of TorannD's "A RimWorld of Magic" for RimWorld 1.7. All
 [*]Bundled translations: [url=https://steamcommunity.com/sharedfiles/filedetails/?id=2882739907]Russian, Ukrainian, Portuguese (based on Nevelian's translation)[/url].
 [/olist]
 
-[i]Load order: Harmony → this mod; the MP fork goes before it. Do NOT enable old JecsLite/JecsLite 1.6 alongside.[/i]
+[i]Load order: Harmony → this mod; the MP fork goes before it. Requires [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3312959701]JecsLite - A RimWorld of Magic[/url]; do NOT enable the original JecsTools alongside.[/i]
 
 [b]CAUTION! This port and its integrations were made with AI assistance — I'm not a C# developer and can't judge how well the AI handled it. If you don't use AI mods, please pass this one by.[/b] I fixed this mod for myself and decided to share it. If you have a problem, create a Discussion here — the code is on [url=https://github.com/kelnmaari/RWoM]GitHub[/url].
 
@@ -200,7 +205,7 @@ Unofficial continuation of TorannD's "A RimWorld of Magic" for RimWorld 1.7. All
 
 [olist]
 [*]Убрана зависимость от HugsLib — его задачи (147 Harmony-патчей, уведомления) мод делает сам.
-[*]Фреймворк JecsLite (AbilityUser, AbilityUserAI, CompDeflector и др.) пересобран под 1.7 и вшит — отдельный JecsLite не нужен.
+[*]Библиотеки семейства JecsTools (AbilityUser, AbilityUserAI, CompDeflector и др.) больше не вшиты — теперь нужна зависимость: [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3312959701]JecsLite - A RimWorld of Magic[/url] от Zaljerem (пересобран под 1.7).
 [*]Исправлены поломки 1.7: проверка прямой видимости (автокаст, Blink/Summon сквозь стены, пропавшие кулдауны), серые иконки при нехватке маны, отражённые выстрелы, атрибутные патчи (117/153).
 [*][b]Мультиплеер[/b] встроен — нужен форк 1.7: [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3820003322](1.7)Multiplayer-temp[/url]. Кастануть, кулдауны и гизмо синхронизируются.
 [*][b]Интеграция с ISEKAI[/b] (опционально): уровни классов дают XP пробуждения и ранг F…Nation в Гримуаре [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3657580708](Leveling)[/url]; 4 магических врата с существами RWoM для [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3813394602]Dungeons[/url] (C–S); сосуществование с [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3757560461]Creatures[/url], [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3718568958]Guild Faction[/url] и [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3800773705]RIM ISEKAI[/url] проверено.
@@ -209,7 +214,7 @@ Unofficial continuation of TorannD's "A RimWorld of Magic" for RimWorld 1.7. All
 [*]Вшиты переводы: [url=https://steamcommunity.com/sharedfiles/filedetails/?id=2882739907]русский, украинский, португальский (по переводу Nevelian)[/url].
 [/olist]
 
-[i]Порядок: Harmony → этот мод; форк MP перед ним. Старый JecsLite 1.6 вместе с модом не включать.[/i]
+[i]Порядок: Harmony → этот мод; форк MP перед ним. Нужен [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3312959701]JecsLite - A RimWorld of Magic[/url]; оригинальный JecsTools вместе с модом не включать.[/i]
 
 [b]ОСТОРОЖНО! Перенос и интеграции сделаны с помощью ИИ — я не C# разработчик и не знаю, насколько хорошо ИИ справился. Кто не пользуется ИИ-модами — проходите мимо.[/b] Мод исправлял для себя, решил поделиться. Проблема — создайте Обсуждение, код на [url=https://github.com/kelnmaari/RWoM]GitHub[/url].</description>
 </ModMetaData>
