@@ -949,7 +949,7 @@ namespace TorannMagic
             {                
                 if(__instance.ContentSource != null)
                 {
-                    if(__instance.ContentSource.PackageId == "kure.arom" || __instance.ContentSource.PackageId == "torann.arimworldofmagic")
+                    if(__instance.ContentSource.PackageId == "kure.arom" || __instance.ContentSource.PackageId == "torann.arimworldofmagic" || __instance.ContentSource.PackageId == "kelnmaari.arimworldofmagic")
                     {
                         __instance.Destroy();
                         return false;
