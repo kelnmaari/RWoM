@@ -56,12 +56,25 @@ namespace TorannMagic
             Text.Font = GameFont.Medium;
             Label(new Rect(0f, cur, inRect.width, 32f), "Grimoire", TextAnchor.MiddleLeft,
                 TorannMagic.Utils.TMIsekaiUI.HeaderGold);
-            Text.Font = GameFont.Tiny;
-            Label(new Rect(0f, cur + 30f, inRect.width, 14f),
-                pawn.LabelShortCap + " — " + ClassLabel(), TextAnchor.MiddleLeft, TextGray);
-            Label(new Rect(0f, cur + 44f, inRect.width, 14f),
-                "TM_GrimoireSub".Translate(), TextAnchor.MiddleLeft, TextGray);
-            cur += 62f;
+            Text.Font = GameFont.Small;
+            float nameW = Text.CalcSize(pawn.LabelShortCap).x + 8f;
+            Label(new Rect(0f, cur + 30f, nameW, 18f),
+                pawn.LabelShortCap, TextAnchor.MiddleLeft, Color.white);
+            Label(new Rect(nameW, cur + 30f, inRect.width - nameW, 18f),
+                "— " + ClassLabel(), TextAnchor.MiddleLeft, TorannMagic.Utils.TMIsekaiUI.LabelGold);
+            cur += 50f;
+
+            // class description pulled from the class trait
+            string classDesc = ClassDescription();
+            if (!classDesc.NullOrEmpty())
+            {
+                Text.Font = GameFont.Tiny;
+                float dh = Text.CalcHeight(classDesc, inRect.width);
+                Label(new Rect(0f, cur, inRect.width, dh), classDesc, TextAnchor.UpperLeft, TextGray);
+                cur += dh + 8f;
+            }
+
+            cur += 4f;
             EnsureFilters();
 
             Rect scrollRect = new Rect(0f, cur, inRect.width, inRect.height - cur);
@@ -76,6 +89,8 @@ namespace TorannMagic
             {
                 y = DrawIsekaiBlock(view, y);
             }
+
+            y = DrawResourcesBlock(view, y);
 
             y = DrawResourcesBlock(view, y);
 
@@ -905,6 +920,38 @@ namespace TorannMagic
                 }
             }
             return "unawakened";
+        }
+
+        private string ClassDescription()
+        {
+            // custom classes first (most specific), then vanilla class traits
+            if (magic?.customClass?.classTrait?.degreeDatas != null && magic.customClass.classTrait.degreeDatas.Count > 0)
+            {
+                return magic.customClass.classTrait.degreeDatas[0].description;
+            }
+            if (might?.customClass?.classTrait?.degreeDatas != null && might.customClass.classTrait.degreeDatas.Count > 0)
+            {
+                return might.customClass.classTrait.degreeDatas[0].description;
+            }
+            if (pawn.story?.traits == null)
+            {
+                return null;
+            }
+            foreach (TraitDef td in TM_Data.MagicTraits)
+            {
+                if (pawn.story.traits.HasTrait(td) && td.degreeDatas.Count > 0)
+                {
+                    return td.degreeDatas[0].description;
+                }
+            }
+            foreach (TraitDef td in TM_Data.MightTraits)
+            {
+                if (pawn.story.traits.HasTrait(td) && td.degreeDatas.Count > 0)
+                {
+                    return td.degreeDatas[0].description;
+                }
+            }
+            return null;
         }
 
         private static void Label(Rect rect, string text, TextAnchor anchor, Color color)
