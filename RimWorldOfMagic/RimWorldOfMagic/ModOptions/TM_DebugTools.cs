@@ -30,6 +30,95 @@ namespace TorannMagic.ModOptions
             }
         }
 
+        [DebugAction("RWoM", "T: Spawn Mage Duel (10 v 10)", actionType = DebugActionType.Action, allowedGameStates = AllowedGameStates.PlayingOnMap)]
+        public static void SpawnMageDuel()
+        {
+            Map map = Find.CurrentMap;
+            IntVec3 root = UI.MouseCell();
+            if (!root.IsValid || map == null)
+            {
+                root = map.Center;
+            }
+
+            // two distinct non-player factions that are mutual enemies
+            var nonPlayer = Find.FactionManager.AllFactions
+                .Where(f => !f.IsPlayer && !f.defeated && !f.temporary && !f.HostileTo(Faction.OfPlayer))
+                .ToList();
+            Faction sideA = null;
+            Faction sideB = null;
+            foreach (Faction a in nonPlayer)
+            {
+                foreach (Faction b in nonPlayer)
+                {
+                    if (a != b && a.HostileTo(b))
+                    {
+                        sideA = a;
+                        sideB = b;
+                        break;
+                    }
+                }
+                if (sideB != null)
+                {
+                    break;
+                }
+            }
+            if (sideA == null || sideB == null)
+            {
+                Messages.Message("[RWoM] No two mutually hostile factions found on this map/world.", MessageTypeDefOf.RejectInput);
+                return;
+            }
+
+            // mage kinds: the RWoM Seer family (they come with casting comp via backstory)
+            List<PawnKindDef> kinds = DefDatabase<PawnKindDef>.AllDefs
+                .Where(k => k.defName.StartsWith("Seer"))
+                .ToList();
+            if (kinds.Count == 0)
+            {
+                Messages.Message("[RWoM] No Seer mage pawnkinds found.", MessageTypeDefOf.RejectInput);
+                return;
+            }
+
+            IntVec3 posA = root + new IntVec3(-14, 0, -6);
+            IntVec3 posB = root + new IntVec3(14, 0, 6);
+            List<Pawn> listA = SpawnMageSide(map, posA, sideA, kinds);
+            List<Pawn> listB = SpawnMageSide(map, posB, sideB, kinds);
+            if (listA.Count == 0 || listB.Count == 0)
+            {
+                foreach (Pawn p in listA.Concat(listB))
+                {
+                    p.Destroy(DestroyMode.Vanish);
+                }
+                Messages.Message("[RWoM] Spawn failed (no valid cells).", MessageTypeDefOf.RejectInput);
+                return;
+            }
+
+            // both sides immediately assault each other
+            Verse.AI.Group.LordMaker.MakeNewLord(sideA, new LordJob_AssaultThings(sideA, listB.Cast<Verse.Thing>().ToList()), map);
+            Verse.AI.Group.LordMaker.MakeNewLord(sideB, new LordJob_AssaultThings(sideB, listA.Cast<Verse.Thing>().ToList()), map);
+
+            Messages.Message($"[RWoM] Mage duel: {sideA.Name} ({listA.Count}) vs {sideB.Name} ({listB.Count}).",
+                MessageTypeDefOf.ThreatBig);
+        }
+
+        private static List<Pawn> SpawnMageSide(Map map, IntVec3 root, Faction faction, List<PawnKindDef> kinds)
+        {
+            List<Pawn> list = new List<Pawn>();
+            for (int i = 0; i < 10; i++)
+            {
+                PawnKindDef kind = kinds[i % kinds.Count];
+                IntVec3 cell = CellFinder.RandomClosewalkCellNear(root, map, 5);
+                Pawn pawn = PawnGenerator.GeneratePawn(new PawnGenerationRequest(
+                    kind,
+                    faction,
+                    PawnGenerationContext.NonPlayer,
+                    map.Tile,
+                    forceGenerateNewPawn: true));
+                GenSpawn.Spawn(pawn, cell, map);
+                list.Add(pawn);
+            }
+            return list;
+        }
+
         [DebugAction("RWoM", "T: Give Class...", actionType = DebugActionType.ToolMapForPawns, allowedGameStates = AllowedGameStates.PlayingOnMap)]
         public static void GiveClass(Pawn pawn)
         {
@@ -111,6 +200,14 @@ namespace TorannMagic.ModOptions
                 CompAbilityUserMagic compMagic = pawn.GetCompAbilityUserMagic();
                 CompAbilityUserMight compMight = pawn.GetCompAbilityUserMight();
 
+                // some class traits have no degree-0 entry (e.g. TM_WindMage starts
+                // at degree 1) — normalize or GainTrait spams "found no data at degree".
+                // NOTE: DataAtDegree() has a built-in first-defined fallback and never
+                // returns null, so scan degreeDatas directly.
+                if (!classTrait.degreeDatas.Any(dd => dd.degree == traitDegree) && classTrait.degreeDatas.Count > 0)
+                {
+                    traitDegree = classTrait.degreeDatas[0].degree;
+                }
                 pawn.story.traits.GainTrait(new Trait(classTrait, traitDegree, false));
 
                 // Only re-init the side the new class belongs to: the other comp's
