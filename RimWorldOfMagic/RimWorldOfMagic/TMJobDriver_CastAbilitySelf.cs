@@ -1,4 +1,4 @@
-﻿using RimWorld;
+using RimWorld;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -138,7 +138,10 @@ namespace TorannMagic
             };
             combatToil.AddFinishAction(delegate
             {
-                if (this.duration <= 5 && !this.pawn.DestroyedOrNull() && !this.pawn.Dead && !this.pawn.Downed)
+                // verb can be null when the job arrived over Multiplayer with an
+                // unresolved verbToUse reference (or was interrupted before init) —
+                // cleanup must not throw on top of that.
+                if (verb != null && verb.Ability != null && this.duration <= 5 && !this.pawn.DestroyedOrNull() && !this.pawn.Dead && !this.pawn.Downed)
                 {
                     verb.Ability.PostAbilityAttempt();
                     this.pawn.ClearReservationsForJob(this.job);
