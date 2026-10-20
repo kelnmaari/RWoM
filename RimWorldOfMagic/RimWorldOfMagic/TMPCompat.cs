@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Linq;
 using AbilityUser;
 using HarmonyLib;
 using Multiplayer.API;
 using RimWorld;
 using Verse;
+using Verse.AI;
 
 namespace TorannMagic
 {
@@ -32,11 +34,89 @@ namespace TorannMagic
             PatchAbilityUserFramework();
             PatchGizmoToggles();
             PatchGolemCommands();
+            PatchJobVerbRegistration();
 
             if (Prefs.DevMode)
             {
                 Log.Message("[TMPCompat] Multiplayer compatibility initialized.");
             }
+        }
+
+        // MP sync of TryTakeOrderedJob serializes the Job via ExposeData; verbToUse is
+        // a Scribe_References cross-reference that only resolves against the session's
+        // SharedCrossRefs. Ability verbs are created at runtime, so register each one
+        // there as soon as it is taken (both peers run this prefix during their local
+        // UseAbility command, before the host's job-sync command arrives).
+        private static void TryTakeOrderedJob_VerbRegister_Prefix(Job job)
+        {
+            try
+            {
+                var v = job?.verbToUse;
+                if (v != null && !v.loadID.NullOrEmpty())
+                {
+                    SharedCrossRefsRegister(v);
+                }
+            }
+            catch (Exception)
+            {
+            }
+        }
+
+        private static void InitVerb_Register_Postfix(PawnAbility __instance)
+        {
+            try
+            {
+                SharedCrossRefsRegister(__instance.Verb);
+            }
+            catch (Exception)
+            {
+            }
+        }
+
+        internal static void SharedCrossRefsRegister(Verse.ILoadReferenceable obj)
+        {
+            if (obj == null || mpSharedCrossRefs == null)
+            {
+                return;
+            }
+            mpSharedCrossRefsRegister.Invoke(null, new object[] { obj });
+        }
+
+        private static MethodInfo mpSharedCrossRefsGetter;
+        private static MethodInfo mpSharedCrossRefsRegister;
+
+        private static void InitSharedCrossRefsHook()
+        {
+            try
+            {
+                var scribeUtil = AccessTools.TypeByName("Multiplayer.Client.ScribeUtil");
+                mpSharedCrossRefsGetter = AccessTools.PropertyGetter(scribeUtil, "sharedCrossRefs");
+                var sharedType = AccessTools.TypeByName("Multiplayer.Client.SharedCrossRefs")
+                    ?? mpSharedCrossRefsGetter?.ReturnType;
+                mpSharedCrossRefsRegister = AccessTools.Method(sharedType, "RegisterLoaded");
+                if (mpSharedCrossRefsGetter == null || mpSharedCrossRefsRegister == null)
+                {
+                    Log.Warning("[TMPCompat] Multiplayer SharedCrossRefs API not found; verb sync hook disabled.");
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Warning("[TMPCompat] SharedCrossRefs hook failed: " + ex.Message);
+            }
+        }
+
+        private static void PatchJobVerbRegistration()
+        {
+            InitSharedCrossRefsHook();
+            if (mpSharedCrossRefsRegister == null)
+            {
+                return;
+            }
+            var harmony = new Harmony("rimworld.torann.tmagic");
+            harmony.Patch(AccessTools.Method(typeof(Pawn_JobTracker), nameof(Pawn_JobTracker.TryTakeOrderedJob)),
+                postfix: new HarmonyMethod(typeof(TMPCompat), nameof(TryTakeOrderedJob_VerbRegister_Prefix)));
+            harmony.Patch(AccessTools.Method(AccessTools.TypeByName("AbilityUser.PawnAbility"), "InitVerb"),
+                postfix: new HarmonyMethod(typeof(TMPCompat), nameof(InitVerb_Register_Postfix)));
         }
 
         public static bool MultiplayerActive()
