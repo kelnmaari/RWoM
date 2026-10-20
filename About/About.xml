@@ -181,6 +181,10 @@ An unofficial continuation of TorannD's "A RimWorld of Magic" for RimWorld 1.7 (
 
 [i]Load order: Harmony → this mod; load the 1.7 Multiplayer fork [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3820003322]here[/url] before it if you want MP. Do NOT enable the old JecsLite/JecsLite 1.6 alongside.[/i]
 
+[b]CAUTION! This port and its integrations were made with AI assistance — I'm not a C# developer and can't judge how well the AI handled it. If you don't use AI mods, please pass this one by.[/b] I fixed this mod for myself and decided to share it.
+
+If you have a problem, please create a Discussion on this item — I'll look into it when I have time. The code is available on [url=https://github.com/kelnmaari/RWoM]GitHub[/url].
+
 [b][РУССКИЙ][/b]
 Неофициальное продолжение мода TorannD "A RimWorld of Magic" для RimWorld 1.7 (движок Waylith). Вся заслуга оригинала — [url=https://steamcommunity.com/sharedfiles/filedetails/?id=1201382956]TorannD[/url]; это перенос [url=https://github.com/TorannD/RWoM]исходного кода[/url], продолженный как [url=https://github.com/kelnmaari/RWoM]форк[/url].
 
