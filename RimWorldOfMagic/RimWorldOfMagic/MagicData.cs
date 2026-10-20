@@ -197,6 +197,18 @@ namespace TorannMagic
         public List<MagicPowerSkill> magicPowerSkill_Teleport;
         public List<MagicPowerSkill> magicPowerSkill_FoldReality;
 
+        // Skill trees that the original mod never defined even though hediff comps,
+        // projectiles and patches query them via GetSkill_* — the lookups returned
+        // null and the callers NRE'd (Empath and Suppressive Aura hediffs were
+        // force-removed by the game on every tick).
+        public List<MagicPowerSkill> magicPowerSkill_Empathy;
+        public List<MagicPowerSkill> magicPowerSkill_SuppressiveAura;
+        public List<MagicPowerSkill> magicPowerSkill_DistortSpirit;
+        public List<MagicPowerSkill> magicPowerSkill_SpiritDrain;
+        public List<MagicPowerSkill> magicPowerSkill_SpiritPossession;
+        public List<MagicPowerSkill> magicPowerSkill_SpiritStorm;
+        public List<MagicPowerSkill> magicPowerSkill_HarvestPassion;
+
         public List<MagicPowerSkill> magicPowerSkill_P_RayofHope;
         public List<MagicPowerSkill> magicPowerSkill_Heal;
         public List<MagicPowerSkill> magicPowerSkill_Shield;
@@ -1067,6 +1079,132 @@ namespace TorannMagic
                     };
                 }
                 return this.magicPowerSkill_Blink;
+            }
+        }
+
+        public List<MagicPowerSkill> MagicPowerSkill_Empathy
+        {
+            get
+            {
+                bool flag = this.magicPowerSkill_Empathy == null;
+                if (flag)
+                {
+                    this.magicPowerSkill_Empathy = new List<MagicPowerSkill>
+                    {
+                        new MagicPowerSkill("TM_Empathy_pwr", "TM_Empathy_pwr_desc"),
+                        new MagicPowerSkill("TM_Empathy_ver", "TM_Empathy_ver_desc"),
+                        new MagicPowerSkill("TM_Empathy_eff", "TM_Empathy_eff_desc")
+                    };
+                }
+                return this.magicPowerSkill_Empathy;
+            }
+        }
+
+        public List<MagicPowerSkill> MagicPowerSkill_SuppressiveAura
+        {
+            get
+            {
+                bool flag = this.magicPowerSkill_SuppressiveAura == null;
+                if (flag)
+                {
+                    this.magicPowerSkill_SuppressiveAura = new List<MagicPowerSkill>
+                    {
+                        new MagicPowerSkill("TM_SuppressiveAura_pwr", "TM_SuppressiveAura_pwr_desc"),
+                        new MagicPowerSkill("TM_SuppressiveAura_ver", "TM_SuppressiveAura_ver_desc"),
+                        new MagicPowerSkill("TM_SuppressiveAura_eff", "TM_SuppressiveAura_eff_desc")
+                    };
+                }
+                return this.magicPowerSkill_SuppressiveAura;
+            }
+        }
+
+        public List<MagicPowerSkill> MagicPowerSkill_DistortSpirit
+        {
+            get
+            {
+                bool flag = this.magicPowerSkill_DistortSpirit == null;
+                if (flag)
+                {
+                    this.magicPowerSkill_DistortSpirit = new List<MagicPowerSkill>
+                    {
+                        new MagicPowerSkill("TM_DistortSpirit_pwr", "TM_DistortSpirit_pwr_desc"),
+                        new MagicPowerSkill("TM_DistortSpirit_ver", "TM_DistortSpirit_ver_desc"),
+                        new MagicPowerSkill("TM_DistortSpirit_eff", "TM_DistortSpirit_eff_desc")
+                    };
+                }
+                return this.magicPowerSkill_DistortSpirit;
+            }
+        }
+
+        public List<MagicPowerSkill> MagicPowerSkill_SpiritDrain
+        {
+            get
+            {
+                bool flag = this.magicPowerSkill_SpiritDrain == null;
+                if (flag)
+                {
+                    this.magicPowerSkill_SpiritDrain = new List<MagicPowerSkill>
+                    {
+                        new MagicPowerSkill("TM_SpiritDrain_pwr", "TM_SpiritDrain_pwr_desc"),
+                        new MagicPowerSkill("TM_SpiritDrain_ver", "TM_SpiritDrain_ver_desc"),
+                        new MagicPowerSkill("TM_SpiritDrain_eff", "TM_SpiritDrain_eff_desc")
+                    };
+                }
+                return this.magicPowerSkill_SpiritDrain;
+            }
+        }
+
+        public List<MagicPowerSkill> MagicPowerSkill_SpiritPossession
+        {
+            get
+            {
+                bool flag = this.magicPowerSkill_SpiritPossession == null;
+                if (flag)
+                {
+                    this.magicPowerSkill_SpiritPossession = new List<MagicPowerSkill>
+                    {
+                        new MagicPowerSkill("TM_SpiritPossession_pwr", "TM_SpiritPossession_pwr_desc"),
+                        new MagicPowerSkill("TM_SpiritPossession_ver", "TM_SpiritPossession_ver_desc"),
+                        new MagicPowerSkill("TM_SpiritPossession_eff", "TM_SpiritPossession_eff_desc")
+                    };
+                }
+                return this.magicPowerSkill_SpiritPossession;
+            }
+        }
+
+        public List<MagicPowerSkill> MagicPowerSkill_SpiritStorm
+        {
+            get
+            {
+                bool flag = this.magicPowerSkill_SpiritStorm == null;
+                if (flag)
+                {
+                    this.magicPowerSkill_SpiritStorm = new List<MagicPowerSkill>
+                    {
+                        new MagicPowerSkill("TM_SpiritStorm_pwr", "TM_SpiritStorm_pwr_desc"),
+                        new MagicPowerSkill("TM_SpiritStorm_ver", "TM_SpiritStorm_ver_desc"),
+                        new MagicPowerSkill("TM_SpiritStorm_eff", "TM_SpiritStorm_eff_desc")
+                    };
+                }
+                return this.magicPowerSkill_SpiritStorm;
+            }
+        }
+
+        public List<MagicPowerSkill> MagicPowerSkill_HarvestPassion
+        {
+            get
+            {
+                bool flag = this.magicPowerSkill_HarvestPassion == null;
+                if (flag)
+                {
+                    this.magicPowerSkill_HarvestPassion = new List<MagicPowerSkill>
+                    {
+                        new MagicPowerSkill("TM_HarvestPassion_pwr", "TM_HarvestPassion_pwr_desc"),
+                        new MagicPowerSkill("TM_HarvestPassion_ver", "TM_HarvestPassion_ver_desc"),
+                        new MagicPowerSkill("TM_HarvestPassion_eff", "TM_HarvestPassion_eff_desc")
+                    };
+                }
+                return this.magicPowerSkill_HarvestPassion;
             }
         }
         public List<MagicPowerSkill> MagicPowerSkill_Summon
@@ -3911,6 +4049,13 @@ namespace TorannMagic
                     allMagicPowerSkillsList.AddRange(this.MagicPowerSkill_BattleHymn);
                     allMagicPowerSkillsList.AddRange(this.MagicPowerSkill_BestowMight);
                     allMagicPowerSkillsList.AddRange(this.MagicPowerSkill_Blink);
+                    allMagicPowerSkillsList.AddRange(this.MagicPowerSkill_Empathy);
+                    allMagicPowerSkillsList.AddRange(this.MagicPowerSkill_SuppressiveAura);
+                    allMagicPowerSkillsList.AddRange(this.MagicPowerSkill_DistortSpirit);
+                    allMagicPowerSkillsList.AddRange(this.MagicPowerSkill_SpiritDrain);
+                    allMagicPowerSkillsList.AddRange(this.MagicPowerSkill_SpiritPossession);
+                    allMagicPowerSkillsList.AddRange(this.MagicPowerSkill_SpiritStorm);
+                    allMagicPowerSkillsList.AddRange(this.MagicPowerSkill_HarvestPassion);
                     allMagicPowerSkillsList.AddRange(this.MagicPowerSkill_Blizzard);
                     allMagicPowerSkillsList.AddRange(this.MagicPowerSkill_BloodForBlood);
                     allMagicPowerSkillsList.AddRange(this.MagicPowerSkill_BloodGift);
