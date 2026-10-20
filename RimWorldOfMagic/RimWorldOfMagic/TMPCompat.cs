@@ -75,11 +75,17 @@ namespace TorannMagic
 
         internal static void SharedCrossRefsRegister(Verse.ILoadReferenceable obj)
         {
-            if (obj == null || mpSharedCrossRefs == null)
+            if (obj == null || mpSharedCrossRefsRegister == null)
             {
                 return;
             }
-            mpSharedCrossRefsRegister.Invoke(null, new object[] { obj });
+            try
+            {
+                mpSharedCrossRefsRegister.Invoke(null, new object[] { obj });
+            }
+            catch (Exception)
+            {
+            }
         }
 
         private static MethodInfo mpSharedCrossRefsGetter;
