@@ -158,7 +158,15 @@
 		<li>zal.jecsliterwom</li>
 		<li>zetrith.multiplayer</li>
 		<li>rwmt.multiplayer</li>
+		<li>JellyCreative.IsekaiLeveling</li>
+		<li>Poupun.IsekaiCreaturesAddon</li>
+		<li>Poupun.IsekaiDungeonsAddon</li>
+		<li>Poupun.GuildFactionAddon</li>
+		<li>jk.rmt.soulchronicle</li>
 	</loadAfter>
+	<loadBefore>
+		<li>rwmt.MultiplayerCompatibility</li>
+	</loadBefore>
 	<description>[h1]Unofficial RimWorld 1.7 update of "A RimWorld of Magic"[/h1]
 
 [b][ENGLISH][/b]
