@@ -3344,9 +3344,11 @@ namespace TorannMagic
                     {
                         magicPower = comp.MagicData.MagicPowersCustom.FirstOrDefault<MagicPower>((MagicPower x) => x.abilityDef == tmAbilityDef);
                     }
-                    if (comp.MagicData.MagicPowersCustomAll != null)
+                    if (comp.MagicData.AllMagicPowersWithSkills != null)
                     {
-                        foreach (MagicPower mp in comp.MagicData.MagicPowersCustomAll)
+                        // every learned power now carries autocast defaults — the
+                        // generic toggle covers all of them, custom powers included
+                        foreach (MagicPower mp in comp.MagicData.AllMagicPowersWithSkills)
                         {
                             if (mp.autocasting != null && mp.autocasting.type != TMDefs.AutocastType.Null && (mp.autocasting.drafted || mp.autocasting.undrafted))
                             {
@@ -3357,7 +3359,7 @@ namespace TorannMagic
                                     {
                                         magicPower.AutoCast = !magicPower.AutoCast;
                                         return new GizmoResult(GizmoState.Mouseover, null);
-                                        
+
                                     }
                                 }
                             }
@@ -3367,9 +3369,11 @@ namespace TorannMagic
                 if (mightComp != null && mightComp.MightData != null && com.pawnAbility.Def != null)
                 {
                     //might abilities
-                    if (mightComp.MightData.MightPowersCustomAll != null)
+                    if (mightComp.MightData.AllMightPowersWithSkills != null)
                     {
-                        foreach (MightPower mp in mightComp.MightData.MightPowersCustomAll)
+                        // every learned power now carries autocast defaults — the
+                        // generic toggle covers all of them, custom powers included
+                        foreach (MightPower mp in mightComp.MightData.AllMightPowersWithSkills)
                         {
                             if (mp.autocasting != null && mp.autocasting.type != TMDefs.AutocastType.Null && (mp.autocasting.drafted || mp.autocasting.undrafted))
                             {
