@@ -2174,4 +2174,5 @@ DR: [5, 9, 13, 17, 20]%</TM_Golemancy_pwr_desc>
   <TM_GrimoireIsekaiHint>Рівні класів дають XP пробудження; пробудження розширює пул мани.</TM_GrimoireIsekaiHint>
   <TM_GrimoireResources>Ресурси</TM_GrimoireResources>
   <TM_LevelUp>Покращити</TM_LevelUp>
+  <TM_GrimoireSub>Рівні класів, мана та здібності в одному місці.</TM_GrimoireSub>
 </LanguageData>
