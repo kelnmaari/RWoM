@@ -2329,4 +2329,12 @@ Level 3: all 4 effects</TM_CombatDrugs_pwr_desc>
 <TM_UndeadVerbatum>Undead</TM_UndeadVerbatum>
 
 
+  <TM_Grimoire>Grimoire</TM_Grimoire>
+  <TM_GrimoireDesc>Open this character's grimoire: class levels, mana, abilities and awakening progress.</TM_GrimoireDesc>
+  <TM_GrimoireSub>Class levels, mana and abilities at a glance.</TM_GrimoireSub>
+  <TM_GrimoireIsekaiHint>Class levels feed awakening XP; awakening widens the mana pool.</TM_GrimoireIsekaiHint>
+  <TM_Stats>Attributes</TM_Stats>
+  <TM_StatsMight>Combat attributes</TM_StatsMight>
+  <TM_GrimoireIsekaiHint>Class levels feed awakening XP; awakening widens the mana pool.</TM_GrimoireIsekaiHint>
+  <TM_GrimoireResources>Resources</TM_GrimoireResources>
 </LanguageData>

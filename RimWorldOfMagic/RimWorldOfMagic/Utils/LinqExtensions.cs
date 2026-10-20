@@ -8,21 +8,8 @@ namespace TorannMagic.Utils
 {
     public static class LinqExtensions
     {
-        public static IEnumerable<TSource> DistinctBy<TSource, TKey>(
-            this IEnumerable<TSource> source,
-            Func<TSource, TKey> keySelector
-        )
-        // Efficiently get the first elements that are distinct by a property or group (Like injury.Part)
-        {
-            HashSet<TKey> seenKeys = new HashSet<TKey>();
-            foreach (TSource element in source)
-            {
-                if (seenKeys.Contains(keySelector(element))) continue;
-
-                seenKeys.Add(keySelector(element));
-                yield return element;
-            }
-        }
+        // The single-argument DistinctBy overload was removed: .NET 10 provides
+        // an equivalent built-in Enumerable.DistinctBy which it used to conflict with.
 
         public static IEnumerable<TSource> DistinctBy<TSource, TKey>(
             this IEnumerable<TSource> source,

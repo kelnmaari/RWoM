@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -112,6 +112,26 @@ namespace TorannMagic
         public bool usePsionicMindAttackToggle = true;
         public bool useCleaveToggle = true;
         public bool useCQCToggle = true;
+
+        public void TogglePsionicAugmentation()
+        {
+            usePsionicAugmentationToggle = !usePsionicAugmentationToggle;
+        }
+
+        public void TogglePsionicMindAttack()
+        {
+            usePsionicMindAttackToggle = !usePsionicMindAttackToggle;
+        }
+
+        public void ToggleCleave()
+        {
+            useCleaveToggle = !useCleaveToggle;
+        }
+
+        public void ToggleCQC()
+        {
+            useCQCToggle = !useCQCToggle;
+        }
         public List<Thing> combatItems = new List<Thing>();
         public int allowMeditateTick = 0;
         public ThingOwner<ThingWithComps> equipmentContainer = new ThingOwner<ThingWithComps>();
@@ -662,6 +682,7 @@ namespace TorannMagic
                     }
                 }
                 MightData.MightUserLevel = value;
+                TMPIsekai.OnClassLevelUp(this.Pawn, value, magic: false);
             }
         }
 
@@ -5276,10 +5297,7 @@ namespace TorannMagic
                         Order = -90,
                         icon = ContentFinder<Texture2D>.Get("UI/" + toggle, true),
                         isActive = (() => this.useCleaveToggle),
-                        toggleAction = delegate
-                        {
-                            this.useCleaveToggle = !this.useCleaveToggle;
-                        }
+                        toggleAction = ToggleCleave
                     };
                     gizmoCommands.Add(key, itemCleave);
                 }
@@ -5300,10 +5318,7 @@ namespace TorannMagic
                         Order = -90,
                         icon = ContentFinder<Texture2D>.Get("UI/" + toggle, true),
                         isActive = (() => this.useCQCToggle),
-                        toggleAction = delegate
-                        {
-                            this.useCQCToggle = !this.useCQCToggle;
-                        }
+                        toggleAction = ToggleCQC
                     };
                     gizmoCommands.Add(key, itemCQC);
                 }
@@ -5324,10 +5339,7 @@ namespace TorannMagic
                         Order = -90,
                         icon = ContentFinder<Texture2D>.Get("UI/" + toggle, true),
                         isActive = (() => this.usePsionicAugmentationToggle),
-                        toggleAction = delegate
-                        {
-                            this.usePsionicAugmentationToggle = !this.usePsionicAugmentationToggle;
-                        }
+                        toggleAction = TogglePsionicAugmentation
                     };
                     gizmoCommands.Add(key, item);
                 }
@@ -5349,10 +5361,7 @@ namespace TorannMagic
                         Order = -89,
                         icon = ContentFinder<Texture2D>.Get("UI/" + toggle2, true),
                         isActive = (() => this.usePsionicMindAttackToggle),
-                        toggleAction = delegate
-                        {
-                            this.usePsionicMindAttackToggle = !this.usePsionicMindAttackToggle;
-                        }
+                        toggleAction = TogglePsionicMindAttack
                     };
                     gizmoCommands.Add(key, item2);
                 }

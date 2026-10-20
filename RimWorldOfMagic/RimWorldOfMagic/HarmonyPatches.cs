@@ -1,4 +1,4 @@
-﻿using HarmonyLib;
+using HarmonyLib;
 using RimWorld;
 using AbilityUser;
 using RimWorld.Planet;
@@ -36,98 +36,110 @@ namespace TorannMagic
 
         public TorannMagicMod(ModContentPack content) : base(content)
         {
+            if (TMPCompat.MultiplayerActive())
+            {
+                // Only touch Multiplayer.API types when the mod is actually present.
+                TMPCompat.Setup();
+            }
+
             var harmonyInstance = new Harmony("rimworld.torann.tmagic");
 
-            harmonyInstance.Patch(AccessTools.Method(typeof(Pawn_GuestTracker), "SetGuestStatus", new Type[]
+            // RimWorld 1.7 port note: on 1.6 the [HarmonyPatch] attribute classes below were
+            // applied automatically by HugsLib's assembly scan; HugsLib is not available for 1.7,
+            // so they are applied here explicitly, one class at a time so a single broken
+            // target cannot take out the rest.
+            ApplyAttributePatches(harmonyInstance);
+
+            SafePatch(harmonyInstance, AccessTools.Method(typeof(Pawn_GuestTracker), "SetGuestStatus", new Type[]
                 {
                     typeof(Faction),
                     typeof(GuestStatus)
                 }, null), new HarmonyMethod(typeof(TorannMagicMod), "SetGuestStatusForUndead_Prefix", null), null);
-            harmonyInstance.Patch(AccessTools.Method(typeof(IncidentWorker_SelfTame), "Candidates"), null,
+            SafePatch(harmonyInstance, AccessTools.Method(typeof(IncidentWorker_SelfTame), "Candidates"), null,
                  new HarmonyMethod(patchType, nameof(SelfTame_Candidates_Patch)), null);
-            harmonyInstance.Patch(AccessTools.Method(typeof(IncidentWorker_DiseaseHuman), "PotentialVictimCandidates"), null,
+            SafePatch(harmonyInstance, AccessTools.Method(typeof(IncidentWorker_DiseaseHuman), "PotentialVictimCandidates"), null,
                  new HarmonyMethod(patchType, nameof(DiseaseHuman_Candidates_Patch)), null);
-            harmonyInstance.Patch(AccessTools.Method(typeof(IncidentWorker_DiseaseAnimal), "PotentialVictimCandidates"), null,  //calls the same patch as human, which includes hediff for undead animals
+            SafePatch(harmonyInstance, AccessTools.Method(typeof(IncidentWorker_DiseaseAnimal), "PotentialVictimCandidates"), null,  //calls the same patch as human, which includes hediff for undead animals
                  new HarmonyMethod(patchType, nameof(DiseaseHuman_Candidates_Patch)), null);
-            harmonyInstance.Patch(AccessTools.Method(typeof(Pawn), "GetGizmos"), null,
+            SafePatch(harmonyInstance, AccessTools.Method(typeof(Pawn), "GetGizmos"), null,
                  new HarmonyMethod(patchType, nameof(Pawn_Gizmo_TogglePatch)), null);
-            harmonyInstance.Patch(AccessTools.Method(typeof(CompPowerPlant), "CompTick"), null,
+            SafePatch(harmonyInstance, AccessTools.Method(typeof(CompPowerPlant), "CompTick"), null,
                  new HarmonyMethod(patchType, nameof(PowerCompTick_Overdrive_Postfix)), null);
-            harmonyInstance.Patch(AccessTools.Method(typeof(Building_TurretGun), "Tick"), null,
+            SafePatch(harmonyInstance, AccessTools.Method(typeof(Building_TurretGun), "Tick"), null,
                  new HarmonyMethod(patchType, nameof(TurretGunTick_Overdrive_Postfix)), null);
-            harmonyInstance.Patch(AccessTools.Method(typeof(CompRefuelable), "PostDraw"), new HarmonyMethod(patchType, nameof(CompRefuelable_DrawBar_Prefix)),
+            SafePatch(harmonyInstance, AccessTools.Method(typeof(CompRefuelable), "PostDraw"), new HarmonyMethod(patchType, nameof(CompRefuelable_DrawBar_Prefix)),
                  null, null);
-            harmonyInstance.Patch(AccessTools.Method(typeof(AutoUndrafter), "ShouldAutoUndraft"), new HarmonyMethod(patchType, nameof(AutoUndrafter_Undead_Prefix)),
+            SafePatch(harmonyInstance, AccessTools.Method(typeof(AutoUndrafter), "ShouldAutoUndraft"), new HarmonyMethod(patchType, nameof(AutoUndrafter_Undead_Prefix)),
                  null, null);
-            //harmonyInstance.Patch(AccessTools.Method(typeof(PawnUtility), "IsTravelingInTransportPodWorldObject"), null,
+            //SafePatch(harmonyInstance, AccessTools.Method(typeof(PawnUtility), "IsTravelingInTransportPodWorldObject"), null,
             //     new HarmonyMethod(patchType, nameof(IsTravelingInTeleportPod_Postfix)));
 
-            //harmonyInstance.Patch(AccessTools.Method(typeof(FloatMenuMakerMap), "AddHumanlikeOrders"), null,
+            //SafePatch(harmonyInstance, AccessTools.Method(typeof(FloatMenuMakerMap), "AddHumanlikeOrders"), null,
             //     new HarmonyMethod(patchType, nameof(AddHumanLikeOrders_RestrictEquipmentPatch)), null);
-            harmonyInstance.Patch(AccessTools.Method(typeof(FloatMenuOptionProvider), "SelectedPawnValid"), null,
+            SafePatch(harmonyInstance, AccessTools.Method(typeof(FloatMenuOptionProvider), "SelectedPawnValid"), null,
                  new HarmonyMethod(patchType, nameof(SelectedPawnValid_RestrictSpiritPatch)), null);
-            harmonyInstance.Patch(AccessTools.Method(typeof(FloatMenuOptionProvider_Equip), "GetSingleOptionFor", new Type[]
+            SafePatch(harmonyInstance, AccessTools.Method(typeof(FloatMenuOptionProvider_Equip), "GetSingleOptionFor", new Type[]
                 {
                     typeof(Thing),
                     typeof(FloatMenuContext)
                 }, null), new HarmonyMethod(patchType, nameof(FloatMenuOptionProvider_Equip_RestrictEquipmentPatch)), null);
 
-            harmonyInstance.Patch(AccessTools.Method(typeof(CompAbilityItem), "PostDrawExtraSelectionOverlays"), new HarmonyMethod(patchType, nameof(CompAbilityItem_Overlay_Prefix)),
+            SafePatch(harmonyInstance, AccessTools.Method(typeof(CompAbilityItem), "PostDrawExtraSelectionOverlays"), new HarmonyMethod(patchType, nameof(CompAbilityItem_Overlay_Prefix)),
                  null, null);
-            harmonyInstance.Patch(AccessTools.Method(typeof(Verb), "CanHitCellFromCellIgnoringRange"), new HarmonyMethod(patchType, nameof(RimmuNation_CHCFCIR_Patch)),
+            SafePatch(harmonyInstance, AccessTools.Method(typeof(Verb), "CanHitCellFromCellIgnoringRange"), new HarmonyMethod(patchType, nameof(RimmuNation_CHCFCIR_Patch)),
                  null, null);
-            harmonyInstance.Patch(AccessTools.Method(typeof(WealthWatcher), "ForceRecount"), null,
+            SafePatch(harmonyInstance, AccessTools.Method(typeof(WealthWatcher), "ForceRecount"), null,
                  new HarmonyMethod(patchType, nameof(WealthWatcher_ClassAdjustment_Postfix)), null);
-            harmonyInstance.Patch(AccessTools.Method(typeof(Pawn_EquipmentTracker), "TryDropEquipment"), null,
+            SafePatch(harmonyInstance, AccessTools.Method(typeof(Pawn_EquipmentTracker), "TryDropEquipment"), null,
                  new HarmonyMethod(patchType, nameof(PawnEquipment_Drop_Postfix)), null);
-            harmonyInstance.Patch(AccessTools.Method(typeof(Pawn_EquipmentTracker), "AddEquipment"), null,
+            SafePatch(harmonyInstance, AccessTools.Method(typeof(Pawn_EquipmentTracker), "AddEquipment"), null,
                  new HarmonyMethod(patchType, nameof(PawnEquipment_Add_Postfix)), null);
 
-            //harmonyInstance.Patch(AccessTools.Method(typeof(Pawn), "get_IsColonist", null, null), null, new HarmonyMethod(typeof(TorannMagicMod), "Get_IsColonist_Polymorphed"), null);
-            harmonyInstance.Patch(AccessTools.Method(typeof(Caravan), "get_NightResting", null, null), new HarmonyMethod(typeof(TorannMagicMod), "Get_NightResting_Undead", null), null);
-            harmonyInstance.Patch(AccessTools.Method(typeof(StaggerHandler), "get_Staggered", null, null), null, new HarmonyMethod(typeof(TorannMagicMod), "Get_Staggered", null));
-            harmonyInstance.Patch(AccessTools.Method(typeof(Verb_LaunchProjectile), "get_Projectile", null, null), new HarmonyMethod(typeof(TorannMagicMod), "Get_Projectile_ES", null), null);
-            harmonyInstance.Patch(AccessTools.Method(typeof(WindManager), "get_WindSpeed", null, null), new HarmonyMethod(typeof(TorannMagicMod), "Get_WindSpeed", null), null);
-            //harmonyInstance.Patch(AccessTools.Method(typeof(VerbProperties), "get_CausesExplosion", null, null), null, new HarmonyMethod(typeof(TorannMagicMod), "Get_CausesExplosion", null), null);
-            harmonyInstance.Patch(AccessTools.Method(typeof(Pawn), "get_IsFreeNonSlaveColonist", null, null), null, new HarmonyMethod(typeof(TorannMagicMod), "Get_IsFreeNonSlaveColonist_Golem", null));
-            harmonyInstance.Patch(AccessTools.Method(typeof(MainTabWindow_Animals), "get_Pawns", null, null), null, new HarmonyMethod(typeof(TorannMagicMod), "Get_GolemsAsAnimals", null), null);
-            harmonyInstance.Patch(AccessTools.Method(typeof(RecipeDef), "get_AvailableNow", null, null), null, new HarmonyMethod(typeof(TorannMagicMod), "Get_GolemsRecipeAvailable", null), null);
-            harmonyInstance.Patch(AccessTools.Method(typeof(Pawn), "get_ShouldAvoidFences", null, null), new HarmonyMethod(typeof(TorannMagicMod), "Get_GolemShouldAvoidFences"), null, null);
-            harmonyInstance.Patch(AccessTools.Method(typeof(PawnRenderer), "get_CurRotDrawMode", null, null), null, new HarmonyMethod(typeof(TorannMagicMod), "Get_RotBodyForUndead"), null, null);
-            harmonyInstance.Patch(AccessTools.Method(typeof(Pawn), "get_IsColonySubhumanPlayerControlled", null, null), new HarmonyMethod(typeof(TorannMagicMod), "Get_GolemControl"), null, null);
-            //harmonyInstance.Patch(AccessTools.Method(typeof(Pawn), "get_IsPlayerControlled", null, null), new HarmonyMethod(typeof(TorannMagicMod), "Get_GolemControlTwo"), null, null);
-            //harmonyInstance.Patch(AccessTools.Method(typeof(Pawn_HealthTracker), "get_CanBleed", null, null), null, new HarmonyMethod(typeof(TorannMagicMod), "Get_Undead_CanBleed"), null, null);
-            //harmonyInstance.Patch(AccessTools.Method(typeof(Precept_Relic), "get_RelicInPlayerPossession", null, null),null, new HarmonyMethod(typeof(TorannMagicMod), "Get_DelayRelicLost"), null);
-            //harmonyInstance.Patch(AccessTools.Method(typeof(Pawn), "get_InAggroMentalState", null, null), new HarmonyMethod(typeof(TorannMagicMod), "Get_UndeadAggroMentalState"), null, null);
-            //harmonyInstance.Patch(AccessTools.Method(typeof(Pawn), "get_InMentalState", null, null), new HarmonyMethod(typeof(TorannMagicMod), "Get_UndeadMentalState"), null, null);
-            //harmonyInstance.Patch(AccessTools.Method(typeof(Pawn_GuiltTracker), "get_IsGuilty", null, null), new HarmonyMethod(typeof(TorannMagicMod), "Get_UndeadIsGuilty"), null, null);
-            //harmonyInstance.Patch(AccessTools.Method(typeof(RestUtility), "get_IsCharging", null, null), new HarmonyMethod(typeof(TorannMagicMod), "Get_UndeadIsCharging"), null, null);
+            //SafePatch(harmonyInstance, AccessTools.Method(typeof(Pawn), "get_IsColonist", null, null), null, new HarmonyMethod(typeof(TorannMagicMod), "Get_IsColonist_Polymorphed"), null);
+            SafePatch(harmonyInstance, AccessTools.Method(typeof(Caravan), "get_NightResting", null, null), new HarmonyMethod(typeof(TorannMagicMod), "Get_NightResting_Undead", null), null);
+            SafePatch(harmonyInstance, AccessTools.Method(typeof(StaggerHandler), "get_Staggered", null, null), null, new HarmonyMethod(typeof(TorannMagicMod), "Get_Staggered", null));
+            SafePatch(harmonyInstance, AccessTools.Method(typeof(Verb_LaunchProjectile), "get_Projectile", null, null), new HarmonyMethod(typeof(TorannMagicMod), "Get_Projectile_ES", null), null);
+            SafePatch(harmonyInstance, AccessTools.Method(typeof(WindManager), "get_WindSpeed", null, null), new HarmonyMethod(typeof(TorannMagicMod), "Get_WindSpeed", null), null);
+            //SafePatch(harmonyInstance, AccessTools.Method(typeof(VerbProperties), "get_CausesExplosion", null, null), null, new HarmonyMethod(typeof(TorannMagicMod), "Get_CausesExplosion", null), null);
+            SafePatch(harmonyInstance, AccessTools.Method(typeof(Pawn), "get_IsFreeNonSlaveColonist", null, null), null, new HarmonyMethod(typeof(TorannMagicMod), "Get_IsFreeNonSlaveColonist_Golem", null));
+            SafePatch(harmonyInstance, AccessTools.Method(typeof(MainTabWindow_Animals), "get_Pawns", null, null), null, new HarmonyMethod(typeof(TorannMagicMod), "Get_GolemsAsAnimals", null), null);
+            SafePatch(harmonyInstance, AccessTools.Method(typeof(RecipeDef), "get_AvailableNow", null, null), null, new HarmonyMethod(typeof(TorannMagicMod), "Get_GolemsRecipeAvailable", null), null);
+            SafePatch(harmonyInstance, AccessTools.Method(typeof(Pawn), "get_ShouldAvoidFences", null, null), new HarmonyMethod(typeof(TorannMagicMod), "Get_GolemShouldAvoidFences"), null, null);
+            SafePatch(harmonyInstance, AccessTools.Method(typeof(PawnRenderer), "get_CurRotDrawMode", null, null), null, new HarmonyMethod(typeof(TorannMagicMod), "Get_RotBodyForUndead"), null, null);
+            SafePatch(harmonyInstance, AccessTools.Method(typeof(Pawn), "get_IsColonySubhumanPlayerControlled", null, null), new HarmonyMethod(typeof(TorannMagicMod), "Get_GolemControl"), null, null);
+            //SafePatch(harmonyInstance, AccessTools.Method(typeof(Pawn), "get_IsPlayerControlled", null, null), new HarmonyMethod(typeof(TorannMagicMod), "Get_GolemControlTwo"), null, null);
+            //SafePatch(harmonyInstance, AccessTools.Method(typeof(Pawn_HealthTracker), "get_CanBleed", null, null), null, new HarmonyMethod(typeof(TorannMagicMod), "Get_Undead_CanBleed"), null, null);
+            //SafePatch(harmonyInstance, AccessTools.Method(typeof(Precept_Relic), "get_RelicInPlayerPossession", null, null),null, new HarmonyMethod(typeof(TorannMagicMod), "Get_DelayRelicLost"), null);
+            //SafePatch(harmonyInstance, AccessTools.Method(typeof(Pawn), "get_InAggroMentalState", null, null), new HarmonyMethod(typeof(TorannMagicMod), "Get_UndeadAggroMentalState"), null, null);
+            //SafePatch(harmonyInstance, AccessTools.Method(typeof(Pawn), "get_InMentalState", null, null), new HarmonyMethod(typeof(TorannMagicMod), "Get_UndeadMentalState"), null, null);
+            //SafePatch(harmonyInstance, AccessTools.Method(typeof(Pawn_GuiltTracker), "get_IsGuilty", null, null), new HarmonyMethod(typeof(TorannMagicMod), "Get_UndeadIsGuilty"), null, null);
+            //SafePatch(harmonyInstance, AccessTools.Method(typeof(RestUtility), "get_IsCharging", null, null), new HarmonyMethod(typeof(TorannMagicMod), "Get_UndeadIsCharging"), null, null);
 
-            harmonyInstance.Patch(AccessTools.Method(typeof(GenDraw), "DrawRadiusRing", new Type[]
+            SafePatch(harmonyInstance, AccessTools.Method(typeof(GenDraw), "DrawRadiusRing", new Type[]
                 {
                     typeof(IntVec3),
                     typeof(float),
                     typeof(Color),
                     typeof(Func<IntVec3, bool>)
                 }, null), new HarmonyMethod(typeof(TorannMagicMod), "DrawRadiusRing_Patch"), null);
-            harmonyInstance.Patch(AccessTools.Method(typeof(Pawn_PathFollower), "CostToMoveIntoCell", new Type[]
+            SafePatch(harmonyInstance, AccessTools.Method(typeof(Pawn_PathFollower), "CostToMoveIntoCell", new Type[]
                 {
                     typeof(Pawn),
                     typeof(IntVec3)
                 }, null), new HarmonyMethod(typeof(TorannMagicMod), "Pawn_PathFollower_Pathfinder_Prefix", null), null);
-            harmonyInstance.Patch(AccessTools.Method(typeof(StaggerHandler), "StaggerFor", new Type[]
+            SafePatch(harmonyInstance, AccessTools.Method(typeof(StaggerHandler), "StaggerFor", new Type[]
                 {
                     typeof(int),
                     typeof(float)
                 }, null), new HarmonyMethod(typeof(TorannMagicMod), "StaggerFor_Patch", null), null);
-            harmonyInstance.Patch(AccessTools.Method(typeof(MemoryThoughtHandler), "TryGainMemory", new Type[]
+            SafePatch(harmonyInstance, AccessTools.Method(typeof(MemoryThoughtHandler), "TryGainMemory", new Type[]
                 {
                     typeof(ThoughtDef),
                     typeof(Pawn),
                     typeof(Precept)
                 }, null), new HarmonyMethod(typeof(TorannMagicMod), "MemoryThoughtHandler_PreventDisturbedRest_Prefix", null), null);
             //!!! change to PawnDrawParms
-            //harmonyInstance.Patch(AccessTools.Method(typeof(PawnRenderer), "RenderPawnInternal", new Type[]
+            //SafePatch(harmonyInstance, AccessTools.Method(typeof(PawnRenderer), "RenderPawnInternal", new Type[]
             //    {
             //        typeof(Vector3),
             //        typeof(float),
@@ -136,13 +148,13 @@ namespace TorannMagic
             //        typeof(RotDrawMode),
             //        typeof(PawnRenderFlags)
             //    }, null), new HarmonyMethod(typeof(TorannMagicMod), "PawnRenderer_UndeadInternal_Prefix", null), null);
-            harmonyInstance.Patch(AccessTools.Method(typeof(PawnRenderer), "RenderPawnAt", new Type[]
+            SafePatch(harmonyInstance, AccessTools.Method(typeof(PawnRenderer), "RenderPawnAt", new Type[]
                 {
                     typeof(Vector3),
                     typeof(Rot4?),
                     typeof(bool)
                 }, null), new HarmonyMethod(typeof(TorannMagicMod), "PawnRenderer_Blur_Prefix", null), null);
-            harmonyInstance.Patch(AccessTools.Method(typeof(PawnDiedOrDownedThoughtsUtility), "AppendThoughts_Relations", new Type[]
+            SafePatch(harmonyInstance, AccessTools.Method(typeof(PawnDiedOrDownedThoughtsUtility), "AppendThoughts_Relations", new Type[]
                 {
                     typeof(Pawn),
                     typeof(DamageInfo?),
@@ -150,7 +162,7 @@ namespace TorannMagic
                     typeof(List<IndividualThoughtToAdd>),
                     typeof(List<ThoughtToAddToAll>)
                 }, null), new HarmonyMethod(typeof(TorannMagicMod), "AppendThoughts_Relations_PrefixPatch", null), null, null);
-            harmonyInstance.Patch(AccessTools.Method(typeof(PawnDiedOrDownedThoughtsUtility), "AppendThoughts_ForHumanlike", new Type[]
+            SafePatch(harmonyInstance, AccessTools.Method(typeof(PawnDiedOrDownedThoughtsUtility), "AppendThoughts_ForHumanlike", new Type[]
                 {
                     typeof(Pawn),
                     typeof(DamageInfo?),
@@ -158,33 +170,33 @@ namespace TorannMagic
                     typeof(List<IndividualThoughtToAdd>),
                     typeof(List<ThoughtToAddToAll>)
                 }, null), new HarmonyMethod(typeof(TorannMagicMod), "AppendThoughts_ForHumanlike_PrefixPatch", null), null, null);
-            harmonyInstance.Patch(AccessTools.Method(typeof(PawnDiedOrDownedThoughtsUtility), "TryGiveThoughts", new Type[]
+            SafePatch(harmonyInstance, AccessTools.Method(typeof(PawnDiedOrDownedThoughtsUtility), "TryGiveThoughts", new Type[]
                 {
                     typeof(Pawn),
                     typeof(DamageInfo?),
                     typeof(PawnDiedOrDownedThoughtsKind)
                 }, null), new HarmonyMethod(typeof(TorannMagicMod), "TryGiveThoughts_PrefixPatch", null), null, null);
-            harmonyInstance.Patch(AccessTools.Method(typeof(Targeter), "TargeterOnGUI", new Type[]
+            SafePatch(harmonyInstance, AccessTools.Method(typeof(Targeter), "TargeterOnGUI", new Type[]
                 {
                 }, null), null, new HarmonyMethod(typeof(TorannMagicMod), "Targeter_Casting_Postfix", null), null);
-            harmonyInstance.Patch(AccessTools.Method(typeof(QuestPart_LendColonistsToFaction), "Enable", new Type[]
+            SafePatch(harmonyInstance, AccessTools.Method(typeof(QuestPart_LendColonistsToFaction), "Enable", new Type[]
                 {
                     typeof(SignalArgs)
                 }, null), null, new HarmonyMethod(typeof(TorannMagicMod), "QuestPart_LendColonists_Enable_NoUndead"));
-            harmonyInstance.Patch(AccessTools.Method(typeof(HealthUtility), "AdjustSeverity", new Type[]
+            SafePatch(harmonyInstance, AccessTools.Method(typeof(HealthUtility), "AdjustSeverity", new Type[]
                 {
                     typeof(Pawn),
                     typeof(HediffDef),
                     typeof(float)
                 }, null), new HarmonyMethod(typeof(TorannMagicMod), "HealthUtility_HeatCold_HediffGiverForUndead"), null);
-            harmonyInstance.Patch(AccessTools.Method(typeof(ThingFilter), "SetFromPreset", new Type[]
+            SafePatch(harmonyInstance, AccessTools.Method(typeof(ThingFilter), "SetFromPreset", new Type[]
                 {
                     typeof(StorageSettingsPreset)
                 }, null), new HarmonyMethod(typeof(TorannMagicMod), "DefaultStorageSettings_IncludeMagicItems"), null);
-            harmonyInstance.Patch(AccessTools.Method(typeof(AreaManager), "AddStartingAreas", new Type[]
+            SafePatch(harmonyInstance, AccessTools.Method(typeof(AreaManager), "AddStartingAreas", new Type[]
                 {
                 }, null), null, new HarmonyMethod(typeof(TorannMagicMod), "AreaManager_AddMagicZonesToStartingAreas"));
-            harmonyInstance.Patch(AccessTools.Method(typeof(Projectile), "Launch", new Type[]
+            SafePatch(harmonyInstance, AccessTools.Method(typeof(Projectile), "Launch", new Type[]
                 {
                     typeof(Thing),
                     typeof(Vector3),
@@ -195,7 +207,7 @@ namespace TorannMagic
                     typeof(Thing),
                     typeof(ThingDef)
                 }, null), new HarmonyMethod(typeof(TorannMagicMod), "Projectile_Launch_Prefix", null), null, null);
-            harmonyInstance.Patch(AccessTools.Method(typeof(Verb), "TryStartCastOn", new Type[]
+            SafePatch(harmonyInstance, AccessTools.Method(typeof(Verb), "TryStartCastOn", new Type[]
                 {
                     typeof(LocalTargetInfo),
                     typeof(LocalTargetInfo),
@@ -204,7 +216,7 @@ namespace TorannMagic
                     typeof(bool),
                     typeof(bool)
                 }, null), null, new HarmonyMethod(typeof(TorannMagicMod), "TryStartCastOn_Prefix", null), null);
-            harmonyInstance.Patch(AccessTools.Method(typeof(VerbProperties), "AdjustedCooldown", new Type[]
+            SafePatch(harmonyInstance, AccessTools.Method(typeof(VerbProperties), "AdjustedCooldown", new Type[]
                 {
                     typeof(Tool),
                     typeof(Pawn),
@@ -212,9 +224,9 @@ namespace TorannMagic
                 }, null), null, new HarmonyMethod(typeof(TorannMagicMod), "GolemVerb_AdjustedCooldown_Postfix", null), null);
             ///
             /// //-----
-            ////harmonyInstance.Patch(AccessTools.Method(typeof(AbilityUser.PawnAbility), "GetJob"),
+            ////SafePatch(harmonyInstance, AccessTools.Method(typeof(AbilityUser.PawnAbility), "GetJob"),
             ////    new HarmonyMethod(typeof(TorannMagicMod), "PawnAbility_GetJob_Prefix"));
-            ////harmonyInstance.Patch(AccessTools.Method(typeof(QuestNode_RaceProperty), "Matches", new Type[]
+            ////SafePatch(harmonyInstance, AccessTools.Method(typeof(QuestNode_RaceProperty), "Matches", new Type[]
             ////    {
             ////        typeof(object)
             ////    }, null), null, new HarmonyMethod(typeof(TorannMagicMod), "QuestNode_RaceProperties_ExcludeSummoned"));
@@ -223,11 +235,11 @@ namespace TorannMagic
             ////    postfix: new HarmonyMethod(methodType: patchType, methodName: nameof(PawnEquipment_Change_Postfix)), transpiler: null);
             ////harmonyInstance.Patch(original: AccessTools.Method(type: typeof(Pawn_EquipmentTracker), name: "TryTransferEquipmentToContainer"), prefix: null,
             ////    postfix: new HarmonyMethod(methodType: patchType, methodName: nameof(PawnEquipment_Transfer_Postfix)), transpiler: null);
-            ////harmonyInstance.Patch(AccessTools.Method(typeof(Thing), "get_Suspended", null, null), new HarmonyMethod(typeof(TorannMagicMod), "Get_Suspended_Polymorphed", null), null);
-            ////harmonyInstance.Patch(AccessTools.Method(typeof(Toils_Recipe), "DoRecipeWork", new Type[]
+            ////SafePatch(harmonyInstance, AccessTools.Method(typeof(Thing), "get_Suspended", null, null), new HarmonyMethod(typeof(TorannMagicMod), "Get_Suspended_Polymorphed", null), null);
+            ////SafePatch(harmonyInstance, AccessTools.Method(typeof(Toils_Recipe), "DoRecipeWork", new Type[]
             ////    {
             ////    }, null), new HarmonyMethod(typeof(TorannMagicMod), "DoMagicRecipeWork", null), null);
-            ////harmonyInstance.Patch(AccessTools.Method(typeof(CaravanArrivalTimeEstimator), "EstimatedTicksToArrive", new Type[]
+            ////SafePatch(harmonyInstance, AccessTools.Method(typeof(CaravanArrivalTimeEstimator), "EstimatedTicksToArrive", new Type[]
             ////    {
             ////        typeof(int),
             ////        typeof(int),
@@ -246,13 +258,74 @@ namespace TorannMagic
                     {
                         if (ModCheck.Validate.ChildrenSchoolLearning.IsInitialized())
                         {
-                            harmonyInstance.Patch(AccessTools.Method(typeof(PawnUtility), "TrySpawnHatchedOrBornPawn"), null, new HarmonyMethod(typeof(TorannMagicMod), "TM_Children_TrySpawnHatchedOrBornPawn_Tweak"));
+                            SafePatch(harmonyInstance, AccessTools.Method(typeof(PawnUtility), "TrySpawnHatchedOrBornPawn"), null, new HarmonyMethod(typeof(TorannMagicMod), "TM_Children_TrySpawnHatchedOrBornPawn_Tweak"));
                         }
                     }))();
                 }
                 catch (TypeLoadException) { }
             }
             #endregion Children
+
+            if (Prefs.DevMode)
+            {
+                Log.Message($"[TM] Harmony: {harmonyInstance.GetPatchedMethods().Count()} methods patched.");
+            }
+        }
+
+        // Applies every [HarmonyPatch]-annotated class in this assembly. Each class is
+        // processed independently so one invalid target method cannot abort the rest.
+        private static void ApplyAttributePatches(Harmony harmonyInstance)
+        {
+            Type baseType = typeof(HarmonyPatch);
+            List<Type> patchClasses;
+            try
+            {
+                patchClasses = AccessTools.GetTypesFromAssembly(typeof(TorannMagicMod).Assembly)
+                    .Where(t => t.IsClass && t.GetCustomAttributes(baseType, false).Any())
+                    .ToList();
+            }
+            catch (Exception ex)
+            {
+                Log.Error("[TM] Failed to scan for attribute patch classes: " + ex);
+                return;
+            }
+            int applied = 0;
+            foreach (Type patchClass in patchClasses)
+            {
+                try
+                {
+                    harmonyInstance.CreateClassProcessor(patchClass).Patch();
+                    applied++;
+                }
+                catch (Exception ex)
+                {
+                    Log.Error($"[TM] Attribute patch {patchClass.Name} failed: {ex.Message}");
+                }
+            }
+            if (Prefs.DevMode)
+            {
+                Log.Message($"[TM] Harmony: applied {applied}/{patchClasses.Count} attribute patch classes.");
+            }
+        }
+
+        // RimWorld 1.7 port note: wraps Harmony.Patch so a missing/renamed target method logs
+        // a warning instead of throwing from the mod constructor and killing every later patch.
+        private static void SafePatch(Harmony harmonyInstance, MethodBase original, HarmonyMethod prefix = null,
+            HarmonyMethod postfix = null, HarmonyMethod transpiler = null, HarmonyMethod finalizer = null)
+        {
+            try
+            {
+                if (original == null)
+                {
+                    Log.Warning("[TM] Skipping Harmony patch: target method not found (API change in this game version).");
+                    return;
+                }
+                harmonyInstance.Patch(original, prefix, postfix, transpiler, finalizer);
+            }
+            catch (Exception ex)
+            {
+                Log.Warning("[TM] Harmony patch failed on " + (original?.FullDescription() ?? "null") + ": " + ex.Message);
+            }
         }
 
         //public static bool PawnAbility_GetJob_Prefix(PawnAbility __instance, AbilityContext context, LocalTargetInfo target, ref Job __result)
@@ -2241,7 +2314,7 @@ namespace TorannMagic
         [HarmonyPatch(typeof(WeatherWorker), "WeatherTick", null)]
         public class WeatherWorker_Patch
         {
-            public static void Postfix(WeatherManager __instance, Map map)
+            public static void Postfix(Map map)
             {
                 if (map.weatherManager.curWeather == TorannMagicDefOf.TM_HealingRainWD)
                 {
@@ -2537,7 +2610,7 @@ namespace TorannMagic
         public static class CostToMove_Caravan_Patch
         {
             [HarmonyPostfix]
-            public static void CostToMove_Caravan_Postfix(Caravan_PathFollower __instance, Caravan caravan, PlanetLayer start, PlanetTile end, ref int __result, int? ticksAbs = default(int?))
+            public static void CostToMove_Caravan_Postfix(Caravan_PathFollower __instance, Caravan caravan, PlanetTile start, PlanetTile end, ref int __result, int? ticksAbs = default(int?))
             {
                 if (caravan != null)
                 {
@@ -4163,6 +4236,27 @@ namespace TorannMagic
                     CompAbilityUserMagic compMagic = __instance.GetCompAbilityUserMagic();
                     CompAbilityUserMight compMight = __instance.GetCompAbilityUserMight();
                     var gizmoList = __result.ToList();
+
+                    // Grimoire: character window in the isekai visual style (TMPIsekai integration).
+                    // Show for any class holder — magic, might, or hybrid; level/data may still
+                    // be uninitialized right after learning, so check the trait itself.
+                    if (TM_Calc.HasMightOrMagicTrait(__instance))
+                    {
+                        Pawn grimoirePawn = __instance;
+                        Command_Action grimoire = new Command_Action
+                        {
+                            action = delegate
+                            {
+                                Find.WindowStack.Add(new Window_TMGrimoire(grimoirePawn));
+                            },
+                            Order = 65,
+                            defaultLabel = "TM_Grimoire".Translate(),
+                            defaultDesc = "TM_GrimoireDesc".Translate(),
+                            icon = ContentFinder<Texture2D>.Get("Books/arcane", true)
+                        };
+                        gizmoList.Add(grimoire);
+                    }
+
                     bool canBecomeClassless = false;
                     if (ModOptions.Settings.Instance.Wanderer && __instance.story.traits.HasTrait(TorannMagicDefOf.TM_Gifted) && __instance.ageTracker.AgeBiologicalYears >= 4)
                     {

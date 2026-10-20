@@ -1,4 +1,4 @@
-﻿using RimWorld;
+using RimWorld;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -172,13 +172,15 @@ namespace TorannMagic
                 Order = 109,
                 icon = ContentFinder<Texture2D>.Get("UI/Polymorph_cancel"),
                 isActive = () => true,
-                toggleAction = delegate
-                {
-                    temporary = true;
-                    ticksLeft = 1;
-                }
+                toggleAction = CancelPolymorph
             };
             yield return item;            
+        }
+
+        public void CancelPolymorph()
+        {
+            temporary = true;
+            ticksLeft = 1;
         }
 
         private void PreDestroy()

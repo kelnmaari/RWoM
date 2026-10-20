@@ -1,4 +1,4 @@
-﻿using RimWorld;
+using RimWorld;
 using System;
 using UnityEngine;
 using Verse;
@@ -45,7 +45,10 @@ namespace TorannMagic
         public override bool IsVisible
         {
             get
-            {                
+            {
+                // Progression moved into the Grimoire window (Window_TMGrimoire);
+                // flip this to true to bring the legacy tabs back.
+                return false;                
                 bool flag = base.SelPawn.story != null && base.SelPawn.IsColonist;
                 if (flag)
                 {

@@ -1,4 +1,4 @@
-﻿
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,6 +27,131 @@ namespace TorannMagic.ModOptions
             foreach(ThingDef d in enumerable)
             {
                 DebugThingPlaceHelper.DebugSpawn(d, UI.MouseCell(), 1, false, null);
+            }
+        }
+
+        [DebugAction("RWoM", "T: Give Class...", actionType = DebugActionType.ToolMapForPawns, allowedGameStates = AllowedGameStates.PlayingOnMap)]
+        public static void GiveClass(Pawn pawn)
+        {
+            if (pawn == null || pawn.story == null || pawn.story.traits == null)
+            {
+                return;
+            }
+            List<FloatMenuOption> options = new List<FloatMenuOption>();
+
+            foreach (TraitDef td in TM_Data.MagicTraits)
+            {
+                TraitDef captured = td;
+                options.Add(new FloatMenuOption("magic: " + ClassTraitLabel(td), delegate
+                {
+                    ApplyClassTrait(pawn, captured, 0, customIndex: -1, customClass: null, isMage: true);
+                }));
+            }
+            foreach (TraitDef td in TM_Data.MightTraits)
+            {
+                TraitDef captured = td;
+                options.Add(new FloatMenuOption("might: " + ClassTraitLabel(td), delegate
+                {
+                    ApplyClassTrait(pawn, captured, 0, customIndex: -1, customClass: null, isMage: false);
+                }));
+            }
+
+            List<TorannMagic.TMDefs.TM_CustomClass> customClasses = TM_ClassUtility.CustomClasses;
+            if (customClasses != null)
+            {
+                for (int i = 0; i < customClasses.Count; i++)
+                {
+                    TorannMagic.TMDefs.TM_CustomClass cc = customClasses[i];
+                    if (cc == null || cc.classTrait == null)
+                    {
+                        continue;
+                    }
+                    int index = i;
+                    string kind = cc.isMage ? "custom mage" : "custom fighter";
+                    options.Add(new FloatMenuOption(kind + ": " + ClassTraitLabel(cc.classTrait), delegate
+                    {
+                        ApplyClassTrait(pawn, cc.classTrait, cc.traitDegree, index, cc, cc.isMage);
+                    }));
+                }
+            }
+
+            if (options.Count > 0)
+            {
+                Find.WindowStack.Add(new FloatMenu(options));
+            }
+        }
+
+        private static string ClassTraitLabel(TraitDef td)
+        {
+            if (td != null && td.degreeDatas != null && td.degreeDatas.Count > 0)
+            {
+                return td.degreeDatas[0].label;
+            }
+            return td != null ? td.defName : "???";
+        }
+
+        /// <summary>
+        /// Grants a class the way a class book does, with a full reset first so an
+        /// existing class does not leave stale abilities behind: clear class trait
+        /// and class hediffs, drop the comp's power/XP data, gain the new trait,
+        /// store the customIndex/customClass pair for custom classes, then force the
+        /// comp to re-run its own assignment (the same ResolveFactionChange path the
+        /// game uses when a pawn joins the colony with a class).
+        /// </summary>
+        private static void ApplyClassTrait(Pawn pawn, TraitDef classTrait, int traitDegree, int customIndex, TorannMagic.TMDefs.TM_CustomClass customClass, bool isMage)
+        {
+            try
+            {
+                TM_DebugTools.RemoveClassTrait(pawn);
+                if (pawn.health != null && pawn.health.hediffSet != null)
+                {
+                    TM_DebugTools.RemoveClassHediffs(pawn);
+                }
+
+                CompAbilityUserMagic compMagic = pawn.GetCompAbilityUserMagic();
+                CompAbilityUserMight compMight = pawn.GetCompAbilityUserMight();
+
+                pawn.story.traits.GainTrait(new Trait(classTrait, traitDegree, false));
+
+                // Only re-init the side the new class belongs to: the other comp's
+                // data stays null until its own class trait appears, and its
+                // AssignAbilities would dereference it and throw.
+                if (compMagic != null && compMagic.IsMagicUser)
+                {
+                    if (customClass != null)
+                    {
+                        compMagic.customIndex = customIndex;
+                        compMagic.customClass = customClass;
+                    }
+                    if (compMagic.MagicData != null)
+                    {
+                        compMagic.RemovePowers(true);
+                        Traverse.Create(compMagic).Field("magicData").SetValue(null);
+                    }
+                    Traverse.Create(compMagic).Field("colonistPowerCheck").SetValue(false);
+                    compMagic.magicPowersInitializedForColonist = false;
+                    compMagic.ResolveFactionChange();
+                }
+                if (compMight != null && compMight.IsMightUser)
+                {
+                    if (customClass != null)
+                    {
+                        compMight.customIndex = customIndex;
+                        compMight.customClass = customClass;
+                    }
+                    if (compMight.MightData != null)
+                    {
+                        compMight.RemovePowers(true);
+                        Traverse.Create(compMight).Field("mightData").SetValue(null);
+                    }
+                    compMight.AssignAbilities();
+                }
+
+                Log.Message($"[TM] Debug: granted class '{ClassTraitLabel(classTrait)}' to {pawn.LabelShortCap}.");
+            }
+            catch (Exception ex)
+            {
+                Log.Error("[TM] Debug GiveClass failed: " + ex);
             }
         }
 

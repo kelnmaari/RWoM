@@ -1,4 +1,4 @@
-﻿using RimWorld;
+using RimWorld;
 using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
@@ -59,7 +59,7 @@ namespace TorannMagic
             set => curLevelInt = Mathf.Clamp(value, 0f, 2f*this.pawn.GetCompAbilityUserMagic().maxMP);            
         }
 
-        public override float MaxLevel => this.pawn.ageTracker.AgeBiologicalYears < 13 ? this.pawn.GetCompAbilityUserMagic().maxMP - ((12f - this.pawn.ageTracker.AgeBiologicalYearsFloat) / 12f) : this.pawn.GetCompAbilityUserMagic().maxMP;
+        public override float MaxLevel { get { float maxMP = this.pawn.GetCompAbilityUserMagic().maxMP; if (this.pawn.ageTracker.AgeBiologicalYears < 13) { maxMP -= (12f - this.pawn.ageTracker.AgeBiologicalYearsFloat) / 12f; } return maxMP * TMPIsekai.ManaPoolMultiplier(this.pawn); } }
 
         public override void ExposeData()
         {

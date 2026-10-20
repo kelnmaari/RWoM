@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -145,6 +145,16 @@ namespace TorannMagic
         public bool mageLightSet = false;
         public bool useTechnoBitToggle = true;
         public bool useTechnoBitRepairToggle = true;
+
+        public void ToggleTechnoBit()
+        {
+            useTechnoBitToggle = !useTechnoBitToggle;
+        }
+
+        public void ToggleTechnoBitRepair()
+        {
+            useTechnoBitRepairToggle = !useTechnoBitRepairToggle;
+        }
         public Vector3 bitPosition = Vector3.zero;
         private bool bitFloatingDown = true;
         private float bitOffset = .45f;
@@ -153,6 +163,11 @@ namespace TorannMagic
         public ThingDef technoWeaponThingDef = null;
         public QualityCategory technoWeaponQC = QualityCategory.Normal;
         public bool useElementalShotToggle = true;
+
+        public void ToggleElementalShot()
+        {
+            useElementalShotToggle = !useElementalShotToggle;
+        }
         public Building overdriveBuilding = null;
         public int overdriveDuration = 0;
         public float overdrivePowerOutput = 0;
@@ -1039,6 +1054,10 @@ namespace TorannMagic
                     }
                 }
                 this.MagicData.MagicUserLevel = value;
+                if (flag)
+                {
+                    TMPIsekai.OnClassLevelUp(this.Pawn, value, magic: true);
+                }
             }
         }
 
@@ -8275,10 +8294,7 @@ namespace TorannMagic
                     var item = new Command_Toggle
                     {
                         isActive = () => this.useTechnoBitToggle,
-                        toggleAction = () =>
-                        {
-                            this.useTechnoBitToggle = !this.useTechnoBitToggle;
-                        },
+                        toggleAction = ToggleTechnoBit,
                         defaultLabel = label,
                         defaultDesc = desc,
                         Order = -89,
@@ -8298,10 +8314,7 @@ namespace TorannMagic
                     var item_repair = new Command_Toggle
                     {
                         isActive = () => this.useTechnoBitRepairToggle,
-                        toggleAction = () =>
-                        {
-                            this.useTechnoBitRepairToggle = !this.useTechnoBitRepairToggle;
-                        },
+                        toggleAction = ToggleTechnoBitRepair,
                         defaultLabel = label_repair,
                         defaultDesc = desc_repair,
                         Order = -88,
@@ -8321,10 +8334,7 @@ namespace TorannMagic
                     var item = new Command_Toggle
                     {
                         isActive = () => this.useElementalShotToggle,
-                        toggleAction = () =>
-                        {
-                            this.useElementalShotToggle = !this.useElementalShotToggle;
-                        },
+                        toggleAction = ToggleElementalShot,
                         defaultLabel = label,
                         defaultDesc = desc,
                         Order = -88,
