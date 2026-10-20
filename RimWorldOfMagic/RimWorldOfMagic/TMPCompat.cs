@@ -119,8 +119,11 @@ namespace TorannMagic
                 return;
             }
             var harmony = new Harmony("rimworld.torann.tmagic");
+            // MUST be a prefix: registration has to happen before MP's DoSync serializes
+            // the job — as a postfix it ran after the sync and the verb reference went
+            // out unresolved.
             harmony.Patch(AccessTools.Method(typeof(Pawn_JobTracker), nameof(Pawn_JobTracker.TryTakeOrderedJob)),
-                postfix: new HarmonyMethod(typeof(TMPCompat), nameof(TryTakeOrderedJob_VerbRegister_Prefix)));
+                prefix: new HarmonyMethod(typeof(TMPCompat), nameof(TryTakeOrderedJob_VerbRegister_Prefix)));
             harmony.Patch(AccessTools.Method(AccessTools.TypeByName("AbilityUser.PawnAbility"), "InitVerb"),
                 postfix: new HarmonyMethod(typeof(TMPCompat), nameof(InitVerb_Register_Postfix)));
         }
