@@ -163,6 +163,7 @@
 
 [b][ENGLISH][/b]
 An unofficial continuation of TorannD's "A RimWorld of Magic" for RimWorld 1.7 (Waylith engine). All credit for the original mod goes to [url=https://steamcommunity.com/sharedfiles/filedetails/?id=1201382956]TorannD[/url] — this is a port of [url=https://github.com/TorannD/RWoM]the original code[/url], continued as [url=https://github.com/kelnmaari/RWoM]a fork[/url].
+[i]If the original author wants this item removed from the Workshop, please contact me via DM or in the comments here, and it will be taken down.[/i]
 
 [olist]
 [*]Removed the HugsLib dependency (no longer maintained for 1.7). All of HugsLib's duties (147 Harmony patches, update notifications) are now handled by the mod itself.
@@ -187,6 +188,7 @@ If you have a problem, please create a Discussion on this item — I'll look int
 
 [b][РУССКИЙ][/b]
 Неофициальное продолжение мода TorannD "A RimWorld of Magic" для RimWorld 1.7 (движок Waylith). Вся заслуга оригинала — [url=https://steamcommunity.com/sharedfiles/filedetails/?id=1201382956]TorannD[/url]; это перенос [url=https://github.com/TorannD/RWoM]исходного кода[/url], продолженный как [url=https://github.com/kelnmaari/RWoM]форк[/url].
+[i]Если автор захочет, чтобы я удалил мод из Мастерской — напишите в личные сообщения или в комментариях к моду, удалю.[/i]
 
 [olist]
 [*]Убрана зависимость от HugsLib (для 1.7 не поддерживается) — все его задачи (147 Harmony-патчей, уведомления об обновлениях) мод выполняет сам.
