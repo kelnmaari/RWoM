@@ -30,6 +30,60 @@ namespace TorannMagic.ModOptions
             }
         }
 
+        [DebugAction("RWoM", "T: Spawn Spell Book...", actionType = DebugActionType.Action, allowedGameStates = AllowedGameStates.PlayingOnMap)]
+        public static void SpawnSpellBook()
+        {
+            SpawnLearnItemMenu(d => d.defName.StartsWith("SpellOf_"));
+        }
+
+        [DebugAction("RWoM", "T: Spawn Skill Book...", actionType = DebugActionType.Action, allowedGameStates = AllowedGameStates.PlayingOnMap)]
+        public static void SpawnSkillBook()
+        {
+            SpawnLearnItemMenu(d => d.defName.StartsWith("SkillOf_"));
+        }
+
+        [DebugAction("RWoM", "T: Spawn Torn Book...", actionType = DebugActionType.Action, allowedGameStates = AllowedGameStates.PlayingOnMap)]
+        public static void SpawnTornBook()
+        {
+            SpawnLearnItemMenu(d => d.defName.StartsWith("Torn_BookOf"));
+        }
+
+        // One learn item of the picked kind at the cursor cell, with a picker
+        // styled like the Give Class menu (sorted by in-game label).
+        private static void SpawnLearnItemMenu(Func<ThingDef, bool> filter)
+        {
+            List<FloatMenuOption> options = new List<FloatMenuOption>();
+            foreach (ThingDef def in DefDatabase<ThingDef>.AllDefs
+                .Where(filter)
+                .OrderBy(d => d.LabelCap.ToString()))
+            {
+                ThingDef captured = def;
+                options.Add(new FloatMenuOption(captured.LabelCap, delegate
+                {
+                    Map map = Find.CurrentMap;
+                    IntVec3 cell = UI.MouseCell();
+                    if (map == null || !cell.InBounds(map))
+                    {
+                        Messages.Message("[RWoM] No valid cell under the cursor.", MessageTypeDefOf.RejectInput);
+                        return;
+                    }
+                    Thing thing = ThingMaker.MakeThing(captured);
+                    if (GenPlace.TryPlaceThing(thing, cell, map, ThingPlaceMode.Near))
+                    {
+                        Messages.Message("[RWoM] Spawned " + captured.LabelCap + ".", MessageTypeDefOf.PositiveEvent);
+                    }
+                    else
+                    {
+                        Messages.Message("[RWoM] Could not place " + captured.LabelCap + " here.", MessageTypeDefOf.RejectInput);
+                    }
+                }));
+            }
+            if (options.Count > 0)
+            {
+                Find.WindowStack.Add(new FloatMenu(options));
+            }
+        }
+
         [DebugAction("RWoM", "T: Spawn Mage Duel (10 v 10)", actionType = DebugActionType.Action, allowedGameStates = AllowedGameStates.PlayingOnMap)]
         public static void SpawnMageDuel()
         {
