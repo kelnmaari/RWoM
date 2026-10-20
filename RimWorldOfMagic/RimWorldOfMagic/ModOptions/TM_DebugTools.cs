@@ -244,6 +244,18 @@ namespace TorannMagic.ModOptions
                     compMight.AssignAbilities();
                 }
 
+                // make mana/stamina (class hediff + need) appear immediately: the comp
+                // only resolves them on its own init tick, which already ran for pawns
+                // that existed before the class was granted
+                if (compMagic != null && compMagic.IsMagicUser)
+                {
+                    compMagic.ResolveMana();
+                }
+                if (compMight != null && compMight.IsMightUser)
+                {
+                    compMight.ResolveStamina();
+                }
+
                 Log.Message($"[TM] Debug: granted class '{ClassTraitLabel(classTrait)}' to {pawn.LabelShortCap}.");
             }
             catch (Exception ex)
