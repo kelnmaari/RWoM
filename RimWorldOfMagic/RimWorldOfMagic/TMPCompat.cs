@@ -19,6 +19,14 @@ namespace TorannMagic
     /// </summary>
     public static class TMPCompat
     {
+        // The 1.7 fork "(1.7)Multiplayer-temp" keeps the original packageId; some
+        // forks rename it — check every known id.
+        public static readonly string[] MultiplayerPackageIds =
+        {
+            "zetrith.multiplayer",
+            "rwmt.multiplayer",
+        };
+
         public const string MultiplayerPackageId = "zetrith.multiplayer";
 
         public static bool Initialized { get; private set; }
@@ -130,7 +138,14 @@ namespace TorannMagic
 
         public static bool MultiplayerActive()
         {
-            return ModsConfig.IsActive(MultiplayerPackageId);
+            foreach (string id in MultiplayerPackageIds)
+            {
+                if (ModsConfig.IsActive(id))
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         #region AbilityUser framework
