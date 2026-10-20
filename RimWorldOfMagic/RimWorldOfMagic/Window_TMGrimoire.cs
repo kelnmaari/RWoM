@@ -924,31 +924,38 @@ namespace TorannMagic
 
         private string ClassDescription()
         {
-            // custom classes first (most specific), then vanilla class traits
-            if (magic?.customClass?.classTrait?.degreeDatas != null && magic.customClass.classTrait.degreeDatas.Count > 0)
-            {
-                return magic.customClass.classTrait.degreeDatas[0].description;
-            }
-            if (might?.customClass?.classTrait?.degreeDatas != null && might.customClass.classTrait.degreeDatas.Count > 0)
-            {
-                return might.customClass.classTrait.degreeDatas[0].description;
-            }
+            // full vanilla trait tip: description + stat offsets/effects, same text
+            // the trait tooltip shows
+            Trait trait = ClassTraitOnPawn();
+            return trait?.TipString(pawn);
+        }
+
+        private Trait ClassTraitOnPawn()
+        {
             if (pawn.story?.traits == null)
             {
                 return null;
             }
+            if (magic?.customClass?.classTrait != null && pawn.story.traits.HasTrait(magic.customClass.classTrait))
+            {
+                return pawn.story.traits.GetTrait(magic.customClass.classTrait, magic.customClass.traitDegree);
+            }
+            if (might?.customClass?.classTrait != null && pawn.story.traits.HasTrait(might.customClass.classTrait))
+            {
+                return pawn.story.traits.GetTrait(might.customClass.classTrait, might.customClass.traitDegree);
+            }
             foreach (TraitDef td in TM_Data.MagicTraits)
             {
-                if (pawn.story.traits.HasTrait(td) && td.degreeDatas.Count > 0)
+                if (pawn.story.traits.HasTrait(td))
                 {
-                    return td.degreeDatas[0].description;
+                    return pawn.story.traits.GetTrait(td);
                 }
             }
             foreach (TraitDef td in TM_Data.MightTraits)
             {
-                if (pawn.story.traits.HasTrait(td) && td.degreeDatas.Count > 0)
+                if (pawn.story.traits.HasTrait(td))
                 {
-                    return td.degreeDatas[0].description;
+                    return pawn.story.traits.GetTrait(td);
                 }
             }
             return null;
@@ -958,6 +965,14 @@ namespace TorannMagic
         {
             GUI.color = color;
             GUIStyle style = new GUIStyle(GUI.skin.label) { alignment = anchor, wordWrap = true };
+            // match vanilla font metrics, otherwise Text.CalcHeight underestimates
+            // and IMGUI labels clip the text
+            switch (Text.Font)
+            {
+                case GameFont.Tiny: style.fontSize = 12; break;
+                case GameFont.Small: style.fontSize = 14; break;
+                case GameFont.Medium: style.fontSize = 16; break;
+            }
             GUI.Label(rect, text, style);
             GUI.color = Color.white;
         }
