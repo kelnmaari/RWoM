@@ -2156,8 +2156,6 @@ DR: [5, 9, 13, 17, 20]%</TM_Golemancy_pwr_desc>
   <TM_Read>Читати {0}</TM_Read>
   <TM_SelectPassion>Обрати пріоритет</TM_SelectPassion>
   <TM_SetVerbatum>Встановити</TM_SetVerbatum>
-  <TM_Stats>Атрибути</TM_Stats>
-  <TM_StatsMight>Бойові атрибути</TM_StatsMight>
   <TM_TooWeak>{0} має надто сильну арканову слабкість, щоб вивчати це зараз.</TM_TooWeak>
   <TM_UndeadVerbatum>Нежить</TM_UndeadVerbatum>
   <TM_Use>Використати {0}</TM_Use>
@@ -2169,10 +2167,5 @@ DR: [5, 9, 13, 17, 20]%</TM_Golemancy_pwr_desc>
   <classIconSizeDesc>Змінює розмір іконки класу на панелі колоністів</classIconSizeDesc>
   <showUndeadAnimalChangeDesc>Нежить-тварини показують першу стадію гниття (згнилі); якщо вимкнено, виглядають як за життя</showUndeadAnimalChangeDesc>
   <showUndeadPawnChangeDesc>Нежить-пішаки показують різні стадії гниття; якщо вимкнено, виглядають як за життя</showUndeadPawnChangeDesc>
-  <TM_Grimoire>Гримуар</TM_Grimoire>
-  <TM_GrimoireDesc>Відкриє гримуар цього персонажа: рівні класів, мана, здібності та прогрес пробудження.</TM_GrimoireDesc>
-  <TM_GrimoireIsekaiHint>Рівні класів дають XP пробудження; пробудження розширює пул мани.</TM_GrimoireIsekaiHint>
-  <TM_GrimoireResources>Ресурси</TM_GrimoireResources>
-  <TM_LevelUp>Покращити</TM_LevelUp>
   <TM_GrimoireSub>Рівні класів, мана та здібності в одному місці.</TM_GrimoireSub>
 </LanguageData>

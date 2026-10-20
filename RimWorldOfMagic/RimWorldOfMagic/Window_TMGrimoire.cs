@@ -92,8 +92,6 @@ namespace TorannMagic
 
             y = DrawResourcesBlock(view, y);
 
-            y = DrawResourcesBlock(view, y);
-
             if (magic != null && magic.MagicData != null)
             {
                 y = DrawMagicSection(view, y);
