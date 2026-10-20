@@ -200,11 +200,17 @@ namespace TorannMagic
             // With JecsLite active, the Multiplayer-Compatibility mod syncs the
             // JecsTools ability framework itself (its JecsTools class triggers on
             // zal.jecsliterwom) — including PawnAbility.UseAbility and a sync
-            // worker. A second registration makes newer MP forks reject it with
-            // "already registered as a SyncMethod" (returning null or throwing),
-            // which used to abort our whole setup. Probe first and defer to the
-            // compat mod whenever it already owns the method; when it is absent
-            // (or too old to know JecsLite), our registration below is the only one.
+            // worker. Newer MP forks report a second registration as an ERROR
+            // ("already registered as a SyncMethod") even when they keep going,
+            // so ask the fork's registry first and defer to the compat mod
+            // without registering anything.
+            MethodInfo useAbilityMethod = AccessTools.Method(typeof(PawnAbility), nameof(PawnAbility.UseAbility));
+            if (IsSyncMethodRegistered(useAbilityMethod))
+            {
+                Log.Message("[TMPCompat] PawnAbility.UseAbility is already synced by Multiplayer-Compatibility — deferring to it.");
+                return;
+            }
+
             ISyncMethod useAbility;
             try
             {
@@ -243,6 +249,28 @@ namespace TorannMagic
             catch (Exception ex)
             {
                 Log.Warning("[TMPCompat] PawnAbility sync worker registration skipped: " + ex.Message);
+            }
+        }
+
+        // Multiplayer.Client.Sync.methodBaseToInternalId is a public static
+        // registry of every registered SyncMethod in the rwmt forks. Returns
+        // false when the fork build doesn't expose it — the caller then just
+        // registers and the fork reports a duplicate itself.
+        private static bool IsSyncMethodRegistered(MethodInfo method)
+        {
+            if (method == null)
+            {
+                return false;
+            }
+            try
+            {
+                var dict = AccessTools.Field(AccessTools.TypeByName("Multiplayer.Client.Sync"), "methodBaseToInternalId")
+                    ?.GetValue(null) as System.Collections.IDictionary;
+                return dict != null && dict.Contains(method);
+            }
+            catch (Exception)
+            {
+                return false;
             }
         }
 
