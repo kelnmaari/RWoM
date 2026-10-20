@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using UnityEngine;
 using Verse;
 
@@ -159,7 +159,10 @@ namespace TorannMagic.ModOptions
             Widgets.CheckboxLabeled(rowRect7, "AICanCast".Translate(), ref Settings.Instance.AICasting, false);
             Rect rowRect7ShiftRight = UIHelper.GetRowRect(rowRect7, rowHeight, num);
             rowRect7ShiftRight.x += rowRect7.width + 56f;
-            Widgets.CheckboxLabeled(rowRect7ShiftRight, "AIHardMode".Translate(), ref Settings.Instance.AIHardMode, !ModOptions.Settings.Instance.AICasting);            
+            Widgets.CheckboxLabeled(rowRect7ShiftRight, "AIHardMode".Translate(), ref Settings.Instance.AIHardMode, !ModOptions.Settings.Instance.AICasting);
+            Rect slaveScribeRect = rowRect7ShiftRight;
+            slaveScribeRect.y += 30f;
+            Widgets.CheckboxLabeled(slaveScribeRect, "TM_SlavesCanScribe".Translate(), ref Settings.Instance.SlavesCanScribe, false);            
             num++;            
             Rect rowRect11 = UIHelper.GetRowRect(rowRect7, rowHeight, num);
             Widgets.CheckboxLabeled(rowRect11, "unrestrictedBloodTypesForBloodMagic".Translate(), ref Settings.Instance.unrestrictedBloodTypes, false);            

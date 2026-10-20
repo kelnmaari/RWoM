@@ -1,4 +1,4 @@
-﻿using RimWorld;
+using RimWorld;
 using Verse;
 
 namespace TorannMagic.SihvRMagicScrollScribe
@@ -15,7 +15,7 @@ namespace TorannMagic.SihvRMagicScrollScribe
 
             if (parent.def != null && comp != null)
             {
-                if (user.IsSlave)
+                if (user.IsSlave && !ModOptions.Settings.Instance.SlavesCanScribe)
                 {                    
                     Messages.Message("TM_SlaveScribeFail".Translate(
                         parent.def.label

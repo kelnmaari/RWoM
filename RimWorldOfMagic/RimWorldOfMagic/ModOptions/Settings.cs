@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Verse;
 using System.Collections.Generic;
 using RimWorld;
@@ -14,6 +14,7 @@ namespace TorannMagic.ModOptions
         public bool AICasting = true;
         public bool AIAggressiveCasting = true;
         public bool AIHardMode = false;        
+        public bool SlavesCanScribe = false;   // allow slaves to write class tomes
         public float baseMageChance = 1f;
         public float baseFighterChance = 1f;
         public float advMageChance = 0.5f;
@@ -137,6 +138,7 @@ namespace TorannMagic.ModOptions
             Scribe_Values.Look<bool>(ref this.AICasting, "AICasting", true, false);
             Scribe_Values.Look<bool>(ref this.AIAggressiveCasting, "AIAggressiveCasting", true, false);
             Scribe_Values.Look<bool>(ref this.AIHardMode, "AIHardMode", false, false);
+            Scribe_Values.Look<bool>(ref this.SlavesCanScribe, "SlavesCanScribe", false, false);
             Scribe_Values.Look<bool>(ref this.AIMarking, "AIMarking", false, false);
             Scribe_Values.Look<bool>(ref this.AIFighterMarking, "AIFighterMarking", false, false);
             Scribe_Values.Look<bool>(ref this.AIFriendlyMarking, "AIFriendlyMarking", false, false);

@@ -2339,4 +2339,5 @@ Level 3: all 4 effects</TM_CombatDrugs_pwr_desc>
   <TM_GrimoireResources>Resources</TM_GrimoireResources>
   <TM_Grimoire>Grimoire</TM_Grimoire>
   <TM_LevelUp>Upgrade</TM_LevelUp>
+  <TM_SlavesCanScribe>Allow slaves to write class tomes</TM_SlavesCanScribe>
 </LanguageData>
