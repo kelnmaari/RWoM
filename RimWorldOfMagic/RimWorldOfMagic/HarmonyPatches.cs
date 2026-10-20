@@ -8483,6 +8483,46 @@ namespace TorannMagic
             }
         }
 
+        [HarmonyPatch(typeof(PawnAbility), "UseAbility")]
+        public static class AbilityUseCombatLog_Patch
+        {
+            // Instant (non-projectile) abilities apply their effects directly and
+            // never reach the projectile log path. Every cast funnels through
+            // PawnAbility.UseAbility, so log pawn-targeted casts there; friendly
+            // support casts are skipped or autocast healers would flood the feed.
+            public static void Postfix(PawnAbility __instance, LocalTargetInfo target)
+            {
+                try
+                {
+                    Pawn caster = __instance.Pawn;
+                    if (caster == null || caster.Destroyed)
+                    {
+                        return;
+                    }
+                    TMAbilityDef tmad = __instance.Def as TMAbilityDef;
+                    if (tmad == null)
+                    {
+                        return;
+                    }
+                    Pawn targetPawn = target.Thing as Pawn;
+                    if (targetPawn == null || targetPawn == caster)
+                    {
+                        return;
+                    }
+                    bool offensive = (tmad.MainVerb as VerbProperties_Ability)?.isViolent ?? true;
+                    bool sameFaction = targetPawn.Faction != null && targetPawn.Faction == caster.Faction;
+                    if (!offensive && sameFaction)
+                    {
+                        return;
+                    }
+                    Find.BattleLog.Add(new BattleLogEntry_TMAbilityUsed(caster, targetPawn, tmad, RulePackDefOf.Event_AbilityUsed));
+                }
+                catch (Exception)
+                {
+                }
+            }
+        }
+
         [HarmonyPatch(typeof(Thing), "TakeDamage")]
         public static class SpellDamageCombatLog_Patch
         {
