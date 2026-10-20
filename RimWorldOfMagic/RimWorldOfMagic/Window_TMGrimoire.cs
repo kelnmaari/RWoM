@@ -62,10 +62,11 @@ namespace TorannMagic
             Label(new Rect(0f, cur + 44f, inRect.width, 14f),
                 "TM_GrimoireSub".Translate(), TextAnchor.MiddleLeft, TextGray);
             cur += 62f;
+            EnsureFilters();
 
             Rect scrollRect = new Rect(0f, cur, inRect.width, inRect.height - cur);
             float viewWidth = scrollRect.width - 20f;
-            float viewHeight = EstimateViewHeight(viewWidth);
+            float viewHeight = MeasureViewHeight(viewWidth);
             Rect view = new Rect(0f, 0f, viewWidth, Mathf.Max(viewHeight, scrollRect.height));
             Widgets.BeginScrollView(scrollRect, ref scrollPos, view);
 
@@ -135,18 +136,12 @@ namespace TorannMagic
             y += info.height + 10f;
 
             // global stat skills (Clarity / Focus / Spirit), 1 point per level
-            y = DrawStatBlock(view, y, "TM_Stats", new List<MagicPowerSkill>
-            {
-                magic.MagicData.MagicPowerSkill_global_regen[0],
-                magic.MagicData.MagicPowerSkill_global_eff[0],
-                magic.MagicData.MagicPowerSkill_global_spirit[0],
-            });
+            y = DrawStatBlock(view, y, "TM_Stats", magicStats);
 
-            List<TMAbilityDef> filter = MagicAbilityFilter(GetMagicClassGroup(), null);
             foreach (MagicPower power in magic.MagicData.AllMagicPowersWithSkills)
             {
                 TMAbilityDef ability = power.abilityDef as TMAbilityDef;
-                if (ability == null || !filter.Contains(ability))
+                if (ability == null || !magicFilter.Contains(ability))
                 {
                     continue;
                 }
@@ -164,7 +159,7 @@ namespace TorannMagic
                 desc += "\n\n" + "TM_MCU_NextLevel".Translate() + "\n" + power.nextLevelAbilityDescDef.description;
             }
             float descWidth = view.width - 24f - IconSize - 10f;
-            float descHeight = string.IsNullOrEmpty(desc) ? 0f : Text.CalcHeight(desc, descWidth);
+            float descHeight = PowerDescriptionHeight(power, view.width);
             List<MagicPowerSkill> skills = GetMagicSkills(ability);
             float cardHeight = Mathf.Max(IconSize, 32f + descHeight) + skills.Count * 32f + 16f + 8f;
 
@@ -359,19 +354,12 @@ namespace TorannMagic
 
             y += info.height + 10f;
 
-            y = DrawStatBlock(view, y, "TM_StatsMight", new List<MightPowerSkill>
-            {
-                might.MightData.MightPowerSkill_global_refresh[0],
-                might.MightData.MightPowerSkill_global_seff[0],
-                might.MightData.MightPowerSkill_global_strength[0],
-                might.MightData.MightPowerSkill_global_endurance[0],
-            });
+            y = DrawStatBlock(view, y, "TM_StatsMight", mightStats);
 
-            List<TMAbilityDef> filter = MagicAbilityFilter(null, GetMightClassGroup());
             foreach (MightPower power in might.MightData.AllMightPowersWithSkills)
             {
                 TMAbilityDef ability = power.abilityDef as TMAbilityDef;
-                if (ability == null || !filter.Contains(ability))
+                if (ability == null || !mightFilter.Contains(ability))
                 {
                     continue;
                 }
@@ -389,7 +377,7 @@ namespace TorannMagic
                 desc += "\n\n" + "TM_MCU_NextLevel".Translate() + "\n" + power.nextLevelAbilityDescDef.description;
             }
             float descWidth = view.width - 24f - IconSize - 10f;
-            float descHeight = string.IsNullOrEmpty(desc) ? 0f : Text.CalcHeight(desc, descWidth);
+            float descHeight = PowerDescriptionHeight(power, view.width);
             List<MightPowerSkill> skills = GetMightSkills(ability);
             float cardHeight = Mathf.Max(IconSize, 32f + descHeight) + skills.Count * 32f + 16f + 8f;
 
@@ -576,7 +564,7 @@ namespace TorannMagic
             return y + panel.height + 12f;
         }
 
-        private float DrawResourcesBlock(Rect view, float y)
+        private List<(string label, float cur, float max, string regen, Color color)> GetResourceBars()
         {
             // Same sources the vanilla energy gizmo uses: the comp's own need
             // instances and the *100 display scale, plus the real regen rate.
@@ -609,6 +597,12 @@ namespace TorannMagic
                     ResCustom(magic.customClass.classIconColor));
             }
 
+            return bars;
+        }
+
+        private float DrawResourcesBlock(Rect view, float y)
+        {
+            var bars = GetResourceBars();
             if (bars.Count == 0)
             {
                 return y;
@@ -723,46 +717,169 @@ namespace TorannMagic
             return y + panel.height + 12f;
         }
 
-        private float EstimateViewHeight(float width)
+        // Height helpers mirror the drawing code exactly; the scroll view needs the
+        // total up front or the bottom of the list is unreachable.
+        private float MeasureViewHeight(float width)
         {
-            // Rough pre-pass so the scrollbar width is stable; exact heights are
-            // computed during drawing and the view simply grows as needed.
             float h = 90f;
-            if (magic != null && magic.MagicData != null)
-            {
-                h += 135f + GetMagicClassGroupCards() * 230f + 20f;
-            }
-            if (might != null && might.MightData != null)
-            {
-                h += 105f + GetMightClassGroupCards() * 230f + 20f;
-            }
             if (TMPIsekai.Active)
             {
                 h += 64f;
             }
+            h += ResourcesPanelHeight();
+            if (magic != null && magic.MagicData != null)
+            {
+                h += 30f + 76f + 10f + 22f;                       // header + info panel + gap + section label
+                h += StatBlockHeight(magicStats);
+                foreach (MagicPower power in magic.MagicData.AllMagicPowersWithSkills)
+                {
+                    TMAbilityDef ability = power.abilityDef as TMAbilityDef;
+                    if (ability == null || !magicFilter.Contains(ability))
+                    {
+                        continue;
+                    }
+                    h += MagicPowerCardHeight(width, power) + 10f;
+                }
+                h += 12f;
+            }
+            if (might != null && might.MightData != null)
+            {
+                h += 30f + 64f + 10f + 22f;
+                h += StatBlockHeight(mightStats);
+                foreach (MightPower power in might.MightData.AllMightPowersWithSkills)
+                {
+                    TMAbilityDef ability = power.abilityDef as TMAbilityDef;
+                    if (ability == null || !mightFilter.Contains(ability))
+                    {
+                        continue;
+                    }
+                    h += MightPowerCardHeight(width, power) + 10f;
+                }
+                h += 12f;
+            }
             return h;
         }
 
-        private int GetMagicClassGroupCards()
+        private float ResourcesPanelHeight()
         {
-            List<TMAbilityDef> filter = MagicAbilityFilter(GetMagicClassGroup(), null);
-            int n = 0;
-            foreach (MagicPower p in magic.MagicData.AllMagicPowersWithSkills)
+            if (magic == null && might == null)
             {
-                if (p.abilityDef is TMAbilityDef a && filter.Contains(a)) n++;
+                return 0f;
             }
-            return n;
+            int bars = 0;
+            if (might != null && might.Stamina != null) bars++;
+            if (magic != null && magic.Mana != null) bars++;
+            if (pawn.health?.hediffSet?.GetFirstHediffOfDef(HediffDef.Named("TM_PsionicHD"), false) != null) bars++;
+            if (pawn.health?.hediffSet?.GetFirstHediffOfDef(HediffDef.Named("TM_HateHD"), false) != null) bars++;
+            if (pawn.health?.hediffSet?.GetFirstHediffOfDef(HediffDef.Named("TM_BloodHD"), false) != null) bars++;
+            if (pawn.health?.hediffSet?.GetFirstHediffOfDef(HediffDef.Named("TM_ChiHD"), false) != null) bars++;
+            Need_Spirit spirit = pawn.needs?.TryGetNeed(TorannMagicDefOf.TM_SpiritND) as Need_Spirit;
+            if (spirit != null) bars++;
+            if (magic != null && magic.customClass != null && magic.customClass.showHediffOnGizmo && magic.customClass.classHediff != null) bars++;
+            return bars == 0 ? 0f : 30f + bars * 30f + 14f + 12f;
         }
 
-        private int GetMightClassGroupCards()
+        private List<MagicPowerSkill> magicStats;
+        private List<MightPowerSkill> mightStats;
+        private List<TMAbilityDef> magicFilter;
+        private List<TMAbilityDef> mightFilter;
+        private bool filtersBuilt;
+
+        private void EnsureFilters()
         {
-            List<TMAbilityDef> filter = MagicAbilityFilter(null, GetMightClassGroup());
-            int n = 0;
-            foreach (MightPower p in might.MightData.AllMightPowersWithSkills)
+            if (filtersBuilt)
             {
-                if (p.abilityDef is TMAbilityDef a && filter.Contains(a)) n++;
+                return;
             }
-            return n;
+            filtersBuilt = true;
+            magicStats = magic != null && magic.MagicData != null
+                ? new List<MagicPowerSkill>
+                {
+                    magic.MagicData.MagicPowerSkill_global_regen[0],
+                    magic.MagicData.MagicPowerSkill_global_eff[0],
+                    magic.MagicData.MagicPowerSkill_global_spirit[0],
+                }
+                : new List<MagicPowerSkill>();
+            mightStats = might != null && might.MightData != null
+                ? new List<MightPowerSkill>
+                {
+                    might.MightData.MightPowerSkill_global_refresh[0],
+                    might.MightData.MightPowerSkill_global_seff[0],
+                    might.MightData.MightPowerSkill_global_strength[0],
+                    might.MightData.MightPowerSkill_global_endurance[0],
+                }
+                : new List<MightPowerSkill>();
+            magicFilter = MagicAbilityFilter(GetMagicClassGroup(), null);
+            mightFilter = MagicAbilityFilter(null, GetMightClassGroup());
+        }
+
+        private float StatBlockHeight(List<MagicPowerSkill> stats)
+        {
+            return stats.Count == 0 ? 0f : 26f + stats.Count * 30f + 14f + 12f;
+        }
+
+        private float StatBlockHeight(List<MightPowerSkill> stats)
+        {
+            return stats.Count == 0 ? 0f : 26f + stats.Count * 30f + 14f + 12f;
+        }
+
+        private float MagicPowerCardHeight(float width, MagicPower power)
+        {
+            TMAbilityDef ability = (TMAbilityDef)power.abilityDef;
+            float descHeight = PowerDescriptionHeight(power, width);
+            int skillCount = 0;
+            MagicPowerSkill s = magic.MagicData.GetSkill_Power(ability);
+            if (s != null) skillCount++;
+            s = magic.MagicData.GetSkill_Efficiency(ability);
+            if (s != null) skillCount++;
+            s = magic.MagicData.GetSkill_Versatility(ability);
+            if (s != null) skillCount++;
+            return Mathf.Max(IconSize, 32f + descHeight) + skillCount * 32f + 16f + 8f;
+        }
+
+        private float MightPowerCardHeight(float width, MightPower power)
+        {
+            TMAbilityDef ability = (TMAbilityDef)power.abilityDef;
+            float descHeight = PowerDescriptionHeight(power, width);
+            int skillCount = 0;
+            MightPowerSkill s = might.MightData.GetSkill_Power(ability);
+            if (s != null) skillCount++;
+            s = might.MightData.GetSkill_Efficiency(ability);
+            if (s != null) skillCount++;
+            s = might.MightData.GetSkill_Versatility(ability);
+            if (s != null) skillCount++;
+            return Mathf.Max(IconSize, 32f + descHeight) + skillCount * 32f + 16f + 8f;
+        }
+
+        private float PowerDescriptionHeight(MagicPower power, float width)
+        {
+            string desc = power.abilityDescDef?.description;
+            if (power.level > 0 && power.level < power.maxLevel && power.nextLevelAbilityDescDef?.description != null)
+            {
+                desc += "\n\n" + "TM_MCU_NextLevel".Translate() + "\n" + power.nextLevelAbilityDescDef.description;
+            }
+            if (string.IsNullOrEmpty(desc))
+            {
+                return 0f;
+            }
+            Text.Font = GameFont.Tiny;
+            float h = Text.CalcHeight(desc, width - 24f - IconSize - 10f);
+            return h;
+        }
+
+        private float PowerDescriptionHeight(MightPower power, float width)
+        {
+            string desc = power.abilityDescDef?.description;
+            if (power.level > 0 && power.level < power.maxLevel && power.nextLevelAbilityDescDef?.description != null)
+            {
+                desc += "\n\n" + "TM_MCU_NextLevel".Translate() + "\n" + power.nextLevelAbilityDescDef.description;
+            }
+            if (string.IsNullOrEmpty(desc))
+            {
+                return 0f;
+            }
+            Text.Font = GameFont.Tiny;
+            return Text.CalcHeight(desc, width - 24f - IconSize - 10f);
         }
 
         private string ClassLabel()

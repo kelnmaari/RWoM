@@ -2209,4 +2209,6 @@ DR: [5, 9, 13, 17, 20]%</TM_Golemancy_pwr_desc>
   <TM_StatsMight>Боевые атрибуты</TM_StatsMight>
   <TM_GrimoireIsekaiHint>Уровни классов дают XP пробуждения; пробуждение расширяет пул маны.</TM_GrimoireIsekaiHint>
   <TM_GrimoireResources>Ресурсы</TM_GrimoireResources>
+  <TM_Grimoire>Гримуар</TM_Grimoire>
+  <TM_LevelUp>Улучшить</TM_LevelUp>
 </LanguageData>

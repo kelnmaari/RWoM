@@ -2337,4 +2337,6 @@ Level 3: all 4 effects</TM_CombatDrugs_pwr_desc>
   <TM_StatsMight>Combat attributes</TM_StatsMight>
   <TM_GrimoireIsekaiHint>Class levels feed awakening XP; awakening widens the mana pool.</TM_GrimoireIsekaiHint>
   <TM_GrimoireResources>Resources</TM_GrimoireResources>
+  <TM_Grimoire>Grimoire</TM_Grimoire>
+  <TM_LevelUp>Upgrade</TM_LevelUp>
 </LanguageData>
