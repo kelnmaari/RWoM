@@ -264,6 +264,18 @@ namespace TorannMagic.ModOptions
                 }
                 pawn.story.traits.GainTrait(new Trait(classTrait, traitDegree, false));
 
+                // mirror the class-book mechanic: taking a class consumes the
+                // Magically Gifted / Physical Prodigy stepping-stone traits
+                // (the book and ritual paths remove them the same way)
+                for (int i = pawn.story.traits.allTraits.Count - 1; i >= 0; i--)
+                {
+                    Trait t = pawn.story.traits.allTraits[i];
+                    if (t != null && (t.def == TorannMagicDefOf.TM_Gifted || t.def == TorannMagicDefOf.PhysicalProdigy))
+                    {
+                        pawn.story.traits.allTraits.RemoveAt(i);
+                    }
+                }
+
                 // Only re-init the side the new class belongs to: the other comp's
                 // data stays null until its own class trait appears, and its
                 // AssignAbilities would dereference it and throw.
