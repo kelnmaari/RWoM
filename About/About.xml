@@ -170,52 +170,46 @@
 	<description>[h1]Unofficial RimWorld 1.7 update of "A RimWorld of Magic"[/h1]
 
 [b][ENGLISH][/b]
-An unofficial continuation of TorannD's "A RimWorld of Magic" for RimWorld 1.7 (Waylith engine). All credit for the original mod goes to [url=https://steamcommunity.com/sharedfiles/filedetails/?id=1201382956]TorannD[/url] — this is a port of [url=https://github.com/TorannD/RWoM]the original code[/url], continued as [url=https://github.com/kelnmaari/RWoM]a fork[/url].
-[i]If the original author wants this item removed from the Workshop, please contact me via DM or in the comments here, and it will be taken down.[/i]
+Unofficial continuation of TorannD's "A RimWorld of Magic" for RimWorld 1.7. All credit for the original goes to [url=https://steamcommunity.com/sharedfiles/filedetails/?id=1201382956]TorannD[/url] — port of [url=https://github.com/TorannD/RWoM]the original code[/url], continued as [url=https://github.com/kelnmaari/RWoM]a fork[/url].
+[i]If the original author wants this item removed from the Workshop, contact me via DM or comments — it will be taken down.[/i]
 
 [olist]
-[*]Removed the HugsLib dependency (no longer maintained for 1.7). All of HugsLib's duties (147 Harmony patches, update notifications) are now handled by the mod itself.
-[*]JecsLite framework (AbilityUser, AbilityUserAI, CompDeflector and friends) is rebuilt for 1.7 and bundled inside — no separate JecsLite is needed on 1.7.
+[*]HugsLib dependency removed — its duties (147 Harmony patches, update notes) are handled by the mod itself.
+[*]JecsLite framework (AbilityUser, AbilityUserAI, CompDeflector, etc.) rebuilt for 1.7 and bundled — no separate JecsLite needed.
 [*]Fixed 1.7 regressions: LineOfSight default flip (autocast, Blink/Summon through walls, missing cooldowns), greyed-out ability icons, broken reflected shots, attribute patches (117 classes / 153 methods).
-[*][b]Multiplayer support[/b] built in — requires the 1.7 multiplayer fork: [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3820003322](1.7)Multiplayer-temp[/url]. Ability casts, cooldowns and gizmos are synced.
-[*][b]Isekai family integration[/b] (optional, all coexist peacefully):
-  - [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3657580708]ISEKAI RPG LEVELING[/url]: class level-ups grant awakening XP; awakening widens the mana pool; Grimoire shows your awakening rank (F…Nation).
-  - [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3813394602]ISEKAI DUNGEONS ADD-ON[/url]: adds 4 magic-themed gates — Flame Rift, Tide Rift, Bone Crypt, Demon Gate (ranks C–S) with RWoM creatures; they join gate spawns, guild contracts and gate scrolls automatically.
-  - [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3757560461]ISEKAI CREATURES ADD-ON[/url] and [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3718568958]GUILD FACTION ADD-ON[/url]: coexist; RWoM creatures can appear in dungeons and guild contracts.
-  - [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3800773705]RIM ISEKAI — Complete Integrated[/url]: coexistence verified in a clean load test.
-[*]New character window (Grimoire): class levels, XP/mana/stamina bars with real regen rates, full spell list with descriptions and visible per-skill upgrade explanations, resources panel.
-[*]Debug menu: "T: Give Class..." action to grant any class to a selected pawn.
-[*]Translations bundled: [url=https://steamcommunity.com/sharedfiles/filedetails/?id=2882739907]Russian, Ukrainian, Portuguese (based on Nevelian's translation)[/url].
+[*][b]Multiplayer support[/b] built in — needs the 1.7 MP fork: [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3820003322](1.7)Multiplayer-temp[/url]. Ability casts, cooldowns and gizmos are synced.
+[*][b]Isekai family integration[/b] (optional, coexists cleanly):
+[olist]
+[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=3657580708]ISEKAI RPG LEVELING[/url] — class level-ups grant awakening XP; awakening widens the mana pool; Grimoire shows awakening rank (F…Nation).
+[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=3813394602]ISEKAI DUNGEONS ADD-ON[/url] — 4 magic gates: Flame Rift, Tide Rift, Bone Crypt, Demon Gate (C–S) with RWoM creatures; auto-join gate spawns, guild contracts and scrolls.
+[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=3757560461]CREATURES[/url] and [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3718568958]GUILD FACTION[/url] add-ons — coexist; RWoM creatures appear in dungeons and guild contracts.
+[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=3800773705]RIM ISEKAI — Complete Integrated[/url] — clean coexistence verified.
+[/olist]
+[*]New character window (Grimoire): class levels, XP/mana/stamina bars with real regen rates, full spell list with descriptions and per-skill upgrade explanations, resources panel.
+[*]Debug menu: "T: Give Class..." grants any class to a selected pawn.
+[*]Bundled translations: [url=https://steamcommunity.com/sharedfiles/filedetails/?id=2882739907]Russian, Ukrainian, Portuguese (based on Nevelian's translation)[/url].
 [/olist]
 
-[i]Load order: Harmony → this mod; load the 1.7 Multiplayer fork [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3820003322]here[/url] before it if you want MP. Do NOT enable the old JecsLite/JecsLite 1.6 alongside.[/i]
+[i]Load order: Harmony → this mod; the MP fork goes before it. Do NOT enable old JecsLite/JecsLite 1.6 alongside.[/i]
 
-[b]CAUTION! This port and its integrations were made with AI assistance — I'm not a C# developer and can't judge how well the AI handled it. If you don't use AI mods, please pass this one by.[/b] I fixed this mod for myself and decided to share it.
-
-If you have a problem, please create a Discussion on this item — I'll look into it when I have time. The code is available on [url=https://github.com/kelnmaari/RWoM]GitHub[/url].
+[b]CAUTION! This port and its integrations were made with AI assistance — I'm not a C# developer and can't judge how well the AI handled it. If you don't use AI mods, please pass this one by.[/b] I fixed this mod for myself and decided to share it. If you have a problem, create a Discussion here — the code is on [url=https://github.com/kelnmaari/RWoM]GitHub[/url].
 
 [b][РУССКИЙ][/b]
-Неофициальное продолжение мода TorannD "A RimWorld of Magic" для RimWorld 1.7 (движок Waylith). Вся заслуга оригинала — [url=https://steamcommunity.com/sharedfiles/filedetails/?id=1201382956]TorannD[/url]; это перенос [url=https://github.com/TorannD/RWoM]исходного кода[/url], продолженный как [url=https://github.com/kelnmaari/RWoM]форк[/url].
-[i]Если автор захочет, чтобы я удалил мод из Мастерской — напишите в личные сообщения или в комментариях к моду, удалю.[/i]
+Неофициальное продолжение мода TorannD "A RimWorld of Magic" для RimWorld 1.7. Заслуга оригинала — [url=https://steamcommunity.com/sharedfiles/filedetails/?id=1201382956]TorannD[/url]; перенос [url=https://github.com/TorannD/RWoM]его кода[/url], продолжено как [url=https://github.com/kelnmaari/RWoM]форк[/url].
+[i]Если автор захочет удалить этот итем из Мастерской — напишите в ЛС или в комментариях, удалю.[/i]
 
 [olist]
-[*]Убрана зависимость от HugsLib (для 1.7 не поддерживается) — все его задачи (147 Harmony-патчей, уведомления об обновлениях) мод выполняет сам.
-[*]Фреймворк JecsLite (AbilityUser, AbilityUserAI, CompDeflector и др.) пересобран под 1.7 и вшит в мод — отдельный JecsLite на 1.7 не нужен.
-[*]Исправлены поломки 1.7: дефолтная проверка прямой видимости (автокаст, Blink/Summon сквозь стены, пропавшие кулдауны), серые иконки при нехватке маны, сломанные отражённые выстрелы, атрибутные патчи (117 классов / 153 метода).
-[*][b]Поддержка мультиплеера[/b] встроена — требуется форк мультиплеера 1.7: [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3820003322](1.7)Multiplayer-temp[/url]. Применение способностей, кулдауны и гизмо синхронизируются.
-[*][b]Интеграция с ISEKAI-модами[/b] (опционально, сосуществуют без конфликтов):
-  - [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3657580708]ISEKAI RPG LEVELING[/url]: уровни классов дают XP пробуждения; пробуждение расширяет пул маны; в Гримуаре виден ранг пробуждения (F…Nation).
-  - [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3813394602]ISEKAI DUNGEONS ADD-ON[/url]: добавляет 4 магических врат — Огненный разлом, Приливный разлом, Костяной склеп, Врата демонов (ранги C–S) с существами RWoM; они автоматически попадают в появление врат, контракты гильдии и свитки врат.
-  - [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3757560461]ISEKAI CREATURES ADD-ON[/url] и [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3718568958]GUILD FACTION ADD-ON[/url]: сосуществуют; существа RWoM появляются в данжах и контрактах гильдии.
-  - [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3800773705]RIM ISEKAI — Complete Integrated[/url]: сосуществование проверено чистым тестом загрузки.
-[*]Новое окно персонажа (Гримуар): уровни классов, полосы XP/маны/выносливости с реальной скоростью восстановления, полный список заклинаний с описаниями и прокачкой скиллов с пояснениями, панель ресурсов.
-[*]Меню отладки: действие "T: Give Class..." — выдать любому пешке любой класс.
-[*]Вшиты переводы: [url=https://steamcommunity.com/sharedfiles/filedetails/?id=2882739907]русский, украинский, португальский (на основе перевода Nevelian)[/url].
+[*]Убрана зависимость от HugsLib — его задачи (147 Harmony-патчей, уведомления) мод делает сам.
+[*]Фреймворк JecsLite (AbilityUser, AbilityUserAI, CompDeflector и др.) пересобран под 1.7 и вшит — отдельный JecsLite не нужен.
+[*]Исправлены поломки 1.7: проверка прямой видимости (автокаст, Blink/Summon сквозь стены, пропавшие кулдауны), серые иконки при нехватке маны, отражённые выстрелы, атрибутные патчи (117/153).
+[*][b]Мультиплеер[/b] встроен — нужен форк 1.7: [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3820003322](1.7)Multiplayer-temp[/url]. Кастануть, кулдауны и гизмо синхронизируются.
+[*][b]Интеграция с ISEKAI[/b] (опционально): уровни классов дают XP пробуждения и ранг F…Nation в Гримуаре [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3657580708](Leveling)[/url]; 4 магических врата с существами RWoM для [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3813394602]Dungeons[/url] (C–S); сосуществование с [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3757560461]Creatures[/url], [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3718568958]Guild Faction[/url] и [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3800773705]RIM ISEKAI[/url] проверено.
+[*]Гримуар: уровни, XP/мана/выносливость с реальным реген, заклинания с описаниями, прокачка скиллов с пояснениями, панель ресурсов.
+[*]Отладка: "T: Give Class..." выдаёт класс выбранной пешке.
+[*]Вшиты переводы: [url=https://steamcommunity.com/sharedfiles/filedetails/?id=2882739907]русский, украинский, португальский (по переводу Nevelian)[/url].
 [/olist]
 
-[i]Порядок загрузки: Harmony → этот мод; для мультиплеера перед ним — форк [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3820003322](1.7)Multiplayer-temp[/url]. Не включайте старый JecsLite/JecsLite 1.6 одновременно с модом.[/i]
+[i]Порядок: Harmony → этот мод; форк MP перед ним. Старый JecsLite 1.6 вместе с модом не включать.[/i]
 
-[b]ОСТОРОЖНО! Этот перенос и интеграции сделаны с помощью ИИ — я не C# разработчик и не знаю, насколько хорошо ИИ справился. Те, кто не пользуется ИИ-модами, проходите мимо пожалуйста.[/b] Мод исправлял для себя, решил поделиться с людьми.
-
-[b]Если у вас есть проблема — создайте Обсуждение к моду, по мере времени посмотрю. Код опубликован на [url=https://github.com/kelnmaari/RWoM]GitHub[/url].[/b]</description>
+[b]ОСТОРОЖНО! Перенос и интеграции сделаны с помощью ИИ — я не C# разработчик и не знаю, насколько хорошо ИИ справился. Кто не пользуется ИИ-модами — проходите мимо.[/b] Мод исправлял для себя, решил поделиться. Проблема — создайте Обсуждение, код на [url=https://github.com/kelnmaari/RWoM]GitHub[/url].</description>
 </ModMetaData>
