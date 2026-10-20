@@ -164,16 +164,21 @@ namespace TorannMagic
             CameraJumper.TryHideWorld();
             if (!map.mapPawns.AnyColonistSpawned && !map.IsPlayerHome)
             {
-                StringBuilder stringBuilder = new StringBuilder();
-                stringBuilder.Append("TM_AbandoningMap".Translate(map.Parent.LabelCap));
-                Find.WindowStack.Add(Dialog_MessageBox.CreateConfirmation(stringBuilder.ToString(), delegate
+                // Only settlement sites can be abandoned — on encounter/quest maps
+                // map.Parent is not a Settlement and the cleanup comp would NRE.
+                Settlement sm = map.Parent as Settlement;
+                if (sm != null)
                 {
-                    Settlement sm = map.Parent as Settlement;
-                    WorldTransport.TM_DelayedDestroyMap ddm = new WorldTransport.TM_DelayedDestroyMap();
-                    ddm.parent = sm;
-                    ddm.delayTicks = 120;
-                    sm.AllComps.Add(ddm);
-                }));
+                    StringBuilder stringBuilder = new StringBuilder();
+                    stringBuilder.Append("TM_AbandoningMap".Translate(map.Parent.LabelCap));
+                    Find.WindowStack.Add(Dialog_MessageBox.CreateConfirmation(stringBuilder.ToString(), delegate
+                    {
+                        WorldTransport.TM_DelayedDestroyMap ddm = new WorldTransport.TM_DelayedDestroyMap();
+                        ddm.parent = sm;
+                        ddm.delayTicks = 120;
+                        sm.AllComps.Add(ddm);
+                    }));
+                }
             }
         }
 

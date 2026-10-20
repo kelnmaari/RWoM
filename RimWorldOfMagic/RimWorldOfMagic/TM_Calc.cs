@@ -21,25 +21,46 @@ namespace TorannMagic
     public static class TM_Calc
     {
         //Extensions
-        // Non-generic GetComp<CompAbilityUserMagic> for performance since isInst against generic T is slow
+        // Non-generic GetComp<CompAbilityUserMagic> for performance since isInst against generic T is slow.
+        // The comps list of a ThingWithComps is fixed at spawn, so the lookup result is cached per
+        // thing in a ConditionalWeakTable: entries die with the thing, nothing is saved, MP-safe.
+        private static readonly object NoComp = new object();
+        private static readonly System.Runtime.CompilerServices.ConditionalWeakTable<ThingWithComps, object> magicCompCache =
+            new System.Runtime.CompilerServices.ConditionalWeakTable<ThingWithComps, object>();
+
         public static CompAbilityUserMagic GetCompAbilityUserMagic(this ThingWithComps thingWithComps)
         {
+            if (thingWithComps == null) return null;
+            if (magicCompCache.TryGetValue(thingWithComps, out object cached)) return cached as CompAbilityUserMagic;
             for (int i = 0; i < thingWithComps.AllComps.Count; i++)
             {
-                if (thingWithComps.AllComps[i] is CompAbilityUserMagic comp) return comp;
+                if (thingWithComps.AllComps[i] is CompAbilityUserMagic comp)
+                {
+                    magicCompCache.Add(thingWithComps, comp);
+                    return comp;
+                }
             }
-
+            magicCompCache.Add(thingWithComps, NoComp);
             return null;
         }
 
-        // Non-generic GetComp<CompAbilityUserMight> for performance since isInst against generic T is slow
+        private static readonly System.Runtime.CompilerServices.ConditionalWeakTable<ThingWithComps, object> mightCompCache =
+            new System.Runtime.CompilerServices.ConditionalWeakTable<ThingWithComps, object>();
+
+        // Non-generic GetComp<CompAbilityUserMight> for performance since isInst against generic T is slow (cached, see above)
         public static CompAbilityUserMight GetCompAbilityUserMight(this ThingWithComps thingWithComps)
         {
+            if (thingWithComps == null) return null;
+            if (mightCompCache.TryGetValue(thingWithComps, out object cached)) return cached as CompAbilityUserMight;
             for (int i = 0; i < thingWithComps.AllComps.Count; i++)
             {
-                if (thingWithComps.AllComps[i] is CompAbilityUserMight comp) return comp;
+                if (thingWithComps.AllComps[i] is CompAbilityUserMight comp)
+                {
+                    mightCompCache.Add(thingWithComps, comp);
+                    return comp;
+                }
             }
-
+            mightCompCache.Add(thingWithComps, NoComp);
             return null;
         }
 

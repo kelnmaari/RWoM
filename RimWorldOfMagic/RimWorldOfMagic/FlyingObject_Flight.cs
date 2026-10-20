@@ -118,10 +118,10 @@ namespace TorannMagic
         public void Launch(Thing launcher, Vector3 origin, LocalTargetInfo targ, Thing flyingThing, DamageInfo? newDamageInfo = null)
         {
 
-            bool spawned = flyingThing.Spawned;            
+            bool spawned = flyingThing != null && flyingThing.Spawned;
             pawn = launcher as Pawn;
-            drafted = pawn.Drafted;
-            comp = pawn.GetCompAbilityUserMagic();
+            drafted = pawn?.Drafted ?? false;
+            comp = pawn?.GetCompAbilityUserMagic();
 
             if (spawned)
             {               
@@ -155,9 +155,22 @@ namespace TorannMagic
             bool flag = !this.ExactPosition.InBoundsWithNullCheck(base.Map);
             if (flag)
             {
-                this.ticksToImpact++;
-                base.Position = this.ExactPosition.ToIntVec3();
-                this.Destroy(DestroyMode.Vanish);
+                // Never orphan the flying pawn off-map: land at the closest
+                // in-bounds cell instead of destroying the projectile mid-flight.
+                this.ticksToImpact = 0;
+                IntVec3 c = this.ExactPosition.ToIntVec3();
+                if (base.Map != null)
+                {
+                    c.x = Mathf.Clamp(c.x, 0, base.Map.Size.x - 1);
+                    c.z = Mathf.Clamp(c.z, 0, base.Map.Size.z - 1);
+                    this.destination = c.ToVector3Shifted();
+                    base.Position = c;
+                    this.ImpactSomething();
+                }
+                else
+                {
+                    this.Destroy(DestroyMode.Vanish);
+                }
             }
             else
             {
@@ -191,11 +204,10 @@ namespace TorannMagic
 
         protected override void DrawAt(Vector3 drawLoc, bool flip = false)
         {
-            bool flag = this.flyingThing != null;
-            if (flag)
+            // flyingThing can be null after a failed save restore — never draw it.
+            if (this.flyingThing != null)
             {
-                bool flag2 = this.flyingThing is Pawn;
-                if (flag2)
+                if (this.flyingThing is Pawn pawn2)
                 {
                     Vector3 arg_2B_0 = this.DrawPos;
                     bool flag4 = !this.DrawPos.ToIntVec3().IsValid;
@@ -203,18 +215,12 @@ namespace TorannMagic
                     {
                         return;
                     }
-                    Pawn pawn = this.flyingThing as Pawn;
-                    pawn.Drawer.renderer.RenderPawnAt(this.DrawPos);  
-                    
+                    pawn2.Drawer.renderer.RenderPawnAt(this.DrawPos);
                 }
                 else
                 {
                     Graphics.DrawMesh(MeshPool.plane10, this.DrawPos, this.ExactRotation, this.flyingThing.def.DrawMatSingle, 0);
                 }
-            }
-            else
-            {
-                Graphics.DrawMesh(MeshPool.plane10, this.DrawPos, this.ExactRotation, this.flyingThing.def.DrawMatSingle, 0);
             }
             base.Comps_PostDraw();
         }
@@ -230,8 +236,8 @@ namespace TorannMagic
 
         private void ImpactSomething()
         {
-            bool flag = this.assignedTarget != null;
-            if (flag)
+            // A destroyed/despawned target must not be passed into Impact.
+            if (this.assignedTarget != null && !this.assignedTarget.Destroyed && this.assignedTarget.Spawned)
             {
                 Pawn targetPawn = this.assignedTarget as Pawn;
                 bool flag2 = targetPawn != null && targetPawn.GetPosture() != PawnPosture.Standing && (this.origin - this.destination).MagnitudeHorizontalSquared() >= 20.25f && Rand.Value > 0.2f;
@@ -252,29 +258,39 @@ namespace TorannMagic
 
         protected new void Impact(Thing hitThing)
         {
-            bool flag = hitThing == null;
-            if (flag)
-            {
-                Pawn hitPawn;
-                bool flag2 = (hitPawn = (base.Position.GetThingList(base.Map).FirstOrDefault((Thing x) => x == this.assignedTarget) as Pawn)) != null;
-                if (flag2)
-                {
-                    hitThing = hitPawn;
-                }
-            }
-            bool hasValue = this.impactDamage.HasValue;
-            if (hasValue)
-            {
-                hitThing.TakeDamage(this.impactDamage.Value);
-            }
             try
             {
-                SoundDefOf.Ambient_AltitudeWind.sustainFadeoutTime.Equals(30.0f);                
+                if (hitThing == null && base.Map != null)
+                {
+                    Pawn hitPawn = base.Position.GetThingList(base.Map).FirstOrDefault((Thing x) => x == this.assignedTarget) as Pawn;
+                    if (hitPawn != null)
+                    {
+                        hitThing = hitPawn;
+                    }
+                }
+                if (this.impactDamage.HasValue && hitThing != null && !hitThing.Destroyed)
+                {
+                    hitThing.TakeDamage(this.impactDamage.Value);
+                }
 
-                GenSpawn.Spawn(this.flyingThing, base.Position, base.Map);
-                ModOptions.Constants.SetPawnInFlight(false);
+                SoundDefOf.Ambient_AltitudeWind.sustainFadeoutTime.Equals(30.0f);
+
+                if (this.flyingThing != null && !this.flyingThing.Destroyed && base.Map != null)
+                {
+                    // Spawn exactly once; fall back to a nearby cell when the
+                    // destination is blocked instead of re-spawning the pawn.
+                    if (this.flyingThing.Spawned)
+                    {
+                        // already back on a map (should not happen) — keep it
+                    }
+                    else if (!GenPlace.TryPlaceThing(this.flyingThing, base.Position, base.Map, ThingPlaceMode.Direct))
+                    {
+                        GenPlace.TryPlaceThing(this.flyingThing, base.Position, base.Map, ThingPlaceMode.Near);
+                    }
+                }
+
                 Pawn p = this.flyingThing as Pawn;
-                if (p.IsColonist)
+                if (p != null && p.Spawned && p.IsColonist && p.drafter != null)
                 {
                     if (ModOptions.Settings.Instance.cameraSnap)
                     {
@@ -282,17 +298,33 @@ namespace TorannMagic
                     }
                     p.drafter.Drafted = this.drafted;
                 }
-                this.Destroy(DestroyMode.Vanish);
             }
-            catch
+            catch (Exception ex)
             {
-                GenSpawn.Spawn(this.flyingThing, base.Position, base.Map);
-                ModOptions.Constants.SetPawnInFlight(false);
-                Pawn p = this.flyingThing as Pawn;
-                if (p.IsColonist)
+                Log.Warning("TM Flight: error while landing, recovering the carrier pawn: " + ex);
+                try
                 {
-                    p.drafter.Drafted =this.drafted;
+                    Pawn p2 = this.flyingThing as Pawn;
+                    if (p2 != null && !p2.Spawned && !p2.Destroyed && base.Map != null)
+                    {
+                        if (CellFinder.TryFindRandomCellNear(base.Position, base.Map, 5,
+                            (IntVec3 c) => c.Standable(base.Map), out IntVec3 cell))
+                        {
+                            GenSpawn.Spawn(p2, cell, base.Map);
+                        }
+                        else
+                        {
+                            GenSpawn.Spawn(p2, base.Position, base.Map);
+                        }
+                    }
                 }
+                catch
+                {
+                }
+            }
+            finally
+            {
+                ModOptions.Constants.SetPawnInFlight(false);
                 this.Destroy(DestroyMode.Vanish);
             }
         }        

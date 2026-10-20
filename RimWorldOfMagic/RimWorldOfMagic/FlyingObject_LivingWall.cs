@@ -670,11 +670,10 @@ namespace TorannMagic
 
         protected override void DrawAt(Vector3 drawLoc, bool flip = false)
         {
-            bool flag = this.flyingThing != null;
-            if (flag)
+            // flyingThing can be null after a failed save restore — never draw it.
+            if (this.flyingThing != null)
             {
-                bool flag2 = this.flyingThing is Pawn;
-                if (flag2)
+                if (this.flyingThing is Pawn pawn)
                 {
                     Vector3 arg_2B_0 = this.DrawPos;
                     bool flag4 = !this.DrawPos.ToIntVec3().IsValid;
@@ -682,8 +681,7 @@ namespace TorannMagic
                     {
                         return;
                     }
-                    Pawn pawn = this.flyingThing as Pawn;
-                    pawn.Drawer.renderer.RenderPawnAt(this.DrawPos);                      
+                    pawn.Drawer.renderer.RenderPawnAt(this.DrawPos);
                 }
                 else
                 {
@@ -691,10 +689,6 @@ namespace TorannMagic
                     drawP.y = 8.1f;
                     Graphics.DrawMesh(MeshPool.plane10, drawP, Quaternion.identity, this.flyingThing.def.DrawMatSingle, 0);
                 }
-            }
-            else
-            {
-                Graphics.DrawMesh(MeshPool.plane10, this.DrawPos, Quaternion.identity, this.flyingThing.def.DrawMatSingle, 0);
             }
             base.Comps_PostDraw();
         }
@@ -708,8 +702,8 @@ namespace TorannMagic
 
         private void ImpactSomething()
         {
-            bool flag = this.assignedTarget != null;
-            if (flag)
+            // A destroyed/despawned target must not be passed into Impact.
+            if (this.assignedTarget != null && !this.assignedTarget.Destroyed && this.assignedTarget.Spawned)
             {
                 Pawn pawn = this.assignedTarget as Pawn;
                 bool flag2 = pawn != null && pawn.GetPosture() != PawnPosture.Standing && (this.origin - this.destination).MagnitudeHorizontalSquared() >= 20.25f && Rand.Value > 0.2f;
