@@ -2215,4 +2215,5 @@ DR: [5, 9, 13, 17, 20]%</TM_Golemancy_pwr_desc>
   <TM_LevelUp>Улучшить</TM_LevelUp>
   <TM_GrimoireDesc>Відкриє гримуар цього персонажа: рівні класів, мана, здібності та прогрес пробудження.</TM_GrimoireDesc>
   <TM_SlavesCanScribe>Разрешить рабам записывать классы в тома</TM_SlavesCanScribe>
+  <AU_DISABLED>Отключено</AU_DISABLED>
 </LanguageData>

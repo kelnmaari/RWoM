@@ -2168,4 +2168,5 @@ DR: [5, 9, 13, 17, 20]%</TM_Golemancy_pwr_desc>
   <showUndeadAnimalChangeDesc>Нежить-тварини показують першу стадію гниття (згнилі); якщо вимкнено, виглядають як за життя</showUndeadAnimalChangeDesc>
   <showUndeadPawnChangeDesc>Нежить-пішаки показують різні стадії гниття; якщо вимкнено, виглядають як за життя</showUndeadPawnChangeDesc>
   <TM_GrimoireSub>Рівні класів, мана та здібності в одному місці.</TM_GrimoireSub>
+  <AU_DISABLED>Вимкнено</AU_DISABLED>
 </LanguageData>

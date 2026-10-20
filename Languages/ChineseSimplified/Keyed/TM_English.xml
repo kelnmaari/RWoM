@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <LanguageData>
 
 
@@ -698,4 +698,5 @@
   <!--<TM_增强>闪电风暴增强</TM_增强>-->
   <!--<TM_功能性增强>闪电风暴功能性增强</TM_功能性增强>-->
 
+  <AU_DISABLED>已禁用</AU_DISABLED>
 </LanguageData>

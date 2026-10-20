@@ -2966,7 +2966,7 @@ namespace TorannMagic
                     TipSignal tipSignal = com.Desc;
                     if (com.Disabled && !com.disabledReason.NullOrEmpty())
                     {
-                        tipSignal.text = tipSignal.text + "\n" + StringsToTranslate.AU_DISABLED + ": " + com.disabledReason;
+                        tipSignal.text = tipSignal.text + "\n" + "AU_DISABLED".Translate() + ": " + com.disabledReason;
                     }
                     TooltipHandler.TipRegion(rect, tipSignal);
                 }
