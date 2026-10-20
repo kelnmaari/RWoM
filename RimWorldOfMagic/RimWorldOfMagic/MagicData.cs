@@ -47,7 +47,12 @@ namespace TorannMagic
                         mp.maxLevel = current.customPower.maxLevel;
                         mp.learnCost = current.customPower.learnCost;
                         mp.costToLevel = current.customPower.costToLevel;
-                        mp.autocasting = current.customPower.autocasting;
+                        if (current.customPower.autocasting != null)
+                        {
+                            // only override when the custom def defines its own node —
+                            // otherwise keep the constructor's autocast defaults
+                            mp.autocasting = current.customPower.autocasting;
+                        }
                         if (!magicPowerCustom.Any(a => a.GetAbilityDef(0) == mp.GetAbilityDef(0)))
                         {
                             newPower = true;

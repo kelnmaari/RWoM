@@ -165,6 +165,10 @@ namespace TorannMagic
             }
 
             LoadLegacyClassAutocast();
+            if (this.autocasting == null)
+            {
+                this.autocasting = TMDefs.TM_AutocastDefaults.For(this.abilityDef as TMAbilityDef, true);
+            }
 
         }
 
@@ -179,6 +183,11 @@ namespace TorannMagic
             Scribe_Values.Look<int>(ref this.ticksUntilNextCast, "ticksUntilNextCast", -1, false);
             Scribe_Collections.Look<AbilityDef>(ref this.TMabilityDefs, "TMabilityDefs", (LookMode)4, null);
             Scribe_Deep.Look<TMDefs.TM_Autocast>(ref this.autocasting, "autocasting", new object[0]);
+            if (Scribe.mode == LoadSaveMode.PostLoadInit && this.autocasting == null)
+            {
+                // old saves stored null for powers without legacy entries
+                this.autocasting = TMDefs.TM_AutocastDefaults.For(this.abilityDef as TMAbilityDef, true);
+            }
         }
 
         public void LoadLegacyClassAutocast()

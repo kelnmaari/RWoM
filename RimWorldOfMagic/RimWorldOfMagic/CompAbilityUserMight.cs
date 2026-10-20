@@ -2739,7 +2739,9 @@ namespace TorannMagic
                 bool isCustom = this.customIndex >= 0;
                 if (this.Pawn.drafter != null && !this.Pawn.Drafted && this.Stamina != null && this.Stamina.CurLevelPercentage >= ModOptions.Settings.Instance.autocastMinThreshold)
                 {
-                    foreach (MightPower mp in this.MightData.MightPowersCustomAll)
+                    // All learned powers (custom included) — every power now carries
+                    // autocast defaults, gated per-pawn by the mp.autocast toggle.
+                    foreach (MightPower mp in this.MightData.AllMightPowersWithSkills)
                     {
                         //Log.Message("checking custom power " + mp.abilityDef.defName);
                         if (mp.learned && mp.autocast && mp.autocasting != null && mp.autocasting.mightUser && mp.autocasting.undrafted)
@@ -3135,7 +3137,7 @@ namespace TorannMagic
                 //combat (drafted) spells
                 if (this.Pawn.drafter != null && this.Pawn.Drafted && this.Pawn.drafter.FireAtWill && this.Stamina != null && (this.Stamina.CurLevelPercentage >= ModOptions.Settings.Instance.autocastCombatMinThreshold || this.Pawn.story.traits.HasTrait(TorannMagicDefOf.TM_Monk)) && this.Pawn.CurJob.def != JobDefOf.Goto && this.Pawn.CurJob.def != JobDefOf.AttackMelee)
                 {
-                    foreach (MightPower mp in this.MightData.MightPowersCustom)
+                    foreach (MightPower mp in this.MightData.AllMightPowersWithSkills)
                     {
                         if (mp.learned && mp.autocast && mp.autocasting != null && mp.autocasting.mightUser && mp.autocasting.drafted)
                         {
