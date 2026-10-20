@@ -1,6 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
 <LanguageData>
-
-  <!-- Notification messages  -->
   <TM_NotEnoughMana>Se não houver maná suficiente.</TM_NotEnoughMana>
   <TM_NotEnoughBlood>O sangue não foi doado o suficiente.</TM_NotEnoughBlood>
   <TM_NotEnoughMaxMana>Se você não tiver reservas suficientes de maná para manter o se</TM_NotEnoughMaxMana>
@@ -13,7 +12,6 @@
   <TM_NoRequiredInspiration>Se for possível, este recurso não tem a inspiração que você precisa para executar.</TM_NoRequiredInspiration>
   <TM_NotInspired>Se não for um 0, não é inspirador.</TM_NotInspired>
   <MentalStateByPsyker>A superação do ataque mental.</MentalStateByPsyker>
-
   <TM_InvalidTarget>No entanto, não foi encontrado um alvo adequado para a habilidade de 081 warner.</TM_InvalidTarget>
   <InvalidPortal>A localização inválida do portal-destino e todas as posições vizinhas devem ser válidas e livres de lixo.</InvalidPortal>
   <InvalidMine>Localização inadequada da mina causada - a posição de destino deve ser válida e livre de lixo.</InvalidMine>
@@ -66,12 +64,12 @@
   <TM_BondedAnimalReleaseToColony>Acabou a ligação entre o se e o que aconteceu, mas o que foi necessário para a colônia.</TM_BondedAnimalReleaseToColony>
   <TM_AnimalIncapableOfBond>que não tem inteligência suficiente para formar uma conexão com o 081.</TM_AnimalIncapableOfBond>
   <TM_AnimalAlreadyHasBond>O grupo já está ligado a outro Ranger.</TM_AnimalAlreadyHasBond>
-  <TM_FailedRangerBond></TM_FailedRangerBond>
+  <TM_FailedRangerBond />
   <TM_RangerNotExperienced> Isso pode aumentar, investindo pontos na Empatia Animal.</TM_RangerNotExperienced>
   <TM_TooManyTraps>Se você se restringir às armadilhas, se apaga a remover a armadilha mais antiga.</TM_TooManyTraps>
   <TM_SummonedCreatureLimitExceeded>O número máximo de criaturas causadas superou o número máximo de criaturas convocadas, removendo a chamada mais antiga.</TM_SummonedCreatureLimitExceeded>
   <TM_NoMinionToDismiss>Se você não tiver um minion.</TM_NoMinionToDismiss>
-<TM_NoGuardianSpiritToDismiss>Não há nenhum espírito de guarda que possa ser despedido.</TM_NoGuardianSpiritToDismiss>
+  <TM_NoGuardianSpiritToDismiss>Não há nenhum espírito de guarda que possa ser despedido.</TM_NoGuardianSpiritToDismiss>
   <TM_NoValidUndeadToDismiss>O alvo não é um alvo aceitável.</TM_NoValidUndeadToDismiss>
   <TM_CannotUseGemOfInsight>O GLOBO já possui um segredo ou uma linha de guerra, ou é inabitável, e não pode usar esta pedra preciosa.</TM_CannotUseGemOfInsight>
   <TM_ItemUseFailed>A tentativa de usar o item falhou.</TM_ItemUseFailed>
@@ -82,7 +80,7 @@
   <TM_CleaveChance>Chance de descumprimento de a. 0 350%</TM_CleaveChance>
   <TM_WhirlwindDamage>Danos causados por um vórtice por uma batida</TM_WhirlwindDamage>
   <TM_WeaponDamage>Se não for possível, o que aconteceu é que, por exemplo, o que aconteceu?</TM_WeaponDamage>
-<TM_CritChance>Se este for o ponto final, o ponto de choque crítico é o</TM_CritChance>
+  <TM_CritChance>Se este for o ponto final, o ponto de choque crítico é o</TM_CritChance>
   <TM_AntiArmorDamage>Se você não estiver bem, o que está a fazer é que o que está a acontecer? danos adicionais aos mechanoides:</TM_AntiArmorDamage>
   <TM_ArrowStormDamage>Se você não estiver bem, o que está a fazer é que o que está a acontecer? Precisão: &lt; 2 a.p.%</TM_ArrowStormDamage>
   <TM_LastManaGainPct>Aumento de maná: Se você quiser um aumento de 0 %/5s</TM_LastManaGainPct>
@@ -104,8 +102,8 @@
   <TM_Icon_Undead>Animada Sem Vida</TM_Icon_Undead>
   <TM_Icon_Mage>Aula mágica</TM_Icon_Mage>
   <TM_Icon_Fighter>Classe de combate</TM_Icon_Fighter>
-<TM_Icon_Custom>Sala de aula personalizada</TM_Icon_Custom>
-<TM_NotPsychicSensitive>Se tentou tornar-se um psicônico, não parece ter a sensibilidade mental necessária para mostrar o poder psicônico.</TM_NotPsychicSensitive>
+  <TM_Icon_Custom>Sala de aula personalizada</TM_Icon_Custom>
+  <TM_NotPsychicSensitive>Se tentou tornar-se um psicônico, não parece ter a sensibilidade mental necessária para mostrar o poder psicônico.</TM_NotPsychicSensitive>
   <TM_TooManyStoneskins>Se for possível proteger a pele de pedra apenas nos peões, se você quiser.</TM_TooManyStoneskins>
   <TM_NoSpritesToDismiss>Se não encontrarem espíritos da Terra, os parâmetros são redobrados.</TM_NoSpritesToDismiss>
   <TM_SentinelDeSpawn>Se espalhou em cinzas sem o maná necessário para se manter.</TM_SentinelDeSpawn>
@@ -127,7 +125,7 @@
   <TM_CanNotTeachMagic>Se você não é capaz de ser o mentor de um diante de uma mágica, não é um mágico.</TM_CanNotTeachMagic>
   <TM_CanNotTeachCombat>Se não puder treinar, ele não é um lutador.</TM_CanNotTeachCombat>
   <TM_CanNotTeachMagicDislike>Se recusa a orientar o se para a magia por causa de uma opinião de Se-0 se recusou a orientar o Se-se-á sobre o SE-1.</TM_CanNotTeachMagicDislike>
-  <TM_CanNotTeachCombatDislike></TM_CanNotTeachCombatDislike>
+  <TM_CanNotTeachCombatDislike />
   <TM_TechnoBitToggleDesc>Ativar ou desligar o techno-bit quando desligado, o techno-bit não executará nenhuma ação.</TM_TechnoBitToggleDesc>
   <TM_TechnoBitEnabled>techno-bit ligado</TM_TechnoBitEnabled>
   <TM_TechnoBitDisabled>Tecno-bit desligado</TM_TechnoBitDisabled>
@@ -159,11 +157,11 @@
   <TM_Taunting>Gozação!</TM_Taunting>
   <TM_CeaseToExist>Se você não existir...</TM_CeaseToExist>
   <TM_EndingGameCondition>Se o 0 foi concluído com êxito, este é um 1.</TM_EndingGameCondition>
-  <TM_GameConditionChanged></TM_GameConditionChanged>
+  <TM_GameConditionChanged />
   <TM_GameConditionMadePermanent>se tornou permanente.</TM_GameConditionMadePermanent>
-  <TM_GameConditionAdded></TM_GameConditionAdded>
+  <TM_GameConditionAdded />
   <TM_AlterGameConditionFailed>Se não for possível editar o 0, não foi possível editar o 1.</TM_AlterGameConditionFailed>
-  <TM_PredictionFeelsConfident></TM_PredictionFeelsConfident>
+  <TM_PredictionFeelsConfident />
   <TM_PredictionFeelsUnsure>Se você não está certo, ele não está certo de que ele tenha tido algum efeito sobre a previsão.</TM_PredictionFeelsUnsure>
   <TM_PredictionUnease>Se sente desconfortável por causa das alterações no prognóstico, se calhar alguma coisa correu mal...</TM_PredictionUnease>
   <TM_PredictionTerrified>Se ele estiver assustado, ele sente que algo catastrófico vai acontecer...</TM_PredictionTerrified>
@@ -177,76 +175,65 @@
   <TM_SuppressingFireCount>Tiros: 0</TM_SuppressingFireCount>
   <TM_BuckshotFireCount>Frações de imagem: Se você quiser uma imagem</TM_BuckshotFireCount>
   <TM_LendColonist_UndeadFail>Está a enviar-nos cadáveres, é uma piada?</TM_LendColonist_UndeadFail>
-<TM_AlreadyLearnedAbility>Se você já aprendeu o que você está fazendo, você já aprendeu o que você sabe.</TM_AlreadyLearnedAbility>
-<TM_NotEnoughManaToSustain>Se você não tiver um número suficiente de maná para sustentar o que você quer.</TM_NotEnoughManaToSustain>
-<TM_CannotCastUnderRoof>Se não puder usar o 0 1 de baixo do telhado.</TM_CannotCastUnderRoof>
-<TM_UnableToTravel>Não é possível chegar a este destino.</TM_UnableToTravel>
-<TM_SelectTargetOnMap>Se você escolher um destino no mapa, selecione...</TM_SelectTargetOnMap>
-<TM_AbandoningMap>Os seus peões estão a recusar-se, se querem remover o cartão?</TM_AbandoningMap>
-<TM_IncompatibleWeaponType>Se não for possível usar, é uma arma incompatível.</TM_IncompatibleWeaponType>
-<TM_SpiritAnimalChange>O animal espiritual se alterou de diante de um para o outro.</TM_SpiritAnimalChange>
-<TM_InvalidAction>Se você não puder usar o 081, parâmetros inválidos.</TM_InvalidAction>
-<TM_InvalidAbility>Se não puder usar o 0 de 1, você não pôde usar.</TM_InvalidAbility>
-<TM_SlaveRefuses>Se recusa a executar esta ação.</TM_SlaveRefuses>
-<TM_SlaveScribeFail>Este ponto foi estragado durante o processo de gravação.</TM_SlaveScribeFail>
-<TM_MessageRitualRoleMustBeColonistOrPrisoner>É suposto ser um colono ou um prisioneiro.</TM_MessageRitualRoleMustBeColonistOrPrisoner>
-<TM_MessageRitualRoleMustBeColonist>Se calhar é um colono.</TM_MessageRitualRoleMustBeColonist>
-<TM_MessageRitualRoleMustBeVoidseeker>Se calhar é um buscador de vazio.</TM_MessageRitualRoleMustBeVoidseeker>
-<TM_MessageRitualRoleMustBeMage>É suposto ser um mágico.</TM_MessageRitualRoleMustBeMage>
-<TM_MessageRitualRoleMustNotBeMage>Se não puder ser um mágico, o «0».</TM_MessageRitualRoleMustNotBeMage>
-<TM_MessageRitualRoleMustNotBeFighter>Se calhar já não pode ser um lutador.</TM_MessageRitualRoleMustNotBeFighter>
-<TM_MessageRitualRoleCannotHaveTrait>Se você quiser saber, o «0», é que já tem o sinal de «1».</TM_MessageRitualRoleCannotHaveTrait>
-<TM_MessageRitualRoleMustHaveTrait></TM_MessageRitualRoleMustHaveTrait>
-<TM_DoesNotHaveArcanePathwayInspiration>Se calhar não houve mais inspiração.</TM_DoesNotHaveArcanePathwayInspiration>
-<TM_MessageRitualRoleMustBeInspiredWith>Se você não for inspirado, ele não se inspira no se.</TM_MessageRitualRoleMustBeInspiredWith>
-<TM_MessageRitualRoleCannotBeUndead>Se não puder ser um não-vivo.</TM_MessageRitualRoleCannotBeUndead>
-<TM_RuneCarving>gravura rónica</TM_RuneCarving>
-<TM_ArcaneTatoo>tatuagem secreta</TM_ArcaneTatoo>
-<TM_MaxGolemUpgradeReached>Já foi alcançada a atualização máxima de a.0.. recursos devolvidos</TM_MaxGolemUpgradeReached>
-<TM_NoGolemPartToRestore>Não havia nenhum detalhe ausente para substituir o se; recursos foram devolvidos</TM_NoGolemPartToRestore>
-<TM_GolemBillUnsuccessful>Não foi possível concluir a receita de golem de a.0; recursos foram devolvidos</TM_GolemBillUnsuccessful>
-<TM_GolemCannotReturn>O Golem não pôde voltar à sua posição, está indisponível ou ocupado.</TM_GolemCannotReturn>
-<TM_GolemPartReplaced>A atualização de &lt; 0 03 substituiu a atualização de &lt; 1 03; apenas uma atualização deste tipo pode ser levada por a.2.</TM_GolemPartReplaced>
-<TM_UnfinishedThingNoProduct>Incompleto a.pra 0</TM_UnfinishedThingNoProduct>
-<TM_NoPassionsToTransfer>Não foi encontrado nada de que valha a pena para passar de 0 1 para &quot;</TM_NoPassionsToTransfer>
-<TM_MustHaveInspiration>é preciso haver uma inspiração para o uso de &lt; 1 warner.</TM_MustHaveInspiration>
-<TM_BonusDamage>Danos adicionais: Se não for possível</TM_BonusDamage>
-<TM_NoRangedAttack>nenhum ataque de longo alcance</TM_NoRangedAttack>
-<TM_GolemLight>Luz</TM_GolemLight>
-<TM_GolemLightDesc>Alternador de luz</TM_GolemLightDesc>
-<TM_GolemMinimumToActivate>Energia insuficiente para ativar:</TM_GolemMinimumToActivate>
-<TM_GolemChargesRemaining>&lt; 0 &lt; ações remanescentes</TM_GolemChargesRemaining>
-<TM_AlreadyHasSymbiote>Este é o seu simbiote.</TM_AlreadyHasSymbiote>
-<TM_CannotAlterWeatherType>Não foi possível criar um tipo de tempo alternativo a partir de &lt; 0 03</TM_CannotAlterWeatherType>
-
-  <!-- Surgery Failed letters -->
+  <TM_AlreadyLearnedAbility>Se você já aprendeu o que você está fazendo, você já aprendeu o que você sabe.</TM_AlreadyLearnedAbility>
+  <TM_NotEnoughManaToSustain>Se você não tiver um número suficiente de maná para sustentar o que você quer.</TM_NotEnoughManaToSustain>
+  <TM_CannotCastUnderRoof>Se não puder usar o 0 1 de baixo do telhado.</TM_CannotCastUnderRoof>
+  <TM_UnableToTravel>Não é possível chegar a este destino.</TM_UnableToTravel>
+  <TM_SelectTargetOnMap>Se você escolher um destino no mapa, selecione...</TM_SelectTargetOnMap>
+  <TM_AbandoningMap>Os seus peões estão a recusar-se, se querem remover o cartão?</TM_AbandoningMap>
+  <TM_IncompatibleWeaponType>Se não for possível usar, é uma arma incompatível.</TM_IncompatibleWeaponType>
+  <TM_SpiritAnimalChange>O animal espiritual se alterou de diante de um para o outro.</TM_SpiritAnimalChange>
+  <TM_InvalidAction>Se você não puder usar o 081, parâmetros inválidos.</TM_InvalidAction>
+  <TM_InvalidAbility>Se não puder usar o 0 de 1, você não pôde usar.</TM_InvalidAbility>
+  <TM_SlaveRefuses>Se recusa a executar esta ação.</TM_SlaveRefuses>
+  <TM_SlaveScribeFail>Este ponto foi estragado durante o processo de gravação.</TM_SlaveScribeFail>
+  <TM_MessageRitualRoleMustBeColonistOrPrisoner>É suposto ser um colono ou um prisioneiro.</TM_MessageRitualRoleMustBeColonistOrPrisoner>
+  <TM_MessageRitualRoleMustBeColonist>Se calhar é um colono.</TM_MessageRitualRoleMustBeColonist>
+  <TM_MessageRitualRoleMustBeVoidseeker>Se calhar é um buscador de vazio.</TM_MessageRitualRoleMustBeVoidseeker>
+  <TM_MessageRitualRoleMustBeMage>É suposto ser um mágico.</TM_MessageRitualRoleMustBeMage>
+  <TM_MessageRitualRoleMustNotBeMage>Se não puder ser um mágico, o «0».</TM_MessageRitualRoleMustNotBeMage>
+  <TM_MessageRitualRoleMustNotBeFighter>Se calhar já não pode ser um lutador.</TM_MessageRitualRoleMustNotBeFighter>
+  <TM_MessageRitualRoleCannotHaveTrait>Se você quiser saber, o «0», é que já tem o sinal de «1».</TM_MessageRitualRoleCannotHaveTrait>
+  <TM_MessageRitualRoleMustHaveTrait />
+  <TM_DoesNotHaveArcanePathwayInspiration>Se calhar não houve mais inspiração.</TM_DoesNotHaveArcanePathwayInspiration>
+  <TM_MessageRitualRoleMustBeInspiredWith>Se você não for inspirado, ele não se inspira no se.</TM_MessageRitualRoleMustBeInspiredWith>
+  <TM_MessageRitualRoleCannotBeUndead>Se não puder ser um não-vivo.</TM_MessageRitualRoleCannotBeUndead>
+  <TM_RuneCarving>gravura rónica</TM_RuneCarving>
+  <TM_ArcaneTatoo>tatuagem secreta</TM_ArcaneTatoo>
+  <TM_MaxGolemUpgradeReached>Já foi alcançada a atualização máxima de a.0.. recursos devolvidos</TM_MaxGolemUpgradeReached>
+  <TM_NoGolemPartToRestore>Não havia nenhum detalhe ausente para substituir o se; recursos foram devolvidos</TM_NoGolemPartToRestore>
+  <TM_GolemBillUnsuccessful>Não foi possível concluir a receita de golem de a.0; recursos foram devolvidos</TM_GolemBillUnsuccessful>
+  <TM_GolemCannotReturn>O Golem não pôde voltar à sua posição, está indisponível ou ocupado.</TM_GolemCannotReturn>
+  <TM_GolemPartReplaced>A atualização de &lt; 0 03 substituiu a atualização de &lt; 1 03; apenas uma atualização deste tipo pode ser levada por a.2.</TM_GolemPartReplaced>
+  <TM_UnfinishedThingNoProduct>Incompleto a.pra 0</TM_UnfinishedThingNoProduct>
+  <TM_NoPassionsToTransfer>Não foi encontrado nada de que valha a pena para passar de 0 1 para "</TM_NoPassionsToTransfer>
+  <TM_MustHaveInspiration>é preciso haver uma inspiração para o uso de &lt; 1 warner.</TM_MustHaveInspiration>
+  <TM_BonusDamage>Danos adicionais: Se não for possível</TM_BonusDamage>
+  <TM_NoRangedAttack>nenhum ataque de longo alcance</TM_NoRangedAttack>
+  <TM_GolemLight>Luz</TM_GolemLight>
+  <TM_GolemLightDesc>Alternador de luz</TM_GolemLightDesc>
+  <TM_GolemMinimumToActivate>Energia insuficiente para ativar:</TM_GolemMinimumToActivate>
+  <TM_GolemChargesRemaining>&lt; 0 &lt; ações remanescentes</TM_GolemChargesRemaining>
+  <TM_AlreadyHasSymbiote>Este é o seu simbiote.</TM_AlreadyHasSymbiote>
+  <TM_CannotAlterWeatherType>Não foi possível criar um tipo de tempo alternativo a partir de &lt; 0 03</TM_CannotAlterWeatherType>
   <LetterLabelRegrowthSurgeryFail>A operação não correu bem</LetterLabelRegrowthSurgeryFail>
   <LetterRegrowthSurgeryFail>Porém, falhou por causa de sua causa. Para executar esta operação com sucesso, você deve cumprir as seguintes condições :\n\n1. O cirurgião deve ser um druide\n\n2. O Druide deve ter aprendido o feitiço de crescimento dos membros. Você deve ter a semente da vida como ingrediente para a operação .\n\n4. O Druid deve ter 90 ou mais unidades de maná no momento da operação .\n\n5. Uma vez que todas estas condições sejam cumpridas, o druido ainda deve realizar a cirurgia com sucesso, o que depende de sua habilidade médica .\n\n Boa sorte, mago!</LetterRegrowthSurgeryFail>
   <TM_NotMagicUser>não é um usuário mágico</TM_NotMagicUser>
   <TM_NoRegrowthSpell>não aprendeu o feitiço a criar membros</TM_NoRegrowthSpell>
   <TM_InsufficientManaForSurgery>falta de maná suficiente para completar a operação - são necessários 90 ou mais</TM_InsufficientManaForSurgery>
-
-<LetterLabelRuneCarvingFail>Não foi possível cortar as runas</LetterLabelRuneCarvingFail>
-<LetterRuneCarvingFail>Este ponto, que acabou de ser executado, acabou de tentar executar o que aconteceu com o que aconteceu. O cirurgião deve ser Magom\n2. Mago, devia ser treinado para Cortar Runas .\n3. Você deve ter, no mínimo, o que você quer para completar o corte da runa .\n4. O mago deve ser capaz de fazer trabalhos artísticos e artesanais. Após o cumprimento de todas estas condições, o mago ainda deve executar com sucesso a esculpição - a chance de sucesso no corte de runas começa em 70% e aumenta de acordo com a habilidade do craft, a habilidade artística e a habilidade de cortar runas.</LetterRuneCarvingFail>
-<TM_NoRuneCarvingSpell>não pode cortar runas</TM_NoRuneCarvingSpell>
-<TM_InsufficientManaForCarving>Falta maná suficiente para completar o corte de runas - Para o 0, você precisa de um 1 de 350 ou mais.</TM_InsufficientManaForCarving>
-<TM_RuneCarvingFailed></TM_RuneCarvingFailed>
-<TM_CarvingFailedChance>Não foi possível cortar as runas.</TM_CarvingFailedChance>
-
-  <!-- Caravan Request letters -->
+  <LetterLabelRuneCarvingFail>Não foi possível cortar as runas</LetterLabelRuneCarvingFail>
+  <LetterRuneCarvingFail>Este ponto, que acabou de ser executado, acabou de tentar executar o que aconteceu com o que aconteceu. O cirurgião deve ser Magom\n2. Mago, devia ser treinado para Cortar Runas .\n3. Você deve ter, no mínimo, o que você quer para completar o corte da runa .\n4. O mago deve ser capaz de fazer trabalhos artísticos e artesanais. Após o cumprimento de todas estas condições, o mago ainda deve executar com sucesso a esculpição - a chance de sucesso no corte de runas começa em 70% e aumenta de acordo com a habilidade do craft, a habilidade artística e a habilidade de cortar runas.</LetterRuneCarvingFail>
+  <TM_NoRuneCarvingSpell>não pode cortar runas</TM_NoRuneCarvingSpell>
+  <TM_InsufficientManaForCarving>Falta maná suficiente para completar o corte de runas - Para o 0, você precisa de um 1 de 350 ou mais.</TM_InsufficientManaForCarving>
+  <TM_RuneCarvingFailed />
+  <TM_CarvingFailedChance>Não foi possível cortar as runas.</TM_CarvingFailedChance>
   <LetterLabelArcaneScriptCaravan>Solicitação de caravana</LetterLabelArcaneScriptCaravan>
   <LetterArcaneScriptCaravan>O povoado ao lado, se você entrar em contato com um pedido comercial especial. Eles gostariam de comprar :\n\n\n\n\n como resposta, eles sugerem :\n\n\n\\n\n Esta solicitação expira depois que: Se você quiser fazer uma transação, envie uma caravana com os suprimentos solicitados. Você pode exibir esta frase selecionando o «0» no mapa do mundo.</LetterArcaneScriptCaravan>
-
-  <!-- Magic circle failed letters -->
   <LetterLabelRitualFail>O ritual falhou</LetterLabelRitualFail>
   <LetterRitualFail>Os seus mágicos não foram capazes de ativar o ritual de grupo. Este ritual tem uma chance de sucesso de 1 por cento. Todos os recursos foram perdidos.</LetterRitualFail>
   <LetterRitualFailDamage>Os seus mágicos não foram capazes de ativar o ritual de grupo, e sofreram com a resposta da magia aos estragos até diante de diante. Este ritual tem 1% de chances de sucesso. Todos os recursos foram perdidos.</LetterRitualFailDamage>
-
-  <!-- Prediction letters -->
   <TM_PredictionLetter>Antecipação: 0</TM_PredictionLetter>
-  <TM_PredictionText>Se o 0, ele previu que o &apos;1&apos; vai acontecer nas próximas 2.</TM_PredictionText>
-
-  <!-- Mod Settings -->
+  <TM_PredictionText>Se o 0, ele previu que o '1' vai acontecer nas próximas 2.</TM_PredictionText>
   <XPMultiplier>Mago XR multiplicador de aumento</XPMultiplier>
   <NeedMultiplier>Multiplicador de maná</NeedMultiplier>
   <AICanCast>A IA usa habilidades</AICanCast>
@@ -286,9 +273,8 @@
   <TM_DeathRetaliationIsLethal>A vingança da morte é sempre letal</TM_DeathRetaliationIsLethal>
   <TM_DeathRetaliationChance>Retaliação da Morte Chance</TM_DeathRetaliationChance>
   <TM_DeathRetaliationDelay>Fator de atraso na retaliação da morte</TM_DeathRetaliationDelay>
-<TM_shrinkIcons>Reduzir ícones</TM_shrinkIcons>
-<TM_CameraSnap>Ligação de câmera após teletransporte</TM_CameraSnap>
-  <!-- Mod Settings Class options -->
+  <TM_shrinkIcons>Reduzir ícones</TM_shrinkIcons>
+  <TM_CameraSnap>Ligação de câmera após teletransporte</TM_CameraSnap>
   <supportTraitChance>Sinais auxiliares</supportTraitChance>
   <TM_ClassWarning>* * Altere as opções de classe apenas quando iniciar um novo jogo * *</TM_ClassWarning>
   <TM_RequiresRestart>* * Qualquer alteração requer reiniciar o jogo * *</TM_RequiresRestart>
@@ -330,42 +316,31 @@
   <TM_Brightmage>Mago da Luz</TM_Brightmage>
   <TM_Shaman>Xamã</TM_Shaman>
   <TM_Shadow>Sombra</TM_Shadow>
-<TM_Golemancer>Golemant</TM_Golemancer>
-<TM_Apothecary>Farmacêutico</TM_Apothecary>
-<TM_Empath>Empata</TM_Empath>
-<TM_Enlightened>Iluminado</TM_Enlightened>
-<TM_Cursed>Maldito</TM_Cursed>
-<TM_FaeBlood>Sangue das Fações</TM_FaeBlood>
-<TM_GiantsBlood>Sangue de gigantes</TM_GiantsBlood>
+  <TM_Golemancer>Golemant</TM_Golemancer>
+  <TM_Apothecary>Farmacêutico</TM_Apothecary>
+  <TM_Empath>Empata</TM_Empath>
+  <TM_Enlightened>Iluminado</TM_Enlightened>
+  <TM_Cursed>Maldito</TM_Cursed>
+  <TM_FaeBlood>Sangue das Fações</TM_FaeBlood>
+  <TM_GiantsBlood>Sangue de gigantes</TM_GiantsBlood>
   <TM_CustomClasses>Classes personalizadas</TM_CustomClasses>
-
-  <!-- Mod Settings event options -->
   <TM_EventOptions>Opções de Eventos</TM_EventOptions>
   <riftChallenge>Dificuldade para quebrar os elementos básicos:</riftChallenge>
   <lichChallenge>Complexidade do Leitão Itinerante</lichChallenge>
   <demonChallenge>Complexidade da invasão demoníaca</demonChallenge>
-
-<!-- Mod settings Golem options -->
-<TM_GolemOptions>Opções de Golem</TM_GolemOptions>
-<TM_GolemShowDormantFrameWhileActive>Mostrar quadro inativo</TM_GolemShowDormantFrameWhileActive>
-<TM_GolemShowDormantFrameWhileActiveDesc>Mostra o contorno do golem adormecido em sua posição adormecida enquanto o golem está ativo.</TM_GolemShowDormantFrameWhileActiveDesc>
-<TM_GolemShowColonistBar>Mostrar os Holems no Bar dos Colonos</TM_GolemShowColonistBar>
-<TM_GolemShowColonistBarDesc>Quando estiver ligado, os golems aparecerão no painel dos colonos com outros colonos. Aplica-se a todos os tipos de holems.</TM_GolemShowColonistBarDesc>
-
-<!-- Mod setings faction options -->
-<TM_FactionOptions>Opções de facção</TM_FactionOptions>
-
-  <!-- Mod Settings extra options -->
+  <TM_GolemOptions>Opções de Golem</TM_GolemOptions>
+  <TM_GolemShowDormantFrameWhileActive>Mostrar quadro inativo</TM_GolemShowDormantFrameWhileActive>
+  <TM_GolemShowDormantFrameWhileActiveDesc>Mostra o contorno do golem adormecido em sua posição adormecida enquanto o golem está ativo.</TM_GolemShowDormantFrameWhileActiveDesc>
+  <TM_GolemShowColonistBar>Mostrar os Holems no Bar dos Colonos</TM_GolemShowColonistBar>
+  <TM_GolemShowColonistBarDesc>Quando estiver ligado, os golems aparecerão no painel dos colonos com outros colonos. Aplica-se a todos os tipos de holems.</TM_GolemShowColonistBarDesc>
+  <TM_FactionOptions>Opções de facção</TM_FactionOptions>
   <TM_ExtraOptions>Opções Avançadas</TM_ExtraOptions>
-
-  <!-- Magic Ability Point Descriptions -->
   <TM_global_regen_pwr>Claridade</TM_global_regen_pwr>
   <TM_global_regen_pwr_desc>Aumenta a taxa de recuperação de maná em 5% por nível.</TM_global_regen_pwr_desc>
   <TM_global_eff_pwr>Concentração</TM_global_eff_pwr>
   <TM_global_eff_pwr_desc>Reduz os custos do maná em todas as capacidades, de 2,5% por nível.</TM_global_eff_pwr_desc>
   <TM_global_spirit_pwr>Espírito</TM_global_spirit_pwr>
   <TM_global_spirit_pwr_desc>Aumenta a quantidade máxima de maná em 4 por nível de habilidade.</TM_global_spirit_pwr_desc>
-
   <TM_global_refresh_pwr>Adaptação</TM_global_refresh_pwr>
   <TM_global_refresh_pwr_desc>Aumenta a taxa de resistência em 5% por nível.</TM_global_refresh_pwr_desc>
   <TM_global_seff_pwr>Coordenação</TM_global_seff_pwr>
@@ -374,7 +349,6 @@
   <TM_global_strength_pwr_desc>Aumenta os danos de capacidade em 5% por nível.</TM_global_strength_pwr_desc>
   <TM_global_endurance_pwr>Resistência</TM_global_endurance_pwr>
   <TM_global_endurance_pwr_desc>Aumenta a resistência máxima em 4 por nível.</TM_global_endurance_pwr_desc>
-
   <TM_WandererCraft_pwr_desc>Cada ponto de habilidade:
 Potencial: + 1%
 Resistência de capacidade: + 2%</TM_WandererCraft_pwr_desc>
@@ -419,7 +393,6 @@ Nível 12: a invisibilidade tem uma duração 25% maior e aplica auto-fixação 
 Nível 13: luz mágica disparará relâmpago contra os inimigos em 24 células a cada 7-13 segundos
 Nível 14: AMY tem 40% de chance de tentar sabotar robôs e mecanoides
 Nível 15: teletransporte, cura e desafio minion aumento da versatilidade Nível 3º nível melhorias</TM_Cantrips_ver_desc>
-
   <TM_WandererCraft_pwr>Exportações</TM_WandererCraft_pwr>
   <TM_WandererCraft_eff>Autodidata</TM_WandererCraft_eff>
   <TM_WandererCraft_ver>Mente avançada</TM_WandererCraft_ver>
@@ -482,7 +455,6 @@ Aumenta o raio da tempestade de neve em .5 por nível de habilidade.</TM_Blizzar
   <TM_Blizzard_eff_desc>Reduz os custos de tempestade de maná em 8% por nível.</TM_Blizzard_eff_desc>
   <TM_Blizzard_ver_desc>Aumenta a tempestade em 1,5 segundos a cada nível.
 Aumenta o raio da tempestade em .5 por nível de habilidade.</TM_Blizzard_ver_desc>
-
   <TM_Soothe_eff>Eficácia da acalmia</TM_Soothe_eff>
   <TM_Rainmaker_eff>Eficiência da chuva</TM_Rainmaker_eff>
   <TM_Icebolt_eff>Eficiência da bola de gelo</TM_Icebolt_eff>
@@ -521,7 +493,6 @@ Aumenta o raio da tempestade em .5 por nível de habilidade.</TM_Blizzard_ver_de
   <TM_EyeOfTheStorm_eff>Fuga atmosférica</TM_EyeOfTheStorm_eff>
   <TM_EyeOfTheStorm_pwr>Rugas da terra</TM_EyeOfTheStorm_pwr>
   <TM_EyeOfTheStorm_ver>Tempestade perfeita</TM_EyeOfTheStorm_ver>
-
   <TM_Shadow_eff_desc>Reduz o custo de manter a sombra em 8% por nível.</TM_Shadow_eff_desc>
   <TM_Blink_eff_desc>Reduz os custos de panqueca em 10% por nível.</TM_Blink_eff_desc>
   <TM_Summon_eff_desc>Reduz os custos de chamamento de maná 10% por nível.</TM_Summon_eff_desc>
@@ -573,7 +544,6 @@ Nível 3: A raiva santa dá poder a todos os aliados no alcance</TM_HolyWrath_ve
   <TM_HolyWrath_eff>Pureza da raiva sagrada</TM_HolyWrath_eff>
   <TM_HolyWrath_pwr>Vingança Santa</TM_HolyWrath_pwr>
   <TM_HolyWrath_ver>Redenção</TM_HolyWrath_ver>
-
   <TM_SummonMinion_eff_desc>Reduz os custos do maná para o apelo de minions em 10%. Também reduz os custos de manutenção em 10%.</TM_SummonMinion_eff_desc>
   <TM_SummonMinion_pwr_desc>Aumenta a quantidade ou a força dos minions causados.
 Nível 0: chame um mignon.
@@ -595,7 +565,6 @@ No grau 3, chame dois primórdios menores para acompanharem o seu desafio princi
   <TM_SummonPoppi_eff_desc>Reduz o custo do maná para chamar o grupo Poppy em 5% cada habilidade de ponto, mas realmente quem pode apostar o preço da felicidade?</TM_SummonPoppi_eff_desc>
   <TM_SummonPoppi_pwr_desc>Mais Poppy, apertam-se.</TM_SummonPoppi_pwr_desc>
   <TM_SummonPoppi_ver_desc>Sair com os Poppies é uma explosão ainda maior.</TM_SummonPoppi_ver_desc>
-
   <TM_SummonMinion_eff>Coerção</TM_SummonMinion_eff>
   <TM_SummonMinion_pwr>Proposta tentadora</TM_SummonMinion_pwr>
   <TM_SummonMinion_ver>Supervisor</TM_SummonMinion_ver>
@@ -611,7 +580,6 @@ No grau 3, chame dois primórdios menores para acompanharem o seu desafio princi
   <TM_SummonPoppi_eff>Entusiasta de Poppy</TM_SummonPoppi_eff>
   <TM_SummonPoppi_pwr>Apanhá-los a Todos</TM_SummonPoppi_pwr>
   <TM_SummonPoppi_ver>Catalisador de aperto</TM_SummonPoppi_ver>
-
   <TM_Poison_eff_desc>Reduz o valor do veneno em 10% por nível de habilidade.</TM_Poison_eff_desc>
   <TM_Poison_pwr_desc>Aumenta a força do veneno, gerando 25% a mais pelo nível de habilidade de cada quadrado que a vítima passa.</TM_Poison_pwr_desc>
   <TM_Poison_ver_desc>Aumenta a gravidade mínima e máxima da intoxicação. Os níveis de gravidade provocam uma diminuição da capacidade de combate e propulsão. Também aumenta a duração do veneno em 10% por nível.
@@ -640,7 +608,6 @@ Nível 1: vermes intestinais, intoxicação alimentar e malária
 Nível 2: doença do sono e parasitas musculares
 Nível 3: Peste</TM_CureDisease_ver_desc>
   <TM_RegrowLimb_eff_desc>Reduz a quantidade de maná necessária para criar membros (cirurgia) em 6% por nível de habilidade. O crescimento não afeta a redução geral dos custos da maná.</TM_RegrowLimb_eff_desc>
-
   <TM_Poison_eff>Métodos de extração</TM_Poison_eff>
   <TM_Poison_pwr>Força do veneno</TM_Poison_pwr>
   <TM_Poison_ver>Membros debilitados</TM_Poison_ver>
@@ -653,7 +620,6 @@ Nível 3: Peste</TM_CureDisease_ver_desc>
   <TM_CureDisease_pwr>Tratamento eficaz</TM_CureDisease_pwr>
   <TM_CureDisease_ver>Conhecimento da Doença</TM_CureDisease_ver>
   <TM_RegrowLimb_eff>Habilidade da Planta</TM_RegrowLimb_eff>
-
   <TM_RaiseUndead_eff_desc>Reduz os custos do feitiço de encorpar 5% por nível de habilidade. Reduz em 10% os custos de permanência por nível de habilidade.</TM_RaiseUndead_eff_desc>
   <TM_RaiseUndead_pwr_desc>Aumenta a quantidade de carência que você pode criar com cada feitiço em 1 por nível de habilidade.
 Nível 0:2
@@ -692,7 +658,6 @@ Nível 2: 28-45; Escuridão que se espalha: 18-30
 Nível 3: 33-50; Escuridão que se espalha: 21-33</TM_DeathBolt_pwr_desc>
   <TM_DeathBolt_eff_desc>Reduz em 6% os custos de bolo mortal por nível de habilidade.</TM_DeathBolt_eff_desc>
   <TM_DeathBolt_ver_desc>A escuridão está a espalhar-se mais longe do local do impacto.</TM_DeathBolt_ver_desc>
-
   <TM_RaiseUndead_eff>Enganar a Morte</TM_RaiseUndead_eff>
   <TM_RaiseUndead_pwr>Criação poderosa</TM_RaiseUndead_pwr>
   <TM_RaiseUndead_ver>Desamparo apressado</TM_RaiseUndead_ver>
@@ -710,7 +675,6 @@ Nível 3: 33-50; Escuridão que se espalha: 21-33</TM_DeathBolt_pwr_desc>
   <TM_DeathBolt_pwr>O Poder Ímpio</TM_DeathBolt_pwr>
   <TM_DeathBolt_eff>Treinamento eterno</TM_DeathBolt_eff>
   <TM_DeathBolt_ver>Proliferação da Escuridão</TM_DeathBolt_ver>
-
   <TM_AdvancedHeal_eff_desc>Reduz o custo do maná de cura avançada em 8% por nível.</TM_AdvancedHeal_eff_desc>
   <TM_AdvancedHeal_ver_desc>Aumenta o número máximo de ferimentos curados para nível 1.</TM_AdvancedHeal_ver_desc>
   <TM_AdvancedHeal_pwr_desc>Aumenta a quantidade de cicatrização de cada ferida em 3 pontos por nível.</TM_AdvancedHeal_pwr_desc>
@@ -747,7 +711,6 @@ Nível 4:18 saúde</TM_HealingCircle_pwr_desc>
   <TM_BestowMight_eff_desc>Reduz em 8% os custos de poder de maná por cada ponto de habilidade.</TM_BestowMight_eff_desc>
   <TM_Resurrection_eff_desc>Reduz os custos de ressuscitação em 5% por nível de habilidade e reduz em 2% a experiência de habilidade perdida.</TM_Resurrection_eff_desc>
   <TM_Resurrection_ver_desc>Aumenta a chance de prevenir os efeitos colaterais da ressurreição em 10% por nível.</TM_Resurrection_ver_desc>
-
   <TM_AdvancedHeal_eff>Cura eficaz</TM_AdvancedHeal_eff>
   <TM_AdvancedHeal_ver>Cura profunda</TM_AdvancedHeal_ver>
   <TM_AdvancedHeal_pwr>Poder de cura</TM_AdvancedHeal_pwr>
@@ -760,7 +723,6 @@ Nível 4:18 saúde</TM_HealingCircle_pwr_desc>
   <TM_BestowMight_eff>Bênção praticada</TM_BestowMight_eff>
   <TM_Resurrection_ver>Ressurreição elegante</TM_Resurrection_ver>
   <TM_Resurrection_eff>estrela de guia</TM_Resurrection_eff>
-
   <TM_BardTraining_pwr_desc>Leva o Bard para o próximo nível. Artista - &gt; Artista - &gt; Menestrel - &gt; Bard. São necessários 2 pontos para treinar.</TM_BardTraining_pwr_desc>
   <TM_Entertain_ver_desc>Aumenta a possibilidade de falar com outros colonos.</TM_Entertain_ver_desc>
   <TM_Entertain_pwr_desc>Aumenta a frequência com que o bardo está preparado para a interação social.</TM_Entertain_pwr_desc>
@@ -795,7 +757,6 @@ Nível 3: consciência -20%</TM_Lullaby_ver_desc>
   <TM_BattleHymn_ver>Atenção prolongada</TM_BattleHymn_ver>
   <TM_BattleHymn_eff>Vocalista</TM_BattleHymn_eff>
   <TM_BattleHymn_pwr>Coro Heroico</TM_BattleHymn_pwr>
-
   <TM_SoulBond_pwr_desc>Aumenta o benefício da ligação da alma com o demónio.</TM_SoulBond_pwr_desc>
   <TM_SoulBond_eff_desc>Reduz os custos do maná para o uso do passo de sombra e do chamador de sombra em 10% por cada ponto de habilidade.</TM_SoulBond_eff_desc>
   <TM_SoulBond_ver_desc>Reduz o peso da ligação mental no suporte.</TM_SoulBond_ver_desc>
@@ -827,7 +788,6 @@ Também aumenta a força do corte demoníaco do escudo em 25%. O escudo básico 
   <TM_PsychicShock_eff_desc>Reduz os custos de choque mental do Manan em 6% por cada ponto de habilidade.</TM_PsychicShock_eff_desc>
   <TM_PsychicShock_ver_desc>Aumenta o raio de choque mental e todos os impulsos secundários na célula 1. O raio básico é 6.</TM_PsychicShock_ver_desc>
   <TM_PsychicShock_pwr_desc>Aumenta os danos de choque mental por nível de habilidade.</TM_PsychicShock_pwr_desc>
-
   <TM_SoulBond_pwr>Comunicação reforçada</TM_SoulBond_pwr>
   <TM_SoulBond_eff>Conexão da Alma</TM_SoulBond_eff>
   <TM_SoulBond_ver>Tampão da Alma</TM_SoulBond_ver>
@@ -849,7 +809,6 @@ Também aumenta a força do corte demoníaco do escudo em 25%. O escudo básico 
   <TM_PsychicShock_ver>Marasmo</TM_PsychicShock_ver>
   <TM_PsychicShock_eff>Mentalista</TM_PsychicShock_eff>
   <TM_PsychicShock_pwr>Vontade dominante</TM_PsychicShock_pwr>
-
   <TM_Stoneskin_pwr_desc>Aumenta o número de ataques que a pele de pedra suaviza antes de se apagar.
 Nível 0:4 ataques
 Nível 1:5 ataques
@@ -906,7 +865,6 @@ Nível 0:0%
 Nível 1:15%
 Nível 2:30%
 Nível 3:45%</TM_Meteor_ver_desc>
-
   <TM_Stoneskin_pwr>Defesa de camadas múltiplas</TM_Stoneskin_pwr>
   <TM_Stoneskin_eff>Pele familiar</TM_Stoneskin_eff>
   <TM_Stoneskin_ver>Couro compartilhado</TM_Stoneskin_ver>
@@ -924,7 +882,6 @@ Nível 3:45%</TM_Meteor_ver_desc>
   <TM_Sentinel_ver>Estado de Direito</TM_Sentinel_ver>
   <TM_Meteor_eff>O golpista da Terra</TM_Meteor_eff>
   <TM_Meteor_ver>Coração de ouro</TM_Meteor_ver>
-
   <TM_TechnoBit_pwr_desc>O techno-bit transforma o manu do tecnômetro, disparando uma fila de microlásicos para o alvo do tecnômetro. Cada nível de habilidade aumenta o alcance do tiro e reduz o atraso no tiro e os custos de ataque.
 Nível 0:25 alcance, 3 tiros a cada 3 segundos, 6 manas
 Nível 5: alcance de tiro 30, 4 tiros a cada 2,75 segundos, 5,5 manas
@@ -969,7 +926,6 @@ Tiro relâmpago: atordoando o alvo (1 Mana)</TM_TechnoWeapon_ver_desc>
   <TM_OrbitalStrike_pwr_desc>Aumenta os danos causados pela explosão em 20% pelo nível de habilidade. Basicamente 25 danos.</TM_OrbitalStrike_pwr_desc>
   <TM_OrbitalStrike_eff_desc>Reduz o custo da mana orbital em 5% do valor básico do nível de habilidade.</TM_OrbitalStrike_eff_desc>
   <TM_OrbitalStrike_ver_desc>Reduz o tempo necessário aos sistemas de bombardeamento orbital para alinhar as coordenadas do alvo.</TM_OrbitalStrike_ver_desc>
-
   <TM_TechnoBit_pwr>Protocolo ofensivo</TM_TechnoBit_pwr>
   <TM_TechnoBit_eff>Protocolo de reparação</TM_TechnoBit_eff>
   <TM_TechnoBit_ver>Neurointerface</TM_TechnoBit_ver>
@@ -991,7 +947,6 @@ Tiro relâmpago: atordoando o alvo (1 Mana)</TM_TechnoWeapon_ver_desc>
   <TM_OrbitalStrike_pwr>Exagero</TM_OrbitalStrike_pwr>
   <TM_OrbitalStrike_eff>Alinhamento calculado</TM_OrbitalStrike_eff>
   <TM_OrbitalStrike_ver>Contornar Autorização</TM_OrbitalStrike_ver>
-
   <TM_BloodGift_pwr_desc>Aumenta os danos causados por toda a magia sanguínea em 10% por um ponto de habilidade.</TM_BloodGift_pwr_desc>
   <TM_BloodGift_eff_desc>Reduz o custo do sacrifício sangrento em 5% por ponto de habilidade e reduz o custo sanguíneo de toda a magia sanguínea em 3% por ponto de habilidade.</TM_BloodGift_eff_desc>
   <TM_BloodGift_ver_desc>Aumenta em 10% a quantidade de magia sanguínea obtida pelo sacrifício sangrento ou por hemorragia. Um nível elevado de habilidade permite ao mago do sangue tirar sangue fresco da terra:
@@ -1020,7 +975,6 @@ Nível 3: raio 3 da célula</TM_BloodForBlood_ver_desc>
   <TM_BloodMoon_pwr_desc>Aprofundar a noite e causar horrores mais poderosos de sangue, aumentando seu tamanho e danos em 15% por nível de habilidade.</TM_BloodMoon_pwr_desc>
   <TM_BloodMoon_eff_desc>Os horrores sangrentos aguardam ansiosamente pela sua chamada, reduzindo a magia sanguínea necessária para usar a Lua Sanguínea em 4% por um ponto de habilidade e aumentando a frequência de ataques de terror sangrento em 5%.</TM_BloodMoon_eff_desc>
   <TM_BloodMoon_ver_desc>Aumenta a duração da Lua de Sangue em 10% por cada ponto de habilidade.</TM_BloodMoon_ver_desc>
-
   <TM_BloodGift_pwr>Sangue É o Poder</TM_BloodGift_pwr>
   <TM_BloodGift_eff>Vítima do Sangue</TM_BloodGift_eff>
   <TM_BloodGift_ver>Puro Sangue</TM_BloodGift_ver>
@@ -1039,7 +993,6 @@ Nível 3: raio 3 da célula</TM_BloodForBlood_ver_desc>
   <TM_BloodMoon_pwr>Lua cheia</TM_BloodMoon_pwr>
   <TM_BloodMoon_eff>Fome</TM_BloodMoon_eff>
   <TM_BloodMoon_ver>Noite sem fim</TM_BloodMoon_ver>
-
   <TM_EnchantedBody_pwr_desc>Aumenta o poder do Corpo Encantado e da Aura Encantada em £33% pelo nível de habilidade.</TM_EnchantedBody_pwr_desc>
   <TM_EnchantedBody_eff_desc>Reduz o custo dos feitiços e o custo máximo para manter o corpo encantado maná e a aura encantada em 15% por nível de habilidade.</TM_EnchantedBody_eff_desc>
   <TM_EnchantedBody_ver_desc>Reduz a multa de regeneração do Maná do Corpo Encantado e da Aura Encantada em 15% por nível de habilidade.</TM_EnchantedBody_ver_desc>
@@ -1097,7 +1050,6 @@ Nível 0: min 80, Max 250
 Nível 1: min 120, Max 320
 Nível 2: no mínimo 150, no máximo 420
 Nível 3: min 200, max 500; abre acesso à transformação: Lobo escuro</TM_Shapeshift_ver_desc>
-
   <TM_EnchantedBody_pwr>Mente Acima do Corpo</TM_EnchantedBody_pwr>
   <TM_EnchantedBody_eff>Forma cedente</TM_EnchantedBody_eff>
   <TM_EnchantedBody_ver>Adaptação</TM_EnchantedBody_ver>
@@ -1114,7 +1066,6 @@ Nível 3: min 200, max 500; abre acesso à transformação: Lobo escuro</TM_Shap
   <TM_Shapeshift_pwr>Formulário avançado</TM_Shapeshift_pwr>
   <TM_Shapeshift_eff>Transformação sustentável</TM_Shapeshift_eff>
   <TM_Shapeshift_ver>Seleção natural</TM_Shapeshift_ver>
-
   <TM_Prediction_pwr_desc>Usa o poder de previsão para proteger o cronomante.
 Esta habilidade reduz a concentração mental necessária para manter o estado previsível, aumentando ao mesmo tempo a velocidade de resposta aos perigos previstos.
 
@@ -1182,7 +1133,6 @@ Nível 0:20 horas
 Nível 1:24 horas
 Nível 2:28 horas
 Nível 3:32 horas</TM_Recall_ver_desc>
-
   <TM_Prediction_pwr>Conhecimento inicial</TM_Prediction_pwr>
   <TM_Prediction_eff>Rio do tempo</TM_Prediction_eff>
   <TM_Prediction_ver>Terceiro Olho</TM_Prediction_ver>
@@ -1200,7 +1150,6 @@ Nível 3:32 horas</TM_Recall_ver_desc>
   <TM_Recall_pwr>Seguro</TM_Recall_pwr>
   <TM_Recall_eff>Memória perfeita</TM_Recall_eff>
   <TM_Recall_ver>Impressão</TM_Recall_ver>
-
   <TM_ChaosTradition_pwr_desc>Aumenta a probabilidade de que a magia selvagem tenha um efeito benéfico e resolve a possibilidade de uma ação contrária. Não altera os eventos neutros, que são sempre 3%. Requisitos 2 pontos de habilidade para treinamento.
 
 Nível 0: (+) 2%: (-) 5%
@@ -1219,189 +1168,180 @@ Nível 0:2 capacidades
 Nível 1:3 capacidades
 Nível 2:4 capacidades
 Nível 3:5 capacidades</TM_ChaosTradition_ver_desc>
-
   <TM_ChaosTradition_pwr>Fluxo de Caos</TM_ChaosTradition_pwr>
   <TM_ChaosTradition_eff>Mercúrio</TM_ChaosTradition_eff>
   <TM_ChaosTradition_ver>Proteana</TM_ChaosTradition_ver>
-
-<TM_LightLance_pwr_desc>Aumenta a duração da lança de luz em 8% e os danos em 15% por nível de habilidade.</TM_LightLance_pwr_desc>
-<TM_LightLance_eff_desc>Reduz os custos de energia da lança de luz em 8% por nível de habilidade.</TM_LightLance_eff_desc>
-<TM_LightLance_ver_desc>Aumenta o raio de lança de luz em 15% por nível de habilidade.</TM_LightLance_ver_desc>
-<TM_Sunfire_pwr_desc>Aumenta os danos causados pelo Fogo do Sol em 25% e a perfuração da reserva em 10% por ponto de habilidade.</TM_Sunfire_pwr_desc>
-<TM_Sunfire_eff_desc>Reduz os custos de energia do fogo solar em 6% por nível de habilidade.</TM_Sunfire_eff_desc>
-<TM_Sunfire_ver_desc>Aumenta o número de raios produzidos em 4 por nível de habilidade e aumenta a duração média do raio em 10%.</TM_Sunfire_ver_desc>
-<TM_LightBurst_pwr_desc>Cada nível de habilidade aumenta a densidade da luz, resultando em 15% de melhoria no raio eficiente, no furo sensorial e na desorientação causada por cada flash de luz.</TM_LightBurst_pwr_desc>
-<TM_LightBurst_eff_desc>Reduz os custos de maná em 8% por ponto de habilidade.</TM_LightBurst_eff_desc>
-<TM_LightBurst_ver_desc>Aumenta o número de brotos de luz e altera o flash para afetar sensores de mechanoides.
+  <TM_LightLance_pwr_desc>Aumenta a duração da lança de luz em 8% e os danos em 15% por nível de habilidade.</TM_LightLance_pwr_desc>
+  <TM_LightLance_eff_desc>Reduz os custos de energia da lança de luz em 8% por nível de habilidade.</TM_LightLance_eff_desc>
+  <TM_LightLance_ver_desc>Aumenta o raio de lança de luz em 15% por nível de habilidade.</TM_LightLance_ver_desc>
+  <TM_Sunfire_pwr_desc>Aumenta os danos causados pelo Fogo do Sol em 25% e a perfuração da reserva em 10% por ponto de habilidade.</TM_Sunfire_pwr_desc>
+  <TM_Sunfire_eff_desc>Reduz os custos de energia do fogo solar em 6% por nível de habilidade.</TM_Sunfire_eff_desc>
+  <TM_Sunfire_ver_desc>Aumenta o número de raios produzidos em 4 por nível de habilidade e aumenta a duração média do raio em 10%.</TM_Sunfire_ver_desc>
+  <TM_LightBurst_pwr_desc>Cada nível de habilidade aumenta a densidade da luz, resultando em 15% de melhoria no raio eficiente, no furo sensorial e na desorientação causada por cada flash de luz.</TM_LightBurst_pwr_desc>
+  <TM_LightBurst_eff_desc>Reduz os custos de maná em 8% por ponto de habilidade.</TM_LightBurst_eff_desc>
+  <TM_LightBurst_ver_desc>Aumenta o número de brotos de luz e altera o flash para afetar sensores de mechanoides.
 Nível 0:2 brotos de luz
 Nível 1:3 brotos de luz
 Nível 2:3 brotos de luz, afetando os mechanoides
 Nível 3:4 brotos de luz, afetando os mechanoides</TM_LightBurst_ver_desc>
-<TM_LightSkip_pwr_desc>Adiciona mais recursos com o aplicativo avançado. Vale 2 pontos por nível.
+  <TM_LightSkip_pwr_desc>Adiciona mais recursos com o aplicativo avançado. Vale 2 pontos por nível.
 Classificação 0: Passe fácil - mesmo cartão, somente para si mesmo
 Grau 1: Passe em massa da Luz - mesmo cartão, AE em torno do feitiço
 Grau 2: Passe global de luz - global, AE em torno do feitiço</TM_LightSkip_pwr_desc>
-<TM_LightSkip_eff_desc>Reduz em 8% os custos de energia do passe fácil por nível de habilidade.</TM_LightSkip_eff_desc>
-<TM_Refraction_pwr_desc>Aumenta em 20% a precisão dos projéteis refratados e reduz em 15% a precisão dos projéteis refratados.</TM_Refraction_pwr_desc>
-<TM_Refraction_eff_desc>Reduz os custos de refino de energia em 6% por nível de habilidade.</TM_Refraction_eff_desc>
-<TM_Refraction_ver_desc>Aumenta a duração da parede de reposição em 10% (2,5 c) por nível de habilidade.</TM_Refraction_ver_desc>
-<TM_SpiritOfLight_pwr_desc>SoL: Aumenta os danos em 3% e o alcance máximo do ataque em 1 por nível de habilidade.</TM_SpiritOfLight_pwr_desc>
-<TM_SpiritOfLight_eff_desc>Recrutador: Reduz os custos de manutenção em 2% por nível de habilidade.
+  <TM_LightSkip_eff_desc>Reduz em 8% os custos de energia do passe fácil por nível de habilidade.</TM_LightSkip_eff_desc>
+  <TM_Refraction_pwr_desc>Aumenta em 20% a precisão dos projéteis refratados e reduz em 15% a precisão dos projéteis refratados.</TM_Refraction_pwr_desc>
+  <TM_Refraction_eff_desc>Reduz os custos de refino de energia em 6% por nível de habilidade.</TM_Refraction_eff_desc>
+  <TM_Refraction_ver_desc>Aumenta a duração da parede de reposição em 10% (2,5 c) por nível de habilidade.</TM_Refraction_ver_desc>
+  <TM_SpiritOfLight_pwr_desc>SoL: Aumenta os danos em 3% e o alcance máximo do ataque em 1 por nível de habilidade.</TM_SpiritOfLight_pwr_desc>
+  <TM_SpiritOfLight_eff_desc>Recrutador: Reduz os custos de manutenção em 2% por nível de habilidade.
 SoL: Reduz os custos de energia luminosa para o Espírito da Luz em 1% por nível de habilidade.</TM_SpiritOfLight_eff_desc>
-<TM_SpiritOfLight_ver_desc>SoL: Aumenta a energia máxima de luz em 4 por nível de habilidade e absorção de energia de luz em 3% por nível de habilidade.</TM_SpiritOfLight_ver_desc>
-
-<TM_LightLance_pwr>Luz solta</TM_LightLance_pwr>
-<TM_LightLance_eff>Aumento</TM_LightLance_eff>
-<TM_LightLance_ver>Radiação Zumbida</TM_LightLance_ver>
-<TM_Sunfire_pwr>Queimadura profunda</TM_Sunfire_pwr>
-<TM_Sunfire_eff>Energia solar</TM_Sunfire_eff>
-<TM_Sunfire_ver>Queimado sustentável</TM_Sunfire_ver>
-<TM_LightBurst_pwr>Suíte</TM_LightBurst_pwr>
-<TM_LightBurst_eff>Lente</TM_LightBurst_eff>
-<TM_LightBurst_ver>Lumen</TM_LightBurst_ver>
-<TM_LightSkip_pwr>Relatividade</TM_LightSkip_pwr>
-<TM_LightSkip_eff>Sedentando a Onda</TM_LightSkip_eff>
-<TM_Refraction_pwr>Taxa de refino</TM_Refraction_pwr>
-<TM_Refraction_eff>Luz pulverizadora</TM_Refraction_eff>
-<TM_Refraction_ver>Luz decrescente</TM_Refraction_ver>
-<TM_SpiritOfLight_pwr>Radiação</TM_SpiritOfLight_pwr>
-<TM_SpiritOfLight_eff>Manutenção</TM_SpiritOfLight_eff>
-<TM_SpiritOfLight_ver>Absorção</TM_SpiritOfLight_ver>
-
-<TM_Totems_pwr_desc>Aumenta a força dos totems em 3%
+  <TM_SpiritOfLight_ver_desc>SoL: Aumenta a energia máxima de luz em 4 por nível de habilidade e absorção de energia de luz em 3% por nível de habilidade.</TM_SpiritOfLight_ver_desc>
+  <TM_LightLance_pwr>Luz solta</TM_LightLance_pwr>
+  <TM_LightLance_eff>Aumento</TM_LightLance_eff>
+  <TM_LightLance_ver>Radiação Zumbida</TM_LightLance_ver>
+  <TM_Sunfire_pwr>Queimadura profunda</TM_Sunfire_pwr>
+  <TM_Sunfire_eff>Energia solar</TM_Sunfire_eff>
+  <TM_Sunfire_ver>Queimado sustentável</TM_Sunfire_ver>
+  <TM_LightBurst_pwr>Suíte</TM_LightBurst_pwr>
+  <TM_LightBurst_eff>Lente</TM_LightBurst_eff>
+  <TM_LightBurst_ver>Lumen</TM_LightBurst_ver>
+  <TM_LightSkip_pwr>Relatividade</TM_LightSkip_pwr>
+  <TM_LightSkip_eff>Sedentando a Onda</TM_LightSkip_eff>
+  <TM_Refraction_pwr>Taxa de refino</TM_Refraction_pwr>
+  <TM_Refraction_eff>Luz pulverizadora</TM_Refraction_eff>
+  <TM_Refraction_ver>Luz decrescente</TM_Refraction_ver>
+  <TM_SpiritOfLight_pwr>Radiação</TM_SpiritOfLight_pwr>
+  <TM_SpiritOfLight_eff>Manutenção</TM_SpiritOfLight_eff>
+  <TM_SpiritOfLight_ver>Absorção</TM_SpiritOfLight_ver>
+  <TM_Totems_pwr_desc>Aumenta a força dos totems em 3%
 Totem relâmpago: Aumenta o alcance e os danos
 Totem da Terra: Aumenta a frequência e a duração da locomoção
 Totem curador: Aumenta o alcance e o número de curas.</TM_Totems_pwr_desc>
-<TM_Totems_eff_desc>Reduz o custo de criar um totem em 2% por nível de habilidade.</TM_Totems_eff_desc>
-<TM_Totems_ver_desc>Aumenta a duração dos totems em 5% por ponto de habilidade; A duração básica é de 1 hora de jogo.</TM_Totems_ver_desc>
-<TM_ChainLightning_pwr_desc>Aumenta o estrago da cadeia relâmpago em 10% por ponto de habilidade.</TM_ChainLightning_pwr_desc>
-<TM_ChainLightning_eff_desc>Reduz os custos de maná em 6% por ponto de habilidade.</TM_ChainLightning_eff_desc>
-<TM_ChainLightning_ver_desc>Aumenta o número de vezes que um relâmpago em cadeia é ramificado ou rebolado, 1 por ponto de habilidade.</TM_ChainLightning_ver_desc>
-<TM_Enrage_pwr_desc>Aumenta a força da fúria em 0,05 por ponto de habilidade. A gravidade básica é .25, a gravidade máxima é .5</TM_Enrage_pwr_desc>
-<TM_Enrage_eff_desc>Reduz os custos do Maná de fúria em 6% por ponto de habilidade.</TM_Enrage_eff_desc>
-<TM_Enrage_ver_desc>Reduz o número de emoções consumidas pela Fúria; no nível 3 Fúria pode também absorver Alegria (Descanso) para aumentar significativamente sua duração.</TM_Enrage_ver_desc>
-<TM_Hex_pwr_desc>Aumenta em 10% a probabilidade do feitiço, 40% a probabilidade básica.</TM_Hex_pwr_desc>
-<TM_Hex_eff_desc>Reduz os custos do feitiço em 6% por ponto de habilidade.</TM_Hex_eff_desc>
-<TM_Hex_ver_desc>Aumenta a força dos efeitos aplicados aos alvos encantados.</TM_Hex_ver_desc>
-<TM_SpiritWolves_pwr_desc>Os lobos espirituais ficam furiosos quando são chamados. Cada ponto de habilidade aumenta o efeito da raiva.</TM_SpiritWolves_pwr_desc>
-<TM_SpiritWolves_eff_desc>Reduz os custos de manifestação dos Lobos Espirituais em 6% e aumenta a duração de 2 segundos por ponto de habilidade.</TM_SpiritWolves_eff_desc>
-<TM_SpiritWolves_ver_desc>Aumenta o número de lobos chamados em 1 por nível de habilidade.</TM_SpiritWolves_ver_desc>
-<TM_GuardianSpirit_pwr_desc>Aumenta o poder do Espírito Guardião:
+  <TM_Totems_eff_desc>Reduz o custo de criar um totem em 2% por nível de habilidade.</TM_Totems_eff_desc>
+  <TM_Totems_ver_desc>Aumenta a duração dos totems em 5% por ponto de habilidade; A duração básica é de 1 hora de jogo.</TM_Totems_ver_desc>
+  <TM_ChainLightning_pwr_desc>Aumenta o estrago da cadeia relâmpago em 10% por ponto de habilidade.</TM_ChainLightning_pwr_desc>
+  <TM_ChainLightning_eff_desc>Reduz os custos de maná em 6% por ponto de habilidade.</TM_ChainLightning_eff_desc>
+  <TM_ChainLightning_ver_desc>Aumenta o número de vezes que um relâmpago em cadeia é ramificado ou rebolado, 1 por ponto de habilidade.</TM_ChainLightning_ver_desc>
+  <TM_Enrage_pwr_desc>Aumenta a força da fúria em 0,05 por ponto de habilidade. A gravidade básica é .25, a gravidade máxima é .5</TM_Enrage_pwr_desc>
+  <TM_Enrage_eff_desc>Reduz os custos do Maná de fúria em 6% por ponto de habilidade.</TM_Enrage_eff_desc>
+  <TM_Enrage_ver_desc>Reduz o número de emoções consumidas pela Fúria; no nível 3 Fúria pode também absorver Alegria (Descanso) para aumentar significativamente sua duração.</TM_Enrage_ver_desc>
+  <TM_Hex_pwr_desc>Aumenta em 10% a probabilidade do feitiço, 40% a probabilidade básica.</TM_Hex_pwr_desc>
+  <TM_Hex_eff_desc>Reduz os custos do feitiço em 6% por ponto de habilidade.</TM_Hex_eff_desc>
+  <TM_Hex_ver_desc>Aumenta a força dos efeitos aplicados aos alvos encantados.</TM_Hex_ver_desc>
+  <TM_SpiritWolves_pwr_desc>Os lobos espirituais ficam furiosos quando são chamados. Cada ponto de habilidade aumenta o efeito da raiva.</TM_SpiritWolves_pwr_desc>
+  <TM_SpiritWolves_eff_desc>Reduz os custos de manifestação dos Lobos Espirituais em 6% e aumenta a duração de 2 segundos por ponto de habilidade.</TM_SpiritWolves_eff_desc>
+  <TM_SpiritWolves_ver_desc>Aumenta o número de lobos chamados em 1 por nível de habilidade.</TM_SpiritWolves_ver_desc>
+  <TM_GuardianSpirit_pwr_desc>Aumenta o poder do Espírito Guardião:
 Espírito do Urso: Aumentaram os objetivos da ridicularização (4 - &gt; 9), a chance de gozação (60% - &gt; 78%) e o alcance da burla (15 - &gt; 21); aumento da flexibilização de danos (4 - &gt; 7)
 Espírito de Manguda: Aumenta os danos causados pela sombra (11 - &gt; 16) e a chance de crítica (40% - &gt; 65%); aumenta a duração da invisibilidade (1,5 c - &gt; 2,5 s) e a velocidade (2 s - &gt; 3 s) após a sombra bater.
 Espírito do Corvo: Aumenta a chance de bruxaria (50% - &gt; 75%); aumenta a eficiência do buff mental «Corvo epifania», Sensibilidade extrassolar e velocidade de pesquisa (20% - &gt; 30%)</TM_GuardianSpirit_pwr_desc>
-<TM_GuardianSpirit_eff_desc>Reduz o custo do feitiço, o custo máximo do conteúdo da MP e o custo de regeneração da maná do Espírito Guardião em 6% por ponto de habilidade.</TM_GuardianSpirit_eff_desc>
-<TM_GuardianSpirit_ver_desc>Aumenta a eficiência da ligação espiritual do Espírito Guardião para aumentar a velocidade de movimentos, manipulação, cura, ignorar a dor e evasão em 10% por ponto de habilidade.</TM_GuardianSpirit_ver_desc>
-
-<TM_Totems_pwr>Assistente total</TM_Totems_pwr>
-<TM_Totems_eff>Portador de totem</TM_Totems_eff>
-<TM_Totems_ver>Durabilidade</TM_Totems_ver>
-<TM_ChainLightning_pwr>Pai da tempestade</TM_ChainLightning_pwr>
-<TM_ChainLightning_eff>Atmosfera elétrica</TM_ChainLightning_eff>
-<TM_ChainLightning_ver>Relâmpago envolto</TM_ChainLightning_ver>
-
-<TM_Enrage_pwr>Fúria inabalável</TM_Enrage_pwr>
-<TM_Enrage_eff>Provocador</TM_Enrage_eff>
-<TM_Enrage_ver>Fúria fria</TM_Enrage_ver>
-<TM_Hex_pwr>Bruxo</TM_Hex_pwr>
-<TM_Hex_eff>Feitiços</TM_Hex_eff>
-<TM_Hex_ver>Manifesto de Jao</TM_Hex_ver>
-<TM_SpiritWolves_pwr>Refúgio Norte</TM_SpiritWolves_pwr>
-<TM_SpiritWolves_eff>Wow espiritual</TM_SpiritWolves_eff>
-<TM_SpiritWolves_ver>Líder da manada</TM_SpiritWolves_ver>
-<TM_GuardianSpirit_pwr>Guardião Explícito</TM_GuardianSpirit_pwr>
-<TM_GuardianSpirit_eff>Conexão com o espírito</TM_GuardianSpirit_eff>
-<TM_GuardianSpirit_ver>Ligação Espiritual</TM_GuardianSpirit_ver>
-
-<TM_Golemancy_pwr_desc>Aumenta a velocidade de movimento e reduz os danos ao golema.
+  <TM_GuardianSpirit_eff_desc>Reduz o custo do feitiço, o custo máximo do conteúdo da MP e o custo de regeneração da maná do Espírito Guardião em 6% por ponto de habilidade.</TM_GuardianSpirit_eff_desc>
+  <TM_GuardianSpirit_ver_desc>Aumenta a eficiência da ligação espiritual do Espírito Guardião para aumentar a velocidade de movimentos, manipulação, cura, ignorar a dor e evasão em 10% por ponto de habilidade.</TM_GuardianSpirit_ver_desc>
+  <TM_Totems_pwr>Assistente total</TM_Totems_pwr>
+  <TM_Totems_eff>Portador de totem</TM_Totems_eff>
+  <TM_Totems_ver>Durabilidade</TM_Totems_ver>
+  <TM_ChainLightning_pwr>Pai da tempestade</TM_ChainLightning_pwr>
+  <TM_ChainLightning_eff>Atmosfera elétrica</TM_ChainLightning_eff>
+  <TM_ChainLightning_ver>Relâmpago envolto</TM_ChainLightning_ver>
+  <TM_Enrage_pwr>Fúria inabalável</TM_Enrage_pwr>
+  <TM_Enrage_eff>Provocador</TM_Enrage_eff>
+  <TM_Enrage_ver>Fúria fria</TM_Enrage_ver>
+  <TM_Hex_pwr>Bruxo</TM_Hex_pwr>
+  <TM_Hex_eff>Feitiços</TM_Hex_eff>
+  <TM_Hex_ver>Manifesto de Jao</TM_Hex_ver>
+  <TM_SpiritWolves_pwr>Refúgio Norte</TM_SpiritWolves_pwr>
+  <TM_SpiritWolves_eff>Wow espiritual</TM_SpiritWolves_eff>
+  <TM_SpiritWolves_ver>Líder da manada</TM_SpiritWolves_ver>
+  <TM_GuardianSpirit_pwr>Guardião Explícito</TM_GuardianSpirit_pwr>
+  <TM_GuardianSpirit_eff>Conexão com o espírito</TM_GuardianSpirit_eff>
+  <TM_GuardianSpirit_ver>Ligação Espiritual</TM_GuardianSpirit_ver>
+  <TM_Golemancy_pwr_desc>Aumenta a velocidade de movimento e reduz os danos ao golema.
 Movimento: + [10, 15, 19, 23, 26]%
 DR: [5, 9, 13, 17, 20]%</TM_Golemancy_pwr_desc>
-<TM_Golemancy_eff_desc>Aumenta a consciência geral do glem.
+  <TM_Golemancy_eff_desc>Aumenta a consciência geral do glem.
 Consciência: + [10, 15, 19, 23, 26]%</TM_Golemancy_eff_desc>
-<TM_Golemancy_ver_desc>Aumenta o desempenho do holemante.
+  <TM_Golemancy_ver_desc>Aumenta o desempenho do holemante.
 Velocidade de funcionamento: + [10, 15, 19, 23, 26]%
 Taxa de pesquisa: + [10, 15, 19, 23, 26]%
 Recuperação do Trauma: + [50, 60, 70, 80, 90%]</TM_Golemancy_ver_desc>
-<TM_RuneCarving_pwr_desc>Aumenta o bónus de eficiência da parte, mas também aumenta a dificuldade. O treino requer 2 pontos de capacidade.
+  <TM_RuneCarving_pwr_desc>Aumenta o bónus de eficiência da parte, mas também aumenta a dificuldade. O treino requer 2 pontos de capacidade.
 Nível 0:20% de eficácia
 Nível 1: eficiência de 22%, probabilidade de sucesso de -5%
 Nível 2: eficiência de 24%, probabilidade de sucesso de -10%
 Nível 3: eficácia de 25%, probabilidade de sucesso de -15%</TM_RuneCarving_pwr_desc>
-<TM_RuneCarving_eff_desc>10% de maná por ponto de habilidade é devolvido após a gravação de ruma.</TM_RuneCarving_eff_desc>
-<TM_RuneCarving_ver_desc>Aumenta a chance de corte de runas bem-sucedidas em 10% por nível de habilidade.</TM_RuneCarving_ver_desc>
-<TM_Branding_pwr_desc>Aumenta o poder de cada variedade.</TM_Branding_pwr_desc>
-<TM_Branding_eff_desc>Reduz a multa de regeneração de maná em 10% por nível de habilidade.</TM_Branding_eff_desc>
-<TM_SigilSurge_pwr_desc>Aumenta o limite que o Sigil Surf pode alcançar quando está ativo.</TM_SigilSurge_pwr_desc>
-<TM_SigilSurge_eff_desc>Reduz em 10% os custos de manter o Sigil-surto por cada ponto de habilidade.</TM_SigilSurge_eff_desc>
-<TM_SigilSurge_ver_desc>Reduz a quantidade de dor sofrida pelo feitiço quando o sigilo sobe.</TM_SigilSurge_ver_desc>
-<TM_SigilDrain_pwr_desc>Aumenta a quantidade de energia da marca absorvida pelo feitiço para cada marca usada no escoamento do sigilo.</TM_SigilDrain_pwr_desc>
-<TM_SigilDrain_eff_desc>Reduz os custos de manutenção do maná no escoamento de Sigil em 20% por ponto de habilidade.</TM_SigilDrain_eff_desc>
-<TM_SigilDrain_ver_desc>Reduz a quantidade de dor sofrida por cada peão quando o escoamento do ciglete está ativo</TM_SigilDrain_ver_desc>
-<TM_LivingWall_pwr_desc>Aumenta os danos e o alcance do principal mecanismo de ataque da parede viva</TM_LivingWall_pwr_desc>
-<TM_LivingWall_eff_desc>Reduz o custo máximo do maná em 15% por nível de habilidade.</TM_LivingWall_eff_desc>
-<TM_LivingWall_ver_desc>Cada ponto de habilidade aumenta a velocidade de movimento e a frequência dos ataques.</TM_LivingWall_ver_desc>
-<TM_Golemancy_pwr>Atualizar quadro</TM_Golemancy_pwr>
-<TM_Golemancy_eff>Controlador</TM_Golemancy_eff>
-<TM_Golemancy_ver>Atualização da mente</TM_Golemancy_ver>
-<TM_RuneCarving_pwr>Traço profundo</TM_RuneCarving_pwr>
-<TM_RuneCarving_eff>Mestre do Run</TM_RuneCarving_eff>
-<TM_RuneCarving_ver>Mãos Seguras</TM_RuneCarving_ver>
-<TM_Branding_pwr>Intensidade</TM_Branding_pwr>
-<TM_Branding_eff>Assistente de marca</TM_Branding_eff>
-<TM_SigilSurge_pwr>Potência de sobrecarga</TM_SigilSurge_pwr>
-<TM_SigilSurge_eff>Assistente de tensão</TM_SigilSurge_eff>
-<TM_SigilSurge_ver>Reduzir feedback</TM_SigilSurge_ver>
-<TM_SigilDrain_pwr>Potência de Sliv</TM_SigilDrain_pwr>
-<TM_SigilDrain_eff>Assistente de escoamento</TM_SigilDrain_eff>
-<TM_SigilDrain_ver>Filtro de feedback</TM_SigilDrain_ver>
-<TM_LivingWall_pwr>Inabalável</TM_LivingWall_pwr>
-<TM_LivingWall_eff>Inexorável</TM_LivingWall_eff>
-<TM_LivingWall_ver>Indestrutível</TM_LivingWall_ver>
-<TM_Empathy_pwr_desc>Aumenta a força de vontade da empatia, reduzindo a suscetibilidade à sujeição às suas emoções e aumentando a probabilidade de transmitir emoções positivas.
+  <TM_RuneCarving_eff_desc>10% de maná por ponto de habilidade é devolvido após a gravação de ruma.</TM_RuneCarving_eff_desc>
+  <TM_RuneCarving_ver_desc>Aumenta a chance de corte de runas bem-sucedidas em 10% por nível de habilidade.</TM_RuneCarving_ver_desc>
+  <TM_Branding_pwr_desc>Aumenta o poder de cada variedade.</TM_Branding_pwr_desc>
+  <TM_Branding_eff_desc>Reduz a multa de regeneração de maná em 10% por nível de habilidade.</TM_Branding_eff_desc>
+  <TM_SigilSurge_pwr_desc>Aumenta o limite que o Sigil Surf pode alcançar quando está ativo.</TM_SigilSurge_pwr_desc>
+  <TM_SigilSurge_eff_desc>Reduz em 10% os custos de manter o Sigil-surto por cada ponto de habilidade.</TM_SigilSurge_eff_desc>
+  <TM_SigilSurge_ver_desc>Reduz a quantidade de dor sofrida pelo feitiço quando o sigilo sobe.</TM_SigilSurge_ver_desc>
+  <TM_SigilDrain_pwr_desc>Aumenta a quantidade de energia da marca absorvida pelo feitiço para cada marca usada no escoamento do sigilo.</TM_SigilDrain_pwr_desc>
+  <TM_SigilDrain_eff_desc>Reduz os custos de manutenção do maná no escoamento de Sigil em 20% por ponto de habilidade.</TM_SigilDrain_eff_desc>
+  <TM_SigilDrain_ver_desc>Reduz a quantidade de dor sofrida por cada peão quando o escoamento do ciglete está ativo</TM_SigilDrain_ver_desc>
+  <TM_LivingWall_pwr_desc>Aumenta os danos e o alcance do principal mecanismo de ataque da parede viva</TM_LivingWall_pwr_desc>
+  <TM_LivingWall_eff_desc>Reduz o custo máximo do maná em 15% por nível de habilidade.</TM_LivingWall_eff_desc>
+  <TM_LivingWall_ver_desc>Cada ponto de habilidade aumenta a velocidade de movimento e a frequência dos ataques.</TM_LivingWall_ver_desc>
+  <TM_Golemancy_pwr>Atualizar quadro</TM_Golemancy_pwr>
+  <TM_Golemancy_eff>Controlador</TM_Golemancy_eff>
+  <TM_Golemancy_ver>Atualização da mente</TM_Golemancy_ver>
+  <TM_RuneCarving_pwr>Traço profundo</TM_RuneCarving_pwr>
+  <TM_RuneCarving_eff>Mestre do Run</TM_RuneCarving_eff>
+  <TM_RuneCarving_ver>Mãos Seguras</TM_RuneCarving_ver>
+  <TM_Branding_pwr>Intensidade</TM_Branding_pwr>
+  <TM_Branding_eff>Assistente de marca</TM_Branding_eff>
+  <TM_SigilSurge_pwr>Potência de sobrecarga</TM_SigilSurge_pwr>
+  <TM_SigilSurge_eff>Assistente de tensão</TM_SigilSurge_eff>
+  <TM_SigilSurge_ver>Reduzir feedback</TM_SigilSurge_ver>
+  <TM_SigilDrain_pwr>Potência de Sliv</TM_SigilDrain_pwr>
+  <TM_SigilDrain_eff>Assistente de escoamento</TM_SigilDrain_eff>
+  <TM_SigilDrain_ver>Filtro de feedback</TM_SigilDrain_ver>
+  <TM_LivingWall_pwr>Inabalável</TM_LivingWall_pwr>
+  <TM_LivingWall_eff>Inexorável</TM_LivingWall_eff>
+  <TM_LivingWall_ver>Indestrutível</TM_LivingWall_ver>
+  <TM_Empathy_pwr_desc>Aumenta a força de vontade da empatia, reduzindo a suscetibilidade à sujeição às suas emoções e aumentando a probabilidade de transmitir emoções positivas.
 Resistência à quebra mental [0,5,9,12,13,15%]
 Chance de vibração positiva [5,10,15,20,25%]</TM_Empathy_pwr_desc>
-<TM_Empathy_eff_desc>Aumenta o alcance da empatia em 3s e a frequência das vibrações emocionais em 2s por nível de habilidade. A taxa padrão é uma a cada 21 segundos.</TM_Empathy_eff_desc>
-<TM_Empathy_ver_desc>Aumenta a penetração de feitiços para todas as capacidades em 5% por nível de habilidade.</TM_Empathy_ver_desc>
-<TM_MindKiller_pwr_desc>Aumenta o número máximo de alvos em 2 e a força total dos efeitos em 20% por nível de habilidade. Com 1 +, os peões amigáveis não serão afetados. O objetivo básico máximo é 8.</TM_MindKiller_pwr_desc>
-<TM_MindKiller_eff_desc>Reduz a quantidade de humor consumida para ativação em 5% por nível de habilidade.</TM_MindKiller_eff_desc>
-<TM_MindKiller_ver_desc>Aumenta o alcance e as chances de sucesso:
+  <TM_Empathy_eff_desc>Aumenta o alcance da empatia em 3s e a frequência das vibrações emocionais em 2s por nível de habilidade. A taxa padrão é uma a cada 21 segundos.</TM_Empathy_eff_desc>
+  <TM_Empathy_ver_desc>Aumenta a penetração de feitiços para todas as capacidades em 5% por nível de habilidade.</TM_Empathy_ver_desc>
+  <TM_MindKiller_pwr_desc>Aumenta o número máximo de alvos em 2 e a força total dos efeitos em 20% por nível de habilidade. Com 1 +, os peões amigáveis não serão afetados. O objetivo básico máximo é 8.</TM_MindKiller_pwr_desc>
+  <TM_MindKiller_eff_desc>Reduz a quantidade de humor consumida para ativação em 5% por nível de habilidade.</TM_MindKiller_eff_desc>
+  <TM_MindKiller_ver_desc>Aumenta o alcance e as chances de sucesso:
 Raio: [15,17,19,21] c
 Chance: [50,60,70,80]%</TM_MindKiller_ver_desc>
-<TM_SuppressiveAura_pwr_desc>Aumenta a duração da supressão de emoções em 20% e a chance de resolver emoções positivas em 10% por nível de habilidade.</TM_SuppressiveAura_pwr_desc>
-<TM_SuppressiveAura_eff_desc>Aumenta o raio da aura esmagadora em 15% por nível de habilidade; no nível 3, os efeitos se estendem a todos os membros da caravana.</TM_SuppressiveAura_eff_desc>
-<TM_SuppressiveAura_ver_desc>Simula sentimentos de alegria e conforto para transmitir aos peões afetados; cada nível de habilidade aumenta a quantidade de alegria e conforto transmitidos.</TM_SuppressiveAura_ver_desc>
-<TM_HarvestPassion_pwr_desc>Aumenta a chance de ter uma paixão de 6% assim que a alegria do objetivo for esgotada. A chance básica é de 30% a cada 1 segundo. Também aumenta a chance de reunir paixões adicionais (se possível) em 20% por nível de habilidade, uma chance básica de 30%. A tentativa vai acabar assim que a alegria dos encantadores se esgotar.</TM_HarvestPassion_pwr_desc>
-<TM_HarvestPassion_eff_desc>Reduz o número de alegrias do feitiço exaustivo por iteração em 20% por nível de habilidade e aumenta o número de alegrias da meta exaustiva por iteração em 15% por nível de habilidade.</TM_HarvestPassion_eff_desc>
-<TM_HarvestPassion_ver_desc>Aumenta em 1% a chance de uma maré de inspiração. A chance básica é de 2% a cada hora de jogo.</TM_HarvestPassion_ver_desc>
-<TM_Symbiosis_pwr_desc>Aumenta a consciência do peão-mestre para cada nível de habilidade.
+  <TM_SuppressiveAura_pwr_desc>Aumenta a duração da supressão de emoções em 20% e a chance de resolver emoções positivas em 10% por nível de habilidade.</TM_SuppressiveAura_pwr_desc>
+  <TM_SuppressiveAura_eff_desc>Aumenta o raio da aura esmagadora em 15% por nível de habilidade; no nível 3, os efeitos se estendem a todos os membros da caravana.</TM_SuppressiveAura_eff_desc>
+  <TM_SuppressiveAura_ver_desc>Simula sentimentos de alegria e conforto para transmitir aos peões afetados; cada nível de habilidade aumenta a quantidade de alegria e conforto transmitidos.</TM_SuppressiveAura_ver_desc>
+  <TM_HarvestPassion_pwr_desc>Aumenta a chance de ter uma paixão de 6% assim que a alegria do objetivo for esgotada. A chance básica é de 30% a cada 1 segundo. Também aumenta a chance de reunir paixões adicionais (se possível) em 20% por nível de habilidade, uma chance básica de 30%. A tentativa vai acabar assim que a alegria dos encantadores se esgotar.</TM_HarvestPassion_pwr_desc>
+  <TM_HarvestPassion_eff_desc>Reduz o número de alegrias do feitiço exaustivo por iteração em 20% por nível de habilidade e aumenta o número de alegrias da meta exaustiva por iteração em 15% por nível de habilidade.</TM_HarvestPassion_eff_desc>
+  <TM_HarvestPassion_ver_desc>Aumenta em 1% a chance de uma maré de inspiração. A chance básica é de 2% a cada hora de jogo.</TM_HarvestPassion_ver_desc>
+  <TM_Symbiosis_pwr_desc>Aumenta a consciência do peão-mestre para cada nível de habilidade.
 Nível 0: + 70%
 Nível 1: + 100%
 Nível 2: + 125%
 Nível 3: + 150%
 </TM_Symbiosis_pwr_desc>
-<TM_Symbiosis_eff_desc>Reduz os custos de início da simbiose em 35%.</TM_Symbiosis_eff_desc>
-<TM_Symbiosis_ver_desc>Aumenta a carcaça de proteção que rodeia o dono e reduz a porcentagem de ferimento absorvido aplicado ao corpo do simbiote.
+  <TM_Symbiosis_eff_desc>Reduz os custos de início da simbiose em 35%.</TM_Symbiosis_eff_desc>
+  <TM_Symbiosis_ver_desc>Aumenta a carcaça de proteção que rodeia o dono e reduz a porcentagem de ferimento absorvido aplicado ao corpo do simbiote.
 Nível 0:25% absorvido, 100% transferido
 Nível 1:30% absorvido, 80% transferido
 Nível 2:35% absorvido, 60% transmitido
 Nível 3:40% absorvido, 50% transmitido</TM_Symbiosis_ver_desc>
-<TM_Empathy_pwr>Pensamento positivo</TM_Empathy_pwr>
-<TM_Empathy_eff>Terapia de grupo</TM_Empathy_eff>
-<TM_Empathy_ver>Livro aberto</TM_Empathy_ver>
-<TM_MindKiller_pwr>Sufocamento</TM_MindKiller_pwr>
-<TM_MindKiller_eff>Olhar de aço</TM_MindKiller_eff>
-<TM_MindKiller_ver>Combate à tempestade</TM_MindKiller_ver>
-<TM_SuppressiveAura_pwr>Supressão prolongada</TM_SuppressiveAura_pwr>
-<TM_SuppressiveAura_eff>Enorme Aura</TM_SuppressiveAura_eff>
-<TM_SuppressiveAura_ver>Beata Mentiras</TM_SuppressiveAura_ver>
-<TM_HarvestPassion_pwr>Caçador apaixonado</TM_HarvestPassion_pwr>
-<TM_HarvestPassion_eff>Hooligan</TM_HarvestPassion_eff>
-<TM_HarvestPassion_ver>Desespero</TM_HarvestPassion_ver>
-<TM_Symbiosis_pwr>Conscientização</TM_Symbiosis_pwr>
-<TM_Symbiosis_eff>Comuna</TM_Symbiosis_eff>
-<TM_Symbiosis_ver>Concha</TM_Symbiosis_ver>
-
-  <!-- Might Ability Point Descriptions -->
+  <TM_Empathy_pwr>Pensamento positivo</TM_Empathy_pwr>
+  <TM_Empathy_eff>Terapia de grupo</TM_Empathy_eff>
+  <TM_Empathy_ver>Livro aberto</TM_Empathy_ver>
+  <TM_MindKiller_pwr>Sufocamento</TM_MindKiller_pwr>
+  <TM_MindKiller_eff>Olhar de aço</TM_MindKiller_eff>
+  <TM_MindKiller_ver>Combate à tempestade</TM_MindKiller_ver>
+  <TM_SuppressiveAura_pwr>Supressão prolongada</TM_SuppressiveAura_pwr>
+  <TM_SuppressiveAura_eff>Enorme Aura</TM_SuppressiveAura_eff>
+  <TM_SuppressiveAura_ver>Beata Mentiras</TM_SuppressiveAura_ver>
+  <TM_HarvestPassion_pwr>Caçador apaixonado</TM_HarvestPassion_pwr>
+  <TM_HarvestPassion_eff>Hooligan</TM_HarvestPassion_eff>
+  <TM_HarvestPassion_ver>Desespero</TM_HarvestPassion_ver>
+  <TM_Symbiosis_pwr>Conscientização</TM_Symbiosis_pwr>
+  <TM_Symbiosis_eff>Comuna</TM_Symbiosis_eff>
+  <TM_Symbiosis_ver>Concha</TM_Symbiosis_ver>
   <TM_WayfarerCraft_pwr_desc>Cada ponto de habilidade:
 Habilidades: + 1%
 Capacidade de resistência: + 2%</TM_WayfarerCraft_pwr_desc>
@@ -1446,7 +1386,6 @@ Nível 12: pele gorda aumenta a resistência em 15% e cultiva espinhos que podem
 Nível 13: aumenta a versatilidade da Legião para nível 2
 Nível 14: queima de fúria o consumo de resistência diminui 35%
 Nível 15: o impacto da tempestade consome 25% menos resistência por ataque</TM_FieldTraining_ver_desc>
-
   <TM_WayfarerCraft_pwr>Aperfeiçoamento</TM_WayfarerCraft_pwr>
   <TM_WayfarerCraft_eff>Sempai</TM_WayfarerCraft_eff>
   <TM_WayfarerCraft_ver>Resistência</TM_WayfarerCraft_ver>
@@ -1476,7 +1415,6 @@ A oportunidade básica é de 0%.</TM_Cleave_ver_desc>
   <TM_Whirlwind_eff_desc>Reduz os custos de resistência do vórtice em 15% do valor básico do nível de habilidade.</TM_Whirlwind_eff_desc>
   <TM_Whirlwind_ver_desc>Adiciona 5% de chance de nocauteamento para cada nível de qualificação.
 A chance básica é de 0%.</TM_Whirlwind_ver_desc>
-
   <TM_Sprint_eff>Eficiência de Sprint</TM_Sprint_eff>
   <TM_Sprint_pwr>Poder de Sprint</TM_Sprint_pwr>
   <TM_Fortitude_pwr>A força do Espírito</TM_Fortitude_pwr>
@@ -1509,10 +1447,9 @@ Nível 3:30% de resistência restabelecido</TM_Headshot_ver_desc>
   <TM_AntiArmor_pwr_desc>Melhora os nanitos usados em cartuchos anti-blindados, aumentando os danos aos alvos blindados em 50% por cada ponto de habilidade.</TM_AntiArmor_pwr_desc>
   <TM_AntiArmor_eff_desc>Reduz os custos de resistência do tiro anti-blindagem em 10% do custo básico no nível de habilidade.</TM_AntiArmor_eff_desc>
   <TM_AntiArmor_ver_desc>Aumenta a quantidade e a potência de fragmentos causados por projéteis de ruptura. Os projéteis não explodem se o alvo não estiver blindado.</TM_AntiArmor_ver_desc>
-<TM_ShadowSlayer_pwr_desc>Aumenta o dano de cada tiro em 2 por nível de habilidade enquanto a invisibilidade é ativa.</TM_ShadowSlayer_pwr_desc>
-<TM_ShadowSlayer_eff_desc>Reduz o custo de resistência para ativar a capa do assassino das sombras em 6% por nível de habilidade.</TM_ShadowSlayer_eff_desc>
-<TM_ShadowSlayer_ver_desc>Aumenta a duração do campo de disfarce do caçador de sombra em 3 segundos para cada nível de habilidade. A duração padrão é de 40 segundos.</TM_ShadowSlayer_ver_desc>
-
+  <TM_ShadowSlayer_pwr_desc>Aumenta o dano de cada tiro em 2 por nível de habilidade enquanto a invisibilidade é ativa.</TM_ShadowSlayer_pwr_desc>
+  <TM_ShadowSlayer_eff_desc>Reduz o custo de resistência para ativar a capa do assassino das sombras em 6% por nível de habilidade.</TM_ShadowSlayer_eff_desc>
+  <TM_ShadowSlayer_ver_desc>Aumenta a duração do campo de disfarce do caçador de sombra em 3 segundos para cada nível de habilidade. A duração padrão é de 40 segundos.</TM_ShadowSlayer_ver_desc>
   <TM_SniperFocus_pwr>Treino de atirador</TM_SniperFocus_pwr>
   <TM_DisablingShot_eff>Valor do Extrato</TM_DisablingShot_eff>
   <TM_DisablingShot_ver>Sedativo Potência</TM_DisablingShot_ver>
@@ -1522,10 +1459,9 @@ Nível 3:30% de resistência restabelecido</TM_Headshot_ver_desc>
   <TM_AntiArmor_pwr>Nanits</TM_AntiArmor_pwr>
   <TM_AntiArmor_eff>Valor do Extrato</TM_AntiArmor_eff>
   <TM_AntiArmor_ver>Balas de ruptura</TM_AntiArmor_ver>
-<TM_ShadowSlayer_pwr>Vantagem de sigilo</TM_ShadowSlayer_pwr>
-<TM_ShadowSlayer_eff>Antecipação de salvação</TM_ShadowSlayer_eff>
-<TM_ShadowSlayer_ver>Atualização de software</TM_ShadowSlayer_ver>
-
+  <TM_ShadowSlayer_pwr>Vantagem de sigilo</TM_ShadowSlayer_pwr>
+  <TM_ShadowSlayer_eff>Antecipação de salvação</TM_ShadowSlayer_eff>
+  <TM_ShadowSlayer_ver>Atualização de software</TM_ShadowSlayer_ver>
   <TM_BladeFocus_pwr_desc>Promove treinamento como dançarino com lâminas. Cada nível requer 2 pontos de habilidade para aprender e atualizar a linha de classe.
 Nível 0: Chance de ser atingido No Médio Combate + 3, Movimento + 0h15, Limite de Ataque Nervoso -3%
 Nível 1: Chance de entrar em Combate Médio + 6, Movimento + 0.20, Limite de Ataque Nervoso -5%
@@ -1584,7 +1520,6 @@ Nível 3: movimento + 50%, manipulação + 50%, bombeamento de sangue + 40%, cha
   <TM_ArrowStorm_pwr_desc>Aumenta os danos de cada flecha de 10% por cada ponto de habilidade.</TM_ArrowStorm_pwr_desc>
   <TM_ArrowStorm_eff_desc>Reduz o custo de resistência das flechas em 8% por ponto de habilidade.</TM_ArrowStorm_eff_desc>
   <TM_ArrowStorm_ver_desc>Aumenta a precisão da flecha em 5% por nível de habilidade. Isso é aditivo, então se a precisão for de 60%, o nível 2 da habilidade aumentará a precisão para 70%. A precisão é determinada pela precisão da cebola equipada.</TM_ArrowStorm_ver_desc>
-
   <TM_RangerTraining_pwr>Treinamento dos Rangers</TM_RangerTraining_pwr>
   <TM_BowTraining_pwr>Habilidade de Posse Cebola</TM_BowTraining_pwr>
   <TM_PoisonTrap_ver>Mais Armadilhas</TM_PoisonTrap_ver>
@@ -1667,7 +1602,6 @@ Nível 1:60
 Nível 2:55
 Nível 3:50</TM_PsionicStorm_eff_desc>
   <TM_PsionicStorm_ver_desc>Aumenta a velocidade em 10% por ponto de habilidade.</TM_PsionicStorm_ver_desc>
-
   <TM_PsionicAugmentation_eff>Aumento da Mobilidade</TM_PsionicAugmentation_eff>
   <TM_PsionicAugmentation_ver>Aumento da Inteligência</TM_PsionicAugmentation_ver>
   <TM_PsionicAugmentation_pwr>Forma de Manipulação do Reforço</TM_PsionicAugmentation_pwr>
@@ -1729,7 +1663,6 @@ Nível 3:13%</TM_LifeSteal_ver_desc>
   <TM_GraveBlade_pwr>À porta da morte</TM_GraveBlade_pwr>
   <TM_GraveBlade_eff>Transportador</TM_GraveBlade_eff>
   <TM_GraveBlade_ver>Sangue e espírito</TM_GraveBlade_ver>
-
   <TM_Chi_pwr_desc>Aumenta a quantidade máxima de energia queimada em 20%. Base Max 50 de energia.
 Os peões feridos cobram 4 danos por cada energia queimada e atordoamento.</TM_Chi_pwr_desc>
   <TM_Chi_eff_desc>Reduz o qi necessário para usar a capacidade do qi em 6% por unidade de habilidade.</TM_Chi_eff_desc>
@@ -1795,7 +1728,6 @@ Nível 3: adiciona 15% de aumento de resistência e regeneração do maná</TM_P
   <TM_MoveOut_eff_desc>Reduz a resistência necessária para ordenar a mudança! 10% por cada nível de habilidade.</TM_MoveOut_eff_desc>
   <TM_HoldTheLine_pwr_desc>Aumenta a eficiência na retenção da linha e aumenta a quantidade de cada peão afetado. É um bónus fixo, independente do número de peões que recebem um mandado.</TM_HoldTheLine_pwr_desc>
   <TM_HoldTheLine_eff_desc>Reduz a resistência necessária para mandar manter a linha! 10% por cada nível de habilidade.</TM_HoldTheLine_eff_desc>
-
   <TM_ProvisionerAura_pwr>Adepto da Contabilidade</TM_ProvisionerAura_pwr>
   <TM_ProvisionerAura_eff>Gestor eficiente</TM_ProvisionerAura_eff>
   <TM_ProvisionerAura_ver>Corretor</TM_ProvisionerAura_ver>
@@ -1874,7 +1806,6 @@ Nível 2: 16-24 danos, 2.7c raio
 Nível 3: 17-26 danos, raio 3.05c</TM_60mmMortar_pwr_desc>
   <TM_60mmMortar_eff_desc>Reduz o custo de energia para a implantação de um sistema de morteiros de 60 mm em 8% e aumenta a precisão em 10% para o nível de qualificação.</TM_60mmMortar_eff_desc>
   <TM_60mmMortar_ver_desc>Aumenta o alcance máximo do tiro e reduz o atraso entre os projéteis. O grau 3 aumenta o número de rodadas para 4.</TM_60mmMortar_ver_desc>
-
   <TM_PistolSpec_pwr>Especialização da Pistola</TM_PistolSpec_pwr>
   <TM_PistolSpec_eff>Duplo toque</TM_PistolSpec_eff>
   <TM_PistolSpec_ver>Flutuar Para uma arma</TM_PistolSpec_ver>
@@ -1893,113 +1824,103 @@ Nível 3: 17-26 danos, raio 3.05c</TM_60mmMortar_pwr_desc>
   <TM_60mmMortar_pwr>Explosivo Substância</TM_60mmMortar_pwr>
   <TM_60mmMortar_eff>Perito em morteiro</TM_60mmMortar_eff>
   <TM_60mmMortar_ver>Projéteis de qualidade</TM_60mmMortar_ver>
-
-<TM_ShadowWalk_pwr_desc>Aplica invisibilidade de curta duração ao feitiço após o Caminho da Sombra.
+  <TM_ShadowWalk_pwr_desc>Aplica invisibilidade de curta duração ao feitiço após o Caminho da Sombra.
 Nível 0: Nenhum
 Nível 1: invisibilidade 2s
 Nível 2: invisibilidade 3s
 Nível 3: invisibilidade 4s</TM_ShadowWalk_pwr_desc>
-<TM_ShadowWalk_eff_desc>Reduz a quantidade de maná necessária para usar o caminho de sombra em 8% por ponto de habilidade.</TM_ShadowWalk_eff_desc>
-<TM_ShadowWalk_ver_desc>Cria um excesso de sombra para restaurar e proteger o feitiço e os peões-alvo amigáveis.
+  <TM_ShadowWalk_eff_desc>Reduz a quantidade de maná necessária para usar o caminho de sombra em 8% por ponto de habilidade.</TM_ShadowWalk_eff_desc>
+  <TM_ShadowWalk_ver_desc>Cria um excesso de sombra para restaurar e proteger o feitiço e os peões-alvo amigáveis.
 Nível 0: Nenhum
 Nível 1: cura o feitiço
 Nível 2: cura o objetivo
 Nível 3: por pouco tempo esconde o alvo</TM_ShadowWalk_ver_desc>
-<TM_ShadowStrike_pwr_desc>Aumenta o dano da sombra em 5% por ponto de habilidade.</TM_ShadowStrike_pwr_desc>
-<TM_ShadowStrike_eff_desc>Reduz os custos de resistência em 4% por ponto de habilidade.</TM_ShadowStrike_eff_desc>
-<TM_ShadowStrike_ver_desc>Adiciona resistência e letalidade ao impacto da sombra:
+  <TM_ShadowStrike_pwr_desc>Aumenta o dano da sombra em 5% por ponto de habilidade.</TM_ShadowStrike_pwr_desc>
+  <TM_ShadowStrike_eff_desc>Reduz os custos de resistência em 4% por ponto de habilidade.</TM_ShadowStrike_eff_desc>
+  <TM_ShadowStrike_ver_desc>Adiciona resistência e letalidade ao impacto da sombra:
 Nível 0: Nenhum
 Nível 1: obtenha 2 segundos de invisibilidade
 Nível 2: invisibilidade + 1 segundo.
 Nível 3: executa o impacto da sombra através de um pico de sombra noturna que causa toxina de sombra noturna em todos os inimigos a 2 metros de distância do alvo.
 Nível 4: aumenta a toxicidade da sombra noturna
 Nível 5: raio + 1 m</TM_ShadowStrike_ver_desc>
-<TM_Nightshade_pwr_desc>Aumenta a toxicidade de cada ataque em 20% por ponto de habilidade.</TM_Nightshade_pwr_desc>
-<TM_Nightshade_eff_desc>Reduz os custos de manutenção da sombra noturna em 6% por ponto de habilidade.</TM_Nightshade_eff_desc>
-<TM_Nightshade_ver_desc>Aumenta o número máximo de doses de toxina da sombra noturna em 20% por ponto de habilidade.</TM_Nightshade_ver_desc>
-<TM_VeilOfShadows_pwr_desc>Aumenta a duração de invisibilidade e neblina de sombra em 1 segundo por ponto de habilidade. O padrão fornece 10 segundos de invisibilidade.</TM_VeilOfShadows_pwr_desc>
-<TM_VeilOfShadows_eff_desc>Reduz o custo de resistência de «Véus das sombras» em 6% por ponto de habilidade.</TM_VeilOfShadows_eff_desc>
-<TM_VeilOfShadows_ver_desc>Aumenta o raio de neblina de sombra em 10% por ponto de habilidade, e também aplica bónus de movimento e manipulação de 20% por ponto de habilidade.</TM_VeilOfShadows_ver_desc>
-
-<TM_ShadowWalk_pwr>Sombra prolongada</TM_ShadowWalk_pwr>
-<TM_ShadowWalk_eff>Contraste</TM_ShadowWalk_eff>
-<TM_ShadowWalk_ver>Carinho da sombra</TM_ShadowWalk_ver>
-<TM_ShadowStrike_pwr>Golpes violentos</TM_ShadowStrike_pwr>
-<TM_ShadowStrike_eff>Abordagem oculta</TM_ShadowStrike_eff>
-<TM_ShadowStrike_ver>Sombra venenosa</TM_ShadowStrike_ver>
-<TM_Nightshade_pwr>Atividade tóxica</TM_Nightshade_pwr>
-<TM_Nightshade_eff>Coletor</TM_Nightshade_eff>
-<TM_Nightshade_ver>Reservas tóxicas</TM_Nightshade_ver>
-<TM_VeilOfShadows_pwr>Sombra agarrada</TM_VeilOfShadows_pwr>
-<TM_VeilOfShadows_eff>Shadow</TM_VeilOfShadows_eff>
-<TM_VeilOfShadows_ver>Escuridão esmagadora</TM_VeilOfShadows_ver>
-
-<TM_Herbalist_pwr_desc>Aumenta a capacidade das ervas farmacêuticas em 10 por nível de habilidade.</TM_Herbalist_pwr_desc>
-<TM_Herbalist_eff_desc>Reduz a taxa de validade dos ingredientes em 10% por nível de habilidade.</TM_Herbalist_eff_desc>
-<TM_Herbalist_ver_desc>Aumente o número de ingredientes úteis encontrados durante a colheita em 10% por nível de habilidade.</TM_Herbalist_ver_desc>
-<TM_PoisonFlask_pwr_desc>Aumenta a duração do nevoeiro de chafariz com veneno em 1 segundo por nível de habilidade. Base de dados 6s.</TM_PoisonFlask_pwr_desc>
-<TM_PoisonFlask_eff_desc>Reduz em 8% o número de ingredientes necessários para criar um colo de veneno por nível de habilidade.</TM_PoisonFlask_eff_desc>
-<TM_PoisonFlask_ver_desc>Aumenta o alcance do nevoeiro de chafariz com veneno em .8c por nível de habilidade, básico 4c.</TM_PoisonFlask_ver_desc>
-<TM_Elixir_pwr_desc>Aumenta a duração do estágio de Elixir em 2,4 horas.</TM_Elixir_pwr_desc>
-<TM_Elixir_eff_desc>Reduz a quantidade de ingredientes para a produção de elixir em 8% por nível de habilidade.</TM_Elixir_eff_desc>
-<TM_Elixir_ver_desc>Os benefícios do elixir de ervas podem ser ampliados usando ingredientes corretos:
+  <TM_Nightshade_pwr_desc>Aumenta a toxicidade de cada ataque em 20% por ponto de habilidade.</TM_Nightshade_pwr_desc>
+  <TM_Nightshade_eff_desc>Reduz os custos de manutenção da sombra noturna em 6% por ponto de habilidade.</TM_Nightshade_eff_desc>
+  <TM_Nightshade_ver_desc>Aumenta o número máximo de doses de toxina da sombra noturna em 20% por ponto de habilidade.</TM_Nightshade_ver_desc>
+  <TM_VeilOfShadows_pwr_desc>Aumenta a duração de invisibilidade e neblina de sombra em 1 segundo por ponto de habilidade. O padrão fornece 10 segundos de invisibilidade.</TM_VeilOfShadows_pwr_desc>
+  <TM_VeilOfShadows_eff_desc>Reduz o custo de resistência de «Véus das sombras» em 6% por ponto de habilidade.</TM_VeilOfShadows_eff_desc>
+  <TM_VeilOfShadows_ver_desc>Aumenta o raio de neblina de sombra em 10% por ponto de habilidade, e também aplica bónus de movimento e manipulação de 20% por ponto de habilidade.</TM_VeilOfShadows_ver_desc>
+  <TM_ShadowWalk_pwr>Sombra prolongada</TM_ShadowWalk_pwr>
+  <TM_ShadowWalk_eff>Contraste</TM_ShadowWalk_eff>
+  <TM_ShadowWalk_ver>Carinho da sombra</TM_ShadowWalk_ver>
+  <TM_ShadowStrike_pwr>Golpes violentos</TM_ShadowStrike_pwr>
+  <TM_ShadowStrike_eff>Abordagem oculta</TM_ShadowStrike_eff>
+  <TM_ShadowStrike_ver>Sombra venenosa</TM_ShadowStrike_ver>
+  <TM_Nightshade_pwr>Atividade tóxica</TM_Nightshade_pwr>
+  <TM_Nightshade_eff>Coletor</TM_Nightshade_eff>
+  <TM_Nightshade_ver>Reservas tóxicas</TM_Nightshade_ver>
+  <TM_VeilOfShadows_pwr>Sombra agarrada</TM_VeilOfShadows_pwr>
+  <TM_VeilOfShadows_eff>Shadow</TM_VeilOfShadows_eff>
+  <TM_VeilOfShadows_ver>Escuridão esmagadora</TM_VeilOfShadows_ver>
+  <TM_Herbalist_pwr_desc>Aumenta a capacidade das ervas farmacêuticas em 10 por nível de habilidade.</TM_Herbalist_pwr_desc>
+  <TM_Herbalist_eff_desc>Reduz a taxa de validade dos ingredientes em 10% por nível de habilidade.</TM_Herbalist_eff_desc>
+  <TM_Herbalist_ver_desc>Aumente o número de ingredientes úteis encontrados durante a colheita em 10% por nível de habilidade.</TM_Herbalist_ver_desc>
+  <TM_PoisonFlask_pwr_desc>Aumenta a duração do nevoeiro de chafariz com veneno em 1 segundo por nível de habilidade. Base de dados 6s.</TM_PoisonFlask_pwr_desc>
+  <TM_PoisonFlask_eff_desc>Reduz em 8% o número de ingredientes necessários para criar um colo de veneno por nível de habilidade.</TM_PoisonFlask_eff_desc>
+  <TM_PoisonFlask_ver_desc>Aumenta o alcance do nevoeiro de chafariz com veneno em .8c por nível de habilidade, básico 4c.</TM_PoisonFlask_ver_desc>
+  <TM_Elixir_pwr_desc>Aumenta a duração do estágio de Elixir em 2,4 horas.</TM_Elixir_pwr_desc>
+  <TM_Elixir_eff_desc>Reduz a quantidade de ingredientes para a produção de elixir em 8% por nível de habilidade.</TM_Elixir_eff_desc>
+  <TM_Elixir_ver_desc>Os benefícios do elixir de ervas podem ser ampliados usando ingredientes corretos:
 Nível 0: reduz a destruição no estado de repouso e aumenta a regeneração da saúde durante o estado ativo.
 Nível 1: Luta ativa contra infecções
 Nível 2: Luta ativa contra doenças
 Nível 3: lentamente cura lesões irreversíveis</TM_Elixir_ver_desc>
-<TM_SoothingBalm_pwr_desc>Aumenta a qualidade total das feridas tratadas em 10% por nível de habilidade. Base de 50 a 70%.</TM_SoothingBalm_pwr_desc>
-<TM_SoothingBalm_eff_desc>Reduz a quantidade de ingredientes usados para criar um balsamo calmante em 8% por nível de habilidade.</TM_SoothingBalm_eff_desc>
-<TM_SoothingBalm_ver_desc>Aumenta o número de feridas tratadas com um bálsamo calmante.</TM_SoothingBalm_ver_desc>
-<TM_FireSuppressionFlask_eff_desc>Reduz em 15% o número de ingredientes necessários para criar um colo de veneno por nível de habilidade.</TM_FireSuppressionFlask_eff_desc>
-
-<TM_Herbalist_pwr>Bolsa Travnick</TM_Herbalist_pwr>
-<TM_Herbalist_eff>Salvar</TM_Herbalist_eff>
-<TM_Herbalist_ver>Furajir</TM_Herbalist_ver>
-<TM_PoisonFlask_pwr>Nuvem prolongada</TM_PoisonFlask_pwr>
-<TM_PoisonFlask_eff>Eficiência dos ingredientes</TM_PoisonFlask_eff>
-<TM_PoisonFlask_ver>Nuvem em expansão</TM_PoisonFlask_ver>
-<TM_Elixir_pwr>Potência</TM_Elixir_pwr>
-<TM_Elixir_eff>Eficiência dos ingredientes</TM_Elixir_eff>
-<TM_Elixir_ver>Química</TM_Elixir_ver>
-<TM_SoothingBalm_pwr>Pomada medicinal</TM_SoothingBalm_pwr>
-<TM_SoothingBalm_eff>Eficiência dos ingredientes</TM_SoothingBalm_eff>
-<TM_SoothingBalm_ver>Anestésico</TM_SoothingBalm_ver>
-<TM_FireSuppressionFlask_eff>Eficiência dos ingredientes</TM_FireSuppressionFlask_eff>
-
-<TM_ApothecaryHerbsGizmoLabel>Ervas</TM_ApothecaryHerbsGizmoLabel>
-
-<TM_Taunt_pwr>Rival</TM_Taunt_pwr>
-<TM_Taunt_eff>Livro de insultos</TM_Taunt_eff>
-<TM_Taunt_ver>Raio de raio</TM_Taunt_ver>
-<TM_Taunt_pwr_desc>Aumenta a probabilidade de sucesso da burla e o número máximo de alvos.
+  <TM_SoothingBalm_pwr_desc>Aumenta a qualidade total das feridas tratadas em 10% por nível de habilidade. Base de 50 a 70%.</TM_SoothingBalm_pwr_desc>
+  <TM_SoothingBalm_eff_desc>Reduz a quantidade de ingredientes usados para criar um balsamo calmante em 8% por nível de habilidade.</TM_SoothingBalm_eff_desc>
+  <TM_SoothingBalm_ver_desc>Aumenta o número de feridas tratadas com um bálsamo calmante.</TM_SoothingBalm_ver_desc>
+  <TM_FireSuppressionFlask_eff_desc>Reduz em 15% o número de ingredientes necessários para criar um colo de veneno por nível de habilidade.</TM_FireSuppressionFlask_eff_desc>
+  <TM_Herbalist_pwr>Bolsa Travnick</TM_Herbalist_pwr>
+  <TM_Herbalist_eff>Salvar</TM_Herbalist_eff>
+  <TM_Herbalist_ver>Furajir</TM_Herbalist_ver>
+  <TM_PoisonFlask_pwr>Nuvem prolongada</TM_PoisonFlask_pwr>
+  <TM_PoisonFlask_eff>Eficiência dos ingredientes</TM_PoisonFlask_eff>
+  <TM_PoisonFlask_ver>Nuvem em expansão</TM_PoisonFlask_ver>
+  <TM_Elixir_pwr>Potência</TM_Elixir_pwr>
+  <TM_Elixir_eff>Eficiência dos ingredientes</TM_Elixir_eff>
+  <TM_Elixir_ver>Química</TM_Elixir_ver>
+  <TM_SoothingBalm_pwr>Pomada medicinal</TM_SoothingBalm_pwr>
+  <TM_SoothingBalm_eff>Eficiência dos ingredientes</TM_SoothingBalm_eff>
+  <TM_SoothingBalm_ver>Anestésico</TM_SoothingBalm_ver>
+  <TM_FireSuppressionFlask_eff>Eficiência dos ingredientes</TM_FireSuppressionFlask_eff>
+  <TM_ApothecaryHerbsGizmoLabel>Ervas</TM_ApothecaryHerbsGizmoLabel>
+  <TM_Taunt_pwr>Rival</TM_Taunt_pwr>
+  <TM_Taunt_eff>Livro de insultos</TM_Taunt_eff>
+  <TM_Taunt_ver>Raio de raio</TM_Taunt_ver>
+  <TM_Taunt_pwr_desc>Aumenta a probabilidade de sucesso da burla e o número máximo de alvos.
 Nível 0:60%, 5 objetivos no máximo
 Nível 1:65%, no máximo 6 metas
 Nível 2:70%, no máximo 7 objetivos
 Nível 3:75%, no máximo 8 objetivos</TM_Taunt_pwr_desc>
-<TM_Taunt_eff_desc>Reduz os custos de energia em 10% por nível de habilidade.</TM_Taunt_eff_desc>
-<TM_Taunt_ver_desc>Aumenta o raio de ridicularização em 2 células; por padrão, 15 células.</TM_Taunt_ver_desc>
-
-<TM_Explosion_pwr>Destruição</TM_Explosion_pwr>
-<TM_Explosion_eff>Canto</TM_Explosion_eff>
-<TM_Explosion_ver>Melhoria da visão</TM_Explosion_ver>
-<TM_Explosion_pwr_desc>Aumenta os danos causados pela explosão em 2% pelo nível de habilidade.</TM_Explosion_pwr_desc>
-<TM_Explosion_eff_desc>Reduz os custos de energia por explosão em 1% por nível de habilidade.</TM_Explosion_eff_desc>
-<TM_Explosion_ver_desc>Reduz o tempo necessário para ativar a explosão em 1% e aumenta o raio de explosão em 1 célula em níveis de 10/20/30; por omissão, 12 células.</TM_Explosion_ver_desc>
-
-<TM_MedicalSupply_ver>Capacidade</TM_MedicalSupply_ver>
-<TM_MedicalSupply_ver_desc>Aumenta a quantidade máxima de medicamentos transportados 10 por nível de habilidade.</TM_MedicalSupply_ver_desc>
-<TM_Medigel_eff>Médico de guerra</TM_Medigel_eff>
-<TM_Medigel_eff_desc>Reduz os custos de energia de Medigel em 5% por nível de habilidade.</TM_Medigel_eff_desc>
-<TM_CombatDrugs_pwr>Eficiência</TM_CombatDrugs_pwr>
-<TM_CombatDrugs_pwr_desc>Aumenta o número de efeitos aplicados:
+  <TM_Taunt_eff_desc>Reduz os custos de energia em 10% por nível de habilidade.</TM_Taunt_eff_desc>
+  <TM_Taunt_ver_desc>Aumenta o raio de ridicularização em 2 células; por padrão, 15 células.</TM_Taunt_ver_desc>
+  <TM_Explosion_pwr>Destruição</TM_Explosion_pwr>
+  <TM_Explosion_eff>Canto</TM_Explosion_eff>
+  <TM_Explosion_ver>Melhoria da visão</TM_Explosion_ver>
+  <TM_Explosion_pwr_desc>Aumenta os danos causados pela explosão em 2% pelo nível de habilidade.</TM_Explosion_pwr_desc>
+  <TM_Explosion_eff_desc>Reduz os custos de energia por explosão em 1% por nível de habilidade.</TM_Explosion_eff_desc>
+  <TM_Explosion_ver_desc>Reduz o tempo necessário para ativar a explosão em 1% e aumenta o raio de explosão em 1 célula em níveis de 10/20/30; por omissão, 12 células.</TM_Explosion_ver_desc>
+  <TM_MedicalSupply_ver>Capacidade</TM_MedicalSupply_ver>
+  <TM_MedicalSupply_ver_desc>Aumenta a quantidade máxima de medicamentos transportados 10 por nível de habilidade.</TM_MedicalSupply_ver_desc>
+  <TM_Medigel_eff>Médico de guerra</TM_Medigel_eff>
+  <TM_Medigel_eff_desc>Reduz os custos de energia de Medigel em 5% por nível de habilidade.</TM_Medigel_eff_desc>
+  <TM_CombatDrugs_pwr>Eficiência</TM_CombatDrugs_pwr>
+  <TM_CombatDrugs_pwr_desc>Aumenta o número de efeitos aplicados:
 Efeito de nível 0:1
 Nível 1:2 efeitos
 Nível 2:3 efeitos
 Nível 3: todos os 4 efeitos</TM_CombatDrugs_pwr_desc>
-<TM_CombatDrugs_ver>Estabilização</TM_CombatDrugs_ver>
-<TM_CombatDrugs_ver_desc>Dura 120 segundos, mais 20 segundos por nível de habilidade.</TM_CombatDrugs_ver_desc>
-
-  <!-- UI -->
+  <TM_CombatDrugs_ver>Estabilização</TM_CombatDrugs_ver>
+  <TM_CombatDrugs_ver_desc>Dura 120 segundos, mais 20 segundos por nível de habilidade.</TM_CombatDrugs_ver_desc>
   <TM_TabMagic>Magia</TM_TabMagic>
   <TM_TabMight>Força</TM_TabMight>
   <TM_TabCustom>Sala de aula</TM_TabCustom>
@@ -2022,13 +1943,8 @@ Nível 3: todos os 4 efeitos</TM_CombatDrugs_pwr_desc>
   <TM_SuperSoldierPathWarning>* * É possível escolher apenas uma especialização em armas; quando o caminho for selecionado, todos os outros caminhos serão fechados * *</TM_SuperSoldierPathWarning>
   <TM_SpellLocked>Bloqueado: Descubra, por meio de rolagem</TM_SpellLocked>
   <TM_MasterSpellLocked>Bloqueado: Saiba o que se passa com o pergaminho do assistente</TM_MasterSpellLocked>
-
-  <!-- ========== Button Tooltips ========== -->
   <Poppi_fuelGrowth>Extração química</Poppi_fuelGrowth>
   <TM_ArmorHarmony>Virtude</TM_ArmorHarmony>
-
-  <!-- ========== Button Tooltips ========== -->
-
   <TM_AbilityDescBaseManaCost>Valor Básico de Mana: Se você quiser</TM_AbilityDescBaseManaCost>
   <TM_AbilityDescAdjustedManaCost>Valor ajustado de Mana:</TM_AbilityDescAdjustedManaCost>
   <TM_AbilityDescBaseStaminaCost>Custo de Resistência de Base</TM_AbilityDescBaseStaminaCost>
@@ -2045,8 +1961,8 @@ Nível 3: todos os 4 efeitos</TM_CombatDrugs_pwr_desc>
   <TM_PsionicInitialCost>Valor Inicial da Energia Psicônica:</TM_PsionicInitialCost>
   <TM_PsionicBlastAddCost>Consequente Custo de Energia da Explosão</TM_PsionicBlastAddCost>
   <TM_RequiresHateAmount>Ódio requerido: Se você Quiser</TM_RequiresHateAmount>
-  <TM_PsionicBarrierMaintenanceCost/>
-  <TM_PsionicBarrierConversionRate/>
+  <TM_PsionicBarrierMaintenanceCost />
+  <TM_PsionicBarrierConversionRate />
   <TM_Replicate>Digitalização de Replicação</TM_Replicate>
   <TM_ReplicateDesc>A Forja Secreta é capaz de escanear um objeto e reproduzir o seu design. Em caso de sucesso, a forja armazena os desenhos de projeto do produto digitalizado e o produto pode ser fabricado na forja. A fabricação de itens complexos requer o mesmo material que os itens padrão, mas qualquer exigência de pesquisa ou habilidade de craft é ignorada. Todos os itens replicados exigem alta inteligência para serem reproduzidos, e a forja só pode ser controlada por um mágico. Nota do administrador: a forja pode ser digitalizada gratuitamente, mas o design ativo é substituído por uma receita padrão, se o jogo for reiniciado .\n\n A replicação não tem limite de utilização, mas é o mais benéfico, quando usado para criar objetos, você não tem pesquisa para criar, para alterar os requisitos de craft para aproveitar o aumento dramático da velocidade de craft de forja secreta ou tirar proveito do bônus de qualidade ao trabalhar com um mago de alto nível.</TM_ReplicateDesc>
   <TM_ReplicateDisabled>Replicação Desativada</TM_ReplicateDisabled>
@@ -2060,48 +1976,43 @@ Nível 3: todos os 4 efeitos</TM_CombatDrugs_pwr_desc>
   <TM_PromoteWayfarerDesc>Promove um peão dotado para a turma dos viajantes. O viajante não tem nenhuma capacidade de classe, mas pode explorar todas as capacidades autônomas sem classe com pergaminhos e pode melhorar a capacidade de combate além do seu potencial normal.
 * Para se tornar uma classe de poder, um peão deve ler um livro que ensina uniformes de combate. *
 * * Após a promoção do peão não pode se tornar outra classe de lutadores, a decisão é permanente e não pode ser revogada - isso também é válido para a classe de viajantes. * *</TM_PromoteWayfarerDesc>
-
-<TM_ActivateGolem>Ativar</TM_ActivateGolem>
-<TM_ActivateGolemDesc>Começa o processo de ativação do golem - depois de ativado, o golem será movido como um peão normal. Qualquer atualização ou reparação em estado de paz será descartada. É necessário um mínimo de energia para ativar.</TM_ActivateGolemDesc>
-<TM_DeActivateGolem>Desativar</TM_DeActivateGolem>
-<TM_DeActivateGolemDesc>Manda-o adormecer. O Golem vai tentar voltar para o seu local de inatividade. Se esta localização não estiver disponível, o golem será desativado na sua localização atual. Se a localização estiver disponível, a nova emissão deste comando cancelará o comando de retorno e desativará imediatamente o golem na sua posição atual.</TM_DeActivateGolemDesc>
-<TM_ActivateGolemDisabled>Desligado - energia insuficiente</TM_ActivateGolemDisabled>
-<TM_AssignGolemRestPosition>Posição adormecida</TM_AssignGolemRestPosition>
-<TM_AssignGolemRestPositionDesc>Indica a localização que o goleiro deve desativar.</TM_AssignGolemRestPositionDesc>
-<TM_DormantPositionUnreachable>Posição selecionada não disponível ou ocupada - Cancelamento</TM_DormantPositionUnreachable>
-<TM_GolemStationaryDefenseToggle>protocolo de proteção</TM_GolemStationaryDefenseToggle>
-<TM_GolemStationaryDefenseToggleDesc>Alterna a proteção fixa. O golem permanece adormecido usando proteção fixa.</TM_GolemStationaryDefenseToggleDesc>
-<TM_GolemActiveDefenseToggle>protocolo de interação</TM_GolemActiveDefenseToggle>
-<TM_GolemActiveDefenseToggleDesc>Alterna a proteção ativa. O Golem é ativado se o inimigo entrar na sua zona de ameaça. Você pode configurar o intervalo de ameaça para um golem selecionando um golem adormecido e abrindo a guia de golem.</TM_GolemActiveDefenseToggleDesc>
-
-<TM_UpgradesVerbatum>Atualizações</TM_UpgradesVerbatum>
-<TM_GolemThreatRange>Faixa de ameaças:</TM_GolemThreatRange>
-<TM_GolemThreatRangeDesc>Determina a distância em que o goleiro detectará e ativará o ataque contra um alvo hostil; este valor também determina a distância em que o golem ativo atacará a ameaça. A definição deste valor em 0 impede que o holo inativo seja ativado da ameaça mais próxima.</TM_GolemThreatRangeDesc>
-<TM_GolemAbilityMinimum>Limite de capacidade:</TM_GolemAbilityMinimum>
-<TM_GolemAbilityMinimumDesc>Especifica a porcentagem mínima de energia necessária para usar a capacidade de energia; o golem não usará a capacidade que requer energia se a porcentagem de energia for menor do que esse valor. A configuração deste valor vai desativar 100% o uso da capacidade.</TM_GolemAbilityMinimumDesc>
-<TM_GolemRestMinimum>Porta de paz:</TM_GolemRestMinimum>
-<TM_GolemRestMinimumDesc>A porcentagem de energia que o goleiro tentará voltar ao estado de repouso para desativar e recarregar a energia; o golem é automaticamente desativado a 0%.</TM_GolemRestMinimumDesc>
-<TM_GolemAwakenMinimum>Ativar limiar:</TM_GolemAwakenMinimum>
-<TM_GolemAwakenMinimumDesc>A porcentagem de energia em que o golo é ativado para tarefas; defina 10% ou menos para desativar a ativação automática.</TM_GolemAwakenMinimumDesc>
-<TM_GolemMasterDesc>Nomeia um holemante mestre deste golem; a nomeação do assistente permite que o holem melhore o comportamento para proteger o holemante designado.</TM_GolemMasterDesc>
-<TM_GolemFollowsMaster>Siga o mestre</TM_GolemFollowsMaster>
-<TM_GolemFollowsMasterDesc>Quando estiver incluído, o golem dará prioridade a seguir e proteger o seu anfitrião sobre todas as outras tarefas relacionadas com o trabalho.</TM_GolemFollowsMasterDesc>
-<TM_GolemDraftedFollow>Composto apenas</TM_GolemDraftedFollow>
-<TM_GolemDraftedFollowDesc>Coloca a proteção do anfitrião designado acima de todas as outras ações quando o assistente for chamado; um mestre pode guiar um golem em combate, como um animal solto.</TM_GolemDraftedFollowDesc>
-<TM_GolemDormantWhenUpgrading>Mantenha-se calmo ao atualizar</TM_GolemDormantWhenUpgrading>
-<TM_GolemDormantWhenUpgradingDesc>Quando estiver ligado, o golem ficará adormecido se houver contas na fila. O golem permanecerá sempre em paz quando a conta estiver em andamento (atualização incompleta).</TM_GolemDormantWhenUpgradingDesc>
-<TM_GolemUseAbilitiesWhileDormant>Use a capacidade de paz</TM_GolemUseAbilitiesWhileDormant>
-<TM_GolemUseAbilitiesWhileDormantDesc>Desligado, o goleiro inativo nunca usará poderes.</TM_GolemUseAbilitiesWhileDormantDesc>
-<TM_GolemRestrictedAggression>Agressão limitada</TM_GolemRestrictedAggression>
-<TM_GolemRestrictedAggressionDesc>Quando estiver ligado, o goleiro não ativará ou perseguirá alvos por portas ou fora da área permitida.</TM_GolemRestrictedAggressionDesc>
-<TM_GolemName>Nome do golem</TM_GolemName>
-<TM_GolemNameDesc>Alterar nome do golem</TM_GolemNameDesc>
-<TM_GolemMasterLabel>Golemant</TM_GolemMasterLabel>
-<TM_ActivatesGolem_Time>Ativa o golem. Normalmente demora um pouco. O Golem não pode ser ativado se estiver a ser modernizado.</TM_ActivatesGolem_Time>
-<TM_DeActivatesGolem_Time>Desativar o golem - o que remete o golem para a posição original e pode levar algum tempo.</TM_DeActivatesGolem_Time>
-
- <!-- ========== Building Menu's ========== -->
-
+  <TM_ActivateGolem>Ativar</TM_ActivateGolem>
+  <TM_ActivateGolemDesc>Começa o processo de ativação do golem - depois de ativado, o golem será movido como um peão normal. Qualquer atualização ou reparação em estado de paz será descartada. É necessário um mínimo de energia para ativar.</TM_ActivateGolemDesc>
+  <TM_DeActivateGolem>Desativar</TM_DeActivateGolem>
+  <TM_DeActivateGolemDesc>Manda-o adormecer. O Golem vai tentar voltar para o seu local de inatividade. Se esta localização não estiver disponível, o golem será desativado na sua localização atual. Se a localização estiver disponível, a nova emissão deste comando cancelará o comando de retorno e desativará imediatamente o golem na sua posição atual.</TM_DeActivateGolemDesc>
+  <TM_ActivateGolemDisabled>Desligado - energia insuficiente</TM_ActivateGolemDisabled>
+  <TM_AssignGolemRestPosition>Posição adormecida</TM_AssignGolemRestPosition>
+  <TM_AssignGolemRestPositionDesc>Indica a localização que o goleiro deve desativar.</TM_AssignGolemRestPositionDesc>
+  <TM_DormantPositionUnreachable>Posição selecionada não disponível ou ocupada - Cancelamento</TM_DormantPositionUnreachable>
+  <TM_GolemStationaryDefenseToggle>protocolo de proteção</TM_GolemStationaryDefenseToggle>
+  <TM_GolemStationaryDefenseToggleDesc>Alterna a proteção fixa. O golem permanece adormecido usando proteção fixa.</TM_GolemStationaryDefenseToggleDesc>
+  <TM_GolemActiveDefenseToggle>protocolo de interação</TM_GolemActiveDefenseToggle>
+  <TM_GolemActiveDefenseToggleDesc>Alterna a proteção ativa. O Golem é ativado se o inimigo entrar na sua zona de ameaça. Você pode configurar o intervalo de ameaça para um golem selecionando um golem adormecido e abrindo a guia de golem.</TM_GolemActiveDefenseToggleDesc>
+  <TM_UpgradesVerbatum>Atualizações</TM_UpgradesVerbatum>
+  <TM_GolemThreatRange>Faixa de ameaças:</TM_GolemThreatRange>
+  <TM_GolemThreatRangeDesc>Determina a distância em que o goleiro detectará e ativará o ataque contra um alvo hostil; este valor também determina a distância em que o golem ativo atacará a ameaça. A definição deste valor em 0 impede que o holo inativo seja ativado da ameaça mais próxima.</TM_GolemThreatRangeDesc>
+  <TM_GolemAbilityMinimum>Limite de capacidade:</TM_GolemAbilityMinimum>
+  <TM_GolemAbilityMinimumDesc>Especifica a porcentagem mínima de energia necessária para usar a capacidade de energia; o golem não usará a capacidade que requer energia se a porcentagem de energia for menor do que esse valor. A configuração deste valor vai desativar 100% o uso da capacidade.</TM_GolemAbilityMinimumDesc>
+  <TM_GolemRestMinimum>Porta de paz:</TM_GolemRestMinimum>
+  <TM_GolemRestMinimumDesc>A porcentagem de energia que o goleiro tentará voltar ao estado de repouso para desativar e recarregar a energia; o golem é automaticamente desativado a 0%.</TM_GolemRestMinimumDesc>
+  <TM_GolemAwakenMinimum>Ativar limiar:</TM_GolemAwakenMinimum>
+  <TM_GolemAwakenMinimumDesc>A porcentagem de energia em que o golo é ativado para tarefas; defina 10% ou menos para desativar a ativação automática.</TM_GolemAwakenMinimumDesc>
+  <TM_GolemMasterDesc>Nomeia um holemante mestre deste golem; a nomeação do assistente permite que o holem melhore o comportamento para proteger o holemante designado.</TM_GolemMasterDesc>
+  <TM_GolemFollowsMaster>Siga o mestre</TM_GolemFollowsMaster>
+  <TM_GolemFollowsMasterDesc>Quando estiver incluído, o golem dará prioridade a seguir e proteger o seu anfitrião sobre todas as outras tarefas relacionadas com o trabalho.</TM_GolemFollowsMasterDesc>
+  <TM_GolemDraftedFollow>Composto apenas</TM_GolemDraftedFollow>
+  <TM_GolemDraftedFollowDesc>Coloca a proteção do anfitrião designado acima de todas as outras ações quando o assistente for chamado; um mestre pode guiar um golem em combate, como um animal solto.</TM_GolemDraftedFollowDesc>
+  <TM_GolemDormantWhenUpgrading>Mantenha-se calmo ao atualizar</TM_GolemDormantWhenUpgrading>
+  <TM_GolemDormantWhenUpgradingDesc>Quando estiver ligado, o golem ficará adormecido se houver contas na fila. O golem permanecerá sempre em paz quando a conta estiver em andamento (atualização incompleta).</TM_GolemDormantWhenUpgradingDesc>
+  <TM_GolemUseAbilitiesWhileDormant>Use a capacidade de paz</TM_GolemUseAbilitiesWhileDormant>
+  <TM_GolemUseAbilitiesWhileDormantDesc>Desligado, o goleiro inativo nunca usará poderes.</TM_GolemUseAbilitiesWhileDormantDesc>
+  <TM_GolemRestrictedAggression>Agressão limitada</TM_GolemRestrictedAggression>
+  <TM_GolemRestrictedAggressionDesc>Quando estiver ligado, o goleiro não ativará ou perseguirá alvos por portas ou fora da área permitida.</TM_GolemRestrictedAggressionDesc>
+  <TM_GolemName>Nome do golem</TM_GolemName>
+  <TM_GolemNameDesc>Alterar nome do golem</TM_GolemNameDesc>
+  <TM_GolemMasterLabel>Golemant</TM_GolemMasterLabel>
+  <TM_ActivatesGolem_Time>Ativa o golem. Normalmente demora um pouco. O Golem não pode ser ativado se estiver a ser modernizado.</TM_ActivatesGolem_Time>
+  <TM_DeActivatesGolem_Time>Desativar o golem - o que remete o golem para a posição original e pode levar algum tempo.</TM_DeActivatesGolem_Time>
   <TM_SelectPortalDestination>Ativar Portal</TM_SelectPortalDestination>
   <TM_UsePortal>Usar Portal</TM_UsePortal>
   <TM_DeactivatePortal>Desativar Portal</TM_DeactivatePortal>
@@ -2115,8 +2026,6 @@ Nível 3: todos os 4 efeitos</TM_CombatDrugs_pwr_desc>
   <TM_PortalNoGatewayLearned>O feitiço do Portal não foi dominado por 0</TM_PortalNoGatewayLearned>
   <TM_NeedManaToActivatePortal>Ativar: &lt; 0 a.p. de .70 man</TM_NeedManaToActivatePortal>
   <TM_ChargeManaStorage>Carregador: Se você estiver carregando, 0</TM_ChargeManaStorage>
-
-  <!-- ============ Enchanting Menu's =============-->
   <TabEnchantment>Encantada</TabEnchantment>
   <TM_DropGem>Drop 0</TM_DropGem>
   <TM_PickupGem>Projetar por a.0 f. para enfeitar</TM_PickupGem>
@@ -2124,15 +2033,12 @@ Nível 3: todos os 4 efeitos</TM_CombatDrugs_pwr_desc>
   <TM_EnchantItem>Engavetar a. 0 a.p.</TM_EnchantItem>
   <TM_CannotDrop>Não foi possível driblar a.0..</TM_CannotDrop>
   <TM_NeedManaForEnchant>Encantamento: Se você não quiser fazer nada?</TM_NeedManaForEnchant>
-
-<!-- ============ Golem Menu's ===================-->
-<TabGolem>Golem</TabGolem>
-<TM_GolemAbilities>Habilidades de &lt; 0 a.p.</TM_GolemAbilities>
-<TM_GolemAbilitiesButton>Habilidades</TM_GolemAbilitiesButton>
-<TM_GolemAbilityEnabledDesc>Alterna o uso de &lt; 0 f.: se 1</TM_GolemAbilityEnabledDesc>
-<TM_GolemShowDormant>Mostrar quadro inativo</TM_GolemShowDormant>
-<TM_GolemShowDormantDesc>Mostra a moldura sobre a inatividade deste golem. Use o menu de configurações de moda para mudar isso para todos os holems.</TM_GolemShowDormantDesc>
-  <!-- ============ Enchantment Labels =============-->
+  <TabGolem>Golem</TabGolem>
+  <TM_GolemAbilities>Habilidades de &lt; 0 a.p.</TM_GolemAbilities>
+  <TM_GolemAbilitiesButton>Habilidades</TM_GolemAbilitiesButton>
+  <TM_GolemAbilityEnabledDesc>Alterna o uso de &lt; 0 f.: se 1</TM_GolemAbilityEnabledDesc>
+  <TM_GolemShowDormant>Mostrar quadro inativo</TM_GolemShowDormant>
+  <TM_GolemShowDormantDesc>Mostra a moldura sobre a inatividade deste golem. Use o menu de configurações de moda para mudar isso para todos os holems.</TM_GolemShowDormantDesc>
   <TM_MaxMPLabel>Aumento Máximo de Energia: &lt; 0</TM_MaxMPLabel>
   <TM_MPRegenRateLabel>Aumento de Regeneração de Energia: &lt; 0 350%</TM_MPRegenRateLabel>
   <TM_CoolDownLabel>Reduzir a recarga de Capacidade de Recarga</TM_CoolDownLabel>
@@ -2144,27 +2050,22 @@ Nível 3: todos os 4 efeitos</TM_CombatDrugs_pwr_desc>
   <TM_PhantomShift>Mudança fantasma</TM_PhantomShift>
   <TM_ArcalleumCooldown>Recarregar Arkalleum</TM_ArcalleumCooldown>
   <TM_EA_Hediff>Se você acertar, o que você pode fazer?</TM_EA_Hediff>
-  <TM_EA_Damage></TM_EA_Damage>
-
-  <!-- ============ Floating Text =============-->
+  <TM_EA_Damage />
   <TM_Enchanted>Encantado!</TM_Enchanted>
   <TM_UnableToLearnAdvancedClass>Se você não pôde aplicar, você não pôde aplicar, se você não pôde aplicar.</TM_UnableToLearnAdvancedClass>
   <TM_LearnFail_NotClass>classe básica não encontrada</TM_LearnFail_NotClass>
   <TM_LearnFail_NoRequiredTrait>a barra necessária não foi encontrada</TM_LearnFail_NoRequiredTrait>
   <TM_LearnFail_DisallowedTrait>traço conflitante</TM_LearnFail_DisallowedTrait>
-
   <TM_SpiritVerbatum>Espírito</TM_SpiritVerbatum>
   <TM_AncientSpiritVerbatum>Espírito antigo</TM_AncientSpiritVerbatum>
   <TM_VengefulSpiritVerbatum>Espírito vingativo</TM_VengefulSpiritVerbatum>
   <TM_LostSpiritVerbatum>Espírito perdido</TM_LostSpiritVerbatum>
   <TM_RegretSpiritVerbatum>Espírito de arrependimento</TM_RegretSpiritVerbatum>
-
   <TM_BaseSpiritDesc>Um espírito vagabundo, ligado a este mundo por um poder desconhecido. Os acontecimentos relacionados com a origem deste espírito são desconhecidos, mas são fortes o suficiente para levar o espírito a procurar respostas, justiça ou redenção dos vivos.</TM_BaseSpiritDesc>
   <TM_AncientSpiritDesc>Esse espírito existiu durante séculos e não se lembra mais de seu destino. Os espíritos antigos têm seus objetivos e tornaram-se mestres do controle da energia espiritual. A energia máxima do espírito foi aumentada em 50.</TM_AncientSpiritDesc>
   <TM_VengefulSpiritDesc>Os espíritos vingativos são cheios de maldade e ódio, querendo apenas causar o seu sofrimento vivo. Os espíritos vingativos podem mostrar grande força durante a distorção espiritual e a tempestade espiritual, mas são mais difíceis de harmonizar quando possuem um corpo vivo. Aumenta a velocidade de ataque do Spirit Storm em 25% e o bónus do uron Distorition Spirit em 6%. Reduz a compatibilidade em 1.</TM_VengefulSpiritDesc>
   <TM_LostSpiritDesc>Espíritos perdidos percorrem o reino em constante estado de dor existencial, incapazes de compreender o seu objetivo. Os perdidos estão dispostos a juntar-se à causa dos outros e estão mais facilmente em sintonia com as almas gémeas. Eles também podem aumentar a força da capacidade do espírito de ralo. Aumente em 10% a duração, o raio, o número máximo de alvos e os bónus Spirit Bally. Aumenta a compatibilidade em 2.</TM_LostSpiritDesc>
   <TM_RegretSpiritDesc>O espírito de pesar ainda pode se lembrar de seu propósito como espírito, mas não pode corrigir seus erros antes que seja tarde demais. Agora eles andam pelo mundo como espíritos cheios de tristeza e arrependimento, ainda à procura de uma maneira de cumprir o seu propósito. Os espíritos do arrependimento aumentam a capacidade de sugar o espírito em 20%.</TM_RegretSpiritDesc>
-
   <TM_SpiritPossession_pwr_desc>Aumenta a sensibilidade mental e a consciência na forma do espírito, e aumenta a quantidade de energia produzida ao tocar o espírito em 10% por nível:
 Sensibilidade: + [40%, 65%, 85%, 100%]
 Consciência: + [0%, 15%, 25%, 40%]</TM_SpiritPossession_pwr_desc>
@@ -2189,7 +2090,6 @@ Nível 3: 14s, 24s</TM_SpiritRally_ver_desc>
   <TM_SpiritStorm_pwr_desc>Aumenta os danos causados pela Tempestade Espiritual em 12% por cada nível de habilidade.</TM_SpiritStorm_pwr_desc>
   <TM_SpiritStorm_eff_desc>Reduz o custo da energia espiritual para criar uma tempestade espiritual em 10% por cada nível de habilidade.</TM_SpiritStorm_eff_desc>
   <TM_SpiritStorm_ver_desc>Aumenta o raio da tempestade espiritual em 1s por cada nível de habilidade. Raio básico 4c.</TM_SpiritStorm_ver_desc>
-
   <TM_SpiritPossession_pwr>A força do espírito</TM_SpiritPossession_pwr>
   <TM_SpiritPossession_eff>Controle de espírito</TM_SpiritPossession_eff>
   <TM_SpiritPossession_ver>Gerenciamento de espírito</TM_SpiritPossession_ver>
@@ -2208,7 +2108,6 @@ Nível 3: 14s, 24s</TM_SpiritRally_ver_desc>
   <TM_SpiritStorm_pwr>Raiva do espírito</TM_SpiritStorm_pwr>
   <TM_SpiritStorm_eff>Empatia</TM_SpiritStorm_eff>
   <TM_SpiritStorm_ver>Mar de tristeza</TM_SpiritStorm_ver>
-
   <TM_GolemAssignAreaDesc>Permitir área</TM_GolemAssignAreaDesc>
   <TM_RemovePossession>Deixar o corpo</TM_RemovePossession>
   <TM_RemovePossessionDesc>O Espírito abandona o corpo voluntariamente, e as características do peão voltam ao estado em que ela estava antes da posse.</TM_RemovePossessionDesc>
@@ -2216,5 +2115,63 @@ Nível 3: 14s, 24s</TM_SpiritRally_ver_desc>
   <TM_GolemDoScreenShakeDesc>Se esta função estiver desativada, os golems não vão causar tremores na tela ao ativar ou desactivar.</TM_GolemDoScreenShakeDesc>
   <TM_EndSymbiosis>Fim da simbiose</TM_EndSymbiosis>
   <TM_EndSymbiosisDesc>O empato separa a sua vontade do seu dono e volta para o seu corpo. Esta opção só está disponível se o host estiver próximo ao simbiota.</TM_EndSymbiosisDesc>
-
-  </LanguageData>
+  <AIFighterMarkingDesc>Mostra um pequeno ícone de classe ao lado de um lutador de IA</AIFighterMarkingDesc>
+  <AIMarkingDesc>Mostra um pequeno ícone de classe ao lado de um mago de IA</AIMarkingDesc>
+  <TM_AlterClothingDepth>Ajustar profundidade de desenho das roupas</TM_AlterClothingDepth>
+  <TM_AlterClothingDepthDesc>Quando ativado, as opções abaixo alteram a ordem em que as roupas são desenhadas (sobre ou sob outras peças).</TM_AlterClothingDepthDesc>
+  <TM_BookCausesWeakness>O leitor ganhará fraqueza arcana ao estudar este grimório.</TM_BookCausesWeakness>
+  <TM_BookExperienceCombat>Ganho de experiência de classe de combate</TM_BookExperienceCombat>
+  <TM_BookExperienceGrimoire>Ganho de experiência de classe mágica</TM_BookExperienceGrimoire>
+  <TM_CameraSnapDesc>Centraliza a câmera no peão selecionado após teletransporte (blink, golpe em fase etc.)</TM_CameraSnapDesc>
+  <TM_CloakDepth>Profundidade das capas</TM_CloakDepth>
+  <TM_CloakDepthDesc>Ajusta a profundidade de desenho das capas para aparecerem sobre ou sob outras roupas. Se precisar ajustar, o valor geralmente é bem pequeno (.001).</TM_CloakDepthDesc>
+  <TM_CloakDepthNorth>Profundidade das capas (norte)</TM_CloakDepthNorth>
+  <TM_CloakDepthNorthDesc>Ajusta a profundidade das capas quando o personagem olha para o norte (cima). Se precisar ajustar, o valor geralmente é bem pequeno (.001).</TM_CloakDepthNorthDesc>
+  <TM_CreateAreas>Criar áreas do mapa</TM_CreateAreas>
+  <TM_CreateAreasDesc>Cria zonas automaticamente para sprites, transmutação e semente de revigoramento. Essas zonas são necessárias para a funcionalidade refinada das habilidades associadas. Não remove áreas já criadas. O jogador pode criá-las manualmente depois, mas devem se chamar exatamente "earth sprites", "transmutate" e "regrowth seed". Funcionamento: sprites de terra sempre escolhem um novo local de transformação dentro da área "earth sprites"; com transmutação em autocast, um encantador só transmuta equipamento na área "transmutate"; um druida cria uma nova semente de revigoramento automaticamente quando o feitiço está disponível, na área "regrowth seed" (funciona melhor com um estoque de sementes sob a zona).</TM_CreateAreasDesc>
+  <TM_DisplayOptions>Opções de exibição</TM_DisplayOptions>
+  <TM_EnabledClasses>Classes habilitadas</TM_EnabledClasses>
+  <TM_GolemAssignArea>Restringe o golem a esta área</TM_GolemAssignArea>
+  <TM_GolemCharge>Energia: {0}%</TM_GolemCharge>
+  <TM_GolemWorkTypeEnabledDesc>Alterna o uso de {0}</TM_GolemWorkTypeEnabledDesc>
+  <TM_IncitePassionSelection>{0} selecionado para Incitar Paixão</TM_IncitePassionSelection>
+  <TM_Inject>Injetar {0}</TM_Inject>
+  <TM_MCU_BaseMana>Ganho base de mana: {0}</TM_MCU_BaseMana>
+  <TM_MCU_BaseRegen>Bônus de regeneração de mana: {0}</TM_MCU_BaseRegen>
+  <TM_MCU_CurrentLevel>Nível atual:</TM_MCU_CurrentLevel>
+  <TM_MCU_EnergyDrainBonus>Ganho de mana modificado: {0}</TM_MCU_EnergyDrainBonus>
+  <TM_MCU_ManaDrain>Dreno de mana: -{0}</TM_MCU_ManaDrain>
+  <TM_MCU_ManaNet>Manutenção total de mana: {0}</TM_MCU_ManaNet>
+  <TM_MCU_ManaSickness>Enfermidade de mana: -{0}</TM_MCU_ManaSickness>
+  <TM_MCU_ManaSurge>Surto de mana: +{0}</TM_MCU_ManaSurge>
+  <TM_MCU_ManaWeakness>Fraqueza de mana: -{0}</TM_MCU_ManaWeakness>
+  <TM_MCU_Minion>Custo de lacaio: -{0}</TM_MCU_Minion>
+  <TM_MCU_NextLevel>Próximo nível:</TM_MCU_NextLevel>
+  <TM_MCU_Paracyte>Dreno parassítico: -{0}</TM_MCU_Paracyte>
+  <TM_MCU_PointsToLearn>{0} pontos para </TM_MCU_PointsToLearn>
+  <TM_MCU_RegenBonus>Bônus de regeneração de energia: +{0}</TM_MCU_RegenBonus>
+  <TM_MCU_Sprite>Custo de sprites: -{0}</TM_MCU_Sprite>
+  <TM_MCU_Syrrium>Bônus de syrrium: +{0}</TM_MCU_Syrrium>
+  <TM_MCU_Undead>Custo de mortos-vivos: -{0}</TM_MCU_Undead>
+  <TM_Read>Ler {0}</TM_Read>
+  <TM_SelectPassion>Selecionar paixão</TM_SelectPassion>
+  <TM_SetVerbatum>Definir</TM_SetVerbatum>
+  <TM_Stats>Atributos</TM_Stats>
+  <TM_StatsMight>Atributos de combate</TM_StatsMight>
+  <TM_TooWeak>{0} tem fraqueza arcana demais para estudar agora.</TM_TooWeak>
+  <TM_UndeadVerbatum>Morto-vivo</TM_UndeadVerbatum>
+  <TM_Use>Usar {0}</TM_Use>
+  <TM_offsetApplyAt>Limiar de aplicação do deslocamento</TM_offsetApplyAt>
+  <TM_offsetApplyAtDesc>Aplica o deslocamento às roupas quando a profundidade total excede este valor; use este limiar para ajustar roupas de múltiplas camadas se elas aparecerem acima de capas e cabelo.</TM_offsetApplyAtDesc>
+  <TM_offsetMultilayerClothing>Deslocamento mult camadas</TM_offsetMultilayerClothing>
+  <TM_offsetMultilayerClothingDesc>Ajusta a profundidade de roupas de múltiplas camadas, mas apenas quando o deslocamento calculado é extremo (apareceria sobre todas as outras). Destinado principalmente a corrigir capas.</TM_offsetMultilayerClothingDesc>
+  <TM_shrinkIconsDesc>Reduz o tamanho dos ícones ao selecionar peões com muitas habilidades</TM_shrinkIconsDesc>
+  <classIconSizeDesc>Altera o tamanho do ícone de classe na barra de colonos</classIconSizeDesc>
+  <showUndeadAnimalChangeDesc>Animais mortos-vivos mostram o primeiro estágio de putrefação; se desativado, aparecem como quando vivos</showUndeadAnimalChangeDesc>
+  <showUndeadPawnChangeDesc>Peões mortos-vivos mostram estágios variados de putrefação; se desativado, aparecem como quando vivos</showUndeadPawnChangeDesc>
+  <TM_Grimoire>Grimório</TM_Grimoire>
+  <TM_GrimoireDesc>Abre o grimório deste personagem: níveis de classe, mana, habilidades e progresso de despertar.</TM_GrimoireDesc>
+  <TM_GrimoireIsekaiHint>Níveis de classe alimentam o XP de despertar; o despertar amplia a reserva de mana.</TM_GrimoireIsekaiHint>
+  <TM_GrimoireResources>Recursos</TM_GrimoireResources>
+  <TM_LevelUp>Aprimorar</TM_LevelUp>
+</LanguageData>
