@@ -36,12 +36,6 @@ namespace TorannMagic
 
         public TorannMagicMod(ModContentPack content) : base(content)
         {
-            if (TMPCompat.MultiplayerActive())
-            {
-                // Only touch Multiplayer.API types when the mod is actually present.
-                TMPCompat.Setup();
-            }
-
             var harmonyInstance = new Harmony("rimworld.torann.tmagic");
 
             // RimWorld 1.7 port note: on 1.6 the [HarmonyPatch] attribute classes below were

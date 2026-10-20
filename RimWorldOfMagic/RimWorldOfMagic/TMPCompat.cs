@@ -31,6 +31,9 @@ namespace TorannMagic
 
         public static bool Initialized { get; private set; }
 
+        // Called from TMPCompatStartup (StaticConstructorOnStartup) — by that point
+        // every active mod class (including the MP fork's) has been constructed and
+        // the Multiplayer API is initialized, so RegisterSyncMethod hits the real API.
         public static void Setup()
         {
             if (Initialized)
@@ -39,15 +42,20 @@ namespace TorannMagic
             }
             Initialized = true;
 
-            PatchAbilityUserFramework();
-            PatchGizmoToggles();
-            PatchGolemCommands();
-            PatchJobVerbRegistration();
-
-            if (Prefs.DevMode)
+            try
             {
-                Log.Message("[TMPCompat] Multiplayer compatibility initialized.");
+                PatchAbilityUserFramework();
+                PatchGizmoToggles();
+                PatchGolemCommands();
+                PatchJobVerbRegistration();
             }
+            catch (Exception ex)
+            {
+                Log.Error("[TMPCompat] Multiplayer compatibility setup failed: " + ex);
+                return;
+            }
+
+            Log.Message("[TMPCompat] Multiplayer compatibility initialized.");
         }
 
         // MP sync of TryTakeOrderedJob serializes the Job via ExposeData; verbToUse is
@@ -156,6 +164,9 @@ namespace TorannMagic
             // and stop local targeting afterwards so the client does not re-enter it.
             MP.RegisterSyncMethod(typeof(PawnAbility), nameof(PawnAbility.UseAbility))
                 .SetPostInvoke(StopTargeting);
+            // NOTE: if the Multiplayer API is present but uninitialized (e.g. only the
+            // API assembly got loaded), MP.* throws and Setup's caller catches it —
+            // the rest of the mod is unaffected.
 
             // CreateDelegate at runtime instead of a method-group conversion: the
             // compiler would otherwise emit a hidden static field of type
