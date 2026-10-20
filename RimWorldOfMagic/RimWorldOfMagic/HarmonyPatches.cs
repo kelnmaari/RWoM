@@ -8483,5 +8483,43 @@ namespace TorannMagic
             }
         }
 
+        [HarmonyPatch(typeof(Thing), "TakeDamage")]
+        public static class SpellDamageCombatLog_Patch
+        {
+            // 1.7 creates combat log entries only at the vanilla damage sites
+            // (Bullet.Impact, DamageWorker.ExplosionDamageThing); spell projectiles
+            // derived from Projectile_AbilityBase apply their damage directly and
+            // never appear in the log. Synthesize the ranged-impact entry for them;
+            // linking it to the damage result also attributes the injury tooltip.
+            public static void Postfix(Thing __instance, DamageInfo dinfo, DamageWorker.DamageResult __result)
+            {
+                try
+                {
+                    if (!(__instance is Pawn victim) || victim.Destroyed || dinfo.Instigator == null)
+                    {
+                        return;
+                    }
+                    if (!(__result.wounded || __result.totalDamageDealt > 0f))
+                    {
+                        return;
+                    }
+                    if (!(dinfo.Instigator is Projectile_AbilityBase projectile))
+                    {
+                        return;
+                    }
+                    if (!(projectile.Launcher is Pawn caster) || caster == victim)
+                    {
+                        return;
+                    }
+                    BattleLogEntry_RangedImpact entry = new BattleLogEntry_RangedImpact(caster, victim, null, null, projectile.def, null);
+                    Find.BattleLog.Add(entry);
+                    __result.AssociateWithLog(entry);
+                }
+                catch (Exception)
+                {
+                }
+            }
+        }
+
     }
 }
