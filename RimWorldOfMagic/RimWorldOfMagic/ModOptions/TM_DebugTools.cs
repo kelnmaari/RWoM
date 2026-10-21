@@ -147,8 +147,12 @@ namespace TorannMagic.ModOptions
             }
 
             // both sides immediately assault each other
-            Verse.AI.Group.LordMaker.MakeNewLord(sideA, new LordJob_AssaultThings(sideA, listB.Cast<Verse.Thing>().ToList()), map);
-            Verse.AI.Group.LordMaker.MakeNewLord(sideB, new LordJob_AssaultThings(sideB, listA.Cast<Verse.Thing>().ToList()), map);
+            // damageFraction: max — the vanilla transition would switch the whole
+            // lord to ExitMapAndDefendSelf once the targets took 100% cumulative
+            // damage, sending everyone off the map mid-fight; with it maxed the
+            // assault lasts until a side is downed
+            Verse.AI.Group.LordMaker.MakeNewLord(sideA, new LordJob_AssaultThings(sideA, listB.Cast<Verse.Thing>().ToList(), float.MaxValue), map);
+            Verse.AI.Group.LordMaker.MakeNewLord(sideB, new LordJob_AssaultThings(sideB, listA.Cast<Verse.Thing>().ToList(), float.MaxValue), map);
 
             Messages.Message($"[RWoM] Mage duel: {sideA.Name} ({listA.Count}) vs {sideB.Name} ({listB.Count}).",
                 MessageTypeDefOf.ThreatBig);
@@ -168,6 +172,18 @@ namespace TorannMagic.ModOptions
                     map.Tile,
                     forceGenerateNewPawn: true));
                 GenSpawn.Spawn(pawn, cell, map);
+                // start the duel with full resources — otherwise the autocast mana
+                // threshold keeps them from casting while it regenerates
+                Need_Mana mana = pawn.needs?.TryGetNeed<Need_Mana>();
+                if (mana != null)
+                {
+                    mana.CurLevel = mana.MaxLevel;
+                }
+                Need_Stamina stamina = pawn.needs?.TryGetNeed<Need_Stamina>();
+                if (stamina != null)
+                {
+                    stamina.CurLevel = stamina.MaxLevel;
+                }
                 list.Add(pawn);
             }
             return list;
