@@ -1,4 +1,4 @@
-﻿using RimWorld;
+using RimWorld;
 using Verse;
 using UnityEngine;
 using System.Collections.Generic;
@@ -93,7 +93,7 @@ namespace TorannMagic
                     }
                     else //map null
                     {
-                        if (this.Pawn.ParentHolder.ToString().Contains("Caravan"))
+                        if (this.Pawn.ParentHolder != null && this.Pawn.ParentHolder.ToString().Contains("Caravan"))
                         {
                             foreach (Pawn current in base.Pawn.holdingOwner)
                             {

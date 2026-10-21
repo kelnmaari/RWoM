@@ -2264,7 +2264,7 @@ namespace TorannMagic
                     }
                 }
             }
-            else if (pawn.ParentHolder.ToString().Contains("Caravan"))
+            else if (pawn.ParentHolder != null && pawn.ParentHolder.ToString().Contains("Caravan"))
             {
                 foreach (Thing currentThing in pawn.holdingOwner)
                 {
