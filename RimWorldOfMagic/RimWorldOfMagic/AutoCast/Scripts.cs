@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -887,6 +887,10 @@ namespace TorannMagic.AutoCast
         public static void Evaluate(CompAbilityUserMight casterComp, TMAbilityDef abilitydef, PawnAbility ability, MightPower power, out bool success)
         {
             success = false;
+            if (ability == null)
+            {
+                return;
+            }
             Pawn caster = casterComp.Pawn;
             LocalTargetInfo jobTarget = caster;
 
@@ -904,6 +908,10 @@ namespace TorannMagic.AutoCast
         public static void Evaluate(CompAbilityUserMagic casterComp, TMAbilityDef abilitydef, PawnAbility ability, MagicPower power, out bool success)
         {
             success = false;
+            if (ability == null)
+            {
+                return;
+            }
             Pawn caster = casterComp.Pawn;
             LocalTargetInfo jobTarget = caster;
 
@@ -992,6 +1000,10 @@ namespace TorannMagic.AutoCast
     {
         public static void Execute(Job job, Pawn caster)
         {
+            if (job == null)
+            {
+                return;
+            }
             if (caster.IsColonist && ModOptions.Settings.Instance.autocastQueueing && !caster.Drafted && caster.CurJobDef != JobDefOf.Hunt)
             {
                 if (caster.jobs.jobQueue.Count < 1)

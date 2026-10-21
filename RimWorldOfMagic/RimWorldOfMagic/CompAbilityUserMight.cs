@@ -2757,6 +2757,10 @@ namespace TorannMagic
                             if (canUseWithEquippedWeapon && canUseIfViolentAbility)
                             {
                                 PawnAbility ability = this.AbilityData.Powers.FirstOrDefault((PawnAbility x) => x.Def == tmad);
+                                if (ability == null)
+                                {
+                                    continue;
+                                }
                                 if (mp.autocasting.type == TMDefs.AutocastType.OnTarget && this.Pawn.CurJob.targetA != null && this.Pawn.CurJob.targetA.Thing != null)
                                 {
                                     LocalTargetInfo localTarget = TM_Calc.GetAutocastTarget(this.Pawn, mp.autocasting, this.Pawn.CurJob.targetA);                                        
@@ -3153,6 +3157,10 @@ namespace TorannMagic
                             if (canUseWithEquippedWeapon && canUseIfViolentAbility)
                             {
                                 PawnAbility ability = this.AbilityData.Powers.FirstOrDefault((PawnAbility x) => x.Def == tmad);
+                                if (ability == null)
+                                {
+                                    continue;
+                                }
                                 if (mp.autocasting.type == TMDefs.AutocastType.OnTarget && this.Pawn.TargetCurrentlyAimingAt != null && this.Pawn.TargetCurrentlyAimingAt.Thing != null)
                                 {
                                     LocalTargetInfo localTarget = TM_Calc.GetAutocastTarget(this.Pawn, mp.autocasting, this.Pawn.TargetCurrentlyAimingAt);
@@ -3609,6 +3617,10 @@ namespace TorannMagic
                             if (canUseWithEquippedWeapon && canUseIfViolentAbility)
                             {
                                 PawnAbility ability = this.AbilityData.Powers.FirstOrDefault((PawnAbility x) => x.Def == tmad);
+                                if (ability == null)
+                                {
+                                    continue;
+                                }
                                 if (mp.autocasting.type == TMDefs.AutocastType.OnTarget && this.Pawn.TargetCurrentlyAimingAt != null)
                                 {
                                     LocalTargetInfo localTarget = TM_Calc.GetAutocastTarget(this.Pawn, mp.autocasting, this.Pawn.TargetCurrentlyAimingAt);
