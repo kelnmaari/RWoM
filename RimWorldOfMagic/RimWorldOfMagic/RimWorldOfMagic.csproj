@@ -7,6 +7,7 @@
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <DefineConstants>$(DefineConstants);RW17</DefineConstants>
+    <DefaultItemExcludes>$(DefaultItemExcludes);obj48/**</DefaultItemExcludes>
     <LangVersion>latest</LangVersion>
     <RootNamespace>TorannMagic</RootNamespace>
     <AssemblyName>TorannMagic</AssemblyName>

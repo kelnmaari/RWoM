@@ -4419,6 +4419,25 @@ namespace TorannMagic
         }
 
         [HarmonyPatch(typeof(Pawn), "Kill", null)]
+        /// <summary>
+        /// Death/dismissal releases pawns from their faction, which fires
+        /// Pawn_GuestTracker.SetGuestStatus — third-party postfixes there
+        /// (Better Pawn Control) can throw on their own stale data, and an
+        /// unguarded throw aborts Pawn.Kill mid-way, soft-locking the
+        /// dismissing pawn and spamming errors every tick.
+        /// </summary>
+        private static void TryReleaseFaction(Pawn pawn)
+        {
+            try
+            {
+                pawn.SetFaction(null, null);
+            }
+            catch (Exception ex)
+            {
+                Log.Warning("[TM] Faction release on death/dismissal failed (a guest-tracker mod postfix threw): " + ex.Message);
+            }
+        }
+
         public static class Undead_Kill_Prefix
         {
             public static bool Prefix(ref Pawn __instance, DamageInfo? dinfo)
@@ -4427,15 +4446,15 @@ namespace TorannMagic
                 {
                     if ( __instance.health != null && __instance.Faction != null && (__instance.health.hediffSet.HasHediff(TorannMagicDefOf.TM_UndeadHD) || __instance.health.hediffSet.HasHediff(TorannMagicDefOf.TM_UndeadAnimalHD)))
                     {
-                        __instance.SetFaction(null, null);
+                        TryReleaseFaction(__instance);
                     }
                     if (__instance.RaceProps != null && __instance.Faction != null && __instance.RaceProps.DeathActionWorker.GetType() == typeof(DeathWorker_Poppi))
                     {
-                        __instance.SetFaction(null, null);
+                        TryReleaseFaction(__instance);
                     }
                     if(__instance.def.thingClass == typeof(TMPawnSummoned) && __instance.Faction != null)
                     {
-                        __instance.SetFaction(null, null);
+                        TryReleaseFaction(__instance);
                     }
                     if (TM_Calc.IsMagicUser(__instance) && dinfo.HasValue && dinfo.Value.Instigator != null && dinfo.Value.Instigator is Pawn)
                     {
