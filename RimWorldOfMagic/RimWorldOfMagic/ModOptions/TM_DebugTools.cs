@@ -185,6 +185,14 @@ namespace TorannMagic.ModOptions
                     map.Tile,
                     forceGenerateNewPawn: true));
                 GenSpawn.Spawn(pawn, cell, map);
+                // vanilla raid pawns get this in PawnGroupKindWorker_Normal: without
+                // it any damage below the kind's flee threshold starts PanicFlee and
+                // the duelist runs for the map edge mid-battle
+                pawn.mindState.canFleeIndividual = false;
+                if (pawn.needs?.mood != null)
+                {
+                    pawn.needs.mood.CurLevelPercentage = 1f;
+                }
                 if (randomClasses)
                 {
                     ApplyRandomClass(pawn);
