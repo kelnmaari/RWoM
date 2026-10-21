@@ -85,7 +85,18 @@ namespace TorannMagic.ModOptions
         }
 
         [DebugAction("RWoM", "T: Spawn Mage Duel (10 v 10)", actionType = DebugActionType.Action, allowedGameStates = AllowedGameStates.PlayingOnMap)]
-        public static void SpawnMageDuel()
+        public static void SpawnMageDuel10()
+        {
+            SpawnMageDuel(10, false);
+        }
+
+        [DebugAction("RWoM", "T: Spawn Mage Duel (50 v 50, random classes)", actionType = DebugActionType.Action, allowedGameStates = AllowedGameStates.PlayingOnMap)]
+        public static void SpawnMageDuel50()
+        {
+            SpawnMageDuel(50, true);
+        }
+
+        private static void SpawnMageDuel(int perSide, bool randomClasses)
         {
             Map map = Find.CurrentMap;
             IntVec3 root = UI.MouseCell();
@@ -132,10 +143,11 @@ namespace TorannMagic.ModOptions
                 return;
             }
 
-            IntVec3 posA = root + new IntVec3(-14, 0, -6);
-            IntVec3 posB = root + new IntVec3(14, 0, 6);
-            List<Pawn> listA = SpawnMageSide(map, posA, sideA, kinds);
-            List<Pawn> listB = SpawnMageSide(map, posB, sideB, kinds);
+            int spread = perSide <= 10 ? 14 : 26;
+            IntVec3 posA = root + new IntVec3(-spread, 0, -spread / 2);
+            IntVec3 posB = root + new IntVec3(spread, 0, spread / 2);
+            List<Pawn> listA = SpawnMageSide(map, posA, sideA, kinds, perSide, randomClasses);
+            List<Pawn> listB = SpawnMageSide(map, posB, sideB, kinds, perSide, randomClasses);
             if (listA.Count == 0 || listB.Count == 0)
             {
                 foreach (Pawn p in listA.Concat(listB))
@@ -158,13 +170,13 @@ namespace TorannMagic.ModOptions
                 MessageTypeDefOf.ThreatBig);
         }
 
-        private static List<Pawn> SpawnMageSide(Map map, IntVec3 root, Faction faction, List<PawnKindDef> kinds)
+        private static List<Pawn> SpawnMageSide(Map map, IntVec3 root, Faction faction, List<PawnKindDef> kinds, int perSide, bool randomClasses)
         {
             List<Pawn> list = new List<Pawn>();
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < perSide; i++)
             {
                 PawnKindDef kind = kinds[i % kinds.Count];
-                IntVec3 cell = CellFinder.RandomClosewalkCellNear(root, map, 5);
+                IntVec3 cell = CellFinder.RandomClosewalkCellNear(root, map, perSide <= 10 ? 5 : 12);
                 Pawn pawn = PawnGenerator.GeneratePawn(new PawnGenerationRequest(
                     kind,
                     faction,
@@ -172,6 +184,10 @@ namespace TorannMagic.ModOptions
                     map.Tile,
                     forceGenerateNewPawn: true));
                 GenSpawn.Spawn(pawn, cell, map);
+                if (randomClasses)
+                {
+                    ApplyRandomClass(pawn);
+                }
                 // start the duel with full resources — otherwise the autocast mana
                 // threshold keeps them from casting while it regenerates
                 Need_Mana mana = pawn.needs?.TryGetNeed<Need_Mana>();
@@ -187,6 +203,77 @@ namespace TorannMagic.ModOptions
                 list.Add(pawn);
             }
             return list;
+        }
+
+        // Gives a generated pawn a random class through the same full-reset path as
+        // the Give Class action, then rolls random power levels so the AI leveled-
+        // variant swap casts scaled spells right away.
+        private static void ApplyRandomClass(Pawn pawn)
+        {
+            try
+            {
+                List<TraitDef> pool = TM_Data.MagicTraits.Concat(TM_Data.MightTraits).ToList();
+                List<TorannMagic.TMDefs.TM_CustomClass> customs = TM_ClassUtility.CustomClasses;
+                if (customs != null && customs.Count > 0 && Rand.Chance(0.25f))
+                {
+                    int index = Rand.RangeInclusive(0, customs.Count - 1);
+                    TorannMagic.TMDefs.TM_CustomClass cc = customs[index];
+                    if (cc != null && cc.classTrait != null)
+                    {
+                        ApplyClassTrait(pawn, cc.classTrait, cc.traitDegree, index, cc, cc.isMage);
+                        RollRandomPowerLevels(pawn);
+                        return;
+                    }
+                }
+                if (pool.Count == 0)
+                {
+                    return;
+                }
+                TraitDef picked = pool.RandomElement();
+                ApplyClassTrait(pawn, picked, 0, -1, null, TM_Data.MagicTraits.Contains(picked));
+                RollRandomPowerLevels(pawn);
+            }
+            catch (Exception ex)
+            {
+                Log.Warning("[RWoM] Debug: random class roll failed for " + pawn.LabelShortCap + ": " + ex.Message);
+            }
+        }
+
+        private static void RollRandomPowerLevels(Pawn pawn)
+        {
+            try
+            {
+                CompAbilityUserMagic cm = pawn.GetCompAbilityUserMagic();
+                if (cm != null && cm.MagicData != null)
+                {
+                    foreach (MagicPower mp in cm.MagicData.AllMagicPowersWithSkills)
+                    {
+                        TMAbilityDef ability = mp.abilityDef as TMAbilityDef;
+                        if (mp.learned && mp.maxLevel > 0 && mp.TMabilityDefs != null && mp.TMabilityDefs.Count > 0)
+                        {
+                            int cap = Math.Min(2, Math.Min(mp.maxLevel, mp.TMabilityDefs.Count - 1));
+                            mp.level = Rand.RangeInclusive(0, cap);
+                        }
+                    }
+                }
+                CompAbilityUserMight cmm = pawn.GetCompAbilityUserMight();
+                if (cmm != null && cmm.MightData != null)
+                {
+                    foreach (MightPower mp in cmm.MightData.AllMightPowersWithSkills)
+                    {
+                        TMAbilityDef ability = mp.abilityDef as TMAbilityDef;
+                        if (mp.learned && mp.maxLevel > 0 && mp.TMabilityDefs != null && mp.TMabilityDefs.Count > 0)
+                        {
+                            int cap = Math.Min(2, Math.Min(mp.maxLevel, mp.TMabilityDefs.Count - 1));
+                            mp.level = Rand.RangeInclusive(0, cap);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Warning("[RWoM] Debug: random power level roll failed: " + ex.Message);
+            }
         }
 
         [DebugAction("RWoM", "T: Give Class...", actionType = DebugActionType.ToolMapForPawns, allowedGameStates = AllowedGameStates.PlayingOnMap)]
