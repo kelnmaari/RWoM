@@ -6,12 +6,16 @@ using System.Linq;
 namespace TorannMagic
 {
     /// <summary>
-    /// Inspect-pane tab variant of the Grimoire button for might class holders —
-    /// the fighter side of the "grimoireOnAbilityBar = false" setting; opens the
-    /// shared Grimoire window on click.
+    /// Inspect-pane tab variant of the Grimoire button (might side). Enabled by
+    /// turning off the "grimoireOnAbilityBar" mod setting: the tab shows for
+    /// class holders and opens the Grimoire window on click, then deselects
+    /// itself so no empty pane is left behind. For hybrids the magic tab wins —
+    /// both tabs open the same window, showing two of them made no sense.
     /// </summary>
     public class ITab_Pawn_Might : ITab
     {
+        private bool pendingDeselect;
+
         public override bool IsVisible
         {
             get
@@ -26,13 +30,18 @@ namespace TorannMagic
                     return false;
                 }
                 CompAbilityUserMight comp = pawn.GetCompAbilityUserMight();
-                return comp != null && comp.IsMightUser;
+                if (comp == null || !comp.IsMightUser)
+                {
+                    return false;
+                }
+                // hybrids already see the magic tab — both open the same window
+                CompAbilityUserMagic cm = pawn.GetCompAbilityUserMagic();
+                return cm == null || !cm.IsMagicUser;
             }
         }
 
         public ITab_Pawn_Might()
         {
-            this.size = new Vector2(360f, 130f);
             this.labelKey = "TM_Grimoire";
         }
 
@@ -40,19 +49,27 @@ namespace TorannMagic
         {
             base.OnOpen();
             OpenGrimoire();
+            pendingDeselect = true;
+        }
+
+        public override void TabUpdate()
+        {
+            base.TabUpdate();
+            if (pendingDeselect)
+            {
+                // ToggleTab sets OpenTabType after OnOpen returns, so the
+                // deselect has to happen on the next frame
+                pendingDeselect = false;
+                if (MainButtonDefOf.Inspect.TabWindow is MainTabWindow_Inspect pane && pane.OpenTabType == GetType())
+                {
+                    pane.OpenTabType = null;
+                }
+            }
         }
 
         protected override void FillTab()
         {
-            Rect buttonRect = new Rect(12f, 12f, this.size.x - 24f, 32f);
-            if (Widgets.ButtonText(buttonRect, "TM_GrimoireOpen".Translate()))
-            {
-                OpenGrimoire();
-            }
-            Rect hintRect = new Rect(16f, 52f, this.size.x - 32f, this.size.y - 64f);
-            Text.Anchor = TextAnchor.MiddleCenter;
-            Widgets.Label(hintRect, "TM_GrimoireTabHint".Translate());
-            Text.Anchor = TextAnchor.UpperLeft;
+            // the Grimoire window opens on tab click; nothing to draw in the pane
         }
 
         private void OpenGrimoire()
