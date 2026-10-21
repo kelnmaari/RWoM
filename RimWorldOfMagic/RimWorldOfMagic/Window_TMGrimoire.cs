@@ -51,39 +51,45 @@ namespace TorannMagic
 
         public override void DoWindowContents(Rect inRect)
         {
-            float cur = 0f;
+            EnsureFilters();
 
+            float viewWidth = inRect.width - 20f;
+
+            // the whole header (title, pawn name, class description) scrolls with
+            // the content — a fixed header left a tiny viewport on small screens
+            string classDesc = ClassDescription();
+            Text.Font = GameFont.Tiny;
+            float headerH = 50f + 12f;
+            if (!classDesc.NullOrEmpty())
+            {
+                headerH += Text.CalcHeight(classDesc, viewWidth) + 8f;
+            }
+            Text.Font = GameFont.Small;
+
+            Rect view = new Rect(0f, 0f, viewWidth, Mathf.Max(headerH + MeasureViewHeight(viewWidth), inRect.height));
+            Widgets.BeginScrollView(inRect, ref scrollPos, view);
+
+            float y = 0f;
             Text.Font = GameFont.Medium;
-            Label(new Rect(0f, cur, inRect.width, 32f), "Grimoire", TextAnchor.MiddleLeft,
+            Label(new Rect(0f, y, viewWidth, 32f), "Grimoire", TextAnchor.MiddleLeft,
                 TorannMagic.Utils.TMIsekaiUI.HeaderGold);
             Text.Font = GameFont.Small;
             float nameW = Text.CalcSize(pawn.LabelShortCap).x + 8f;
-            Label(new Rect(0f, cur + 30f, nameW, 18f),
+            Label(new Rect(0f, y + 30f, nameW, 18f),
                 pawn.LabelShortCap, TextAnchor.MiddleLeft, Color.white);
-            Label(new Rect(nameW, cur + 30f, inRect.width - nameW, 18f),
+            Label(new Rect(nameW, y + 30f, viewWidth - nameW, 18f),
                 "— " + ClassLabel(), TextAnchor.MiddleLeft, TorannMagic.Utils.TMIsekaiUI.LabelGold);
-            cur += 50f;
+            y += 50f;
 
-            // class description pulled from the class trait
-            string classDesc = ClassDescription();
             if (!classDesc.NullOrEmpty())
             {
                 Text.Font = GameFont.Tiny;
-                float dh = Text.CalcHeight(classDesc, inRect.width);
-                Label(new Rect(0f, cur, inRect.width, dh), classDesc, TextAnchor.UpperLeft, TextGray);
-                cur += dh + 8f;
+                float dh = Text.CalcHeight(classDesc, viewWidth);
+                Label(new Rect(0f, y, viewWidth, dh), classDesc, TextAnchor.UpperLeft, TextGray);
+                y += dh + 8f;
             }
-
-            cur += 4f;
-            EnsureFilters();
-
-            Rect scrollRect = new Rect(0f, cur, inRect.width, inRect.height - cur);
-            float viewWidth = scrollRect.width - 20f;
-            float viewHeight = MeasureViewHeight(viewWidth);
-            Rect view = new Rect(0f, 0f, viewWidth, Mathf.Max(viewHeight, scrollRect.height));
-            Widgets.BeginScrollView(scrollRect, ref scrollPos, view);
-
-            float y = 0f;
+            Text.Font = GameFont.Small;
+            y += 4f;
 
             if (TMPIsekai.Active)
             {
