@@ -166,7 +166,8 @@ namespace TorannMagic.ModOptions
             Verse.AI.Group.LordMaker.MakeNewLord(sideA, new LordJob_AssaultThings(sideA, listB.Cast<Verse.Thing>().ToList(), float.MaxValue), map);
             Verse.AI.Group.LordMaker.MakeNewLord(sideB, new LordJob_AssaultThings(sideB, listA.Cast<Verse.Thing>().ToList(), float.MaxValue), map);
 
-            Messages.Message($"[RWoM] Mage duel: {sideA.Name} ({listA.Count}) vs {sideB.Name} ({listB.Count}).",
+            string classNote = randomClasses ? " with random classes" : "";
+            Messages.Message($"[RWoM] Mage duel{classNote}: {sideA.Name} ({listA.Count}) vs {sideB.Name} ({listB.Count}).",
                 MessageTypeDefOf.ThreatBig);
         }
 
@@ -220,7 +221,7 @@ namespace TorannMagic.ModOptions
                     TorannMagic.TMDefs.TM_CustomClass cc = customs[index];
                     if (cc != null && cc.classTrait != null)
                     {
-                        ApplyClassTrait(pawn, cc.classTrait, cc.traitDegree, index, cc, cc.isMage);
+                        ApplyClassTrait(pawn, cc.classTrait, cc.traitDegree, index, cc, cc.isMage, logGrant: false);
                         RollRandomPowerLevels(pawn);
                         return;
                     }
@@ -230,7 +231,7 @@ namespace TorannMagic.ModOptions
                     return;
                 }
                 TraitDef picked = pool.RandomElement();
-                ApplyClassTrait(pawn, picked, 0, -1, null, TM_Data.MagicTraits.Contains(picked));
+                ApplyClassTrait(pawn, picked, 0, -1, null, TM_Data.MagicTraits.Contains(picked), logGrant: false);
                 RollRandomPowerLevels(pawn);
             }
             catch (Exception ex)
@@ -316,7 +317,7 @@ namespace TorannMagic.ModOptions
                     string kind = cc.isMage ? "custom mage" : "custom fighter";
                     options.Add(new FloatMenuOption(kind + ": " + ClassTraitLabel(cc.classTrait), delegate
                     {
-                        ApplyClassTrait(pawn, cc.classTrait, cc.traitDegree, index, cc, cc.isMage);
+                        ApplyClassTrait(pawn, cc.classTrait, cc.traitDegree, index, cc, cc.isMage, logGrant: false);
                     }));
                 }
             }
@@ -344,7 +345,7 @@ namespace TorannMagic.ModOptions
         /// comp to re-run its own assignment (the same ResolveFactionChange path the
         /// game uses when a pawn joins the colony with a class).
         /// </summary>
-        private static void ApplyClassTrait(Pawn pawn, TraitDef classTrait, int traitDegree, int customIndex, TorannMagic.TMDefs.TM_CustomClass customClass, bool isMage)
+        private static void ApplyClassTrait(Pawn pawn, TraitDef classTrait, int traitDegree, int customIndex, TorannMagic.TMDefs.TM_CustomClass customClass, bool isMage, bool logGrant = true)
         {
             try
             {
@@ -425,7 +426,10 @@ namespace TorannMagic.ModOptions
                     compMight.ResolveStamina();
                 }
 
-                Log.Message($"[TM] Debug: granted class '{ClassTraitLabel(classTrait)}' to {pawn.LabelShortCap}.");
+                if (logGrant)
+                {
+                    Log.Message($"[TM] Debug: granted class '{ClassTraitLabel(classTrait)}' to {pawn.LabelShortCap}.");
+                }
             }
             catch (Exception ex)
             {
