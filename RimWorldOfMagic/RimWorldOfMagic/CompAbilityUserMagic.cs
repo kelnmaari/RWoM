@@ -5897,7 +5897,7 @@ namespace TorannMagic
         {
             if (!this.Pawn.story.traits.HasTrait(TorannMagicDefOf.Faceless))
             {
-                InspectTabBase inspectTabsx = base.Pawn.GetInspectTabs().FirstOrDefault((InspectTabBase x) => x.labelKey == "TM_TabMagic");
+                InspectTabBase inspectTabsx = base.Pawn.GetInspectTabs().FirstOrDefault((InspectTabBase x) => x is ITab_Pawn_Magic);
                 IEnumerable<InspectTabBase> inspectTabs = base.Pawn.GetInspectTabs();
                 bool flag = inspectTabs != null && inspectTabs.Count<InspectTabBase>() > 0;
                 if (flag)
