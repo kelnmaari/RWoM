@@ -1292,4 +1292,8 @@ Cantidad base: 0%</TM_LifeSteal_ver_desc>
 <TM_Enchanted>¡Encantado!</TM_Enchanted>
 
   <AU_DISABLED>Desactivado</AU_DISABLED>
+  <TM_GrimoireTabMode>Grimorio en la barra de habilidades</TM_GrimoireTabMode>
+  <TM_GrimoireTabModeDesc>Activado — botón del Grimorio en la barra de habilidades. Desactivado — el Grimorio pasa a ser una pestaña del panel de inspección, como las antiguas pestañas Magic/Fighter.</TM_GrimoireTabModeDesc>
+  <TM_GrimoireOpen>Abrir el Grimorio</TM_GrimoireOpen>
+  <TM_GrimoireTabHint>La ventana del Grimorio ya está abierta — ciérrala para volver.</TM_GrimoireTabHint>
 </LanguageData>

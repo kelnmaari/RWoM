@@ -2176,4 +2176,8 @@ Nível 3: 14s, 24s</TM_SpiritRally_ver_desc>
   <TM_LevelUp>Aprimorar</TM_LevelUp>
   <TM_GrimoireSub>Níveis de classe, mana e habilidades em um só lugar.</TM_GrimoireSub>
   <AU_DISABLED>Desativado</AU_DISABLED>
+  <TM_GrimoireTabMode>Grimório na barra de habilidades</TM_GrimoireTabMode>
+  <TM_GrimoireTabModeDesc>Ativado — botão do Grimório na barra de habilidades. Desativado — o Grimório vira uma aba do painel de inspeção, como as antigas abas Magic/Fighter.</TM_GrimoireTabModeDesc>
+  <TM_GrimoireOpen>Abrir o Grimório</TM_GrimoireOpen>
+  <TM_GrimoireTabHint>A janela do Grimório já está aberta — feche-a para voltar.</TM_GrimoireTabHint>
 </LanguageData>

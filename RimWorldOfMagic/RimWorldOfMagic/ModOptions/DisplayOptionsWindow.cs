@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEngine;
@@ -64,6 +64,10 @@ namespace TorannMagic.ModOptions
             num++;
             Rect rowRect1ShiftRight = UIHelper.GetRowRect(rowRect1, rowHeight, num);
             Widgets.CheckboxLabeled(rowRect1ShiftRight, "showLevelUpMessage".Translate(), ref Settings.Instance.showLevelUpMessage, false);
+            num++;
+            Rect rowRectGrimoire = UIHelper.GetRowRect(rect1, rowHeight, num);
+            Widgets.CheckboxLabeled(rowRectGrimoire, "TM_GrimoireTabMode".Translate(), ref Settings.Instance.grimoireOnAbilityBar, false);
+            TooltipHandler.TipRegion(rowRectGrimoire, "TM_GrimoireTabModeDesc".Translate());
             num++;
             Rect rowRect2 = UIHelper.GetRowRect(rect1, rowHeight, num);
             Widgets.CheckboxLabeled(rowRect2, "AIMarking".Translate(), ref Settings.Instance.AIMarking, false);

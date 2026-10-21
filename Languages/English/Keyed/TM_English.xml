@@ -2341,4 +2341,8 @@ Level 3: all 4 effects</TM_CombatDrugs_pwr_desc>
   <TM_LevelUp>Upgrade</TM_LevelUp>
   <TM_SlavesCanScribe>Allow slaves to write class tomes</TM_SlavesCanScribe>
   <AU_DISABLED>DISABLED</AU_DISABLED>
+  <TM_GrimoireTabMode>Grimoire on the ability bar</TM_GrimoireTabMode>
+  <TM_GrimoireTabModeDesc>On — the Grimoire button sits on the ability bar. Off — the Grimoire moves to an inspect-pane tab, like the old Magic/Fighter tabs.</TM_GrimoireTabModeDesc>
+  <TM_GrimoireOpen>Open Grimoire</TM_GrimoireOpen>
+  <TM_GrimoireTabHint>The Grimoire window is already open — close it to return to the UI.</TM_GrimoireTabHint>
 </LanguageData>

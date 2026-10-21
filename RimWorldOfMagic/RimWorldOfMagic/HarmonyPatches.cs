@@ -4235,7 +4235,7 @@ namespace TorannMagic
                     // Grimoire: character window in the isekai visual style (TMPIsekai integration).
                     // Show for any class holder — magic, might, or hybrid; level/data may still
                     // be uninitialized right after learning, so check the trait itself.
-                    if (TM_Calc.HasMightOrMagicTrait(__instance))
+                    if (ModOptions.Settings.Instance.grimoireOnAbilityBar && TM_Calc.HasMightOrMagicTrait(__instance))
                     {
                         Pawn grimoirePawn = __instance;
                         Command_Action grimoire = new Command_Action

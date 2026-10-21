@@ -2216,4 +2216,8 @@ DR: [5, 9, 13, 17, 20]%</TM_Golemancy_pwr_desc>
   <TM_GrimoireDesc>Відкриє гримуар цього персонажа: рівні класів, мана, здібності та прогрес пробудження.</TM_GrimoireDesc>
   <TM_SlavesCanScribe>Разрешить рабам записывать классы в тома</TM_SlavesCanScribe>
   <AU_DISABLED>Отключено</AU_DISABLED>
+  <TM_GrimoireTabMode>Гримуар на панели способностей</TM_GrimoireTabMode>
+  <TM_GrimoireTabModeDesc>Включено — кнопка Гримуара на панели способностей (как раньше). Выключено — Гримуар переносится во вкладку панели осмотра, как старые вкладки Magic/Fighter.</TM_GrimoireTabModeDesc>
+  <TM_GrimoireOpen>Открыть Гримуар</TM_GrimoireOpen>
+  <TM_GrimoireTabHint>Окно Гримуара уже открыто — закройте его, чтобы вернуться к интерфейсу.</TM_GrimoireTabHint>
 </LanguageData>

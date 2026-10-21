@@ -699,4 +699,8 @@
   <!--<TM_功能性增强>闪电风暴功能性增强</TM_功能性增强>-->
 
   <AU_DISABLED>已禁用</AU_DISABLED>
+  <TM_GrimoireTabMode>能力栏中的魔典</TM_GrimoireTabMode>
+  <TM_GrimoireTabModeDesc>开启 — 魔典按钮显示在能力栏上。关闭 — 魔典改为检查面板中的标签页（类似旧的 Magic/Fighter 标签）。</TM_GrimoireTabModeDesc>
+  <TM_GrimoireOpen>打开魔典</TM_GrimoireOpen>
+  <TM_GrimoireTabHint>魔典窗口已打开 — 请关闭它以返回。</TM_GrimoireTabHint>
 </LanguageData>

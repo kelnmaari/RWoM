@@ -1,124 +1,73 @@
 using RimWorld;
-using System;
 using UnityEngine;
 using Verse;
+using System.Linq;
 
 namespace TorannMagic
 {
-    public class ITab_Pawn_Might : ITab  //code by Jecrell
+    /// <summary>
+    /// Inspect-pane tab variant of the Grimoire button for might class holders —
+    /// the fighter side of the "grimoireOnAbilityBar = false" setting; opens the
+    /// shared Grimoire window on click.
+    /// </summary>
+    public class ITab_Pawn_Might : ITab
     {
-        private Pawn PawnToShowInfoAbout
-        {
-            get
-            {
-                Pawn pawn = null;
-                bool flag = base.SelPawn != null;
-                if (flag)
-                {
-                    pawn = base.SelPawn;
-                }
-                else
-                {
-                    Corpse corpse = base.SelThing as Corpse;
-                    if (corpse != null)
-                    {
-                        pawn = corpse.InnerPawn;
-                    }
-                }
-                if (pawn == null)
-                {
-                    Log.Error("Character tab found no selected pawn to display.");
-                    return null;
-                }
-                return pawn;
-            }
-        }
-
         public override bool IsVisible
         {
             get
             {
-                // Progression moved into the Grimoire window (Window_TMGrimoire);
-                // flip this to true to bring the legacy tabs back.
-                return false;
-                
-                bool flag = base.SelPawn.story != null && base.SelPawn.IsColonist;
-                if (flag)
+                if (ModOptions.Settings.Instance.grimoireOnAbilityBar)
                 {
-                    CompAbilityUserMight compMight = base.SelPawn.GetCompAbilityUserMight();
-                    if (compMight != null)
-                    {
-                        if (compMight.customClass != null)
-                        {
-                            return true;
-                        }
-                        if(compMight.AdvancedClasses.Count > 0)
-                        {
-                            return true;
-                        }
-                    }
-                    if (base.SelPawn.story.traits.HasTrait(TorannMagicDefOf.Gladiator))
-                    {
-                        return flag && true;
-                    }
-                    if (base.SelPawn.story.traits.HasTrait(TorannMagicDefOf.TM_Sniper))
-                    {
-                        return flag && true;
-                    }
-                    if (base.SelPawn.story.traits.HasTrait(TorannMagicDefOf.Bladedancer))
-                    {
-                        return flag && true;
-                    }
-                    if (base.SelPawn.story.traits.HasTrait(TorannMagicDefOf.Ranger))
-                    {
-                        return flag && true;
-                    }
-                    if (base.SelPawn.story.traits.HasTrait(TorannMagicDefOf.Faceless))
-                    {
-                        return flag && true;
-                    }
-                    if (base.SelPawn.story.traits.HasTrait(TorannMagicDefOf.TM_Psionic))
-                    {
-                        return flag && true;
-                    }
-                    if (base.SelPawn.story.traits.HasTrait(TorannMagicDefOf.DeathKnight))
-                    {
-                        return flag && true;
-                    }
-                    if (base.SelPawn.story.traits.HasTrait(TorannMagicDefOf.TM_Monk))
-                    {
-                        return flag && true;
-                    }
-                    if (base.SelPawn.story.traits.HasTrait(TorannMagicDefOf.TM_Wayfarer))
-                    {
-                        return flag && true;
-                    }
-                    if (base.SelPawn.story.traits.HasTrait(TorannMagicDefOf.TM_Commander))
-                    {
-                        return flag && true;
-                    }
-                    if (base.SelPawn.story.traits.HasTrait(TorannMagicDefOf.TM_SuperSoldier))
-                    {
-                        return flag && true;
-                    }
+                    return false;
                 }
-
-                return false;
-                
+                Pawn pawn = base.SelPawn;
+                if (pawn == null || !pawn.IsColonist)
+                {
+                    return false;
+                }
+                CompAbilityUserMight comp = pawn.GetCompAbilityUserMight();
+                return comp != null && comp.IsMightUser;
             }
         }
 
         public ITab_Pawn_Might()
         {
-            this.size = MightCardUtility.MightCardSize + new Vector2(17f, 17f) * 2f;
-            this.labelKey = "TM_TabMight";
+            this.size = new Vector2(360f, 130f);
+            this.labelKey = "TM_Grimoire";
+        }
+
+        public override void OnOpen()
+        {
+            base.OnOpen();
+            OpenGrimoire();
         }
 
         protected override void FillTab()
         {
-            Rect rect = new Rect(17f, 17f, MightCardUtility.MightCardSize.x, MightCardUtility.MightCardSize.y);
-            MightCardUtility.DrawMightCard(rect, this.PawnToShowInfoAbout);
+            Rect buttonRect = new Rect(12f, 12f, this.size.x - 24f, 32f);
+            if (Widgets.ButtonText(buttonRect, "TM_GrimoireOpen".Translate()))
+            {
+                OpenGrimoire();
+            }
+            Rect hintRect = new Rect(16f, 52f, this.size.x - 32f, this.size.y - 64f);
+            Text.Anchor = TextAnchor.MiddleCenter;
+            Widgets.Label(hintRect, "TM_GrimoireTabHint".Translate());
+            Text.Anchor = TextAnchor.UpperLeft;
         }
 
+        private void OpenGrimoire()
+        {
+            Pawn pawn = base.SelPawn;
+            if (pawn == null)
+            {
+                return;
+            }
+            Window_TMGrimoire open = Find.WindowStack.Windows.OfType<Window_TMGrimoire>().FirstOrDefault();
+            if (open != null)
+            {
+                open.Close();
+            }
+            Find.WindowStack.Add(new Window_TMGrimoire(pawn));
+        }
     }
 }

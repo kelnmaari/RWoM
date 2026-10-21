@@ -1,162 +1,74 @@
 using RimWorld;
-using System;
 using UnityEngine;
 using Verse;
 using System.Linq;
 
 namespace TorannMagic
 {
-    public class ITab_Pawn_Magic : ITab  //code by Jecrell
+    /// <summary>
+    /// Inspect-pane tab variant of the Grimoire button. Enabled by turning off the
+    /// "grimoireOnAbilityBar" mod setting: the tab shows for magic class holders
+    /// and opens the Grimoire window on click instead of stacking another gizmo
+    /// onto the already crowded ability bar.
+    /// </summary>
+    public class ITab_Pawn_Magic : ITab
     {
-        private Pawn PawnToShowInfoAbout
-        {
-            get
-            {
-                Pawn pawn = null;
-                bool flag = base.SelPawn != null;
-                if (flag)
-                {
-                    pawn = base.SelPawn;
-                }
-                else
-                {
-                    Corpse corpse = base.SelThing as Corpse;
-                    bool flag2 = corpse != null;
-                    if (flag2)
-                    {
-                        pawn = corpse.InnerPawn;
-                    }
-                }
-                bool flag3 = pawn == null;
-                Pawn result;
-                if (flag3)
-                {
-                    Log.Error("Character tab found no selected pawn to display.");
-                    result = null;
-                }
-                else
-                {
-                    result = pawn;
-                }
-                return result;
-            }
-        }
-
         public override bool IsVisible
         {
             get
             {
-                // Progression moved into the Grimoire window (Window_TMGrimoire);
-                // flip this to true to bring the legacy tabs back.
-                return false;                
-                bool flag = base.SelPawn.story != null && base.SelPawn.IsColonist;
-                if (flag)
+                if (ModOptions.Settings.Instance.grimoireOnAbilityBar)
                 {
-                    CompAbilityUserMagic compMagic = base.SelPawn.GetCompAbilityUserMagic();
-                    if (compMagic != null)
-                    {
-                        if (compMagic.customClass != null)
-                        {
-                            return true;
-                        }
-                        if(compMagic.AdvancedClasses.Count > 0)
-                        {
-                            return true;
-                        }
-                    }
-                    if (base.SelPawn.story.traits.HasTrait(TorannMagicDefOf.Arcanist))
-                    {
-                        return flag && true;
-                    }
-                    if (base.SelPawn.story.traits.HasTrait(TorannMagicDefOf.InnerFire))
-                    {
-                        return flag && true;
-                    }
-                    if (base.SelPawn.story.traits.HasTrait(TorannMagicDefOf.HeartOfFrost))
-                    {
-                        return flag && true;
-                    }
-                    if (base.SelPawn.story.traits.HasTrait(TorannMagicDefOf.StormBorn))
-                    {
-                        return flag && true;
-                    }
-                    if (base.SelPawn.story.traits.HasTrait(TorannMagicDefOf.Paladin))
-                    {
-                        return flag && true;
-                    }
-                    if (base.SelPawn.story.traits.HasTrait(TorannMagicDefOf.Summoner))
-                    {
-                        return flag && true;
-                    }
-                    if (base.SelPawn.story.traits.HasTrait(TorannMagicDefOf.Druid))
-                    {
-                        return flag && true;
-                    }
-                    if (base.SelPawn.story.traits.HasTrait(TorannMagicDefOf.Necromancer) || base.SelPawn.story.traits.HasTrait(TorannMagicDefOf.Lich))
-                    {
-                        return flag && true;
-                    }
-                    if (base.SelPawn.story.traits.HasTrait(TorannMagicDefOf.Priest))
-                    {
-                        return flag && true;
-                    }
-                    if (base.SelPawn.story.traits.HasTrait(TorannMagicDefOf.TM_Bard))
-                    {
-                        return flag && true;
-                    }
-                    if (base.SelPawn.story.traits.HasTrait(TorannMagicDefOf.Succubus))
-                    {
-                        return flag && true;
-                    }
-                    if (base.SelPawn.story.traits.HasTrait(TorannMagicDefOf.Warlock))
-                    {
-                        return flag && true;
-                    }
-                    if (base.SelPawn.story.traits.HasTrait(TorannMagicDefOf.Geomancer))
-                    {
-                        return flag && true;
-                    }
-                    if (base.SelPawn.story.traits.HasTrait(TorannMagicDefOf.Technomancer))
-                    {
-                        return flag && true;
-                    }
-                    if (base.SelPawn.story.traits.HasTrait(TorannMagicDefOf.BloodMage))
-                    {
-                        return flag && true;
-                    }
-                    if (base.SelPawn.story.traits.HasTrait(TorannMagicDefOf.Enchanter))
-                    {
-                        return flag && true;
-                    }
-                    if (base.SelPawn.story.traits.HasTrait(TorannMagicDefOf.TM_Wanderer))
-                    {
-                        return flag && true;
-                    }
-                    if (base.SelPawn.story.traits.HasTrait(TorannMagicDefOf.Chronomancer))
-                    {
-                        return flag && true;
-                    }
-                    if (base.SelPawn.story.traits.HasTrait(TorannMagicDefOf.ChaosMage))
-                    {
-                        return flag && true;
-                    }
+                    return false;
                 }
-                return false;
-                //return flag && (base.SelPawn.story.traits.HasTrait(TorannMagicDefOf.Arcanist) || base.SelPawn.story.traits.HasTrait(TorannMagicDefOf.HeartOfFrost) || base.SelPawn.story.traits.HasTrait(TorannMagicDefOf.InnerFire) || base.SelPawn.story.traits.HasTrait(TorannMagicDefOf.StormBorn) || base.SelPawn.story.traits.HasTrait(TorannMagicDefOf.Paladin));
+                Pawn pawn = base.SelPawn;
+                if (pawn == null || !pawn.IsColonist)
+                {
+                    return false;
+                }
+                CompAbilityUserMagic comp = pawn.GetCompAbilityUserMagic();
+                return comp != null && comp.IsMagicUser;
             }
         }
 
         public ITab_Pawn_Magic()
         {
-            this.size = MagicCardUtility.MagicCardSize + new Vector2(17f, 17f) * 2f;
-            this.labelKey = "TM_TabMagic";
+            this.size = new Vector2(360f, 130f);
+            this.labelKey = "TM_Grimoire";
+        }
+
+        public override void OnOpen()
+        {
+            base.OnOpen();
+            OpenGrimoire();
         }
 
         protected override void FillTab()
         {
-            Rect rect = new Rect(17f, 17f, MagicCardUtility.MagicCardSize.x, MagicCardUtility.MagicCardSize.y);
-            MagicCardUtility.DrawMagicCard(rect, this.PawnToShowInfoAbout);
-            
+            Rect buttonRect = new Rect(12f, 12f, this.size.x - 24f, 32f);
+            if (Widgets.ButtonText(buttonRect, "TM_GrimoireOpen".Translate()))
+            {
+                OpenGrimoire();
+            }
+            Rect hintRect = new Rect(16f, 52f, this.size.x - 32f, this.size.y - 64f);
+            Text.Anchor = TextAnchor.MiddleCenter;
+            Widgets.Label(hintRect, "TM_GrimoireTabHint".Translate());
+            Text.Anchor = TextAnchor.UpperLeft;
+        }
+
+        private void OpenGrimoire()
+        {
+            Pawn pawn = base.SelPawn;
+            if (pawn == null)
+            {
+                return;
+            }
+            Window_TMGrimoire open = Find.WindowStack.Windows.OfType<Window_TMGrimoire>().FirstOrDefault();
+            if (open != null)
+            {
+                open.Close();
+            }
+            Find.WindowStack.Add(new Window_TMGrimoire(pawn));
         }
     }
 }
