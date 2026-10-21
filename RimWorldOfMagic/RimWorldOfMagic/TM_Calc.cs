@@ -125,6 +125,15 @@ namespace TorannMagic
             return false;
         }
 
+        // TM_Sprint_II -> TM_Sprint: level variants share the base def name
+        public static string BaseAbilityDefName(string defName)
+        {
+            if (defName.EndsWith("_III")) return defName.Substring(0, defName.Length - 4);
+            if (defName.EndsWith("_II")) return defName.Substring(0, defName.Length - 3);
+            if (defName.EndsWith("_I")) return defName.Substring(0, defName.Length - 2);
+            return defName;
+        }
+
         public static bool IsUndead(Pawn pawn)
         {
             if (pawn == null) return false;

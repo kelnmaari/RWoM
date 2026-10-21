@@ -4934,6 +4934,20 @@ namespace TorannMagic
                             if (canUseWithEquippedWeapon && canUseIfViolentAbility)
                             {
                                 PawnAbility ability = this.AbilityData.Powers.FirstOrDefault((PawnAbility x) => x.Def == tmad);
+                                if (ability == null && mp.level > 0 && tmad != null)
+                                {
+                                    // generated/AI pawns keep the base PawnAbility until a
+                                    // level-up swaps it; swap here so the AI casts the power
+                                    // at the level it actually is
+                                    PawnAbility baseAbility = this.AbilityData.Powers.FirstOrDefault((PawnAbility x) =>
+                                        TM_Calc.BaseAbilityDefName(x.Def.defName) == TM_Calc.BaseAbilityDefName(tmad.defName));
+                                    if (baseAbility != null)
+                                    {
+                                        this.RemovePawnAbility(baseAbility.Def);
+                                        this.AddPawnAbility(tmad);
+                                        ability = this.AbilityData.Powers.FirstOrDefault((PawnAbility x) => x.Def == tmad);
+                                    }
+                                }
                                 if (ability == null)
                                 {
                                     continue;
