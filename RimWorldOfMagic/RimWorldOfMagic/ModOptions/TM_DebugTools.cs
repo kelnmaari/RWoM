@@ -215,7 +215,7 @@ namespace TorannMagic.ModOptions
             {
                 List<TraitDef> pool = TM_Data.MagicTraits.Concat(TM_Data.MightTraits).ToList();
                 List<TorannMagic.TMDefs.TM_CustomClass> customs = TM_ClassUtility.CustomClasses;
-                if (customs != null && customs.Count > 0 && Rand.Chance(0.25f))
+                if (pawn.IsColonist && customs != null && customs.Count > 0 && Rand.Chance(0.25f))
                 {
                     int index = Rand.RangeInclusive(0, customs.Count - 1);
                     TorannMagic.TMDefs.TM_CustomClass cc = customs[index];

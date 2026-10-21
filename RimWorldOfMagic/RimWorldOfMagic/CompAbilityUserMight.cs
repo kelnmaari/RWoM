@@ -834,8 +834,17 @@ namespace TorannMagic
 
             if (this.mightPowersInitialized == false && MightData != null)
             {
-                AssignAbilities();
-            }            
+                try
+                {
+                    AssignAbilities();
+                }
+                catch (Exception ex)
+                {
+                    // random class rolls can hit powers the fighter list lacks;
+                    // without this catch PostInitialize retries forever
+                    Log.Error("[TM] might ability init failed for " + this.Pawn.LabelShortCap + ": " + ex);
+                }
+            }
         }
 
         public void AssignAbilities()

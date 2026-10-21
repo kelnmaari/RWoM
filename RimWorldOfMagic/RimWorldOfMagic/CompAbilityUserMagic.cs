@@ -1215,11 +1215,20 @@ namespace TorannMagic
                 {
                     MagicData.MagicUserLevel = 0;
                     MagicData.MagicAbilityPoints = 0;
-                    AssignAbilities();
-                    if (!this.Pawn.IsColonist)
+                    try
                     {
-                        InitializeSpell();
-                        this.colonistPowerCheck = false;
+                        AssignAbilities();
+                        if (!this.Pawn.IsColonist)
+                        {
+                            InitializeSpell();
+                            this.colonistPowerCheck = false;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        // a random class roll can reference powers the class list
+                        // lacks; without this catch PostInitialize retries forever
+                        Log.Error("[TM] ability init failed for " + this.Pawn.LabelShortCap + ": " + ex);
                     }
                 }
                 this.magicPowersInitialized = true;

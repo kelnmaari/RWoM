@@ -192,6 +192,13 @@ namespace TorannMagic
 
         public override void SetInitialLevel()
         {
+            if (this.pawn?.story == null)
+            {
+                // generated NPC without a backstory got flagged for the mana need
+                this.def.showOnNeedList = false;
+                this.CurLevel = 0.8f;
+                return;
+            }
             if(this.pawn.story.traits.HasTrait(TorannMagicDefOf.Faceless))
             {
                 this.def.showOnNeedList = false;
