@@ -2223,4 +2223,29 @@ DR: [5, 9, 13, 17, 20]%</TM_Golemancy_pwr_desc>
   <TM_AIMarkingDesc>Отмечать враждебных магов иконкой на карте.</TM_AIMarkingDesc>
   <TM_AIFighterMarkingDesc>Отмечать иконкой врагов воинских классов (might).</TM_AIFighterMarkingDesc>
   <TM_AIFriendlyMarkingDesc>Отмечать иконкой магов союзных фракций.</TM_AIFriendlyMarkingDesc>
+  <XPMultiplierDesc>Множитель получаемого магического и боевого опыта.</XPMultiplierDesc>
+  <NeedMultiplierDesc>Множитель расхода маны, выносливости и прочих потребностей классов.</NeedMultiplierDesc>
+  <MagicyteChanceDesc>Шанс, что новорождённые животные будут магицитами (источниками маны).</MagicyteChanceDesc>
+  <TM_DeathRetaliationIsLethalDesc>Смертельна ли предсмертная вспышка мага: если выключено — цель лишь теряет сознание.</TM_DeathRetaliationIsLethalDesc>
+  <TM_DeathRetaliationChanceDesc>Вероятность того, что погибший маг обрушит предсмертную вспышку на убийцу.</TM_DeathRetaliationChanceDesc>
+  <TM_DeathRetaliationDelayDesc>Задержка перед срабатыванием предсмертной вспышки мага.</TM_DeathRetaliationDelayDesc>
+  <TM_enableAutocastDesc>Автокаст жителей колонии: заклинания с включённым тумблером AC применяются сами.</TM_enableAutocastDesc>
+  <TM_autocastUndraftedThresholdDesc>Минимальный процент маны для автокаста вне боя.</TM_autocastUndraftedThresholdDesc>
+  <TM_autocastDraftedThresholdDesc>Минимальный процент маны для боевого автокаста в строю (Fire at will).</TM_autocastDraftedThresholdDesc>
+  <TM_autocastEvaluationFrequencyDesc>Как часто проверяются условия автокаста. Реже — выше производительность.</TM_autocastEvaluationFrequencyDesc>
+  <TM_autocastAnimalsDesc>Разрешить автокаст призванным существам и животным-кастерам.</TM_autocastAnimalsDesc>
+  <AICanCastDesc>Разрешить NPC-магам (рейдеры, враждебные фракции) применять способности в бою.</AICanCastDesc>
+  <AIHardModeDesc>Жесткий режим: NPC-маги умнее и агрессивнее выбирают заклинания.</AIHardModeDesc>
+  <TM_AggressiveAICastingDesc>NPC-маги кастуют чаще и активнее ищут цели для способностей.</TM_AggressiveAICastingDesc>
+  <TM_SlavesCanScribeDesc>Разрешить рабам записывать классы в тома (требуется Ideology).</TM_SlavesCanScribeDesc>
+  <TM_UndeadUpkeepMultiplierDesc>Множитель расходов на содержание нежити.</TM_UndeadUpkeepMultiplierDesc>
+  <TM_ParacyteSoftCapDesc>Мягкий лимит паразитов-магов в мире: после него шанс появления падает.</TM_ParacyteSoftCapDesc>
+  <TM_ParacyteMagesCountDesc>Учитывать ли паразитов в лимите магов фракции.</TM_ParacyteMagesCountDesc>
+  <unrestrictedBloodTypesForBloodMagicDesc>Магия крови работает на любых пешках, а не только с подходящей группой крови.</unrestrictedBloodTypesForBloodMagicDesc>
+  <TM_UnrestrictedWeaponCopyDesc>Копирование и зачарование оружия без ограничений по его типу.</TM_UnrestrictedWeaponCopyDesc>
+  <TM_ClassOptionsDesc>Настройки классов: шансы появления, предки и связанные правила.</TM_ClassOptionsDesc>
+  <TM_FactionOptionsDesc>Настройки фракций и их магов.</TM_FactionOptionsDesc>
+  <TM_EventOptionsDesc>Настройки событий: разломы, демоны, бродячие личи и их сложность.</TM_EventOptionsDesc>
+  <TM_GolemOptionsDesc>Настройки големов и их поведения.</TM_GolemOptionsDesc>
+  <TM_DisplayOptionsDesc>Отображение: иконки, камера, режим Гримуара и элементы интерфейса.</TM_DisplayOptionsDesc>
 </LanguageData>

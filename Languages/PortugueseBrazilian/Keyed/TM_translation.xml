@@ -2183,4 +2183,29 @@ Nível 3: 14s, 24s</TM_SpiritRally_ver_desc>
   <TM_AIMarkingDesc>Marcar magos hostis com um ícone no mapa.</TM_AIMarkingDesc>
   <TM_AIFighterMarkingDesc>Marcar com um ícone os inimigos de classes guerreiras (might).</TM_AIFighterMarkingDesc>
   <TM_AIFriendlyMarkingDesc>Marcar com um ícone os magos de facções aliadas.</TM_AIFriendlyMarkingDesc>
+  <XPMultiplierDesc>Multiplicador de experiência mágica e guerreira ganha.</XPMultiplierDesc>
+  <NeedMultiplierDesc>Multiplicador do consumo de mana, vigor e outras necessidades de classe.</NeedMultiplierDesc>
+  <MagicyteChanceDesc>Chance de que animais recém-nascidos sejam magícitas (fontes de mana).</MagicyteChanceDesc>
+  <TM_DeathRetaliationIsLethalDesc>Se a explosão de retaliação do mago morto é letal; desligado, o alvo só é derrubado.</TM_DeathRetaliationIsLethalDesc>
+  <TM_DeathRetaliationChanceDesc>Chance de um mago morto desencadear uma explosão de retaliação contra o assassino.</TM_DeathRetaliationChanceDesc>
+  <TM_DeathRetaliationDelayDesc>Atraso antes da explosão de retaliação do mago morto acontecer.</TM_DeathRetaliationDelayDesc>
+  <TM_enableAutocastDesc>Autoconjuruação dos colonos: feitiços com o botão AC ativado são lançados sozinhos.</TM_enableAutocastDesc>
+  <TM_autocastUndraftedThresholdDesc>Porcentagem mínima de mana para autoconjurar fora de combate.</TM_autocastUndraftedThresholdDesc>
+  <TM_autocastDraftedThresholdDesc>Porcentagem mínima de mana para autoconjurar em combate (fogo à vontade).</TM_autocastDraftedThresholdDesc>
+  <TM_autocastEvaluationFrequencyDesc>Com que frequência as condições de autoconjuração são avaliadas. Menor é mais leve.</TM_autocastEvaluationFrequencyDesc>
+  <TM_autocastAnimalsDesc>Permitir autoconjuração para criaturas invocadas e animais conjuradores.</TM_autocastAnimalsDesc>
+  <AICanCastDesc>Permitir que magos NPCs (invasores, facções hostis) usem habilidades em combate.</AICanCastDesc>
+  <AIHardModeDesc>Modo difícil: magos NPCs escolhem feitiços de forma mais inteligente e agressiva.</AIHardModeDesc>
+  <TM_AggressiveAICastingDesc>Magos NPCs conjuram mais vezes e procuram alvos ativamente.</TM_AggressiveAICastingDesc>
+  <TM_SlavesCanScribeDesc>Permitir que escravos escrevam tomos de classe (requer Ideology).</TM_SlavesCanScribeDesc>
+  <TM_UndeadUpkeepMultiplierDesc>Multiplicador dos custos de manutenção dos mortos-vivos.</TM_UndeadUpkeepMultiplierDesc>
+  <TM_ParacyteSoftCapDesc>Limite suave de magos paracitas no mundo; depois dele a chance de surgimento cai.</TM_ParacyteSoftCapDesc>
+  <TM_ParacyteMagesCountDesc>Se paracitas contam para o limite de magos da facção.</TM_ParacyteMagesCountDesc>
+  <unrestrictedBloodTypesForBloodMagicDesc>Magia sanguínea funciona em qualquer peão, não apenas em tipos de sangue compatíveis.</unrestrictedBloodTypesForBloodMagicDesc>
+  <TM_UnrestrictedWeaponCopyDesc>Copiar e encantar armas independente do tipo.</TM_UnrestrictedWeaponCopyDesc>
+  <TM_ClassOptionsDesc>Opções de classe: chances de surgimento, ancestrais e regras relacionadas.</TM_ClassOptionsDesc>
+  <TM_FactionOptionsDesc>Opções de facções e seus magos.</TM_FactionOptionsDesc>
+  <TM_EventOptionsDesc>Opções de eventos: fendas, demônios, liches errantes e sua dificuldade.</TM_EventOptionsDesc>
+  <TM_GolemOptionsDesc>Opções de golens e comportamento.</TM_GolemOptionsDesc>
+  <TM_DisplayOptionsDesc>Exibição: ícones, câmera, modo do Grimório e elementos da interface.</TM_DisplayOptionsDesc>
 </LanguageData>

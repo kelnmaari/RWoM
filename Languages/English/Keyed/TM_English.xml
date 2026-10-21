@@ -2348,4 +2348,29 @@ Level 3: all 4 effects</TM_CombatDrugs_pwr_desc>
   <TM_AIMarkingDesc>Draw an icon over hostile magic users on the map.</TM_AIMarkingDesc>
   <TM_AIFighterMarkingDesc>Draw an icon over enemy might (fighter) class pawns.</TM_AIFighterMarkingDesc>
   <TM_AIFriendlyMarkingDesc>Draw an icon over allied-faction magic users.</TM_AIFriendlyMarkingDesc>
+  <XPMultiplierDesc>Multiplier for magic and might experience gained.</XPMultiplierDesc>
+  <NeedMultiplierDesc>Multiplier for mana, stamina and other class need drain rates.</NeedMultiplierDesc>
+  <MagicyteChanceDesc>Chance that newborn animals are magicytes (mana sources).</MagicyteChanceDesc>
+  <TM_DeathRetaliationIsLethalDesc>Whether a dying mage’s retribution burst is lethal; when off the target is only downed.</TM_DeathRetaliationIsLethalDesc>
+  <TM_DeathRetaliationChanceDesc>Chance that a slain mage unleashes a death retaliation burst on the killer.</TM_DeathRetaliationChanceDesc>
+  <TM_DeathRetaliationDelayDesc>Delay before a slain mage’s retaliation burst goes off.</TM_DeathRetaliationDelayDesc>
+  <TM_enableAutocastDesc>Colony autocasting: spells with the AC toggle enabled cast themselves.</TM_enableAutocastDesc>
+  <TM_autocastUndraftedThresholdDesc>Minimum mana percentage for autocasting while not drafted.</TM_autocastUndraftedThresholdDesc>
+  <TM_autocastDraftedThresholdDesc>Minimum mana percentage for combat autocasting while drafted (fire at will).</TM_autocastDraftedThresholdDesc>
+  <TM_autocastEvaluationFrequencyDesc>How often autocast conditions are evaluated. Slower is kinder to performance.</TM_autocastEvaluationFrequencyDesc>
+  <TM_autocastAnimalsDesc>Allow autocasting for summoned creatures and casting animals.</TM_autocastAnimalsDesc>
+  <AICanCastDesc>Allow NPC mages (raiders, hostile factions) to cast abilities in combat.</AICanCastDesc>
+  <AIHardModeDesc>Hard mode: NPC mages pick spells smarter and more aggressively.</AIHardModeDesc>
+  <TM_AggressiveAICastingDesc>NPC mages cast more often and hunt for ability targets.</TM_AggressiveAICastingDesc>
+  <TM_SlavesCanScribeDesc>Allow slaves to write class tomes (requires Ideology).</TM_SlavesCanScribeDesc>
+  <TM_UndeadUpkeepMultiplierDesc>Multiplier for undead upkeep costs.</TM_UndeadUpkeepMultiplierDesc>
+  <TM_ParacyteSoftCapDesc>Soft cap on paracyte mages in the world; past it spawn chance drops.</TM_ParacyteSoftCapDesc>
+  <TM_ParacyteMagesCountDesc>Whether paracytes count toward the faction mage limit.</TM_ParacyteMagesCountDesc>
+  <unrestrictedBloodTypesForBloodMagicDesc>Blood magic works on any pawn, not only compatible blood types.</unrestrictedBloodTypesForBloodMagicDesc>
+  <TM_UnrestrictedWeaponCopyDesc>Copy and enchant weapons regardless of their type.</TM_UnrestrictedWeaponCopyDesc>
+  <TM_ClassOptionsDesc>Class options: spawn chances, ancestry and related rules.</TM_ClassOptionsDesc>
+  <TM_FactionOptionsDesc>Faction options and their mages.</TM_FactionOptionsDesc>
+  <TM_EventOptionsDesc>Event options: rifts, demons, wandering liches and their difficulty.</TM_EventOptionsDesc>
+  <TM_GolemOptionsDesc>Golem options and behavior.</TM_GolemOptionsDesc>
+  <TM_DisplayOptionsDesc>Display: icons, camera, Grimoire mode and UI elements.</TM_DisplayOptionsDesc>
 </LanguageData>

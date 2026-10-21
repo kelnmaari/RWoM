@@ -1299,4 +1299,29 @@ Cantidad base: 0%</TM_LifeSteal_ver_desc>
   <TM_AIMarkingDesc>Marcar con un icono a los magos hostiles en el mapa.</TM_AIMarkingDesc>
   <TM_AIFighterMarkingDesc>Marcar con un icono a los enemigos de clases guerreras (might).</TM_AIFighterMarkingDesc>
   <TM_AIFriendlyMarkingDesc>Marcar con un icono a los magos de facciones aliadas.</TM_AIFriendlyMarkingDesc>
+  <XPMultiplierDesc>Multiplicador de experiencia mágica y guerrera obtenida.</XPMultiplierDesc>
+  <NeedMultiplierDesc>Multiplicador del consumo de maná, vigor y otras necesidades de clase.</NeedMultiplierDesc>
+  <MagicyteChanceDesc>Probabilidad de que los animales recién nacidos sean magícitas (fuentes de maná).</MagicyteChanceDesc>
+  <TM_DeathRetaliationIsLethalDesc>Si la explosión de represalia del mago moribundo es letal; apagado, el objetivo solo queda inconsciente.</TM_DeathRetaliationIsLethalDesc>
+  <TM_DeathRetaliationChanceDesc>Probabilidad de que un mago muerto desate una explosión de represalia contra su asesino.</TM_DeathRetaliationChanceDesc>
+  <TM_DeathRetaliationDelayDesc>Retraso antes de que estalle la represalia del mago muerto.</TM_DeathRetaliationDelayDesc>
+  <TM_enableAutocastDesc>Autolanzamiento de los colonos: los hechizos con el interruptor AC activado se lanzan solos.</TM_enableAutocastDesc>
+  <TM_autocastUndraftedThresholdDesc>Porcentaje mínimo de maná para autolanzar fuera de combate.</TM_autocastUndraftedThresholdDesc>
+  <TM_autocastDraftedThresholdDesc>Porcentaje mínimo de maná para autolanzar en combate (fuego a discreción).</TM_autocastDraftedThresholdDesc>
+  <TM_autocastEvaluationFrequencyDesc>Con qué frecuencia se evalúan las condiciones del autolanzamiento. Más lento rinde mejor.</TM_autocastEvaluationFrequencyDesc>
+  <TM_autocastAnimalsDesc>Permitir autolanzamiento a criaturas invocadas y animales lanzadores.</TM_autocastAnimalsDesc>
+  <AICanCastDesc>Permitir que los magos NPC (invasores, facciones hostiles) usen habilidades en combate.</AICanCastDesc>
+  <AIHardModeDesc>Modo difícil: los magos NPC eligen hechizos con más inteligencia y agresividad.</AIHardModeDesc>
+  <TM_AggressiveAICastingDesc>Los magos NPC lanzan más a menudo y buscan objetivos activamente.</TM_AggressiveAICastingDesc>
+  <TM_SlavesCanScribeDesc>Permitir que los esclavos escriban tomos de clase (requiere Ideology).</TM_SlavesCanScribeDesc>
+  <TM_UndeadUpkeepMultiplierDesc>Multiplicador de los costes de mantenimiento de los no muertos.</TM_UndeadUpkeepMultiplierDesc>
+  <TM_ParacyteSoftCapDesc>Límite flexible de magos paracitos en el mundo; pasado, la probabilidad de aparición cae.</TM_ParacyteSoftCapDesc>
+  <TM_ParacyteMagesCountDesc>Si los paracitos cuentan para el límite de magos de la facción.</TM_ParacyteMagesCountDesc>
+  <unrestrictedBloodTypesForBloodMagicDesc>La magia de sangre funciona en cualquier peón, no solo en tipos de sangre compatibles.</unrestrictedBloodTypesForBloodMagicDesc>
+  <TM_UnrestrictedWeaponCopyDesc>Copiar y encantar armas sin importar su tipo.</TM_UnrestrictedWeaponCopyDesc>
+  <TM_ClassOptionsDesc>Opciones de clase: probabilidades de aparición, antepasados y reglas relacionadas.</TM_ClassOptionsDesc>
+  <TM_FactionOptionsDesc>Opciones de facciones y sus magos.</TM_FactionOptionsDesc>
+  <TM_EventOptionsDesc>Opciones de eventos: grietas, demonios, liches errantes y su dificultad.</TM_EventOptionsDesc>
+  <TM_GolemOptionsDesc>Opciones de gólems y su comportamiento.</TM_GolemOptionsDesc>
+  <TM_DisplayOptionsDesc>Visualización: iconos, cámara, modo del Grimorio y elementos de la interfaz.</TM_DisplayOptionsDesc>
 </LanguageData>

@@ -706,4 +706,29 @@
   <TM_AIMarkingDesc>在地图上用图标标记敌对施法者。</TM_AIMarkingDesc>
   <TM_AIFighterMarkingDesc>用图标标记敌对战士职业单位。</TM_AIFighterMarkingDesc>
   <TM_AIFriendlyMarkingDesc>用图标标记盟友阵营的法师。</TM_AIFriendlyMarkingDesc>
+  <XPMultiplierDesc>魔法与战斗经验获取倍率。</XPMultiplierDesc>
+  <NeedMultiplierDesc>法力、体力及其他职业需求消耗的倍率。</NeedMultiplierDesc>
+  <MagicyteChanceDesc>新生动物为魔晶兽（法力来源）的概率。</MagicyteChanceDesc>
+  <TM_DeathRetaliationIsLethalDesc>法师的临死反噬是否致命；关闭时目标只会倒地。</TM_DeathRetaliationIsLethalDesc>
+  <TM_DeathRetaliationChanceDesc>被杀死的法师对凶手释放临死反噬的概率。</TM_DeathRetaliationChanceDesc>
+  <TM_DeathRetaliationDelayDesc>法师临死反噬的触发延迟。</TM_DeathRetaliationDelayDesc>
+  <TM_enableAutocastDesc>殖民者自动施法：开启了 AC 开关的法术会自动释放。</TM_enableAutocastDesc>
+  <TM_autocastUndraftedThresholdDesc>非战斗状态下自动施法的最低法力百分比。</TM_autocastUndraftedThresholdDesc>
+  <TM_autocastDraftedThresholdDesc>战斗状态（自由开火）下自动施法的最低法力百分比。</TM_autocastDraftedThresholdDesc>
+  <TM_autocastEvaluationFrequencyDesc>自动施法条件的检查频率。越低性能越好。</TM_autocastEvaluationFrequencyDesc>
+  <TM_autocastAnimalsDesc>允许召唤生物和施法动物自动施法。</TM_autocastAnimalsDesc>
+  <AICanCastDesc>允许 NPC 法师（袭击者、敌对阵营）在战斗中使用技能。</AICanCastDesc>
+  <AIHardModeDesc>困难模式：NPC 法师更聪明、更激进地选择法术。</AIHardModeDesc>
+  <TM_AggressiveAICastingDesc>NPC 法师施法更频繁并主动寻找技能目标。</TM_AggressiveAICastingDesc>
+  <TM_SlavesCanScribeDesc>允许奴隶抄写职业典籍（需要 Ideology）。</TM_SlavesCanScribeDesc>
+  <TM_UndeadUpkeepMultiplierDesc>亡灵维护消耗的倍率。</TM_UndeadUpkeepMultiplierDesc>
+  <TM_ParacyteSoftCapDesc>世界中寄生法师的软上限；超过后生成概率下降。</TM_ParacyteSoftCapDesc>
+  <TM_ParacyteMagesCountDesc>寄生法师是否计入阵营法师上限。</TM_ParacyteMagesCountDesc>
+  <unrestrictedBloodTypesForBloodMagicDesc>血魔法对任何小人有效，不再要求血型匹配。</unrestrictedBloodTypesForBloodMagicDesc>
+  <TM_UnrestrictedWeaponCopyDesc>复制和附魔武器不再受武器类型限制。</TM_UnrestrictedWeaponCopyDesc>
+  <TM_ClassOptionsDesc>职业选项：出现概率、祖辈与相关规则。</TM_ClassOptionsDesc>
+  <TM_FactionOptionsDesc>阵营选项及其法师。</TM_FactionOptionsDesc>
+  <TM_EventOptionsDesc>事件选项：裂隙、恶魔、游荡巫妖及其难度。</TM_EventOptionsDesc>
+  <TM_GolemOptionsDesc>魔像选项与行为。</TM_GolemOptionsDesc>
+  <TM_DisplayOptionsDesc>显示：图标、镜头、魔典模式与界面元素。</TM_DisplayOptionsDesc>
 </LanguageData>
