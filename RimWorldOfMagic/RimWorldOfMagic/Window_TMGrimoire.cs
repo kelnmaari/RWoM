@@ -180,7 +180,12 @@ namespace TorannMagic
             float descWidth = view.width - 24f - IconSize - 10f;
             float descHeight = PowerDescriptionHeight(power, view.width);
             List<MagicPowerSkill> skills = GetMagicSkills(ability);
-            float cardHeight = Mathf.Max(IconSize, 32f + descHeight) + skills.Count * 32f + 16f + 8f;
+            float skillRows = 0f;
+            foreach (MagicPowerSkill sk in skills)
+            {
+                skillRows += SkillRowHeight(SkillRowText(sk.label, sk.level, sk.levelMax, sk.desc), view.width - 16f - 50f) + 10f;
+            }
+            float cardHeight = Mathf.Max(IconSize, 32f + descHeight) + skillRows + 16f + 8f;
 
             Rect card = new Rect(0f, y, view.width, cardHeight);
             TorannMagic.Utils.TMIsekaiUI.Panel(card);
@@ -213,10 +218,11 @@ namespace TorannMagic
             foreach (MagicPowerSkill skill in skills)
             {
                 bool canUp = power.learned && skill.level < skill.levelMax && points >= skill.costToLevel;
-                Rect skillLabel = new Rect(card.x + 16f, sy, card.width - 16f - 50f, 18f);
+                string skillText = SkillRowText(skill.label, skill.level, skill.levelMax, skill.desc);
+                float rowH = SkillRowHeight(skillText, card.width - 16f - 50f);
+                Rect skillLabel = new Rect(card.x + 16f, sy, card.width - 16f - 50f, rowH);
                 Text.Font = GameFont.Tiny;
-                Label(skillLabel, skill.label.Translate() + ": " + skill.level + " / " + skill.levelMax +
-                    "  —  " + skill.desc.Translate(), TextAnchor.UpperLeft, canUp ? Color.white : TextGray);
+                Label(skillLabel, skillText, TextAnchor.UpperLeft, canUp ? Color.white : TextGray);
                 if (canUp && Widgets.ButtonText(new Rect(card.xMax - 52f, sy - 2f, 36f, 20f), "+", true, false, true))
                 {
                     skill.level++;
@@ -226,7 +232,7 @@ namespace TorannMagic
                 {
                     Label(new Rect(card.xMax - 52f, sy - 2f, 36f, 20f), "max", TextAnchor.MiddleCenter, TextGray);
                 }
-                sy += 32f;
+                sy += rowH + 10f;
             }
 
             return y + cardHeight + 10f;
@@ -398,7 +404,12 @@ namespace TorannMagic
             float descWidth = view.width - 24f - IconSize - 10f;
             float descHeight = PowerDescriptionHeight(power, view.width);
             List<MightPowerSkill> skills = GetMightSkills(ability);
-            float cardHeight = Mathf.Max(IconSize, 32f + descHeight) + skills.Count * 32f + 16f + 8f;
+            float skillRows = 0f;
+            foreach (MightPowerSkill sk in skills)
+            {
+                skillRows += SkillRowHeight(SkillRowText(sk.label, sk.level, sk.levelMax, sk.desc), view.width - 16f - 50f) + 10f;
+            }
+            float cardHeight = Mathf.Max(IconSize, 32f + descHeight) + skillRows + 16f + 8f;
 
             Rect card = new Rect(0f, y, view.width, cardHeight);
             TorannMagic.Utils.TMIsekaiUI.Panel(card);
@@ -431,10 +442,11 @@ namespace TorannMagic
             foreach (MightPowerSkill skill in skills)
             {
                 bool canUp = power.learned && skill.level < skill.levelMax && points >= skill.costToLevel;
-                Rect skillLabel = new Rect(card.x + 16f, sy, card.width - 16f - 50f, 18f);
+                string skillText = SkillRowText(skill.label, skill.level, skill.levelMax, skill.desc);
+                float rowH = SkillRowHeight(skillText, card.width - 16f - 50f);
+                Rect skillLabel = new Rect(card.x + 16f, sy, card.width - 16f - 50f, rowH);
                 Text.Font = GameFont.Tiny;
-                Label(skillLabel, skill.label.Translate() + ": " + skill.level + " / " + skill.levelMax +
-                    "  —  " + skill.desc.Translate(), TextAnchor.UpperLeft, canUp ? Color.white : TextGray);
+                Label(skillLabel, skillText, TextAnchor.UpperLeft, canUp ? Color.white : TextGray);
                 if (canUp && Widgets.ButtonText(new Rect(card.xMax - 52f, sy - 2f, 36f, 20f), "+", true, false, true))
                 {
                     skill.level++;
@@ -444,7 +456,7 @@ namespace TorannMagic
                 {
                     Label(new Rect(card.xMax - 52f, sy - 2f, 36f, 20f), "max", TextAnchor.MiddleCenter, TextGray);
                 }
-                sy += 32f;
+                sy += rowH + 10f;
             }
 
             return y + cardHeight + 10f;
@@ -525,7 +537,12 @@ namespace TorannMagic
             Label(new Rect(0f, y, view.width, 22f), headerKey.Translate().CapitalizeFirst(),
                 TextAnchor.MiddleLeft, TorannMagic.Utils.TMIsekaiUI.HeaderGold);
             y += 26f;
-            Rect panel = new Rect(0f, y, view.width, stats.Count * 30f + 14f);
+            float statRows = 0f;
+            foreach (MagicPowerSkill stat in stats)
+            {
+                statRows += SkillRowHeight(SkillRowText(stat.label, stat.level, stat.levelMax, stat.desc), view.width - 14f - 50f) + 12f;
+            }
+            Rect panel = new Rect(0f, y, view.width, statRows + 14f);
             TorannMagic.Utils.TMIsekaiUI.Panel(panel);
             int points = magic != null && magic.MagicData != null ? magic.MagicData.MagicAbilityPoints : 0;
             float sy = panel.y + 7f;
@@ -533,9 +550,10 @@ namespace TorannMagic
             {
                 bool canUp = stat.level < stat.levelMax && points >= 1;
                 Text.Font = GameFont.Tiny;
-                Rect row = new Rect(panel.x + 14f, sy, panel.width - 14f - 50f, 18f);
-                Label(row, stat.label.Translate() + ": " + stat.level + " / " + stat.levelMax +
-                    "  —  " + stat.desc.Translate(), TextAnchor.UpperLeft, canUp ? Color.white : TextGray);
+                string statText = SkillRowText(stat.label, stat.level, stat.levelMax, stat.desc);
+                float rowH = SkillRowHeight(statText, panel.width - 14f - 50f);
+                Rect row = new Rect(panel.x + 14f, sy, panel.width - 14f - 50f, rowH);
+                Label(row, statText, TextAnchor.UpperLeft, canUp ? Color.white : TextGray);
                 if (canUp && Widgets.ButtonText(new Rect(panel.xMax - 52f, sy - 2f, 36f, 20f), "+", true, false, true))
                 {
                     stat.level++;
@@ -546,7 +564,7 @@ namespace TorannMagic
                 {
                     Label(new Rect(panel.xMax - 52f, sy - 2f, 36f, 20f), "max", TextAnchor.MiddleCenter, TextGray);
                 }
-                sy += 30f;
+                sy += rowH + 12f;
             }
             return y + panel.height + 12f;
         }
@@ -557,7 +575,12 @@ namespace TorannMagic
             Label(new Rect(0f, y, view.width, 22f), headerKey.Translate().CapitalizeFirst(),
                 TextAnchor.MiddleLeft, TorannMagic.Utils.TMIsekaiUI.HeaderGold);
             y += 26f;
-            Rect panel = new Rect(0f, y, view.width, stats.Count * 30f + 14f);
+            float statRows = 0f;
+            foreach (MightPowerSkill stat in stats)
+            {
+                statRows += SkillRowHeight(SkillRowText(stat.label, stat.level, stat.levelMax, stat.desc), view.width - 14f - 50f) + 12f;
+            }
+            Rect panel = new Rect(0f, y, view.width, statRows + 14f);
             TorannMagic.Utils.TMIsekaiUI.Panel(panel);
             int points = might != null && might.MightData != null ? might.MightData.MightAbilityPoints : 0;
             float sy = panel.y + 7f;
@@ -565,9 +588,10 @@ namespace TorannMagic
             {
                 bool canUp = stat.level < stat.levelMax && points >= 1;
                 Text.Font = GameFont.Tiny;
-                Rect row = new Rect(panel.x + 14f, sy, panel.width - 14f - 50f, 18f);
-                Label(row, stat.label.Translate() + ": " + stat.level + " / " + stat.levelMax +
-                    "  —  " + stat.desc.Translate(), TextAnchor.UpperLeft, canUp ? Color.white : TextGray);
+                string statText = SkillRowText(stat.label, stat.level, stat.levelMax, stat.desc);
+                float rowH = SkillRowHeight(statText, panel.width - 14f - 50f);
+                Rect row = new Rect(panel.x + 14f, sy, panel.width - 14f - 50f, rowH);
+                Label(row, statText, TextAnchor.UpperLeft, canUp ? Color.white : TextGray);
                 if (canUp && Widgets.ButtonText(new Rect(panel.xMax - 52f, sy - 2f, 36f, 20f), "+", true, false, true))
                 {
                     stat.level++;
@@ -578,7 +602,7 @@ namespace TorannMagic
                 {
                     Label(new Rect(panel.xMax - 52f, sy - 2f, 36f, 20f), "max", TextAnchor.MiddleCenter, TextGray);
                 }
-                sy += 30f;
+                sy += rowH + 12f;
             }
             return y + panel.height + 12f;
         }
@@ -738,6 +762,17 @@ namespace TorannMagic
 
         // Height helpers mirror the drawing code exactly; the scroll view needs the
         // total up front or the bottom of the list is unreachable.
+        private static string SkillRowText(string label, int level, int levelMax, string desc)
+        {
+            return label.Translate() + ": " + level + " / " + levelMax + "  —  " + desc.Translate();
+        }
+
+        private static float SkillRowHeight(string text, float width)
+        {
+            Text.Font = GameFont.Tiny;
+            return Mathf.Max(20f, Text.CalcHeight(text, width) + 4f);
+        }
+
         private float MeasureViewHeight(float width)
         {
             float h = 90f;
@@ -749,7 +784,7 @@ namespace TorannMagic
             if (magic != null && magic.MagicData != null)
             {
                 h += 30f + 76f + 10f + 22f;                       // header + info panel + gap + section label
-                h += StatBlockHeight(magicStats);
+                h += StatBlockHeight(magicStats, width);
                 foreach (MagicPower power in magic.MagicData.AllMagicPowersWithSkills)
                 {
                     TMAbilityDef ability = power.abilityDef as TMAbilityDef;
@@ -764,7 +799,7 @@ namespace TorannMagic
             if (might != null && might.MightData != null)
             {
                 h += 30f + 64f + 10f + 22f;
-                h += StatBlockHeight(mightStats);
+                h += StatBlockHeight(mightStats, width);
                 foreach (MightPower power in might.MightData.AllMightPowersWithSkills)
                 {
                     TMAbilityDef ability = power.abilityDef as TMAbilityDef;
@@ -832,42 +867,60 @@ namespace TorannMagic
             mightFilter = MagicAbilityFilter(null, GetMightClassGroup());
         }
 
-        private float StatBlockHeight(List<MagicPowerSkill> stats)
+        private float StatBlockHeight(List<MagicPowerSkill> stats, float width)
         {
-            return stats.Count == 0 ? 0f : 26f + stats.Count * 30f + 14f + 12f;
+            if (stats.Count == 0)
+            {
+                return 0f;
+            }
+            float rows = 0f;
+            foreach (MagicPowerSkill stat in stats)
+            {
+                rows += SkillRowHeight(SkillRowText(stat.label, stat.level, stat.levelMax, stat.desc), width - 14f - 50f) + 12f;
+            }
+            return 26f + rows + 14f + 12f;
         }
 
-        private float StatBlockHeight(List<MightPowerSkill> stats)
+        private float StatBlockHeight(List<MightPowerSkill> stats, float width)
         {
-            return stats.Count == 0 ? 0f : 26f + stats.Count * 30f + 14f + 12f;
+            if (stats.Count == 0)
+            {
+                return 0f;
+            }
+            float rows = 0f;
+            foreach (MightPowerSkill stat in stats)
+            {
+                rows += SkillRowHeight(SkillRowText(stat.label, stat.level, stat.levelMax, stat.desc), width - 14f - 50f) + 12f;
+            }
+            return 26f + rows + 14f + 12f;
         }
 
         private float MagicPowerCardHeight(float width, MagicPower power)
         {
             TMAbilityDef ability = (TMAbilityDef)power.abilityDef;
             float descHeight = PowerDescriptionHeight(power, width);
-            int skillCount = 0;
+            float skillRows = 0f;
             MagicPowerSkill s = magic.MagicData.GetSkill_Power(ability);
-            if (s != null) skillCount++;
+            if (s != null) skillRows += SkillRowHeight(SkillRowText(s.label, s.level, s.levelMax, s.desc), width - 16f - 50f) + 10f;
             s = magic.MagicData.GetSkill_Efficiency(ability);
-            if (s != null) skillCount++;
+            if (s != null) skillRows += SkillRowHeight(SkillRowText(s.label, s.level, s.levelMax, s.desc), width - 16f - 50f) + 10f;
             s = magic.MagicData.GetSkill_Versatility(ability);
-            if (s != null) skillCount++;
-            return Mathf.Max(IconSize, 32f + descHeight) + skillCount * 32f + 16f + 8f;
+            if (s != null) skillRows += SkillRowHeight(SkillRowText(s.label, s.level, s.levelMax, s.desc), width - 16f - 50f) + 10f;
+            return Mathf.Max(IconSize, 32f + descHeight) + skillRows + 16f + 8f;
         }
 
         private float MightPowerCardHeight(float width, MightPower power)
         {
             TMAbilityDef ability = (TMAbilityDef)power.abilityDef;
             float descHeight = PowerDescriptionHeight(power, width);
-            int skillCount = 0;
+            float skillRows = 0f;
             MightPowerSkill s = might.MightData.GetSkill_Power(ability);
-            if (s != null) skillCount++;
+            if (s != null) skillRows += SkillRowHeight(SkillRowText(s.label, s.level, s.levelMax, s.desc), width - 16f - 50f) + 10f;
             s = might.MightData.GetSkill_Efficiency(ability);
-            if (s != null) skillCount++;
+            if (s != null) skillRows += SkillRowHeight(SkillRowText(s.label, s.level, s.levelMax, s.desc), width - 16f - 50f) + 10f;
             s = might.MightData.GetSkill_Versatility(ability);
-            if (s != null) skillCount++;
-            return Mathf.Max(IconSize, 32f + descHeight) + skillCount * 32f + 16f + 8f;
+            if (s != null) skillRows += SkillRowHeight(SkillRowText(s.label, s.level, s.levelMax, s.desc), width - 16f - 50f) + 10f;
+            return Mathf.Max(IconSize, 32f + descHeight) + skillRows + 16f + 8f;
         }
 
         private float PowerDescriptionHeight(MagicPower power, float width)
