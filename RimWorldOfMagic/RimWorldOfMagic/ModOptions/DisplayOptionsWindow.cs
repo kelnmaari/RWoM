@@ -79,7 +79,7 @@ namespace TorannMagic.ModOptions
             num++;
             Rect rowRect3 = UIHelper.GetRowRect(rect1, rowHeight, num);
             Widgets.CheckboxLabeled(rowRect3, "AIFriendlyMarking".Translate(), ref Settings.Instance.AIFriendlyMarking, false);
-            TooltipHandler.TipRegion(rowRect21, "TM_AIFriendlyMarkingDesc".Translate());
+            TooltipHandler.TipRegion(rowRect3, "TM_AIFriendlyMarkingDesc".Translate());
             num++;
             Rect rowRect4 = UIHelper.GetRowRect(rect1, rowHeight, num);
             Widgets.CheckboxLabeled(rowRect4, "showClassIconOnColonistBar".Translate(), ref Settings.Instance.showClassIconOnColonistBar, false);

@@ -2173,4 +2173,7 @@ DR: [5, 9, 13, 17, 20]%</TM_Golemancy_pwr_desc>
   <TM_GrimoireTabModeDesc>Увімкнено — кнопка Гримуара на панелі здібностей. Вимкнено — Гримуар переноситься у вкладку панелі огляду, як старі вкладки Magic/Fighter.</TM_GrimoireTabModeDesc>
   <TM_GrimoireOpen>Відкрити Гримуар</TM_GrimoireOpen>
   <TM_GrimoireTabHint>Вікно Гримуара вже відкрите — закрийте його, щоб повернутися.</TM_GrimoireTabHint>
+  <TM_AIMarkingDesc>Позначати ворожих магів іконкою на карті.</TM_AIMarkingDesc>
+  <TM_AIFighterMarkingDesc>Позначати іконкою ворогів воїнських класів (might).</TM_AIFighterMarkingDesc>
+  <TM_AIFriendlyMarkingDesc>Позначати іконкою магів союзних фракцій.</TM_AIFriendlyMarkingDesc>
 </LanguageData>

@@ -703,4 +703,7 @@
   <TM_GrimoireTabModeDesc>开启 — 魔典按钮显示在能力栏上。关闭 — 魔典改为检查面板中的标签页（类似旧的 Magic/Fighter 标签）。</TM_GrimoireTabModeDesc>
   <TM_GrimoireOpen>打开魔典</TM_GrimoireOpen>
   <TM_GrimoireTabHint>魔典窗口已打开 — 请关闭它以返回。</TM_GrimoireTabHint>
+  <TM_AIMarkingDesc>在地图上用图标标记敌对施法者。</TM_AIMarkingDesc>
+  <TM_AIFighterMarkingDesc>用图标标记敌对战士职业单位。</TM_AIFighterMarkingDesc>
+  <TM_AIFriendlyMarkingDesc>用图标标记盟友阵营的法师。</TM_AIFriendlyMarkingDesc>
 </LanguageData>

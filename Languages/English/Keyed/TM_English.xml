@@ -2345,4 +2345,7 @@ Level 3: all 4 effects</TM_CombatDrugs_pwr_desc>
   <TM_GrimoireTabModeDesc>On — the Grimoire button sits on the ability bar. Off — the Grimoire moves to an inspect-pane tab, like the old Magic/Fighter tabs.</TM_GrimoireTabModeDesc>
   <TM_GrimoireOpen>Open Grimoire</TM_GrimoireOpen>
   <TM_GrimoireTabHint>The Grimoire window is already open — close it to return to the UI.</TM_GrimoireTabHint>
+  <TM_AIMarkingDesc>Draw an icon over hostile magic users on the map.</TM_AIMarkingDesc>
+  <TM_AIFighterMarkingDesc>Draw an icon over enemy might (fighter) class pawns.</TM_AIFighterMarkingDesc>
+  <TM_AIFriendlyMarkingDesc>Draw an icon over allied-faction magic users.</TM_AIFriendlyMarkingDesc>
 </LanguageData>
