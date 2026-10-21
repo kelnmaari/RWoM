@@ -794,13 +794,17 @@ namespace TorannMagic
                         if (this.Pawn.IsColonist)
                         {
                             this.autocastTick = Find.TickManager.TicksGame + (int)Rand.Range(.8f * ModOptions.Settings.Instance.autocastEvaluationFrequency, 1.2f * ModOptions.Settings.Instance.autocastEvaluationFrequency);
-                            ResolveAutoCast();
+                            AutoCast.AutoCastContext.SelectionRestoreAllowed = false;
+                            try { ResolveAutoCast(); }
+                            finally { AutoCast.AutoCastContext.SelectionRestoreAllowed = true; }
                         }
                         else if (ModOptions.Settings.Instance.AICasting && (!this.Pawn.IsPrisoner || this.Pawn.IsFighting()) && (this.Pawn.guest != null && !this.Pawn.IsSlave))
                         {
                             float tickMult = ModOptions.Settings.Instance.AIAggressiveCasting ? 1f : 2f;
                             this.autocastTick = Find.TickManager.TicksGame + (int)(Rand.Range(.75f * ModOptions.Settings.Instance.autocastEvaluationFrequency, 1.25f * ModOptions.Settings.Instance.autocastEvaluationFrequency) * tickMult);
-                            ResolveAIAutoCast();
+                            AutoCast.AutoCastContext.SelectionRestoreAllowed = false;
+                            try { ResolveAIAutoCast(); }
+                            finally { AutoCast.AutoCastContext.SelectionRestoreAllowed = true; }
                         }
                     }
                 }

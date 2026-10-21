@@ -15,6 +15,18 @@ using TorannMagic.Ideology;
 namespace TorannMagic.AutoCast
 {
 
+    public static class AutoCastContext
+    {
+        /// <summary>
+        /// Blink/Phase-style evaluators re-select the caster after the teleport so a
+        /// player's selection survives the despawn/respawn. During autocast
+        /// evaluation the re-select steals the player's selection, plays the select
+        /// sound and flips the inspect pane to the caster's card on every cast —
+        /// suppressed while an autocast resolution is running.
+        /// </summary>
+        public static bool SelectionRestoreAllowed = true;
+    }
+
     public static class Phase
     {
         public static void Evaluate(CompAbilityUserMight casterComp, TMAbilityDef abilitydef, PawnAbility ability, MightPower power, float minDistance, out bool success)
@@ -171,7 +183,7 @@ namespace TorannMagic.AutoCast
             
             casterComp.MightUserXP -= (int)((casterComp.ActualStaminaCost(abilitydef) * 180 * .9f * casterComp.xpGain * ModOptions.Settings.Instance.xpMultiplier));
             ability.PostAbilityAttempt();
-            if (selectCaster)
+            if (selectCaster && AutoCastContext.SelectionRestoreAllowed)
             {
                 Find.Selector.Select(caster, false, true);
             }
@@ -227,7 +239,7 @@ namespace TorannMagic.AutoCast
                 
                 casterComp.MightUserXP -= (int)((casterComp.ActualStaminaCost(abilitydef) * 180 * .9f * casterComp.xpGain * ModOptions.Settings.Instance.xpMultiplier));
                 ability.PostAbilityAttempt();
-                if (selectCaster)
+                if (selectCaster && AutoCastContext.SelectionRestoreAllowed)
                 {
                     Find.Selector.Select(caster, false, true);
                 }
@@ -1253,7 +1265,7 @@ namespace TorannMagic.AutoCast
                     casterComp.MagicUsed.Add(er);
                     ability.PostAbilityAttempt();
                 }
-                if(selectCaster)
+                if (selectCaster && AutoCastContext.SelectionRestoreAllowed)
                 {
                     Find.Selector.Select(caster, false, true);
                 }
@@ -1422,7 +1434,7 @@ namespace TorannMagic.AutoCast
                 caster.Position = targetCell;
                 caster.Notify_Teleported(true, true);
                 //GenClamor.DoClamor(caster, 2f, ClamorDefOf.Ability);
-                if (selectCaster)
+                if (selectCaster && AutoCastContext.SelectionRestoreAllowed)
                 {
                     Find.Selector.Select(caster, false, true);
                 }
@@ -1561,7 +1573,7 @@ namespace TorannMagic.AutoCast
                 caster.pather.nextCellCostTotal = 1f;
                 caster.pather.StartPath(pathEndTarget, pem);
 
-                if (selectCaster)
+                if (selectCaster && AutoCastContext.SelectionRestoreAllowed)
                 {
                     Find.Selector.Select(caster, false, true);
                 }
