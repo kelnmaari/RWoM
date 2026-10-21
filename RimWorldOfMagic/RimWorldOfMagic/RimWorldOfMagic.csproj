@@ -6,6 +6,7 @@
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
+    <DefineConstants>$(DefineConstants);RW17</DefineConstants>
     <LangVersion>latest</LangVersion>
     <RootNamespace>TorannMagic</RootNamespace>
     <AssemblyName>TorannMagic</AssemblyName>

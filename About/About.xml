@@ -124,12 +124,6 @@
 			<downloadUrl>https://github.com/pardeike/HarmonyRimWorld/releases/latest</downloadUrl>
 		  </li>
 		  <li>
-			<packageId>UnlimitedHugs.HugsLib</packageId>
-			<displayName>HugsLib</displayName>
-			<steamWorkshopUrl>https://steamcommunity.com/sharedfiles/filedetails/?id=818773962</steamWorkshopUrl>
-			<downloadUrl>https://ludeon.com/forums/index.php?topic=28066.0</downloadUrl>
-		  </li>
-		  <li>
 			<packageId>zal.jecsliterwom</packageId>
 			<displayName>JecsLite - A RimWorld of Magic</displayName>
 			<steamWorkshopUrl>https://steamcommunity.com/sharedfiles/filedetails/?id=3312959701</steamWorkshopUrl>

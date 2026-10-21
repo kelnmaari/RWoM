@@ -8483,6 +8483,7 @@ namespace TorannMagic
             }
         }
 
+#if RW17
         [HarmonyPatch(typeof(PawnAbility), "UseAbility")]
         public static class AbilityUseCombatLog_Patch
         {
@@ -8523,6 +8524,7 @@ namespace TorannMagic
             }
         }
 
+#endif
         [HarmonyPatch(typeof(Thing), "TakeDamage")]
         public static class SpellDamageCombatLog_Patch
         {
