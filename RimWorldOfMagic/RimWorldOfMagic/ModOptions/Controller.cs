@@ -44,6 +44,9 @@ namespace TorannMagic.ModOptions
 
             Rect rect1 = new Rect(canvas);
             rect1.width -= 16f;
+            // two rows of top margin: the settings viewport starts below the
+            // window header, and GetRowRect lays rows out in scroll-local coords
+            num++;
             num++;
             deathExplosionDmgMin = ModOptions.Settings.Instance.deathExplosionMin.ToString();
             deathExplosionDmgMax = ModOptions.Settings.Instance.deathExplosionMax.ToString();
