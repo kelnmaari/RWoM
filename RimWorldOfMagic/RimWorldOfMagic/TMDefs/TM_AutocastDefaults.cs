@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using AbilityUser;
@@ -46,7 +46,7 @@ namespace TorannMagic.TMDefs
         // Conjurations: summon the fight to help, then engage.
         private static readonly HashSet<string> SummonAlly = new HashSet<string>
         {
-            "TM_Summon", "TM_SummonDemon", "TM_SummonElemental", "TM_SummonExplosive", "TM_SummonMinion",
+            "TM_SummonDemon", "TM_SummonElemental", "TM_SummonExplosive", "TM_SummonMinion",
             "TM_SummonPoppi", "TM_SummonPylon", "TM_SpiritWolves", "TM_Golemancy", "TM_Sentinel",
             "TM_TechnoTurret", "TM_EarthSprites", "TM_LivingWall", "TM_GuardianSpirit"
         };
@@ -74,6 +74,13 @@ namespace TorannMagic.TMDefs
             "TM_RangerTraining", "TM_ShadowSlayer", "TM_ProvisionerAura", "TM_TaskMasterAura",
             "TM_Meditate", "TM_BriarPatch", "TM_FoldReality", "TM_AnimalFriend", "TM_BestowMight",
             "TM_Inspire", "TM_Dominate"
+        };
+
+        // Powers with no meaningful autocast target: Verb_Summon pulls a designated
+        // thing to the caster and rejects self-targets with a toast on every attempt.
+        private static readonly HashSet<string> NoAutocast = new HashSet<string>
+        {
+            "TM_Summon"
         };
 
         public static TM_Autocast For(TMAbilityDef def, bool mightUser)
@@ -113,6 +120,17 @@ namespace TorannMagic.TMDefs
                 includeSelf = false
             };
 
+            if (NoAutocast.Contains(baseName))
+            {
+                // type Null: the autocast toggle is not offered and every
+                // autocast loop skips the power
+                return new TM_Autocast
+                {
+                    type = AutocastType.Null,
+                    mightUser = mightUser,
+                    magicUser = !mightUser
+                };
+            }
             if (HealAllies.Contains(baseName))
             {
                 ac.type = AutocastType.OnNearby;
