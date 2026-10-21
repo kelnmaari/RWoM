@@ -4401,43 +4401,62 @@ namespace TorannMagic
             {
                 if (autocasting.GetTargetType == typeof(Pawn))
                 {
-                    IEnumerable<Pawn> nearbyThings = from x in caster.Map.mapPawns.AllPawnsSpawned
-                                                     where (x.GetType() == typeof(Pawn) &&
-                                                     (x.Position - caster.Position).LengthHorizontal >= autocasting.minRange &&
-                                                     autocasting.maxRange > 0 ? (x.Position - caster.Position).LengthHorizontal <= autocasting.maxRange : true &&
-                                                     autocasting.includeSelf ? true : x != caster)                                                     
-                                                     select x;
-                    List<Pawn> potentialPawns = new List<Pawn>();
-                    potentialPawns.Clear();
-                    foreach(Pawn p in nearbyThings)
+                    // single bounded pass, reservoir-sampled pick, no list allocations:
+                    // this runs per OnNearby power on every autocast evaluation
+                    IReadOnlyList<Pawn> spawned = caster.Map.mapPawns.AllPawnsSpawned;
+                    Pawn found = null;
+                    int candidates = 0;
+                    for (int i = 0; i < spawned.Count; i++)
                     {
-                        if(p.Faction == null)
+                        Pawn p = spawned[i];
+                        if (p == caster && !autocasting.includeSelf)
                         {
-                            if(autocasting.targetNeutral)
+                            continue;
+                        }
+                        float dist = (p.Position - caster.Position).LengthHorizontal;
+                        if (dist < autocasting.minRange)
+                        {
+                            continue;
+                        }
+                        if (autocasting.maxRange > 0 && dist > autocasting.maxRange)
+                        {
+                            continue;
+                        }
+                        if (p.Faction == null)
+                        {
+                            if (!autocasting.targetNeutral)
                             {
-                                potentialPawns.Add(p);
+                                continue;
                             }
                         }
-                        else
+                        else if (p.Faction != caster.Faction && !p.IsPrisoner)
                         {
-                            if (p.Faction != caster.Faction && !p.IsPrisoner)
+                            if (p.Faction.HostileTo(caster.Faction))
                             {
-                                if (autocasting.targetNeutral && !p.Faction.HostileTo(caster.Faction))
+                                if (!autocasting.targetEnemy)
                                 {
-                                    potentialPawns.Add(p);
-                                }
-                                else if (autocasting.targetEnemy && p.Faction.HostileTo(caster.Faction))
-                                {
-                                    potentialPawns.Add(p);
+                                    continue;
                                 }
                             }
-                            else if(autocasting.targetFriendly)
+                            else if (!autocasting.targetNeutral)
                             {
-                                potentialPawns.Add(p);
+                                continue;
                             }
+                        }
+                        else if (!autocasting.targetFriendly)
+                        {
+                            continue;
+                        }
+                        candidates++;
+                        if (Rand.Value <= 1f / candidates)
+                        {
+                            found = p;
                         }
                     }
-                    target = potentialPawns.Count > 0 ? potentialPawns.RandomElement() : null;
+                    if (found != null)
+                    {
+                        target = found;
+                    }
                 }
                 else if (autocasting.GetTargetType == typeof(Building))
                 {

@@ -66,7 +66,7 @@ namespace TorannMagic
             }
             Text.Font = GameFont.Small;
 
-            Rect view = new Rect(0f, 0f, viewWidth, Mathf.Max(headerH + MeasureViewHeight(viewWidth), inRect.height));
+            Rect view = new Rect(0f, 0f, viewWidth, Mathf.Max(headerH + MeasureViewHeightCached(viewWidth), inRect.height));
             Widgets.BeginScrollView(inRect, ref scrollPos, view);
 
             float y = 0f;
@@ -771,6 +771,41 @@ namespace TorannMagic
         {
             Text.Font = GameFont.Tiny;
             return Mathf.Max(20f, Text.CalcHeight(text, width) + 4f);
+        }
+
+        // DoWindowContents runs every GUI frame; the measurement walks every power
+        // description and skill row with Text.CalcHeight. Cache by width + the
+        // levels that can change the wrapped text (desc gains the next-level block).
+        private long viewHeightKey = long.MinValue;
+        private float viewHeightCache;
+
+        private float MeasureViewHeightCached(float width)
+        {
+            long key = (long)(width * 4f);
+            unchecked
+            {
+                if (magic != null && magic.MagicData != null)
+                {
+                    foreach (MagicPower p in magic.MagicData.AllMagicPowersWithSkills)
+                    {
+                        key = key * 31 + p.level;
+                    }
+                }
+                if (might != null && might.MightData != null)
+                {
+                    foreach (MightPower p in might.MightData.AllMightPowersWithSkills)
+                    {
+                        key = key * 31 + p.level;
+                    }
+                }
+            }
+            if (key == viewHeightKey)
+            {
+                return viewHeightCache;
+            }
+            viewHeightKey = key;
+            viewHeightCache = MeasureViewHeight(width);
+            return viewHeightCache;
         }
 
         private float MeasureViewHeight(float width)

@@ -6034,6 +6034,39 @@ namespace TorannMagic
             }
         }
 
+        // TryFindShootLineFromTo runs per targeting frame and per AI target scan —
+        // the ignore list is checked through a set instead of 27 string compares
+        private static readonly HashSet<string> LosIgnoreVerbClasses = new HashSet<string>
+        {
+            "TorannMagic.Verb_Blink",
+            "TorannMagic.Verb_Summon",
+            "TorannMagic.Verb_PhaseStrike",
+            "TorannMagic.Verb_BLOS",
+            "TorannMagic.Verb_LightSkip",
+            "TorannMagic.Verb_SootheAnimal",
+            "TorannMagic.Effect_EyeOfTheStorm",
+            "TorannMagic.Effect_Flight",
+            "TorannMagic.Verb_Regenerate",
+            "TorannMagic.Verb_SpellMending",
+            "TorannMagic.Verb_CauterizeWound",
+            "TorannMagic.Verb_Transpose",
+            "TorannMagic.Verb_Disguise",
+            "TorannMagic.Verb_SoulBond",
+            "TorannMagic.Verb_SummonDemon",
+            "TorannMagic.Verb_EarthSprites",
+            "TorannMagic.Verb_Overdrive",
+            "TorannMagic.Verb_BlankMind",
+            "TorannMagic.Verb_MechaniteReprogramming",
+            "TorannMagic.Verb_ShadowWalk",
+            "TorannMagic.Verb_SoL_CreateLight",
+            "TorannMagic.Verb_Enrage",
+            "TorannMagic.Verb_Hex",
+            "TorannMagic.Verb_Discord",
+            "TorannMagic.Verb_AdvancedHeal",
+            "TorannMagic.Verb_ControlSpiritStorm",
+            "TorannMagic.Verb_Scorn",
+        };
+
         [HarmonyPatch(typeof(Verb), "TryFindShootLineFromTo", null)]
         public static class TryFindShootLineFromTo_Base_Patch
         {
@@ -6066,33 +6099,7 @@ namespace TorannMagic
                     return false;
                 }
 
-                if (verbClass == "TorannMagic.Verb_Blink" ||
-                    verbClass == "TorannMagic.Verb_Summon" ||
-                    verbClass == "TorannMagic.Verb_PhaseStrike" ||
-                    verbClass == "TorannMagic.Verb_BLOS" ||
-                    verbClass == "TorannMagic.Verb_LightSkip" ||
-                    verbClass == "TorannMagic.Verb_SootheAnimal" ||
-                    verbClass == "TorannMagic.Effect_EyeOfTheStorm" ||
-                    verbClass == "TorannMagic.Effect_Flight" ||
-                    verbClass == "TorannMagic.Verb_Regenerate" ||
-                    verbClass == "TorannMagic.Verb_SpellMending" ||
-                    verbClass == "TorannMagic.Verb_CauterizeWound" ||
-                    verbClass == "TorannMagic.Verb_Transpose" ||
-                    verbClass == "TorannMagic.Verb_Disguise" ||
-                    verbClass == "TorannMagic.Verb_SoulBond" ||
-                    verbClass == "TorannMagic.Verb_SummonDemon" ||
-                    verbClass == "TorannMagic.Verb_EarthSprites" ||
-                    verbClass == "TorannMagic.Verb_Overdrive" ||
-                    verbClass == "TorannMagic.Verb_BlankMind" ||
-                    verbClass == "TorannMagic.Verb_MechaniteReprogramming" ||
-                    verbClass == "TorannMagic.Verb_ShadowWalk" ||
-                    verbClass == "TorannMagic.Verb_SoL_CreateLight" ||
-                    verbClass == "TorannMagic.Verb_Enrage" ||
-                    verbClass == "TorannMagic.Verb_Hex" ||
-                    verbClass == "TorannMagic.Verb_Discord" ||
-                    verbClass == "TorannMagic.Verb_AdvancedHeal" ||
-                    verbClass == "TorannMagic.Verb_ControlSpiritStorm" ||
-                    verbClass == "TorannMagic.Verb_Scorn" ||
+                if (LosIgnoreVerbClasses.Contains(verbClass) ||
                     !__instance.verbProps.requireLineOfSight)
                 {
                     //Ignores line of sight
