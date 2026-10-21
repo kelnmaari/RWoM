@@ -892,6 +892,7 @@ namespace TorannMagic
                                     mComp = new CompAbilityUserMagic();
                                     mComp.parent = ___pawn;
                                     ___pawn.AllComps.Add(mComp);
+                                    TM_Calc.InvalidateCompCache(___pawn);
                                 }
                             }
                         }
@@ -921,6 +922,7 @@ namespace TorannMagic
                                     pComp = new CompAbilityUserMight();
                                     pComp.parent = ___pawn;
                                     ___pawn.AllComps.Add(pComp);
+                                    TM_Calc.InvalidateCompCache(___pawn);
                                 }
                             }
                         }

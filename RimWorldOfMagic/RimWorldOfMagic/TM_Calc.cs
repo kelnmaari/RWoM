@@ -25,6 +25,21 @@ namespace TorannMagic
         // The comps list of a ThingWithComps is fixed at spawn, so the lookup result is cached per
         // thing in a ConditionalWeakTable: entries die with the thing, nothing is saved, MP-safe.
         private static readonly object NoComp = new object();
+
+        /// <summary>
+        /// RWoM adds the ability comps to pawns at runtime (spawn patch, Give
+        /// Class). A earlier lookup would have cached the NoComp sentinel for
+        /// such a pawn — call this whenever a comp is added to clear it.
+        /// </summary>
+        public static void InvalidateCompCache(ThingWithComps thing)
+        {
+            if (thing == null)
+            {
+                return;
+            }
+            magicCompCache.Remove(thing);
+            mightCompCache.Remove(thing);
+        }
         private static readonly System.Runtime.CompilerServices.ConditionalWeakTable<ThingWithComps, object> magicCompCache =
             new System.Runtime.CompilerServices.ConditionalWeakTable<ThingWithComps, object>();
 

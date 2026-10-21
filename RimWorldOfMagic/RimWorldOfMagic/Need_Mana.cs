@@ -57,10 +57,29 @@ namespace TorannMagic
         public override float CurLevel
         {            
             get => curLevelInt;
-            set => curLevelInt = Mathf.Clamp(value, 0f, 2f*this.pawn.GetCompAbilityUserMagic().maxMP);            
+            set
+            {
+                // the comp is added to pawns at runtime — early need construction
+                // can outrun it, and a null here would throw from the clamp
+                CompAbilityUserMagic comp = this.pawn?.GetCompAbilityUserMagic();
+                float max = comp != null ? 2f * comp.maxMP : 2f;
+                curLevelInt = Mathf.Clamp(value, 0f, max);
+            }
         }
 
-        public override float MaxLevel { get { float maxMP = this.pawn.GetCompAbilityUserMagic().maxMP; if (this.pawn.ageTracker.AgeBiologicalYears < 13) { maxMP -= (12f - this.pawn.ageTracker.AgeBiologicalYearsFloat) / 12f; } return maxMP * TMPIsekai.ManaPoolMultiplier(this.pawn); } }
+        public override float MaxLevel
+        {
+            get
+            {
+                CompAbilityUserMagic comp = this.pawn?.GetCompAbilityUserMagic();
+                float maxMP = comp != null ? comp.maxMP : 1f;
+                if (this.pawn.ageTracker.AgeBiologicalYears < 13)
+                {
+                    maxMP -= (12f - this.pawn.ageTracker.AgeBiologicalYearsFloat) / 12f;
+                }
+                return maxMP * TMPIsekai.ManaPoolMultiplier(this.pawn);
+            }
+        }
 
         public override void ExposeData()
         {
@@ -193,19 +212,26 @@ namespace TorannMagic
 
         public override void SetInitialLevel()
         {
-            bool faceless = false;
             try
             {
-                faceless = this.pawn?.story?.traits != null && this.pawn.story.traits.HasTrait(TorannMagicDefOf.Faceless);
+                bool faceless = false;
+                try
+                {
+                    faceless = this.pawn?.story?.traits != null && this.pawn.story.traits.HasTrait(TorannMagicDefOf.Faceless);
+                }
+                catch (Exception)
+                {
+                }
+                if (faceless)
+                {
+                    this.def.showOnNeedList = false;
+                }
+                this.CurLevel = 0.8f;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Log.Warning("[TM] mana need init failed for " + (this.pawn?.LabelShortCap ?? "?") + ": " + ex.Message);
             }
-            if (faceless)
-            {
-                this.def.showOnNeedList = false;
-            }
-            this.CurLevel = 0.8f;
         }
 
         public void GainNeed(float amount)

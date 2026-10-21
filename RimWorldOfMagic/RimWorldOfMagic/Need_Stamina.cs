@@ -1,4 +1,4 @@
-﻿using RimWorld;
+using RimWorld;
 using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
@@ -78,10 +78,28 @@ namespace TorannMagic
         public override float CurLevel
         {
             get => base.CurLevel;
-            set => base.CurLevel = Mathf.Clamp(value, 0f, this.pawn.GetCompAbilityUserMight().maxSP);
+            set
+            {
+                // the might comp is added to pawns at runtime — see Need_Mana
+                CompAbilityUserMight comp = this.pawn?.GetCompAbilityUserMight();
+                float max = comp != null ? comp.maxSP : 1f;
+                base.CurLevel = Mathf.Clamp(value, 0f, max);
+            }
         }
 
-        public override float MaxLevel => this.pawn.ageTracker.AgeBiologicalYears < 13 ? this.pawn.GetCompAbilityUserMight().maxSP - ((12f - this.pawn.ageTracker.AgeBiologicalYearsFloat)/10f) : this.pawn.GetCompAbilityUserMight().maxSP;
+        public override float MaxLevel
+        {
+            get
+            {
+                CompAbilityUserMight comp = this.pawn?.GetCompAbilityUserMight();
+                float maxSP = comp != null ? comp.maxSP : 1f;
+                if (this.pawn.ageTracker.AgeBiologicalYears < 13)
+                {
+                    maxSP -= (12f - this.pawn.ageTracker.AgeBiologicalYearsFloat) / 10f;
+                }
+                return maxSP;
+            }
+        }
 
         public override int GUIChangeArrow
         {

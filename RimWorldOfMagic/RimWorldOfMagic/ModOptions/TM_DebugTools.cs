@@ -487,6 +487,7 @@ namespace TorannMagic.ModOptions
                     compMagic = new CompAbilityUserMagic();
                     compMagic.parent = pawn;
                     pawn.AllComps.Add(compMagic);
+                    TM_Calc.InvalidateCompCache(pawn);
                 }
 
                 if (addMightComp)
@@ -494,6 +495,7 @@ namespace TorannMagic.ModOptions
                     compMight = new CompAbilityUserMight();
                     compMight.parent = pawn;
                     pawn.AllComps.Add(compMight);
+                    TM_Calc.InvalidateCompCache(pawn);
                 }
                 //if (addMagicComp || addMightComp)
                 //{
