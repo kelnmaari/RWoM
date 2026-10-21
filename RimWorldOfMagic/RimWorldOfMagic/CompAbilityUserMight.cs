@@ -686,7 +686,6 @@ namespace TorannMagic
                     }
                 }
                 MightData.MightUserLevel = value;
-                TMPIsekai.OnClassLevelUp(this.Pawn, value, magic: false);
             }
         }
 

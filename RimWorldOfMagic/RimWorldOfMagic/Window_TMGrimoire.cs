@@ -91,11 +91,6 @@ namespace TorannMagic
             Text.Font = GameFont.Small;
             y += 4f;
 
-            if (TMPIsekai.Active)
-            {
-                y = DrawIsekaiBlock(view, y);
-            }
-
             y = DrawResourcesBlock(view, y);
 
             if (magic != null && magic.MagicData != null)
@@ -744,21 +739,6 @@ namespace TorannMagic
             return list;
         }
 
-        private float DrawIsekaiBlock(Rect view, float y)
-        {
-            int isoLevel = TMPIsekai.GetIsekaiLevel(pawn);
-            string rank = IsekaiRank(isoLevel);
-            Rect panel = new Rect(0f, y, view.width, 52f);
-            TorannMagic.Utils.TMIsekaiUI.Panel(panel);
-            Text.Font = GameFont.Small;
-            Label(new Rect(panel.x + 12f, panel.y + 6f, panel.width - 24f, 20f),
-                "Awakened  Lv " + isoLevel + (rank.NullOrEmpty() ? "" : "   [" + rank + "]"),
-                TextAnchor.MiddleLeft, Purple);
-            Text.Font = GameFont.Tiny;
-            Label(new Rect(panel.x + 12f, panel.y + 28f, panel.width - 24f, 14f),
-                "TM_GrimoireIsekaiHint".Translate(), TextAnchor.MiddleLeft, TextGray);
-            return y + panel.height + 12f;
-        }
 
         // Height helpers mirror the drawing code exactly; the scroll view needs the
         // total up front or the bottom of the list is unreachable.
@@ -811,10 +791,6 @@ namespace TorannMagic
         private float MeasureViewHeight(float width)
         {
             float h = 90f;
-            if (TMPIsekai.Active)
-            {
-                h += 64f;
-            }
             h += ResourcesPanelHeight();
             if (magic != null && magic.MagicData != null)
             {

@@ -77,7 +77,7 @@ namespace TorannMagic
                 {
                     maxMP -= (12f - this.pawn.ageTracker.AgeBiologicalYearsFloat) / 12f;
                 }
-                return maxMP * TMPIsekai.ManaPoolMultiplier(this.pawn);
+                return maxMP;
             }
         }
 

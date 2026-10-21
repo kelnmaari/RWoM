@@ -1058,10 +1058,6 @@ namespace TorannMagic
                     }
                 }
                 this.MagicData.MagicUserLevel = value;
-                if (flag)
-                {
-                    TMPIsekai.OnClassLevelUp(this.Pawn, value, magic: true);
-                }
             }
         }
 
