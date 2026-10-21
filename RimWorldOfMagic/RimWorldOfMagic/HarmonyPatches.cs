@@ -8553,6 +8553,21 @@ namespace TorannMagic
         }
 
 #endif
+        [HarmonyPatch(typeof(Pawn_DrawTracker), "Notify_DebugAffected")]
+        public static class PawnDrawTracker_NotifyDebugAffected_Patch
+        {
+            // 1.7 vanilla: DrawPosHeld is null for despawned/dead pawns and
+            // Notify_DebugAffected does DrawPosHeld.Value unconditionally. JecsLite
+            // spell impacts call it on pawns that died or despawned mid-flight, the
+            // throw aborts the impact before the projectile is destroyed, and the
+            // projectile then re-impacts (and re-throws) every tick. The method is
+            // purely cosmetic (debug air puffs) — skip it for absent pawns.
+            public static bool Prefix(Pawn ___pawn)
+            {
+                return ___pawn != null && ___pawn.Spawned && !___pawn.Dead;
+            }
+        }
+
         [HarmonyPatch(typeof(Thing), "TakeDamage")]
         public static class SpellDamageCombatLog_Patch
         {

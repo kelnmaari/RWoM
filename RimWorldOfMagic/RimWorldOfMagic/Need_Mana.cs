@@ -230,7 +230,7 @@ namespace TorannMagic
             }
             catch (Exception ex)
             {
-                Log.Warning("[TM] mana need init failed for " + (this.pawn?.LabelShortCap ?? "?") + ": " + ex.Message);
+                Log.Warning("[TM] mana need init failed for " + (this.pawn?.LabelShortCap ?? "?") + ": " + ex);
             }
         }
 
