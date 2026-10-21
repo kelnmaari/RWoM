@@ -2365,7 +2365,11 @@ namespace TorannMagic
                                 current.learned = false;
                             }
                         }
-                        this.MagicData.MagicPowersCM.FirstOrDefault<MagicPower>((MagicPower x) => x.abilityDef == TorannMagicDefOf.TM_ChaosTradition).learned = true;
+                        MagicPower cmPower = this.MagicData.MagicPowersCM.FirstOrDefault<MagicPower>((MagicPower x) => x.abilityDef == TorannMagicDefOf.TM_ChaosTradition);
+                        if (cmPower != null)
+                        {
+                            cmPower.learned = true;
+                        }
                         this.AddPawnAbility(TorannMagicDefOf.TM_ChaosTradition);
                         TM_Calc.AssignChaosMagicPowers(this, !abilityUser.IsColonist);
                     }
@@ -7965,7 +7969,7 @@ namespace TorannMagic
                     {
                         //Log.Message("Loading Chaos Mage Abilities");
                         MagicPower mpCM = this.MagicData.MagicPowersCM.FirstOrDefault<MagicPower>((MagicPower x) => x.abilityDef == TorannMagicDefOf.TM_ChaosTradition);
-                        if (mpCM.learned == true)
+                        if (mpCM != null && mpCM.learned == true)
                         {
                             this.AddPawnAbility(TorannMagicDefOf.TM_ChaosTradition);
                             this.chaosPowers = new List<TM_ChaosPowers>();

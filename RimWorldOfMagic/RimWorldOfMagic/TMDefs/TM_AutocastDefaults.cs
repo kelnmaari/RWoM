@@ -55,8 +55,13 @@ namespace TorannMagic.TMDefs
         private static readonly HashSet<string> DamageAoE = new HashSet<string>
         {
             "TM_LightningStorm", "TM_Sunfire", "TM_LightBurst", "TM_SmokeCloud", "TM_SpiritStorm",
-            "TM_PsionicStorm", "TM_PsionicBlast", "TM_ArrowStorm", "TM_WaveOfFear", "TM_ConsumeCorpse",
-            "TM_CorpseExplosion"
+            "TM_PsionicStorm", "TM_PsionicBlast", "TM_ArrowStorm", "TM_WaveOfFear"
+        };
+
+        // Corpse-targeting powers: cast at nearby corpses regardless of faction.
+        private static readonly HashSet<string> CorpseTarget = new HashSet<string>
+        {
+            "TM_ConsumeCorpse", "TM_CorpseExplosion"
         };
 
         // Map travel, weather, transforms, base powers: player toggles only, never AI.
@@ -160,6 +165,21 @@ namespace TorannMagic.TMDefs
                 ac.drafted = true;
                 ac.undrafted = false;
                 ac.AIUsable = true;
+            }
+            else if (CorpseTarget.Contains(baseName))
+            {
+                ac.type = AutocastType.OnNearby;
+                ac.targetType = "Corpse";
+                ac.drafted = true;
+                ac.undrafted = false;
+                ac.requiresLoS = false;
+                ac.AIUsable = true;
+                ac.targetNeutral = true;
+                ac.targetEnemy = true;
+                ac.targetFriendly = true;
+                ac.targetNoFaction = true;
+                ac.minRange = 0f;
+                ac.maxRange = 30f;
             }
             else if (DamageAoE.Contains(baseName))
             {

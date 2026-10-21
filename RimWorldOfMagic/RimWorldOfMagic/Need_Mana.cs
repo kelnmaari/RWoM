@@ -1,3 +1,4 @@
+using System;
 using RimWorld;
 using System.Linq;
 using System.Collections.Generic;
@@ -192,14 +193,15 @@ namespace TorannMagic
 
         public override void SetInitialLevel()
         {
-            if (this.pawn?.story == null)
+            bool faceless = false;
+            try
             {
-                // generated NPC without a backstory got flagged for the mana need
-                this.def.showOnNeedList = false;
-                this.CurLevel = 0.8f;
-                return;
+                faceless = this.pawn?.story?.traits != null && this.pawn.story.traits.HasTrait(TorannMagicDefOf.Faceless);
             }
-            if(this.pawn.story.traits.HasTrait(TorannMagicDefOf.Faceless))
+            catch (Exception)
+            {
+            }
+            if (faceless)
             {
                 this.def.showOnNeedList = false;
             }

@@ -4385,6 +4385,55 @@ namespace TorannMagic
             return id;
         }
 
+        /// <summary>
+        /// Mirror of the cure checks in Verb_CureDisease / Verb_MechaniteReprogramming:
+        /// the target must actually carry a sickness these spells can remove,
+        /// otherwise the cast is rejected with a toast.
+        /// </summary>
+        public static bool HasCurableSickness(Pawn p)
+        {
+            List<Hediff> hediffs = p?.health?.hediffSet?.hediffs;
+            if (hediffs == null)
+            {
+                return false;
+            }
+            for (int i = 0; i < hediffs.Count; i++)
+            {
+                HediffDef d = hediffs[i].def;
+                if (d == null)
+                {
+                    continue;
+                }
+                if (d.defName == "WoundInfection" || d.defName.Contains("Flu") || d.defName.Contains("Infection") ||
+                    d.defName == "GutWorms" || d.defName == "Malaria" || d.defName == "FoodPoisoning" ||
+                    d.defName == "SleepingSickness" || d.defName == "MuscleParasites" || d.defName == "Scaria" ||
+                    d.defName == "BloodRot" || (d.makesSickThought && d.isBad))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Per-ability target validation for autocast: skips casts the ability
+        /// verbs would only reject with a toast (cure on non-diseases, mechanite
+        /// reprogramming on healthy pawns).
+        /// </summary>
+        public static bool AutocastTargetAcceptable(TMAbilityDef ability, Pawn target)
+        {
+            if (target == null || target.Dead || target.health?.hediffSet == null)
+            {
+                return false;
+            }
+            string baseName = BaseAbilityDefName(ability.defName);
+            if (baseName == "TM_CureDisease" || baseName == "TM_MechaniteReprogramming")
+            {
+                return HasCurableSickness(target);
+            }
+            return true;
+        }
+
         public static LocalTargetInfo GetAutocastTarget(Pawn caster, TM_Autocast autocasting, LocalTargetInfo potentialTarget)
         {
             LocalTargetInfo target = new LocalTargetInfo();
