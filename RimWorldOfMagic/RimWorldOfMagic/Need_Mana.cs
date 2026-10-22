@@ -210,28 +210,14 @@ namespace TorannMagic
             }
         }
 
+        // Need's constructor calls SetInitialLevel before the tracker assigns def.
+        // Visibility belongs to this pawn, never to the shared NeedDef.
+        public override bool ShowOnNeedList => base.ShowOnNeedList &&
+            !(this.pawn.story?.traits?.HasTrait(TorannMagicDefOf.Faceless) ?? false);
+
         public override void SetInitialLevel()
         {
-            try
-            {
-                bool faceless = false;
-                try
-                {
-                    faceless = this.pawn?.story?.traits != null && this.pawn.story.traits.HasTrait(TorannMagicDefOf.Faceless);
-                }
-                catch (Exception)
-                {
-                }
-                if (faceless)
-                {
-                    this.def.showOnNeedList = false;
-                }
-                this.CurLevel = 0.8f;
-            }
-            catch (Exception ex)
-            {
-                Log.Warning("[TM] mana need init failed for " + (this.pawn?.LabelShortCap ?? "?") + ": " + ex);
-            }
+            this.CurLevel = 0.8f;
         }
 
         public void GainNeed(float amount)

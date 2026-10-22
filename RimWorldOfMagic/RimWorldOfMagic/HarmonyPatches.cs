@@ -505,6 +505,9 @@ namespace TorannMagic
         [HarmonyPriority(2000)] //Go first to override other guest checking; do not let undead become guests or dynamically change hediff components
         private static bool SetGuestStatusForUndead_Prefix(Faction newHost, Pawn ___pawn, GuestStatus guestStatus = GuestStatus.Guest)
         {
+            // SetFaction clears guest/slave state through this call. Skipping the
+            // original leaves stale state and still runs other mods' postfixes.
+            if (newHost == null && guestStatus == GuestStatus.Guest) return true;
             if(TM_Calc.IsUndeadNotVamp(___pawn))
             {
                 return false;
@@ -4420,41 +4423,38 @@ namespace TorannMagic
             }            
         }
 
-        [HarmonyPatch(typeof(Pawn), "Kill", null)]
         /// <summary>
-        /// Death/dismissal releases pawns from their faction, which fires
-        /// Pawn_GuestTracker.SetGuestStatus — third-party postfixes there
-        /// (Better Pawn Control) can throw on their own stale data, and an
-        /// unguarded throw aborts Pawn.Kill mid-way, soft-locking the
-        /// dismissing pawn and spamming errors every tick.
+        /// Keep faction cleanup failures from aborting death/dismissal. SetFaction
+        /// is a multi-stage engine operation: do not bypass it or blindly retry
+        /// after a partially completed change, and retain the actual error origin.
         /// </summary>
         private static void TryReleaseFaction(Pawn pawn)
         {
+            if (pawn == null || pawn.Faction == null) return;
             try
             {
                 pawn.SetFaction(null, null);
             }
             catch (Exception ex)
             {
-                Log.Warning("[TM] Faction release on death/dismissal failed (a guest-tracker mod postfix threw): " + ex.Message);
+                Log.Warning("[TM] Faction release on death/dismissal failed for " + pawn.ThingID
+                    + " (faction cleared: " + (pawn.Faction == null) + "). Death will continue.\n" + ex);
             }
         }
 
+        [HarmonyPatch(typeof(Pawn), "Kill", null)]
         public static class Undead_Kill_Prefix
         {
             public static bool Prefix(ref Pawn __instance, DamageInfo? dinfo)
             {
                 if (__instance != null)
                 {
-                    if ( __instance.health != null && __instance.Faction != null && (__instance.health.hediffSet.HasHediff(TorannMagicDefOf.TM_UndeadHD) || __instance.health.hediffSet.HasHediff(TorannMagicDefOf.TM_UndeadAnimalHD)))
-                    {
-                        TryReleaseFaction(__instance);
-                    }
-                    if (__instance.RaceProps != null && __instance.Faction != null && __instance.RaceProps.DeathActionWorker.GetType() == typeof(DeathWorker_Poppi))
-                    {
-                        TryReleaseFaction(__instance);
-                    }
-                    if(__instance.def.thingClass == typeof(TMPawnSummoned) && __instance.Faction != null)
+                    bool releasesFaction = (__instance.health?.hediffSet != null
+                        && (__instance.health.hediffSet.HasHediff(TorannMagicDefOf.TM_UndeadHD)
+                            || __instance.health.hediffSet.HasHediff(TorannMagicDefOf.TM_UndeadAnimalHD)))
+                        || __instance.RaceProps?.DeathActionWorker is DeathWorker_Poppi
+                        || __instance.def.thingClass == typeof(TMPawnSummoned);
+                    if (releasesFaction && !__instance.Dead)
                     {
                         TryReleaseFaction(__instance);
                     }
@@ -5072,7 +5072,13 @@ namespace TorannMagic
                                     }
                                     float actualDmg;
                                     float dmgAmt = dinfo.Amount;
-                                    comp.Stamina.GainNeed((.01f * dmgAmt) + (.005f * (float)ver.level));
+                                    // Undead retain Fortitude, but the need policy forbids their stamina pool.
+                                    // Mitigation still applies; only restore stamina when that pool exists.
+                                    Need_Stamina stamina = comp.Stamina;
+                                    if (stamina != null)
+                                    {
+                                        stamina.GainNeed((.01f * dmgAmt) + (.005f * (float)ver.level));
+                                    }
                                     if (dmgAmt < mitigationAmt)
                                     {
                                         dinfo.SetAmount(0);
@@ -8512,43 +8518,79 @@ namespace TorannMagic
         }
 
 #if RW17
-        [HarmonyPatch(typeof(PawnAbility), "UseAbility")]
-        public static class AbilityUseCombatLog_Patch
+        // Capture before effects can kill/despawn either participant. State is deliberately
+        // transient: a burst resumed from a save without WarmupComplete is not logged.
+        internal static class AbilityCombatLogActivation
         {
-            // Instant (non-projectile) abilities apply their effects directly and
-            // never reach the projectile log path. Every cast funnels through
-            // PawnAbility.UseAbility, so log pawn-targeted casts there; friendly
-            // support casts are skipped or autocast healers would flood the feed.
-            public static void Postfix(PawnAbility __instance, LocalTargetInfo target)
+            private sealed class Activation
+            {
+                internal Pawn Caster;
+                internal Pawn Target;
+                internal TMAbilityDef Ability;
+                internal bool Emitted;
+            }
+            private static readonly System.Runtime.CompilerServices.ConditionalWeakTable<Verb, Activation> activations =
+                new System.Runtime.CompilerServices.ConditionalWeakTable<Verb, Activation>();
+
+            internal static void Capture(Verb verb, Pawn caster, Pawn target, TMAbilityDef ability)
+            {
+                activations.Remove(verb);
+                if (caster == null || target == null || caster == target || ability == null) return;
+                bool offensive = (ability.MainVerb as VerbProperties_Ability)?.isViolent ?? true;
+                if (!offensive && target.Faction != null && target.Faction == caster.Faction) return;
+                activations.Add(verb, new Activation { Caster = caster, Target = target, Ability = ability });
+            }
+
+            internal static BattleLogEntry_TMAbilityUsed Consume(Verb verb, Pawn caster)
+            {
+                Activation activation;
+                if (verb == null || !activations.TryGetValue(verb, out activation) || activation.Emitted || activation.Caster != caster) return null;
+                activation.Emitted = true;
+                return new BattleLogEntry_TMAbilityUsed(activation.Caster, activation.Target, activation.Ability, RulePackDefOf.Event_AbilityUsed);
+            }
+
+            internal static void Capture(Verb_UseAbility verb)
+            {
+                activations.Remove(verb);
+                Capture(verb, verb.CasterPawn, verb.CurrentTarget.Thing as Pawn, verb.Ability?.Def as TMAbilityDef);
+            }
+        }
+
+        [HarmonyPatch(typeof(Verb_UseAbility), "WarmupComplete")]
+        public static class AbilityActivationCombatLog_Patch
+        {
+            public static void Prefix(Verb_UseAbility __instance)
+            {
+                try { AbilityCombatLogActivation.Capture(__instance); }
+                catch (Exception) { }
+            }
+        }
+
+        // This override starts its own burst and does not call the JecsLite base.
+        [HarmonyPatch(typeof(Verb_ShootTLine), "WarmupComplete")]
+        public static class TLineActivationCombatLog_Patch
+        {
+            public static void Prefix(Verb_ShootTLine __instance)
+            {
+                try { AbilityCombatLogActivation.Capture(__instance); }
+                catch (Exception) { }
+            }
+        }
+
+        // Verse calls this only after Available() && TryCastShot() succeeded.
+        // Legacy verbs that apply effects but return false remain unreported.
+        [HarmonyPatch(typeof(Pawn), "Notify_UsedVerb", new Type[] { typeof(Pawn), typeof(Verb) })]
+        public static class AbilitySuccessCombatLog_Patch
+        {
+            public static void Postfix(Pawn __instance, Pawn pawn, Verb verb)
             {
                 try
                 {
-                    Pawn caster = __instance.Pawn;
-                    if (caster == null || caster.Destroyed)
-                    {
-                        return;
-                    }
-                    TMAbilityDef tmad = __instance.Def as TMAbilityDef;
-                    if (tmad == null)
-                    {
-                        return;
-                    }
-                    Pawn targetPawn = target.Thing as Pawn;
-                    if (targetPawn == null || targetPawn == caster)
-                    {
-                        return;
-                    }
-                    bool offensive = (tmad.MainVerb as VerbProperties_Ability)?.isViolent ?? true;
-                    bool sameFaction = targetPawn.Faction != null && targetPawn.Faction == caster.Faction;
-                    if (!offensive && sameFaction)
-                    {
-                        return;
-                    }
-                    Find.BattleLog.Add(new BattleLogEntry_TMAbilityUsed(caster, targetPawn, tmad, RulePackDefOf.Event_AbilityUsed));
+                    if (__instance != pawn) return;
+                    var entry = AbilityCombatLogActivation.Consume(verb, pawn);
+                    if (entry != null) Find.BattleLog.Add(entry);
                 }
-                catch (Exception)
-                {
-                }
+                catch (Exception) { }
             }
         }
 

@@ -18,6 +18,9 @@ namespace TorannMagic
         protected override bool TryCastShot()
         {
             bool result = false;
+            // Capture before despawning/ending the job. Autocast evaluation can
+            // have finished long before a queued or warming-up verb executes.
+            bool playerOrderedCast = AutoCast.AutoCastContext.IsPlayerOrderedAbilityCast(base.CasterPawn?.CurJob, this);
             bool arg_40_0;
             
             if (this.currentTarget != null && base.CasterPawn != null)
@@ -48,7 +51,10 @@ namespace TorannMagic
                         if (this.CasterPawn.IsColonist)
                         {
                             ModOptions.Constants.SetPawnInFlight(true);
-                            ThingSelectionUtility.SelectNextColonist();
+                            if (playerOrderedCast)
+                            {
+                                ThingSelectionUtility.SelectNextColonist();
+                            }
                             this.CasterPawn.DeSpawn();
                             //p.SetPositionDirect(this.currentTarget.Cell);
                             GenSpawn.Spawn(p, this.currentTarget.Cell, map);
@@ -65,7 +71,7 @@ namespace TorannMagic
                                     }
                                 }
                             }
-                            if (ModOptions.Settings.Instance.cameraSnap)
+                            if (playerOrderedCast && ModOptions.Settings.Instance.cameraSnap)
                             {
                                 CameraJumper.TryJumpAndSelect(p);
                             }

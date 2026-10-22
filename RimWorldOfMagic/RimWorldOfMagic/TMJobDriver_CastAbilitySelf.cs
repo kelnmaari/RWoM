@@ -18,6 +18,7 @@ namespace TorannMagic
         bool validCastFlag = false;
         private bool wildCheck = false;
         private int duration;
+        private bool castStarted;
 
         protected override IEnumerable<Toil> MakeNewToils()
         {
@@ -95,17 +96,15 @@ namespace TorannMagic
                         this.duration = (int)(this.verb.verbProps.warmupTime * 60);
                     }
                     LocalTargetInfo target = combatToil.actor.jobs.curJob.GetTarget(TargetIndex.A);
-                    if (target != null && !validCastFlag)
+                    // The engine must initialize currentTarget before WarmupComplete.
+                    // Bypassing it for AI leaves a default cell or a previous cast's target.
+                    if (target.IsValid && !validCastFlag)
                     {
-                        if (this.pawn.IsColonist)
-                        {
-                            verb.TryStartCastOn(target, false, true);
-                        }
-                        else
-                        {
-                            this.duration = 0;
-                            verb.WarmupComplete();
-                        }
+                        castStarted = verb.TryStartCastOn(target, false, true);
+                    }
+                    if (!castStarted)
+                    {
+                        this.EndJobWith(JobCondition.Incompletable);
                     }
                 }
                 else
@@ -141,7 +140,7 @@ namespace TorannMagic
                 // verb can be null when the job arrived over Multiplayer with an
                 // unresolved verbToUse reference (or was interrupted before init) —
                 // cleanup must not throw on top of that.
-                if (verb != null && verb.Ability != null && this.duration <= 5 && !this.pawn.DestroyedOrNull() && !this.pawn.Dead && !this.pawn.Downed)
+                if (castStarted && verb != null && verb.Ability != null && this.duration <= 5 && !this.pawn.DestroyedOrNull() && !this.pawn.Dead && !this.pawn.Downed)
                 {
                     verb.Ability.PostAbilityAttempt();
                     this.pawn.ClearReservationsForJob(this.job);

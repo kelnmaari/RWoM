@@ -89,6 +89,16 @@ namespace TorannMagic
                 Log.Error("[TMPCompat] Job/verb registration setup failed: " + ex);
             }
 
+            try
+            {
+                FleshDevelopment.FleshMultiplayer.Register();
+            }
+            catch (Exception ex)
+            {
+                failed++;
+                Log.Error("[TMPCompat] Flesh development sync setup failed: " + ex);
+            }
+
             if (failed == 0)
             {
                 Log.Message("[TMPCompat] Multiplayer compatibility initialized.");

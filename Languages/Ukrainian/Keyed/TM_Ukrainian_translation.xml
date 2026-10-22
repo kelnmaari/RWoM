@@ -2170,35 +2170,38 @@ DR: [5, 9, 13, 17, 20]%</TM_Golemancy_pwr_desc>
   <TM_GrimoireSub>Рівні класів, мана та здібності в одному місці.</TM_GrimoireSub>
   <AU_DISABLED>Вимкнено</AU_DISABLED>
   <TM_GrimoireTabMode>Гримуар на панелі здібностей</TM_GrimoireTabMode>
-  <TM_GrimoireTabModeDesc>Увімкнено — кнопка Гримуара на панелі здібностей. Вимкнено — Гримуар переноситься у вкладку панелі огляду, як старі вкладки Magic/Fighter.</TM_GrimoireTabModeDesc>
-  <TM_GrimoireOpen>Відкрити Гримуар</TM_GrimoireOpen>
-  <TM_GrimoireTabHint>Вікно Гримуара вже відкрите — закрийте його, щоб повернутися.</TM_GrimoireTabHint>
-  <TM_AIMarkingDesc>Позначати ворожих магів іконкою на карті.</TM_AIMarkingDesc>
-  <TM_AIFighterMarkingDesc>Позначати іконкою ворогів воїнських класів (might).</TM_AIFighterMarkingDesc>
-  <TM_AIFriendlyMarkingDesc>Позначати іконкою магів союзних фракцій.</TM_AIFriendlyMarkingDesc>
-  <XPMultiplierDesc>Множник магічного та бойового досвіду.</XPMultiplierDesc>
-  <NeedMultiplierDesc>Множник витрат мани, витривалості та інших потреб класів.</NeedMultiplierDesc>
-  <MagicyteChanceDesc>Шанс, що новонароджені тварини будуть магицитами (джерелами мани).</MagicyteChanceDesc>
-  <TM_DeathRetaliationIsLethalDesc>Чи смертельна передсмертна спалах мага: якщо вимкнено — ціль лише втрачає свідомість.</TM_DeathRetaliationIsLethalDesc>
-  <TM_DeathRetaliationChanceDesc>Ймовірність, що загиблий маг обрушить передсмертну спалах на вбивцю.</TM_DeathRetaliationChanceDesc>
-  <TM_DeathRetaliationDelayDesc>Затримка перед спрацюванням передсмертної спалаху мага.</TM_DeathRetaliationDelayDesc>
-  <TM_enableAutocastDesc>Автокаст мешканців колонії: заклинання з увімкненим перемикачем AC застосовуються самі.</TM_enableAutocastDesc>
-  <TM_autocastUndraftedThresholdDesc>Мінімальний відсоток мани для автокасту поза боєм.</TM_autocastUndraftedThresholdDesc>
-  <TM_autocastDraftedThresholdDesc>Мінімальний відсоток мани для бойового автокасту в строю.</TM_autocastDraftedThresholdDesc>
-  <TM_autocastEvaluationFrequencyDesc>Як часто перевіряються умови автокасту. Рідше — краща продуктивність.</TM_autocastEvaluationFrequencyDesc>
-  <TM_autocastAnimalsDesc>Дозволити автокаст призваним істотам та тваринам-кастерам.</TM_autocastAnimalsDesc>
-  <AICanCastDesc>Дозволити NPC-магам (рейдери, ворожі фракції) застосовувати здібності в бою.</AICanCastDesc>
-  <AIHardModeDesc>Жорсткий режим: NPC-маги розумніші та агресивніші у виборі заклинань.</AIHardModeDesc>
-  <TM_AggressiveAICastingDesc>NPC-маги кастують частіше та активніше шукають цілі.</TM_AggressiveAICastingDesc>
-  <TM_SlavesCanScribeDesc>Дозволити рабам записувати класи у томи (потрібна Ideology).</TM_SlavesCanScribeDesc>
-  <TM_UndeadUpkeepMultiplierDesc>Множник витрат на утримання нежиті.</TM_UndeadUpkeepMultiplierDesc>
-  <TM_ParacyteSoftCapDesc>М’який ліміт паразитів-магів у світі: після нього шанс появи падає.</TM_ParacyteSoftCapDesc>
-  <TM_ParacyteMagesCountDesc>Чи враховувати паразитів у ліміті магів фракції.</TM_ParacyteMagesCountDesc>
-  <unrestrictedBloodTypesForBloodMagicDesc>Магія крові працює на будь-яких пішаках, а не лише з сумісною групою крові.</unrestrictedBloodTypesForBloodMagicDesc>
-  <TM_UnrestrictedWeaponCopyDesc>Копіювання та зачарування зброї без обмежень за її типом.</TM_UnrestrictedWeaponCopyDesc>
-  <TM_ClassOptionsDesc>Налаштування класів: шанси появи, спорідненість та пов’язані правила.</TM_ClassOptionsDesc>
-  <TM_FactionOptionsDesc>Налаштування фракцій та їх магів.</TM_FactionOptionsDesc>
-  <TM_EventOptionsDesc>Налаштування подій: розломи, демони, мандрівні личі та їх складність.</TM_EventOptionsDesc>
-  <TM_GolemOptionsDesc>Налаштування големів та їх поведінки.</TM_GolemOptionsDesc>
-  <TM_DisplayOptionsDesc>Відображення: іконки, камера, режим Гримуара та елементи інтерфейсу.</TM_DisplayOptionsDesc>
+  <TM_GrimoireTabModeDesc>Увімкнено: показувати кнопку гримуара на панелі здібностей. Вимкнено: відкривати те саме вікно через вкладку гримуара на панелі огляду.</TM_GrimoireTabModeDesc>
+  <TM_GrimoireOpen>Відкрити гримуар</TM_GrimoireOpen>
+  <TM_GrimoireTabHint>Вікно гримуара вже відкрите.</TM_GrimoireTabHint>
+  <TM_AIMarkingDesc>Показувати значки класів над магами й бійцями поза колонією, зокрема нейтральними та дружніми гостями.</TM_AIMarkingDesc>
+  <TM_AIFighterMarkingDesc>Застаріла опція без самостійного ефекту. Значки бійців поза колонією наразі залежать від налаштування значків магів ШІ.</TM_AIFighterMarkingDesc>
+  <TM_AIFriendlyMarkingDesc>Показувати значки класів над вашими колоністами-магами й бійцями.</TM_AIFriendlyMarkingDesc>
+  <XPMultiplierDesc>Множник магічного та бойового досвіду за використання здібностей.</XPMultiplierDesc>
+  <NeedMultiplierDesc>Множник швидкості відновлення мани.</NeedMultiplierDesc>
+  <MagicyteChanceDesc>Імовірність отримати необроблений магіцит під час видобутку породи.</MagicyteChanceDesc>
+  <TM_DeathRetaliationIsLethalDesc>Дозволяти відплаті смертельно поранити самого персонажа, який її здійснює, крім відновлювальних ефектів. Вимкнення не робить шкоду іншим персонажам несмертельною.</TM_DeathRetaliationIsLethalDesc>
+  <TM_DeathRetaliationChanceDesc>Імовірність того, що повалений ворожий маг або боєць підготує відплату. Полонені не можуть мститися.</TM_DeathRetaliationChanceDesc>
+  <TM_DeathRetaliationDelayDesc>Множник зворотного відліку після початку відплати; більші значення відкладають спрацювання.</TM_DeathRetaliationDelayDesc>
+  <TM_enableAutocastDesc>Дозволити колоністам автоматично використовувати магічні та бойові здібності з увімкненим перемикачем AC.</TM_enableAutocastDesc>
+  <TM_autocastUndraftedThresholdDesc>Мінімальний відсоток мани або витривалості для автозастосування поза бойовим режимом. Також використовується під час звичайних перевірок автозастосування NPC.</TM_autocastUndraftedThresholdDesc>
+  <TM_autocastDraftedThresholdDesc>Мінімальний відсоток мани або витривалості для автозастосування в бойовому режимі з дозволеним вогнем. Монахи ігнорують поріг витривалості.</TM_autocastDraftedThresholdDesc>
+  <TM_autocastEvaluationFrequencyDesc>Базовий інтервал між перевірками автозастосування в ігрових секундах. Більші значення означають рідші перевірки; фактичні інтервали випадкові.</TM_autocastEvaluationFrequencyDesc>
+  <TM_autocastAnimalsDesc>Враховувати тварин під час підтримуваних автоматичних пошуків цілей, наприклад для лікування.</TM_autocastAnimalsDesc>
+  <AICanCastDesc>Дозволити магам і бійцям поза колонією використовувати здібності під керуванням ШІ.</AICanCastDesc>
+  <AIHardModeDesc>Посилювати багато магічних і бойових здібностей NPC та підвищувати ймовірність знання вищих заклять у магів NPC.</AIHardModeDesc>
+  <TM_AggressiveAICastingDesc>Підвищувати активність застосування здібностей NPC та вдвічі скорочувати базове перезаряджання й витрати мани або витривалості.</TM_AggressiveAICastingDesc>
+  <TM_SlavesCanScribeDesc>Дозволити рабам писати класові томи й уривки класових рукописів за дотримання звичайних вимог до класу.</TM_SlavesCanScribeDesc>
+  <TM_UndeadUpkeepMultiplierDesc>Множник штрафу до відновлення мани за утримання нежиті; нуль вимикає цей штраф.</TM_UndeadUpkeepMultiplierDesc>
+  <TM_ParacyteSoftCapDesc>Допустиме місцеве навантаження парацитів до зниження відновлення мани. Кожна рослина рахується за 1, а кожен маг — за 2, якщо відповідну опцію ввімкнено.</TM_ParacyteSoftCapDesc>
+  <TM_ParacyteMagesCountDesc>Під час розрахунку штрафу до відновлення мани рахувати кожного мага на мапі за два парацити. Тварини, дикі люди й Безликі не враховуються.</TM_ParacyteMagesCountDesc>
+  <unrestrictedBloodTypesForBloodMagicDesc>Дозволити збирати й підпалювати кров інших рас, зберігаючи решту вимог заклять.</unrestrictedBloodTypesForBloodMagicDesc>
+  <TM_UnrestrictedWeaponCopyDesc>Дозволити техноманту копіювати далекобійну зброю нижче індустріального рівня або з нестандартним способом стрільби. Зброя ближнього бою й надалі виключена.</TM_UnrestrictedWeaponCopyDesc>
+  <TM_ClassOptionsDesc>Вибрати доступні магічні й бойові класи та допоміжні риси, налаштувати ймовірність їх появи.</TM_ClassOptionsDesc>
+  <TM_FactionOptionsDesc>Налаштувати множники появи магів і бійців для кожної фракції.</TM_FactionOptionsDesc>
+  <TM_EventOptionsDesc>Відкрити налаштування складності розломів, мандрівних лічів і демонічних нападів.</TM_EventOptionsDesc>
+  <TM_GolemOptionsDesc>Налаштувати відображення големів: сплячі каркаси, значки на панелі колоністів і тремтіння екрана.</TM_GolemOptionsDesc>
+  <TM_DisplayOptionsDesc>Налаштувати значки, камеру, розташування гримуара, вигляд нежиті й відображення одягу.</TM_DisplayOptionsDesc>
+  <TM_GrimoireDesc>Відкрити гримуар персонажа: рівні класів, ресурси та здібності.</TM_GrimoireDesc>
+  <TM_GrimoireIsekaiHint>Вбудована інтеграція Isekai Leveling від Jelly Creative дає бонуси до запасу й відновлення мани та витривалості, перезаряджання здібностей і витрат ресурсів.</TM_GrimoireIsekaiHint>
+  <TM_Grimoire>Гримуар</TM_Grimoire>
 </LanguageData>

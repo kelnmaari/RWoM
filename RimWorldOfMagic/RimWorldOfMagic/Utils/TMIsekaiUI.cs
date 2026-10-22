@@ -18,31 +18,33 @@ namespace TorannMagic.Utils
         public static readonly Color Divider = new Color(0.28f, 0.46f, 0.60f, 0.8f);
 
         /// <summary>Dark panel with a 1px border and bracket corners.</summary>
-        public static void Panel(Rect r, bool fill = true)
+        public static void Panel(Rect r, bool fill = true) => Panel(r, Border, Corner, fill);
+
+        public static void Panel(Rect r, Color border, Color corner, bool fill = true)
         {
             if (fill)
             {
                 Widgets.DrawBoxSolid(r, Bg);
             }
-            Widgets.DrawBoxSolid(new Rect(r.x, r.y, r.width, 1f), Border);
-            Widgets.DrawBoxSolid(new Rect(r.x, r.yMax - 1f, r.width, 1f), Border);
-            Widgets.DrawBoxSolid(new Rect(r.x, r.y, 1f, r.height), Border);
-            Widgets.DrawBoxSolid(new Rect(r.xMax - 1f, r.y, 1f, r.height), Border);
+            Widgets.DrawBoxSolid(new Rect(r.x, r.y, r.width, 1f), border);
+            Widgets.DrawBoxSolid(new Rect(r.x, r.yMax - 1f, r.width, 1f), border);
+            Widgets.DrawBoxSolid(new Rect(r.x, r.y, 1f, r.height), border);
+            Widgets.DrawBoxSolid(new Rect(r.xMax - 1f, r.y, 1f, r.height), border);
 
             const float c = 10f;
             const float t = 1.6f;
             // top-left
-            Widgets.DrawBoxSolid(new Rect(r.x, r.y, c, t), Corner);
-            Widgets.DrawBoxSolid(new Rect(r.x, r.y, t, c), Corner);
+            Widgets.DrawBoxSolid(new Rect(r.x, r.y, c, t), corner);
+            Widgets.DrawBoxSolid(new Rect(r.x, r.y, t, c), corner);
             // top-right
-            Widgets.DrawBoxSolid(new Rect(r.xMax - c, r.y, c, t), Corner);
-            Widgets.DrawBoxSolid(new Rect(r.xMax - t, r.y, t, c), Corner);
+            Widgets.DrawBoxSolid(new Rect(r.xMax - c, r.y, c, t), corner);
+            Widgets.DrawBoxSolid(new Rect(r.xMax - t, r.y, t, c), corner);
             // bottom-left
-            Widgets.DrawBoxSolid(new Rect(r.x, r.yMax - t, c, t), Corner);
-            Widgets.DrawBoxSolid(new Rect(r.x, r.yMax - c, t, c), Corner);
+            Widgets.DrawBoxSolid(new Rect(r.x, r.yMax - t, c, t), corner);
+            Widgets.DrawBoxSolid(new Rect(r.x, r.yMax - c, t, c), corner);
             // bottom-right
-            Widgets.DrawBoxSolid(new Rect(r.xMax - c, r.yMax - t, c, t), Corner);
-            Widgets.DrawBoxSolid(new Rect(r.xMax - t, r.yMax - c, t, c), Corner);
+            Widgets.DrawBoxSolid(new Rect(r.xMax - c, r.yMax - t, c, t), corner);
+            Widgets.DrawBoxSolid(new Rect(r.xMax - t, r.yMax - c, t, c), corner);
         }
     }
 }

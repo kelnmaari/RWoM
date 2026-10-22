@@ -15,6 +15,35 @@ namespace TorannMagic
         private bool necroValid = true;
         private int lichStrike = 0;
         private bool initialized = false;
+        private bool collapsingForDeadOwner;
+
+        public override void CompPostPostAdd(DamageInfo? dinfo)
+        {
+            base.CompPostPostAdd(dinfo);
+            FleshDevelopment.FleshRepository.Ensure(Pawn);
+        }
+
+        public override void CompPostTickInterval(ref float severityAdjustment, int delta)
+        {
+            base.CompPostTickInterval(ref severityAdjustment, delta);
+            if (CollapseForDeadOwner()) return;
+            FleshDevelopment.FleshActions.Tick(Pawn);
+        }
+
+        private bool CollapseForDeadOwner()
+        {
+            var pawn = Pawn;
+            if (pawn == null || pawn.Dead || collapsingForDeadOwner) return true;
+            // A reference can be unresolved while loading/raising: keep the existing
+            // maintenance grace for that case. A confirmed death needs no grace.
+            if (linkedPawn == null || !linkedPawn.Dead
+                || pawn.def == TorannMagicDefOf.TM_SkeletonR
+                || pawn.def == TorannMagicDefOf.TM_GiantSkeletonR) return false;
+            collapsingForDeadOwner = true;
+            try { pawn.Kill(null, null); }
+            finally { collapsingForDeadOwner = false; }
+            return true;
+        }
 
         public Pawn linkedPawn = null;
         private static readonly string[] nonStandardNeedsToAutoFulfill = new[] {
@@ -102,6 +131,8 @@ namespace TorannMagic
         public override void CompPostTick(ref float severityAdjustment)
         {
             base.CompPostTick(ref severityAdjustment);
+            if (CollapseForDeadOwner()) return;
+            FleshDevelopment.FleshActions.Tick(Pawn);
             bool flag = base.Pawn != null;
             if (flag)
             {

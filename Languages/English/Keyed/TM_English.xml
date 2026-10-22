@@ -53,7 +53,6 @@
 <TM_CannotUseOnLiving>This spell cannot be used on the living.</TM_CannotUseOnLiving>
 <TM_CannontConsumeCorpseType>Cannot consume this type of corpse.</TM_CannontConsumeCorpseType>
 <TM_InvalidCorpseType>Corpse type is invalid for Consume Corpse.</TM_InvalidCorpseType>
-<TM_Learn>Learn</TM_Learn>
 <TM_GatewayBeyondMaximumRange>Target tile is beyond reach of Gateway.</TM_GatewayBeyondMaximumRange>
 <TM_InvalidGatewaySelection>Invalid target tile for Gateway.</TM_InvalidGatewaySelection>
 <TM_InvalidGatewayNotOccupied>Gateway can only be used on map tiles occupied by colonists.</TM_InvalidGatewayNotOccupied>
@@ -2301,7 +2300,6 @@ Level 3: all 4 effects</TM_CombatDrugs_pwr_desc>
 <!-- ============ Right Click Menu Options =============-->
 <TM_Use>Use {0}</TM_Use>
 <TM_Read>Read {0}</TM_Read>
-<TM_Learn>Learn {0}</TM_Learn>
 <TM_Inject>Inject {0}</TM_Inject>
 
 <!-- ============ Magic Card info =============-->
@@ -2327,50 +2325,47 @@ Level 3: all 4 effects</TM_CombatDrugs_pwr_desc>
 
 <!-- ============ Miscellaneous =============-->
 <TM_UndeadVerbatum>Undead</TM_UndeadVerbatum>
-
-
-  <TM_Grimoire>Grimoire</TM_Grimoire>
-  <TM_GrimoireDesc>Open this character's grimoire: class levels, mana, abilities and awakening progress.</TM_GrimoireDesc>
+  <TM_GrimoireDesc>Open this character's Grimoire: class levels, resources and abilities.</TM_GrimoireDesc>
   <TM_GrimoireSub>Class levels, mana and abilities at a glance.</TM_GrimoireSub>
-  <TM_GrimoireIsekaiHint>Class levels feed awakening XP; awakening widens the mana pool.</TM_GrimoireIsekaiHint>
+  <TM_GrimoireIsekaiHint>Isekai Leveling's native integration by Jelly Creative grants bonuses to maximum mana and stamina, their regeneration, ability cooldowns and resource costs.</TM_GrimoireIsekaiHint>
   <TM_Stats>Attributes</TM_Stats>
   <TM_StatsMight>Combat attributes</TM_StatsMight>
-  <TM_GrimoireIsekaiHint>Class levels feed awakening XP; awakening widens the mana pool.</TM_GrimoireIsekaiHint>
   <TM_GrimoireResources>Resources</TM_GrimoireResources>
-  <TM_Grimoire>Grimoire</TM_Grimoire>
   <TM_LevelUp>Upgrade</TM_LevelUp>
   <TM_SlavesCanScribe>Allow slaves to write class tomes</TM_SlavesCanScribe>
   <AU_DISABLED>DISABLED</AU_DISABLED>
   <TM_GrimoireTabMode>Grimoire on the ability bar</TM_GrimoireTabMode>
-  <TM_GrimoireTabModeDesc>On — the Grimoire button sits on the ability bar. Off — the Grimoire moves to an inspect-pane tab, like the old Magic/Fighter tabs.</TM_GrimoireTabModeDesc>
+  <TM_GrimoireTabModeDesc>Enabled: show a Grimoire button on the ability bar. Disabled: open the same window from a Grimoire inspect tab.</TM_GrimoireTabModeDesc>
   <TM_GrimoireOpen>Open Grimoire</TM_GrimoireOpen>
-  <TM_GrimoireTabHint>The Grimoire window is already open — close it to return to the UI.</TM_GrimoireTabHint>
-  <TM_AIMarkingDesc>Draw an icon over hostile magic users on the map.</TM_AIMarkingDesc>
-  <TM_AIFighterMarkingDesc>Draw an icon over enemy might (fighter) class pawns.</TM_AIFighterMarkingDesc>
-  <TM_AIFriendlyMarkingDesc>Draw an icon over allied-faction magic users.</TM_AIFriendlyMarkingDesc>
-  <XPMultiplierDesc>Multiplier for magic and might experience gained.</XPMultiplierDesc>
-  <NeedMultiplierDesc>Multiplier for mana, stamina and other class need drain rates.</NeedMultiplierDesc>
-  <MagicyteChanceDesc>Chance that newborn animals are magicytes (mana sources).</MagicyteChanceDesc>
-  <TM_DeathRetaliationIsLethalDesc>Whether a dying mage’s retribution burst is lethal; when off the target is only downed.</TM_DeathRetaliationIsLethalDesc>
-  <TM_DeathRetaliationChanceDesc>Chance that a slain mage unleashes a death retaliation burst on the killer.</TM_DeathRetaliationChanceDesc>
-  <TM_DeathRetaliationDelayDesc>Delay before a slain mage’s retaliation burst goes off.</TM_DeathRetaliationDelayDesc>
-  <TM_enableAutocastDesc>Colony autocasting: spells with the AC toggle enabled cast themselves.</TM_enableAutocastDesc>
-  <TM_autocastUndraftedThresholdDesc>Minimum mana percentage for autocasting while not drafted.</TM_autocastUndraftedThresholdDesc>
-  <TM_autocastDraftedThresholdDesc>Minimum mana percentage for combat autocasting while drafted (fire at will).</TM_autocastDraftedThresholdDesc>
-  <TM_autocastEvaluationFrequencyDesc>How often autocast conditions are evaluated. Slower is kinder to performance.</TM_autocastEvaluationFrequencyDesc>
-  <TM_autocastAnimalsDesc>Allow autocasting for summoned creatures and casting animals.</TM_autocastAnimalsDesc>
-  <AICanCastDesc>Allow NPC mages (raiders, hostile factions) to cast abilities in combat.</AICanCastDesc>
-  <AIHardModeDesc>Hard mode: NPC mages pick spells smarter and more aggressively.</AIHardModeDesc>
-  <TM_AggressiveAICastingDesc>NPC mages cast more often and hunt for ability targets.</TM_AggressiveAICastingDesc>
-  <TM_SlavesCanScribeDesc>Allow slaves to write class tomes (requires Ideology).</TM_SlavesCanScribeDesc>
-  <TM_UndeadUpkeepMultiplierDesc>Multiplier for undead upkeep costs.</TM_UndeadUpkeepMultiplierDesc>
-  <TM_ParacyteSoftCapDesc>Soft cap on paracyte mages in the world; past it spawn chance drops.</TM_ParacyteSoftCapDesc>
-  <TM_ParacyteMagesCountDesc>Whether paracytes count toward the faction mage limit.</TM_ParacyteMagesCountDesc>
-  <unrestrictedBloodTypesForBloodMagicDesc>Blood magic works on any pawn, not only compatible blood types.</unrestrictedBloodTypesForBloodMagicDesc>
-  <TM_UnrestrictedWeaponCopyDesc>Copy and enchant weapons regardless of their type.</TM_UnrestrictedWeaponCopyDesc>
-  <TM_ClassOptionsDesc>Class options: spawn chances, ancestry and related rules.</TM_ClassOptionsDesc>
-  <TM_FactionOptionsDesc>Faction options and their mages.</TM_FactionOptionsDesc>
-  <TM_EventOptionsDesc>Event options: rifts, demons, wandering liches and their difficulty.</TM_EventOptionsDesc>
-  <TM_GolemOptionsDesc>Golem options and behavior.</TM_GolemOptionsDesc>
-  <TM_DisplayOptionsDesc>Display: icons, camera, Grimoire mode and UI elements.</TM_DisplayOptionsDesc>
+  <TM_GrimoireTabHint>The Grimoire window is already open.</TM_GrimoireTabHint>
+  <TM_AIMarkingDesc>Show class icons over non-colonist mages and fighters, including neutral and friendly visitors.</TM_AIMarkingDesc>
+  <TM_AIFighterMarkingDesc>Legacy option: no independent effect. Non-colonist fighter icons currently follow the AI mage-marking setting.</TM_AIFighterMarkingDesc>
+  <TM_AIFriendlyMarkingDesc>Show class icons over your colonist mages and fighters.</TM_AIFriendlyMarkingDesc>
+  <XPMultiplierDesc>Multiplier for magic and might experience awarded for using abilities.</XPMultiplierDesc>
+  <NeedMultiplierDesc>Multiplier for mana regeneration.</NeedMultiplierDesc>
+  <MagicyteChanceDesc>Chance to obtain raw magicyte while mining.</MagicyteChanceDesc>
+  <TM_DeathRetaliationIsLethalDesc>Allow retaliation to inflict lethal self-injury on the retaliating pawn, except for recovery effects. Disabling this does not make damage to other pawns non-lethal.</TM_DeathRetaliationIsLethalDesc>
+  <TM_DeathRetaliationChanceDesc>Chance for a downed hostile mage or fighter to prepare retaliation. Prisoners cannot retaliate.</TM_DeathRetaliationChanceDesc>
+  <TM_DeathRetaliationDelayDesc>Multiplier for the retaliation countdown after it starts; higher values delay the effect.</TM_DeathRetaliationDelayDesc>
+  <TM_enableAutocastDesc>Enable automatic use of colonists' magic and combat abilities whose AC toggle is enabled.</TM_enableAutocastDesc>
+  <TM_autocastUndraftedThresholdDesc>Minimum mana or stamina percentage for undrafted autocasting. Also used by regular NPC autocast checks.</TM_autocastUndraftedThresholdDesc>
+  <TM_autocastDraftedThresholdDesc>Minimum mana or stamina percentage for drafted autocasting with fire at will enabled. Monks bypass the stamina threshold.</TM_autocastDraftedThresholdDesc>
+  <TM_autocastEvaluationFrequencyDesc>Base interval between autocast checks, in game seconds. Higher values mean fewer checks; actual intervals are randomized.</TM_autocastEvaluationFrequencyDesc>
+  <TM_autocastAnimalsDesc>Include animals in supported automatic target searches, such as healing.</TM_autocastAnimalsDesc>
+  <AICanCastDesc>Allow non-colonist mages and fighters to use AI-controlled abilities.</AICanCastDesc>
+  <AIHardModeDesc>Strengthen many NPC magic and combat abilities and increase the chance of NPC mages knowing master spells.</AIHardModeDesc>
+  <TM_AggressiveAICastingDesc>Increase NPC casting activity and halve base cooldowns and mana/stamina costs.</TM_AggressiveAICastingDesc>
+  <TM_SlavesCanScribeDesc>Allow slaves to write class tomes and torn class manuscripts when the usual class requirements are met.</TM_SlavesCanScribeDesc>
+  <TM_UndeadUpkeepMultiplierDesc>Multiplier for the mana-regeneration penalty of maintaining undead; zero disables that penalty.</TM_UndeadUpkeepMultiplierDesc>
+  <TM_ParacyteSoftCapDesc>Local paracyte load tolerated before mana regeneration is reduced. Each paracyte plant counts as 1; if enabled, each mage counts as 2.</TM_ParacyteSoftCapDesc>
+  <TM_ParacyteMagesCountDesc>Count map mages as two paracytes each when calculating the mana-regeneration penalty; excludes animals, wild people and Faceless.</TM_ParacyteMagesCountDesc>
+  <unrestrictedBloodTypesForBloodMagicDesc>Allow blood collection and ignition to use other races' blood types, without bypassing other spell requirements.</unrestrictedBloodTypesForBloodMagicDesc>
+  <TM_UnrestrictedWeaponCopyDesc>Allow the Technomancer to copy ranged weapons below Industrial tech level or with nonstandard firing verbs. Melee weapons remain excluded.</TM_UnrestrictedWeaponCopyDesc>
+  <TM_ClassOptionsDesc>Choose enabled magic and combat classes and support traits, and adjust their generation chances.</TM_ClassOptionsDesc>
+  <TM_FactionOptionsDesc>Adjust mage and fighter generation multipliers for each faction.</TM_FactionOptionsDesc>
+  <TM_EventOptionsDesc>Open difficulty settings for rift, wandering-lich and demon-assault events.</TM_EventOptionsDesc>
+  <TM_GolemOptionsDesc>Configure golem display: dormant frames, colonist-bar entries and screen shake.</TM_GolemOptionsDesc>
+  <TM_DisplayOptionsDesc>Configure icons, camera behavior, Grimoire placement, undead appearance and clothing rendering.</TM_DisplayOptionsDesc>
+  <TM_Grimoire>Grimoire</TM_Grimoire>
+  <TM_Learn>Learn</TM_Learn>
 </LanguageData>

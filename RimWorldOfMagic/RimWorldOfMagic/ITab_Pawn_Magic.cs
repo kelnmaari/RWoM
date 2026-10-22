@@ -1,4 +1,4 @@
-using RimWorld;
+﻿using RimWorld;
 using UnityEngine;
 using Verse;
 using System.Linq;
@@ -9,7 +9,7 @@ namespace TorannMagic
     /// Inspect-pane tab variant of the Grimoire button (magic side). Enabled by
     /// turning off the "grimoireOnAbilityBar" mod setting: the tab shows for
     /// class holders and opens the Grimoire window on click, then deselects
-    /// itself so no empty pane is left behind. For hybrids the magic tab wins —
+    /// itself so no empty pane is left behind. Faceless uses the might tab; other hybrids use magic —
     /// both tabs open the same window, showing two of them made no sense.
     /// </summary>
     public class ITab_Pawn_Magic : ITab
@@ -30,7 +30,8 @@ namespace TorannMagic
                     return false;
                 }
                 CompAbilityUserMagic comp = pawn.GetCompAbilityUserMagic();
-                return comp != null && comp.IsMagicUser;
+                bool faceless = pawn.story?.traits?.HasTrait(TorannMagicDefOf.Faceless) == true;
+                return comp != null && comp.IsMagicUser && !faceless;
             }
         }
 

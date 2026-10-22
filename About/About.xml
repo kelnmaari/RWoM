@@ -2,7 +2,7 @@
 
 <ModMetaData>
 	<name>A RimWorld of Magic — 1.7 (Unofficial)</name>
-	<author>Torann</author>
+	<author>HUGINN (Original author: Torann)</author>
 	<supportedVersions>
 		<li>1.0</li>
 		<li>1.1</li>
@@ -177,9 +177,9 @@ Unofficial continuation of TorannD's "A RimWorld of Magic" for RimWorld 1.7. All
 [*]The JecsTools-family libraries (AbilityUser, AbilityUserAI, CompDeflector, etc.) are no longer bundled — the mod now depends on Zaljerem's [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3312959701]JecsLite - A RimWorld of Magic[/url] (rebuilt for 1.7).
 [*]Fixed 1.7 regressions: LineOfSight default flip (autocast, Blink/Summon through walls, missing cooldowns), greyed-out ability icons, broken reflected shots, attribute patches (117 classes / 153 methods).
 [*][b]Multiplayer support[/b] built in — needs the 1.7 MP fork: [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3820003322](1.7)Multiplayer-temp[/url]. Ability casts, cooldowns and gizmos are synced.
-[*][b]Isekai family integration[/b] (optional, coexists cleanly):
+[*][b]Isekai family compatibility[/b] (optional; see the Leveling limitation below):
 [olist]
-[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=3657580708]ISEKAI RPG LEVELING[/url] — native RoM support: its passive trees grant mana, stamina and might bonuses when this mod is loaded (integration by Jelly Creative).
+[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=3657580708]ISEKAI RPG LEVELING[/url] — native integration by Jelly Creative. [b]Known limitation:[/b] the tested XML gate requires the exact name "A RimWorld of Magic" and does not recognize this fork's display name, so its RoM bonuses do not activate. Once recognition is fixed and verified, native bonuses cover mana/stamina capacity and regeneration, cooldowns and resource costs. No duplicate bonus layer is added here.
 [*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=3813394602]ISEKAI DUNGEONS ADD-ON[/url] — 4 magic gates: Flame Rift, Tide Rift, Bone Crypt, Demon Gate (C–S) with RWoM creatures; auto-join gate spawns, guild contracts and scrolls.
 [*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=3757560461]CREATURES[/url] and [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3718568958]GUILD FACTION[/url] add-ons — coexist; RWoM creatures appear in dungeons and guild contracts.
 [*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=3800773705]RIM ISEKAI — Complete Integrated[/url] — clean coexistence verified.
@@ -202,7 +202,7 @@ Unofficial continuation of TorannD's "A RimWorld of Magic" for RimWorld 1.7. All
 [*]Библиотеки семейства JecsTools (AbilityUser, AbilityUserAI, CompDeflector и др.) больше не вшиты — теперь нужна зависимость: [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3312959701]JecsLite - A RimWorld of Magic[/url] от Zaljerem (пересобран под 1.7).
 [*]Исправлены поломки 1.7: проверка прямой видимости (автокаст, Blink/Summon сквозь стены, пропавшие кулдауны), серые иконки при нехватке маны, отражённые выстрелы, атрибутные патчи (117/153).
 [*][b]Мультиплеер[/b] встроен — нужен форк 1.7: [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3820003322](1.7)Multiplayer-temp[/url]. Кастануть, кулдауны и гизмо синхронизируются.
-[*][b]Интеграция с ISEKAI[/b] (опционально): пассивные деревья Leveling дают бонусы маны, стамины и силы при загруженном RoM (нативная интеграция от Jelly Creative); 4 магических врата с существами RWoM для [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3813394602]Dungeons[/url] (C–S); сосуществование с [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3757560461]Creatures[/url], [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3718568958]Guild Faction[/url] и [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3800773705]RIM ISEKAI[/url] проверено.
+[*][b]Интеграция с ISEKAI[/b] (опционально): нативная поддержка Leveling от Jelly Creative. [b]Ограничение:[/b] проверенный XML-патч ищет точное имя "A RimWorld of Magic", не распознаёт имя форка и не подключает бонусы RoM. После исправления и проверки распознавания доступны нативные бонусы запаса/восстановления маны и стамины, КД и стоимости способностей. Второй слой бонусов не добавляется. Для [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3813394602]Dungeons[/url] предусмотрены 4 врата с существами RWoM (C–S); [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3757560461]Creatures[/url], [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3718568958]Guild Faction[/url] и [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3800773705]RIM ISEKAI[/url] — отдельные опциональные дополнения.
 [*]Гримуар: уровни, XP/мана/выносливость с реальным реген, заклинания с описаниями, прокачка скиллов с пояснениями, панель ресурсов.
 [*]Отладка: "T: Give Class..." выдаёт класс выбранной пешке.
 [*]Вшиты переводы: [url=https://steamcommunity.com/sharedfiles/filedetails/?id=2882739907]русский, украинский, португальский (по переводу Nevelian)[/url].
