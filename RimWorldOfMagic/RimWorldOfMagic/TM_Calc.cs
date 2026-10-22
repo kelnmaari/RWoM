@@ -4461,6 +4461,9 @@ namespace TorannMagic
             {
                 return false;
             }
+#if RW17
+            if (!Compatibility.AbilityCastSafety.AllowsSelfTarget(caster, ability, target)) return false;
+#endif
             string baseName = BaseAbilityDefName(ability.defName);
             if (baseName == "TM_Blink") return false; // destination evaluator only, never a generic cast job
             if (baseName == "TM_ConsumeCorpse" || baseName == "TM_CorpseExplosion" || baseName == "TM_RaiseUndead")
@@ -4550,6 +4553,11 @@ namespace TorannMagic
 
         public static LocalTargetInfo GetAutocastTarget(Pawn caster, TM_Autocast autocasting, LocalTargetInfo potentialTarget, TMAbilityDef ability)
         {
+            return GetAutocastTarget(caster, autocasting, potentialTarget, ability, null);
+        }
+
+        public static LocalTargetInfo GetAutocastTarget(Pawn caster, TM_Autocast autocasting, LocalTargetInfo potentialTarget, TMAbilityDef ability, Verb castingVerb)
+        {
             LocalTargetInfo target = new LocalTargetInfo();
 
             if (autocasting.type == AutocastType.OnTarget && potentialTarget.IsValid)
@@ -4614,6 +4622,9 @@ namespace TorannMagic
                         {
                             continue;
                         }
+#if RW17
+                        if (castingVerb != null && !Compatibility.AbilityCastSafety.CanAutocast(castingVerb, p)) continue;
+#endif
                         candidates++;
                         if (Rand.Value <= 1f / candidates)
                         {
@@ -4696,6 +4707,9 @@ namespace TorannMagic
             {
                 target = potentialTarget.Cell;
             }
+#if RW17
+            if (castingVerb != null && !Compatibility.AbilityCastSafety.CanAutocast(castingVerb, target)) return LocalTargetInfo.Invalid;
+#endif
             return ability == null || AutocastTargetAcceptable(caster, ability, target) ? target : LocalTargetInfo.Invalid;
         }
 
