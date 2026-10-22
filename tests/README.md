@@ -30,7 +30,7 @@ Use a fresh artifacts directory for each comparison. Build logs, test output and
 
 ## Current verification status
 
-The prepared 1.7 update records **196 passed / 2 failed / 198 total**, with a production build of 0 errors and 395 existing warnings. The two failures remain visible: `Grimoire.Metadata` and `Grimoire.InstalledIsekaiExactNameGate`. The intentionally retained name `A RimWorld of Magic — 1.7 (Unofficial)` differs from the exact name expected by the tested Isekai XML integration. These are known unresolved compatibility failures, not a fully green suite. No assertion is skipped or weakened to hide them.
+The prepared 1.7 update records **227 passed / 2 failed / 229 total**, including 14 ability-projectile and 17 cast-safety checks, with a production build of 0 errors and 395 existing warnings. The two failures remain visible: `Grimoire.Metadata` and `Grimoire.InstalledIsekaiExactNameGate`. The intentionally retained name `A RimWorld of Magic — 1.7 (Unofficial)` differs from the exact name expected by the tested Isekai XML integration. Both failures also occur against the unchanged pre-fix DLL. These are known unresolved compatibility failures, not a fully green suite. No assertion is skipped or weakened to hide them.
 
 ## Coverage and limits
 
@@ -72,6 +72,22 @@ MagicShield tests run the real component on an unspawned pawn through its full l
 
 Damage tests call the compiled `Pawn_PreApplyDamage` prefix with explosive damage and real pawn, MightData and need objects. The undead cases first execute RWoM's actual need policy to verify that stamina is forbidden, then verify that Fortitude still reduces or fully absorbs damage without creating that need. Living controls verify the same mitigation and real stamina restoration. The headless setup accepts only the exact expected `PawnKindDefOf` initialization warning; runtime warnings still fail tests. These checks reproduce a valid failure path matching the reported prefix stack; they do not identify the original damaged pawn or execute a complete explosion, raid, resurrection or Multiplayer pipeline.
 Self-cast regression cases execute the production job driver's combat toil and cleanup with the installed engine's `TryStartCastOn`. They check initial and stale AI verb targets, colonist casting, valid cell targets, invalid target/unspawned caster rejection without charging, and positive warmup followed by one shot through the engine's real warmup stance. A controlled verb records the shot target; a fixed aiming stat avoids unrelated stat infrastructure. The harness does not simulate Advanced Heal's healing/graphics or the AI scheduler after job rejection.
+
+## Shared cast safety and automatic line of sight
+
+`CastSafety` cases exercise the real engine start method and JecsLite's direct pre-cast/blocked-projectile methods. A controlled 20-by-20 map contains actual Thing, Edifice and Cover grids and a full wall; the native shoot-line algorithm includes leaning. A deliberately permissive custom verb demonstrates that a missing custom self/LoS check cannot bypass the shared guard. Its shot records execution without applying spell effects or rendering anything. Message interception records feedback without displaying UI.
+
+The self rule honors `canTargetSelf` while retaining explicit `TargetSelf` category semantics used by legacy self abilities; it does not infer targeting from `isViolent`. The Player/AI origin uses the matching executing cast job's count marker, not faction or `playerForced`. Automatic selection receives the actual verb, filters nearby pawn candidates before random selection, and revalidates the target at start. Spell LoS requirements use the engine shoot line, while spells configured to ignore LoS remain usable. Generic automatic projectile launches recheck sight when `stopBurstWithoutLos` requires it and reject quietly; manual launch feedback is retained.
+
+Job-driver cases prepare a valid toil, insert a wall before init, then exercise real init/cleanup. They verify no shot or `PostAbilityAttempt` after rejection and one attempt after success. Separate fixture-scoped hooks observe that rejected starts never reach the private psionic/Hate deduction methods; they do not execute the health/resource mutation itself. Preflight preserves those deductions' timing for accepted zero-warmup casts. The accepted-start marker is serialized by the driver, but these cases do not establish a complete save/load round trip, live cancellation behavior, a rendered mass battle or Multiplayer synchronization. Use the [live checklist](smoke-tests/validation-1.7.md).
+
+## Kure overhead ability projectiles
+
+`AbilityProjectile` cases use the installed JecsLite `PawnAbility.GetJob` for Player and AI contexts, followed by its real generic `Projectile_AbilityBase.ImpactSomething` and `Impact_Override` methods on a controlled map with a seeded launch state. The effect-recipient boundary records the pawn without applying health/mental-state changes; impact teardown is isolated from graphics. This is not a complete verb launch, job scheduler or Kure XML-loading test.
+
+On RimWorld 1.7, overhead projectiles expose `HitFlags.None` during flight. The tested JecsLite impact method consequently rejects even the selected pawn, then its generic fallback applies effects to the caster. The unchanged DLL reproduces seven failures in the initial eleven-case comparison; the compatibility patches resolve them while preserving thick-roof blocking, ordinary ground hits and real self buffs. Additional cases retain deliberately disabled hits, reject mismatched used/intended targets, preserve full-cover rejection and deliberate derived-projectile caster effects, and leave cell-only and non-RWoM ability behavior unchanged. The patches are compiled only with `RW17`; no 1.6 assembly is built or replaced.
+
+The [Kure live checklist](smoke-tests/kure-targeting-1.7.md) covers manual casts, autocast, ally buffs, misses and roofs. Headless success does not establish full launch/flight behavior, rendered projectiles, every addon spell, complete save/load, or Multiplayer synchronization.
 
 ## Flesh Development
 

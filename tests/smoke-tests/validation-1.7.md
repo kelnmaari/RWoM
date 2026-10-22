@@ -23,6 +23,11 @@ This is a checklist, not a record of completed live tests. Command-line fixtures
 4. Herbal Clarity and Herbal Bliss must expose persistent autocast toggles and work on valid non-combat targets.
 5. Check magic, might and hybrid classes with upgraded and standalone abilities. No duplicate attempt per evaluation pass or cooldown bypass should occur. Include drafted Chaos Mage healing.
 6. Check self-cast healing with stale or cell-only targets, canceled warmups and despawned casters. Reject invalid casts without charging resources.
+7. With both a colonist and a hostile NPC caster, attempt an external-target spell marked `canTargetSelf=false` on the caster. It must not fire or spend resources. Check an allowed self heal/buff and explicit `TargetSelf` abilities separately.
+8. Compare manual and automatic casts at a target behind a wall, then behind ordinary leanable cover. Automatic selection must use the spell's actual targeting/LoS rules; spells configured to ignore LoS must retain that behavior. When choosing nearby targets, include both a visible and a blocked pawn.
+9. Close a door or move the target during warmup/flight. An automatic LoS rejection must finish without repeated player-facing rejection messages; manual rejected casts must retain their feedback. Spells that explicitly allow a burst to continue after losing sight retain that continuation policy.
+10. Repeat rejected starts with Psionic and Death Knight abilities. Verify psionic energy/Hate as well as mana/stamina and cooldowns; accepted casts must retain their usual cost. Save/reload during an accepted warmup and check cost/cooldown behavior once, without claiming the headless marker check covers a full colony load.
+11. Repeat a 50-versus-50 debug battle and, separately, the target Multiplayer setup. Check logs, rejection-message spam, spell recipients, performance and synchronization. These live checks are pending.
 
 ## Grimoire and descriptions
 

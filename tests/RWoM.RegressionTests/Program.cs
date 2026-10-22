@@ -49,10 +49,11 @@ internal static class Program
         AutocastTests.Initialize(repo);
         DamageTests.Initialize();
         SelfCastTests.Initialize();
+        CastSafetyTests.Initialize();
         FleshTargetingTests.Initialize();
         FleshBiteTests.Initialize();
         UndeadReleaseTests.Initialize();
-        var tests = MagicDataTests.Cases().Concat(AutocastTests.Cases()).Concat(CombatLogTests.Cases()).Concat(GrimoireTests.Cases()).Concat(InitializationTests.Cases()).Concat(MagicShieldTests.Cases()).Concat(DamageTests.Cases()).Concat(SelfCastTests.Cases()).Concat(FleshProgressTests.Cases()).Concat(FleshUiTests.Cases()).Concat(FleshPresentationTests.Cases()).Concat(FleshTargetingTests.Cases()).Concat(FleshGameplayTests.Cases()).Concat(FleshHealthEffectsTests.Cases()).Concat(FleshCastingTests.Cases()).Concat(FleshStatTests.Cases()).Concat(FleshBiteTests.Cases()).Concat(UndeadReleaseTests.Cases()).Where(test => test.Name.Contains(filter, StringComparison.OrdinalIgnoreCase)).ToList();
+        var tests = MagicDataTests.Cases().Concat(AutocastTests.Cases()).Concat(CombatLogTests.Cases()).Concat(GrimoireTests.Cases()).Concat(InitializationTests.Cases()).Concat(MagicShieldTests.Cases()).Concat(DamageTests.Cases()).Concat(SelfCastTests.Cases()).Concat(AbilityProjectileTests.Cases()).Concat(CastSafetyTests.Cases()).Concat(FleshProgressTests.Cases()).Concat(FleshUiTests.Cases()).Concat(FleshPresentationTests.Cases()).Concat(FleshTargetingTests.Cases()).Concat(FleshGameplayTests.Cases()).Concat(FleshHealthEffectsTests.Cases()).Concat(FleshCastingTests.Cases()).Concat(FleshStatTests.Cases()).Concat(FleshBiteTests.Cases()).Concat(UndeadReleaseTests.Cases()).Where(test => test.Name.Contains(filter, StringComparison.OrdinalIgnoreCase)).ToList();
         if (tests.Count == 0)
             throw new ArgumentException($"No tests match '{filter}'.");
         int failures = 0;

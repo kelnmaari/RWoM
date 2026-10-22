@@ -20,11 +20,13 @@ namespace TorannMagic
         bool cooldownFlag = false;
         bool energyFlag = false;
         bool validCastFlag = false;
+        private bool castStarted;
 
         public override void ExposeData()
         {
             //Scribe_Deep.Look<Verb_UseAbility>(ref verb, "verb");
             base.ExposeData();
+            Scribe_Values.Look(ref castStarted, "tmCastStarted", false);
         }
 
         protected override IEnumerable<Toil> MakeNewToils()
@@ -32,7 +34,17 @@ namespace TorannMagic
             //yield return Toils_Misc.ThrowColonistAttackingMote(TargetIndex.A);            
             Pawn targetPawn = null;
 
-            verb = this.pawn.CurJob.verbToUse as Verb_UseAbility;            
+            verb = this.pawn.CurJob.verbToUse as Verb_UseAbility;
+#if RW17
+            // Reject forbidden/stale automatic targets before resource-dependent
+            // setup (including Mana Storm side effects). Manual casts may still
+            // walk into range through the existing positioning toil below.
+            if (verb != null && !Compatibility.AbilityCastSafety.AllowsStart(verb, TargetA))
+            {
+                this.EndJobWith(JobCondition.Incompletable);
+                yield break;
+            }
+#endif
             if(this.verb != null)
             {
                 if (this.TargetA.HasThing && this.TargetA.Thing is Pawn && (!pawn.Position.InHorDistOf(this.TargetA.Cell, pawn.CurJob.verbToUse.verbProps.range) || !Verb.UseAbilityProps.canCastInMelee))
@@ -123,11 +135,16 @@ namespace TorannMagic
 
                 combatToil.initAction = delegate
                 {
+                    castStarted = false;
                     if (combatToil.actor.jobs.curJob.verbToUse == null) this.EndJobWith(JobCondition.Errored);
                     this.verb = combatToil.actor.jobs.curJob.verbToUse as Verb_UseAbility;
 
                     if (verb != null && verb.verbProps != null)
                     {
+#if RW17
+                        if (!Compatibility.AbilityCastSafety.CanBeginJobCast(verb, combatToil.actor.jobs.curJob.GetTarget(TargetIndex.A)))
+                        { this.EndJobWith(JobCondition.Incompletable); return; }
+#endif
 
                         try
                         {
@@ -156,16 +173,19 @@ namespace TorannMagic
                             }
                             if (validCastFlag)
                             {
-                                Messages.Message("TM_InvalidAbility".Translate(this.pawn.LabelShort, this.verb.Ability.Def.label), MessageTypeDefOf.RejectInput, false);
+                                if (context == AbilityContext.Player)
+                                    Messages.Message("TM_InvalidAbility".Translate(this.pawn.LabelShort, this.verb.Ability.Def.label), MessageTypeDefOf.RejectInput, false);
                                 this.EndJobWith(JobCondition.Incompletable);
+                                return;
                             }
                         }
 
                         LocalTargetInfo target = combatToil.actor.jobs.curJob.GetTarget(TargetIndex.A);
                         if (target != null && !validCastFlag) 
                         {
-                            verb.TryStartCastOn(target, false, true);                            
+                            castStarted = verb.TryStartCastOn(target, false, true);
                         }
+                        if (!castStarted) { this.EndJobWith(JobCondition.Incompletable); return; }
                         using (IEnumerator<Hediff> enumerator = this.pawn.health.hediffSet.hediffs.GetEnumerator())
                         {
                             while (enumerator.MoveNext())
@@ -216,7 +236,7 @@ namespace TorannMagic
                 combatToil.AddFinishAction(delegate
                 {
 
-                    if (this.duration <= 5 && !this.pawn.DestroyedOrNull() && !this.pawn.Dead && !this.pawn.Downed)
+                    if (castStarted && this.duration <= 5 && !this.pawn.DestroyedOrNull() && !this.pawn.Dead && !this.pawn.Downed)
                     {
                         //ShootLine shootLine;
                         //bool validTarg = verb.TryFindShootLineFromTo(pawn.Position, TargetLocA, out shootLine);
@@ -299,9 +319,14 @@ namespace TorannMagic
                             Toil toil = new Toil();
                             toil.initAction = delegate
                             {
+                                castStarted = false;
 
                                 if (toil.actor.jobs.curJob.verbToUse == null) this.EndJobWith(JobCondition.Errored);
                                 this.verb = toil.actor.jobs.curJob.verbToUse as Verb_UseAbility;
+#if RW17
+                                if (verb == null || !Compatibility.AbilityCastSafety.CanBeginJobCast(verb, target))
+                                { this.EndJobWith(JobCondition.Incompletable); return; }
+#endif
                                 if (this.pawn.RaceProps.Humanlike)
                                 {
                                     //if (this.pawn.story.traits.HasTrait(TorannMagicDefOf.Faceless))
@@ -316,8 +341,10 @@ namespace TorannMagic
 
                                     if (validCastFlag)
                                     {
-                                        Messages.Message("TM_InvalidAbility".Translate(this.pawn.LabelShort, this.verb.Ability.Def.label), MessageTypeDefOf.RejectInput, false);
+                                        if (context == AbilityContext.Player)
+                                            Messages.Message("TM_InvalidAbility".Translate(this.pawn.LabelShort, this.verb.Ability.Def.label), MessageTypeDefOf.RejectInput, false);
                                         this.EndJobWith(JobCondition.Incompletable);
+                                        return;
                                     }
 
                                 }
@@ -325,8 +352,9 @@ namespace TorannMagic
                                 bool canFreeIntercept2 = false;
                                 if (target != null && !validCastFlag)
                                 {
-                                    verb.TryStartCastOn(target, false, canFreeIntercept2);
+                                    castStarted = verb.TryStartCastOn(target, false, canFreeIntercept2);
                                 }
+                                if (!castStarted) { this.EndJobWith(JobCondition.Incompletable); return; }
                                 using (IEnumerator<Hediff> enumerator = this.pawn.health.hediffSet.hediffs.GetEnumerator())
                                 {
                                     while (enumerator.MoveNext())
@@ -364,7 +392,7 @@ namespace TorannMagic
                             };
                             toil.AddFinishAction(delegate
                             {                                
-                                if (this.duration <= 5 && !this.pawn.DestroyedOrNull() && !this.pawn.Dead && !this.pawn.Downed)
+                                if (castStarted && this.duration <= 5 && !this.pawn.DestroyedOrNull() && !this.pawn.Dead && !this.pawn.Downed)
                                 {
                                     verb.Ability.PostAbilityAttempt();
                                 }
@@ -383,7 +411,7 @@ namespace TorannMagic
                         else
                         {
                             //No LoS
-                            if (pawn.IsColonist)
+                            if (context == AbilityContext.Player)
                             {
                                 Messages.Message("TM_OutOfLOS".Translate(
                                     pawn.LabelShort
@@ -403,7 +431,7 @@ namespace TorannMagic
                     {
                         pawn.jobs.EndCurrentJob(JobCondition.Errored, false, true);
                     }
-                    else if (pawn.IsColonist)
+                    else if (context == AbilityContext.Player)
                     {
                         //out of range
                         Messages.Message("TM_OutOfRange".Translate(), MessageTypeDefOf.RejectInput);
