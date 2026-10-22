@@ -69,7 +69,7 @@ namespace TorannMagic.TMDefs
         {
             "TM_Flight", "TM_Teleport", "TM_Blink", "TM_Recall", "TM_LightSkip", "TM_LightSkipMass",
             "TM_LightSkipGlobal", "TM_Polymorph", "TM_Shapeshift", "TM_ShapeshiftDW", "TM_LichForm",
-            "TM_Meteor", "TM_OrbitalStrike", "TM_Rainmaker", "TM_FertileLands", "TM_DryGround",
+            "TM_Rainmaker", "TM_FertileLands", "TM_DryGround",
             "TM_WetGround", "TM_Extinguish", "TM_MageLight", "TM_Sunlight", "TM_Heater", "TM_Cooler",
             "TM_PowerNode", "TM_LightningTrap", "TM_PoisonTrap", "TM_RuneCarving", "TM_EnchantWeapon",
             "TM_EnchanterStone", "TM_Resurrection", "TM_Transmutate", "TM_ShadowWalk", "TM_Entertain",
@@ -81,12 +81,23 @@ namespace TorannMagic.TMDefs
             "TM_Inspire", "TM_Dominate"
         };
 
-        // Powers with no meaningful autocast target: Verb_Summon pulls a designated
-        // thing to the caster and rejects self-targets with a toast on every attempt.
+        // Destructive location spells have no safe automatic target policy. Summon
+        // requires a designated thing, not a generic self target. Saved AC settings
+        // cannot override this admission rule.
         private static readonly HashSet<string> NoAutocast = new HashSet<string>
         {
-            "TM_Summon"
+            "TM_Summon", "TM_Meteor", "TM_OrbitalStrike"
         };
+
+        public static bool IsManualOnly(TMAbilityDef def)
+        {
+            return def != null && NoAutocast.Contains(BaseName(def.defName));
+        }
+
+        public static bool AllowsContext(TMAbilityDef def, AbilityContext context)
+        {
+            return context != AbilityContext.AI || !IsManualOnly(def);
+        }
 
         public static TM_Autocast For(TMAbilityDef def, bool mightUser)
         {
@@ -150,7 +161,7 @@ namespace TorannMagic.TMDefs
                 ac.targetNoFaction = false;
                 ac.minRange = 0f;
                 ac.maxRange = 30f;
-                ac.advancedConditionDefs = new List<string> { "TM_BelowMaxHealth" };
+                ac.advancedConditionDefs = baseName == "TM_CureDisease" ? null : new List<string> { "TM_BelowMaxHealth" };
             }
             else if (SummonAlly.Contains(baseName))
             {
@@ -199,7 +210,9 @@ namespace TorannMagic.TMDefs
             else if (UtilityNoAI.Contains(baseName))
             {
                 ac.type = AutocastType.OnSelf;
-                ac.drafted = true;
+                // Blink's non-null configuration exposes its travel toggle; only
+                // the destination-aware evaluator may execute it.
+                ac.drafted = baseName != "TM_Blink";
                 ac.undrafted = true;
                 ac.AIUsable = false;
             }

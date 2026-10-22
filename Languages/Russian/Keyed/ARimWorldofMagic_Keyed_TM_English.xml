@@ -50,7 +50,6 @@
   <TM_CannotUseOnLiving>Это заклинание не может быть использовано на живых.</TM_CannotUseOnLiving>
   <TM_CannontConsumeCorpseType>Нельзя употреблять этот тип трупов.</TM_CannontConsumeCorpseType>
   <TM_InvalidCorpseType>Тип трупа недопустим для употребления.</TM_InvalidCorpseType>
-  <TM_Learn>Изучено</TM_Learn>
   <TM_GatewayBeyondMaximumRange>Направленная ячейка находится вне досягаемости врат.</TM_GatewayBeyondMaximumRange>
   <TM_InvalidGatewaySelection>Недопустимая ячейка для врат.</TM_InvalidGatewaySelection>
   <TM_InvalidGatewayNotOccupied>Врата можно использовать только на клетках мира, занятых поселенцами.</TM_InvalidGatewayNotOccupied>
@@ -2185,7 +2184,6 @@ DR: [5, 9, 13, 17, 20]%</TM_Golemancy_pwr_desc>
   <TM_Enchanted>Зачаровано!</TM_Enchanted>
   <TM_Use>Использовать {0}</TM_Use>
   <TM_Read>Прочитать {0}</TM_Read>
-  <TM_Learn>Изучить {0}</TM_Learn>
   <TM_Inject>Ввести {0}</TM_Inject>
   <TM_MCU_BaseMana>Базовый прирост маны: {0}</TM_MCU_BaseMana>
   <TM_MCU_BaseRegen>Бонус к восстановлению маны: {0}</TM_MCU_BaseRegen>
@@ -2206,46 +2204,46 @@ DR: [5, 9, 13, 17, 20]%</TM_Golemancy_pwr_desc>
   <TM_MCU_PointsToLearn>{0} очков до</TM_MCU_PointsToLearn>
   <TM_UndeadVerbatum>Нежить</TM_UndeadVerbatum>
   <TM_GrimoireSub>Уровни классов, мана и способности в одном месте.</TM_GrimoireSub>
-  <TM_GrimoireIsekaiHint>Уровни классов дают XP пробуждения; пробуждение расширяет пул маны.</TM_GrimoireIsekaiHint>
+  <TM_GrimoireIsekaiHint>Нативная интеграция Isekai Leveling от Jelly Creative даёт бонусы к запасу и восстановлению маны и стамины, перезарядке способностей и расходу ресурсов.</TM_GrimoireIsekaiHint>
   <TM_Stats>Атрибуты</TM_Stats>
   <TM_StatsMight>Боевые атрибуты</TM_StatsMight>
-  <TM_GrimoireIsekaiHint>Уровни классов дают XP пробуждения; пробуждение расширяет пул маны.</TM_GrimoireIsekaiHint>
   <TM_GrimoireResources>Ресурсы</TM_GrimoireResources>
-  <TM_Grimoire>Гримуар</TM_Grimoire>
   <TM_LevelUp>Улучшить</TM_LevelUp>
-  <TM_GrimoireDesc>Відкриє гримуар цього персонажа: рівні класів, мана, здібності та прогрес пробудження.</TM_GrimoireDesc>
+  <TM_GrimoireDesc>Открыть гримуар персонажа: уровни классов, ресурсы и способности.</TM_GrimoireDesc>
   <TM_SlavesCanScribe>Разрешить рабам записывать классы в тома</TM_SlavesCanScribe>
   <AU_DISABLED>Отключено</AU_DISABLED>
   <TM_GrimoireTabMode>Гримуар на панели способностей</TM_GrimoireTabMode>
-  <TM_GrimoireTabModeDesc>Включено — кнопка Гримуара на панели способностей (как раньше). Выключено — Гримуар переносится во вкладку панели осмотра, как старые вкладки Magic/Fighter.</TM_GrimoireTabModeDesc>
-  <TM_GrimoireOpen>Открыть Гримуар</TM_GrimoireOpen>
-  <TM_GrimoireTabHint>Окно Гримуара уже открыто — закройте его, чтобы вернуться к интерфейсу.</TM_GrimoireTabHint>
-  <TM_AIMarkingDesc>Отмечать враждебных магов иконкой на карте.</TM_AIMarkingDesc>
-  <TM_AIFighterMarkingDesc>Отмечать иконкой врагов воинских классов (might).</TM_AIFighterMarkingDesc>
-  <TM_AIFriendlyMarkingDesc>Отмечать иконкой магов союзных фракций.</TM_AIFriendlyMarkingDesc>
-  <XPMultiplierDesc>Множитель получаемого магического и боевого опыта.</XPMultiplierDesc>
-  <NeedMultiplierDesc>Множитель расхода маны, выносливости и прочих потребностей классов.</NeedMultiplierDesc>
-  <MagicyteChanceDesc>Шанс, что новорождённые животные будут магицитами (источниками маны).</MagicyteChanceDesc>
-  <TM_DeathRetaliationIsLethalDesc>Смертельна ли предсмертная вспышка мага: если выключено — цель лишь теряет сознание.</TM_DeathRetaliationIsLethalDesc>
-  <TM_DeathRetaliationChanceDesc>Вероятность того, что погибший маг обрушит предсмертную вспышку на убийцу.</TM_DeathRetaliationChanceDesc>
-  <TM_DeathRetaliationDelayDesc>Задержка перед срабатыванием предсмертной вспышки мага.</TM_DeathRetaliationDelayDesc>
-  <TM_enableAutocastDesc>Автокаст жителей колонии: заклинания с включённым тумблером AC применяются сами.</TM_enableAutocastDesc>
-  <TM_autocastUndraftedThresholdDesc>Минимальный процент маны для автокаста вне боя.</TM_autocastUndraftedThresholdDesc>
-  <TM_autocastDraftedThresholdDesc>Минимальный процент маны для боевого автокаста в строю (Fire at will).</TM_autocastDraftedThresholdDesc>
-  <TM_autocastEvaluationFrequencyDesc>Как часто проверяются условия автокаста. Реже — выше производительность.</TM_autocastEvaluationFrequencyDesc>
-  <TM_autocastAnimalsDesc>Разрешить автокаст призванным существам и животным-кастерам.</TM_autocastAnimalsDesc>
-  <AICanCastDesc>Разрешить NPC-магам (рейдеры, враждебные фракции) применять способности в бою.</AICanCastDesc>
-  <AIHardModeDesc>Жесткий режим: NPC-маги умнее и агрессивнее выбирают заклинания.</AIHardModeDesc>
-  <TM_AggressiveAICastingDesc>NPC-маги кастуют чаще и активнее ищут цели для способностей.</TM_AggressiveAICastingDesc>
-  <TM_SlavesCanScribeDesc>Разрешить рабам записывать классы в тома (требуется Ideology).</TM_SlavesCanScribeDesc>
-  <TM_UndeadUpkeepMultiplierDesc>Множитель расходов на содержание нежити.</TM_UndeadUpkeepMultiplierDesc>
-  <TM_ParacyteSoftCapDesc>Мягкий лимит паразитов-магов в мире: после него шанс появления падает.</TM_ParacyteSoftCapDesc>
-  <TM_ParacyteMagesCountDesc>Учитывать ли паразитов в лимите магов фракции.</TM_ParacyteMagesCountDesc>
-  <unrestrictedBloodTypesForBloodMagicDesc>Магия крови работает на любых пешках, а не только с подходящей группой крови.</unrestrictedBloodTypesForBloodMagicDesc>
-  <TM_UnrestrictedWeaponCopyDesc>Копирование и зачарование оружия без ограничений по его типу.</TM_UnrestrictedWeaponCopyDesc>
-  <TM_ClassOptionsDesc>Настройки классов: шансы появления, предки и связанные правила.</TM_ClassOptionsDesc>
-  <TM_FactionOptionsDesc>Настройки фракций и их магов.</TM_FactionOptionsDesc>
-  <TM_EventOptionsDesc>Настройки событий: разломы, демоны, бродячие личи и их сложность.</TM_EventOptionsDesc>
-  <TM_GolemOptionsDesc>Настройки големов и их поведения.</TM_GolemOptionsDesc>
-  <TM_DisplayOptionsDesc>Отображение: иконки, камера, режим Гримуара и элементы интерфейса.</TM_DisplayOptionsDesc>
+  <TM_GrimoireTabModeDesc>Включено: кнопка гримуара отображается на панели способностей. Выключено: то же окно открывается через вкладку гримуара в панели осмотра.</TM_GrimoireTabModeDesc>
+  <TM_GrimoireOpen>Открыть гримуар</TM_GrimoireOpen>
+  <TM_GrimoireTabHint>Окно гримуара уже открыто.</TM_GrimoireTabHint>
+  <TM_AIMarkingDesc>Показывать значки классов над магами и бойцами вне колонии, включая нейтральных и дружественных гостей.</TM_AIMarkingDesc>
+  <TM_AIFighterMarkingDesc>Устаревшая настройка без самостоятельного эффекта. Значки бойцов вне колонии сейчас зависят от настройки значков магов ИИ.</TM_AIFighterMarkingDesc>
+  <TM_AIFriendlyMarkingDesc>Показывать значки классов над вашими колонистами-магами и бойцами.</TM_AIFriendlyMarkingDesc>
+  <XPMultiplierDesc>Множитель магического и боевого опыта, получаемого за применение способностей.</XPMultiplierDesc>
+  <NeedMultiplierDesc>Множитель скорости восстановления маны.</NeedMultiplierDesc>
+  <MagicyteChanceDesc>Вероятность получить необработанный магицит при добыче горных пород.</MagicyteChanceDesc>
+  <TM_DeathRetaliationIsLethalDesc>Позволять ответному удару наносить смертельный урон самому персонажу, кроме восстанавливающих эффектов. Отключение не делает урон другим персонажам несмертельным.</TM_DeathRetaliationIsLethalDesc>
+  <TM_DeathRetaliationChanceDesc>Вероятность того, что поверженный враждебный маг или боец подготовит ответный удар. Пленные не могут мстить.</TM_DeathRetaliationChanceDesc>
+  <TM_DeathRetaliationDelayDesc>Множитель обратного отсчёта ответного удара после его запуска: большие значения откладывают срабатывание.</TM_DeathRetaliationDelayDesc>
+  <TM_enableAutocastDesc>Разрешить колонистам автоматически применять магические и боевые способности с включённым переключателем AC.</TM_enableAutocastDesc>
+  <TM_autocastUndraftedThresholdDesc>Минимальный процент маны или стамины для автоприменения вне боевого режима. Также используется при обычных проверках автоприменения у NPC.</TM_autocastUndraftedThresholdDesc>
+  <TM_autocastDraftedThresholdDesc>Минимальный процент маны или стамины для автоприменения в боевом режиме с разрешённым огнём. Монахи игнорируют порог стамины.</TM_autocastDraftedThresholdDesc>
+  <TM_autocastEvaluationFrequencyDesc>Базовый интервал между проверками автоприменения в игровых секундах. Большие значения означают более редкие проверки; фактические интервалы случайны.</TM_autocastEvaluationFrequencyDesc>
+  <TM_autocastAnimalsDesc>Учитывать животных при поддерживаемых автоматических поисках целей, например для лечения.</TM_autocastAnimalsDesc>
+  <AICanCastDesc>Разрешить магам и бойцам вне колонии применять способности под управлением ИИ.</AICanCastDesc>
+  <AIHardModeDesc>Усиливать многие магические и боевые способности NPC и повышать вероятность знания высших заклинаний у магов NPC.</AIHardModeDesc>
+  <TM_AggressiveAICastingDesc>Повышать активность применения способностей NPC и вдвое сокращать базовую перезарядку и затраты маны или стамины.</TM_AggressiveAICastingDesc>
+  <TM_SlavesCanScribeDesc>Разрешить рабам писать классовые тома и обрывки классовых рукописей при соблюдении обычных требований к классу.</TM_SlavesCanScribeDesc>
+  <TM_UndeadUpkeepMultiplierDesc>Множитель штрафа к восстановлению маны за содержание нежити; ноль отключает этот штраф.</TM_UndeadUpkeepMultiplierDesc>
+  <TM_ParacyteSoftCapDesc>Допустимая местная нагрузка парацитов до снижения восстановления маны. Каждое растение считается за 1, а каждый маг — за 2, если включена соответствующая настройка.</TM_ParacyteSoftCapDesc>
+  <TM_ParacyteMagesCountDesc>При расчёте штрафа к восстановлению маны считать каждого мага на карте за два парацита. Животные, дикие люди и Безликие не учитываются.</TM_ParacyteMagesCountDesc>
+  <unrestrictedBloodTypesForBloodMagicDesc>Разрешить сбор и воспламенение крови других рас, сохраняя остальные требования заклинаний.</unrestrictedBloodTypesForBloodMagicDesc>
+  <TM_UnrestrictedWeaponCopyDesc>Разрешить техноманту копировать дальнобойное оружие ниже индустриального уровня или с нестандартным способом стрельбы. Оружие ближнего боя по-прежнему исключено.</TM_UnrestrictedWeaponCopyDesc>
+  <TM_ClassOptionsDesc>Выбрать доступные магические и боевые классы и вспомогательные черты, настроить вероятность их появления.</TM_ClassOptionsDesc>
+  <TM_FactionOptionsDesc>Настроить множители появления магов и бойцов для каждой фракции.</TM_FactionOptionsDesc>
+  <TM_EventOptionsDesc>Открыть настройки сложности разломов, странствующих личей и демонических нападений.</TM_EventOptionsDesc>
+  <TM_GolemOptionsDesc>Настроить отображение големов: спящие каркасы, значки на панели колонистов и тряску экрана.</TM_GolemOptionsDesc>
+  <TM_DisplayOptionsDesc>Настроить значки, камеру, расположение гримуара, внешний вид нежити и отрисовку одежды.</TM_DisplayOptionsDesc>
+  <TM_Grimoire>Гримуар</TM_Grimoire>
+  <TM_Learn>Изучить</TM_Learn>
 </LanguageData>

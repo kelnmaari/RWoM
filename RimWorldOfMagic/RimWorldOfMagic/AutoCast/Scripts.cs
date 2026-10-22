@@ -25,6 +25,117 @@ namespace TorannMagic.AutoCast
         /// suppressed while an autocast resolution is running.
         /// </summary>
         public static bool SelectionRestoreAllowed = true;
+
+        public static bool IsPlayerOrderedAbilityCast(Job job, Verb verb)
+        {
+            // Jecs marks both contexts playerForced; count is 1 for Player, 0 for AI.
+            // Match the executing verb so another job cannot authorize UI changes.
+            return job != null && verb != null && job.verbToUse == verb && job.count == 1;
+        }
+    }
+
+    public static class AutocastPolicy
+    {
+        // These powers retain the existing class/job-specific evaluators below the
+        // generic loops. Ownership includes a negative result: never retry them
+        // through a generic target in the same mode. This is NOT toggle eligibility.
+        private static readonly HashSet<string> MagicUndrafted = new HashSet<string>
+        {
+            "TM_SummonMinion", "TM_TimeMark", "TM_Regenerate", "TM_RegrowLimb",
+            "TM_Heal", "TM_Shield", "TM_AdvancedHeal", "TM_Purify", "TM_Transmutate",
+            "TM_TransferMana", "TM_SiphonMana", "TM_CauterizeWound", "TM_SpellMending",
+            "TM_TeachMagic", "TM_DirtDevil"
+        };
+        private static readonly HashSet<string> MagicDrafted = new HashSet<string>
+        {
+            "TM_Firebolt", "TM_Icebolt", "TM_FrostRay", "TM_LightningBolt", "TM_MagicMissile",
+            "TM_Poison", "TM_Regenerate", "TM_ShadowBolt", "TM_Heal", "TM_Shield",
+            "TM_AdvancedHeal", "TM_SiphonMana", "TM_CauterizeWound", "TM_ArcaneBolt"
+        };
+        private static readonly HashSet<string> MightUndrafted = new HashSet<string>
+        {
+            "TM_PhaseStrike", "TM_FirstAid", "TM_Elixir", "TM_TeachMight"
+        };
+        private static readonly HashSet<string> MightHunting = new HashSet<string>
+        {
+            "TM_ArrowStorm", "TM_PistolWhip", "TM_SuppressingFire", "TM_Buckshot",
+            "TM_Headshot", "TM_Spite", "TM_ThrowingKnife", "TM_TempestStrike"
+        };
+        private static readonly HashSet<string> MightDrafted = new HashSet<string>
+        {
+            "TM_BladeSpin", "TM_TigerStrike", "TM_ThunderStrike", "TM_Grapple", "TM_ArrowStorm",
+            "TM_Spite", "TM_AntiArmor", "TM_Headshot", "TM_DisablingShot", "TM_FirstAid",
+            "TM_PistolWhip", "TM_SuppressingFire", "TM_Buckshot", "TM_ThrowingKnife",
+            "TM_TempestStrike", "TM_PommelStrike"
+        };
+
+        public static bool UsesLegacyEvaluator(TMAbilityDef def, bool might, bool drafted, bool hunting)
+        {
+            if (def == null) return false;
+            string name = TM_Calc.BaseAbilityDefName(def.defName);
+            return might ? (drafted ? MightDrafted.Contains(name) :
+                MightUndrafted.Contains(name) || (hunting && MightHunting.Contains(name))) :
+                (drafted ? MagicDrafted.Contains(name) : MagicUndrafted.Contains(name));
+        }
+
+        public static IEnumerable<MagicPower> MagicPowers(MagicData data)
+        {
+            // Distinct is by saved object identity, not base def: an unlearned class
+            // entry must not hide a separate learned custom/hybrid power.
+            return data.AllMagicPowers.Where(power => power != null && power.learned &&
+                power.TMabilityDefs != null && power.abilityDef is TMAbilityDef def &&
+                !TM_AutocastDefaults.IsManualOnly(def)).Distinct();
+        }
+
+        public static IEnumerable<MightPower> MightPowers(MightData data)
+        {
+            return data.AllMightPowers.Where(power => power != null && power.learned &&
+                power.TMabilityDefs != null && power.abilityDef is TMAbilityDef def &&
+                !TM_AutocastDefaults.IsManualOnly(def)).Distinct();
+        }
+
+        // Dedicated evaluators must read the same saved owner as the toggle.
+        // Keep an unlearned entry only for the existing mimic/ChaosMage paths;
+        // it must never shadow a separately learned custom power. Group levels
+        // together so a family is attempted once in each dedicated evaluator.
+        public static IEnumerable<MagicPower> LegacyMagicPowers(MagicData data)
+        {
+            return data.AllMagicPowers.Where(power => power != null && power.abilityDef is TMAbilityDef)
+                .GroupBy(power => TM_Calc.BaseAbilityDefName(power.abilityDef.defName))
+                .Select(group => group.OrderByDescending(power => power.learned)
+                    .ThenByDescending(power => power.autocast).First());
+        }
+
+        public static IEnumerable<MightPower> LegacyMightPowers(MightData data)
+        {
+            return data.AllMightPowers.Where(power => power != null && power.abilityDef is TMAbilityDef)
+                .GroupBy(power => TM_Calc.BaseAbilityDefName(power.abilityDef.defName))
+                .Select(group => group.OrderByDescending(power => power.learned)
+                    .ThenByDescending(power => power.autocast).First());
+        }
+
+        public static IEnumerable<MagicPower> LegacyMagicGroup(IEnumerable<MagicPower> owners, IEnumerable<MagicPower> templates)
+        {
+            // Preserve the class evaluator's original priority, replacing only owners.
+            return templates.Where(power => power != null && power.abilityDef != null)
+                .Select(power => TM_Calc.BaseAbilityDefName(power.abilityDef.defName)).Distinct()
+                .Select(family => owners.FirstOrDefault(power => TM_Calc.BaseAbilityDefName(power.abilityDef.defName) == family))
+                .Where(power => power != null);
+        }
+
+        public static IEnumerable<MightPower> LegacyMightGroup(IEnumerable<MightPower> owners, IEnumerable<MightPower> templates)
+        {
+            return templates.Where(power => power != null && power.abilityDef != null)
+                .Select(power => TM_Calc.BaseAbilityDefName(power.abilityDef.defName)).Distinct()
+                .Select(family => owners.FirstOrDefault(power => TM_Calc.BaseAbilityDefName(power.abilityDef.defName) == family))
+                .Where(power => power != null);
+        }
+
+        public static bool HasPlayerToggle(TMAbilityDef def, TM_Autocast config)
+        {
+            return def != null && !TM_AutocastDefaults.IsManualOnly(def) && config != null &&
+                config.type != AutocastType.Null && (config.drafted || config.undrafted);
+        }
     }
 
     public static class Phase
@@ -274,6 +385,7 @@ namespace TorannMagic.AutoCast
         public static void TryExecute(CompAbilityUserMagic casterComp, TMAbilityDef abilitydef, PawnAbility ability, MagicPower power, LocalTargetInfo target, int maxRange, out bool success)
         {
             success = false;
+            if (ability == null || !TM_Calc.AutocastTargetAcceptable(casterComp.Pawn, abilitydef, target)) return;
             if (casterComp.Mana.CurLevel >= abilitydef.manaCost && ability.CooldownTicksLeft <= 0)
             {
                 Pawn caster = casterComp.Pawn;
@@ -308,6 +420,7 @@ namespace TorannMagic.AutoCast
         public static void TryExecute(CompAbilityUserMight casterComp, TMAbilityDef abilitydef, PawnAbility ability, MightPower power, LocalTargetInfo target, out bool success)
         {
             success = false;
+            if (ability == null || !TM_Calc.AutocastTargetAcceptable(casterComp.Pawn, abilitydef, target)) return;
             if (casterComp.Stamina.CurLevel >= abilitydef.staminaCost && ability.CooldownTicksLeft <= 0)
             {
                 Pawn caster = casterComp.Pawn;
@@ -331,6 +444,7 @@ namespace TorannMagic.AutoCast
         public static void TryExecute(CompAbilityUserMight casterComp, TMAbilityDef abilitydef, PawnAbility ability, MightPower power, LocalTargetInfo target, float minRange, out bool success)
         {
             success = false;
+            if (ability == null || !TM_Calc.AutocastTargetAcceptable(casterComp.Pawn, abilitydef, target)) return;
             if (casterComp.Stamina.CurLevel >= abilitydef.staminaCost && ability.CooldownTicksLeft <= 0)
             {
                 Pawn caster = casterComp.Pawn;
@@ -352,6 +466,7 @@ namespace TorannMagic.AutoCast
         public static void TryExecute(CompAbilityUserMight casterComp, TMAbilityDef abilitydef, PawnAbility ability, MightPower power, LocalTargetInfo target, float minRange, out bool success)
         {
             success = false;
+            if (ability == null || !TM_Calc.AutocastTargetAcceptable(casterComp.Pawn, abilitydef, target)) return;
             if (casterComp.Stamina.CurLevel >= abilitydef.staminaCost && ability.CooldownTicksLeft <= 0)
             {
                 Pawn caster = casterComp.Pawn;
@@ -373,6 +488,7 @@ namespace TorannMagic.AutoCast
         public static void TryExecute(CompAbilityUserMagic casterComp, TMAbilityDef abilitydef, PawnAbility ability, MagicPower power, LocalTargetInfo target, float minRange, out bool success)
         {
             success = false;
+            if (ability == null || !TM_Calc.AutocastTargetAcceptable(casterComp.Pawn, abilitydef, target)) return;
             if (casterComp.Mana.CurLevel >= abilitydef.manaCost && ability.CooldownTicksLeft <= 0)
             {
                 Pawn caster = casterComp.Pawn;
@@ -394,6 +510,7 @@ namespace TorannMagic.AutoCast
         public static void TryExecute(CompAbilityUserMight casterComp, TMAbilityDef abilitydef, PawnAbility ability, MightPower power, LocalTargetInfo target, float minRange, out bool success)
         {
             success = false;
+            if (ability == null || !TM_Calc.AutocastTargetAcceptable(casterComp.Pawn, abilitydef, target)) return;
             if (casterComp.Stamina.CurLevel >= abilitydef.staminaCost && ability.CooldownTicksLeft <= 0)
             {
                 Pawn caster = casterComp.Pawn;
@@ -415,6 +532,7 @@ namespace TorannMagic.AutoCast
         public static void TryExecute(CompAbilityUserMagic casterComp, TMAbilityDef abilitydef, PawnAbility ability, MagicPower power, LocalTargetInfo target, float minRange, out bool success)
         {
             success = false;
+            if (ability == null || !TM_Calc.AutocastTargetAcceptable(casterComp.Pawn, abilitydef, target)) return;
             if (casterComp.Mana.CurLevel >= abilitydef.manaCost && ability.CooldownTicksLeft <= 0)
             {
                 Pawn caster = casterComp.Pawn;
@@ -587,31 +705,18 @@ namespace TorannMagic.AutoCast
             {
                 Pawn caster = casterComp.Pawn;
                 LocalTargetInfo jobTarget = null;
-                MagicPowerSkill pwr = casterComp.MagicData.MagicPowerSkill_CureDisease.FirstOrDefault((MagicPowerSkill x) => x.label == "TM_CureDisease_pwr");
-                if (pwr.level >= 2)
+                string name = TM_Calc.BaseAbilityDefName(abilitydef.defName);
+                if (name == "TM_CureDisease" || name == "TM_MechaniteReprogramming")
                 {
-                    jobTarget = TM_Calc.FindNearbyAfflictedPawnAny(caster, (int)(abilitydef.MainVerb.range * .9f));
-                    if (jobTarget != null && jobTarget.Thing is Pawn jobPawn)
-                    {
-                        if (jobPawn.health != null && jobPawn.health?.hediffSet != null && !(jobPawn.health.hediffSet.HasHediff(TorannMagicDefOf.TM_DiseaseImmunityHD) || jobPawn.health.hediffSet.HasHediff(TorannMagicDefOf.TM_DiseaseImmunity2HD)))
-                        {
-
-                        }
-                        else
-                        {
-                            jobTarget = null;
-                        }
-                    }
-                    else
-                    {
-                        jobTarget = null;
-                    }
+                    jobTarget = TM_Calc.FindNearbyAutocastCureTarget(caster, abilitydef, (int)(abilitydef.MainVerb.range * .9f));
                 }
                 else
                 {
+                    // Purify keeps its own supported ailment list. CureDisease
+                    // power must not redirect this or mechanites to arbitrary sickness.
                     jobTarget = TM_Calc.FindNearbyAfflictedPawn(caster, (int)(abilitydef.MainVerb.range * .9f), validAfflictionNames);
                 }
-                if (jobTarget != null)
+                if (jobTarget != null && TM_Calc.AutocastTargetAcceptable(caster, abilitydef, jobTarget))
                 {
                     float distanceToTarget = (jobTarget.Cell - caster.Position).LengthHorizontal;
                     if (distanceToTarget < (abilitydef.MainVerb.range * .9f) && jobTarget != null && jobTarget.Thing != null)
@@ -851,6 +956,7 @@ namespace TorannMagic.AutoCast
         public static void Evaluate(CompAbilityUserMagic casterComp, TMAbilityDef abilitydef, PawnAbility ability, MagicPower power, float minDistance, out bool success)
         {
             success = false;
+            if (TM_AutocastDefaults.IsManualOnly(abilitydef)) return;
             Pawn caster = casterComp.Pawn;
             LocalTargetInfo jobTarget = caster.CurJob.targetA;
             float distanceToTarget = (jobTarget.Cell - caster.Position).LengthHorizontal;
@@ -905,6 +1011,7 @@ namespace TorannMagic.AutoCast
             }
             Pawn caster = casterComp.Pawn;
             LocalTargetInfo jobTarget = caster;
+            if (!TM_Calc.AutocastTargetAcceptable(caster, abilitydef, jobTarget)) return;
 
             if (casterComp.Stamina.CurLevel >= casterComp.ActualStaminaCost(abilitydef) && ability.CooldownTicksLeft <= 0 && jobTarget != null)
             {
@@ -926,6 +1033,7 @@ namespace TorannMagic.AutoCast
             }
             Pawn caster = casterComp.Pawn;
             LocalTargetInfo jobTarget = caster;
+            if (!TM_Calc.AutocastTargetAcceptable(caster, abilitydef, jobTarget)) return;
 
             if (casterComp.Mana.CurLevel >= casterComp.ActualManaCost(abilitydef) && ability.CooldownTicksLeft <= 0 && jobTarget != null)
             {                
@@ -943,6 +1051,7 @@ namespace TorannMagic.AutoCast
             success = false;
             Pawn caster = casterComp.Pawn;
             LocalTargetInfo jobTarget = caster.Position;
+            if (ability == null || !TM_Calc.AutocastTargetAcceptable(caster, abilitydef, jobTarget)) return;
 
             if (casterComp.Mana.CurLevel >= casterComp.ActualManaCost(abilitydef) && ability.CooldownTicksLeft <= 0 && jobTarget != null)
             {
@@ -1102,6 +1211,8 @@ namespace TorannMagic.AutoCast
         {
             success = false;
             Pawn caster = casterComp.Pawn;
+            if (ability == null || caster.CurJob == null || caster.pather == null || !caster.pather.Moving ||
+                !caster.pather.Destination.IsValid || caster.Map == null) return;
             //LocalTargetInfo jobTarget = caster.CurJob.targetA;
             LocalTargetInfo jobTarget = caster.pather.Destination;
             Thing carriedThing = null;

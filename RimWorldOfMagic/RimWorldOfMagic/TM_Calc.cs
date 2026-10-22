@@ -1421,6 +1421,27 @@ namespace TorannMagic
             return pawnList.Count > 0 ? pawnList.RandomElement() : null;
         }
 
+        public static Pawn FindNearbyAutocastCureTarget(Pawn caster, TMAbilityDef ability, int radius)
+        {
+            if (caster.Map == null) return null;
+            IReadOnlyList<Pawn> pawns = caster.Map.mapPawns.AllPawnsSpawned;
+            Pawn found = null;
+            int candidates = 0;
+            for (int i = 0; i < pawns.Count; i++)
+            {
+                Pawn target = pawns[i];
+                if (target == null || target.Faction == null || target.Faction != caster.Faction ||
+                    !(target.RaceProps.Humanlike || ModOptions.Settings.Instance.autocastAnimals) ||
+                    (target.Position - caster.Position).LengthHorizontal > radius ||
+                    !AutocastTargetAcceptable(caster, ability, target)) continue;
+                // Filter before sampling, including high-power CureDisease. An
+                // immunity buff does not turn an unsupported wound into a cure.
+                candidates++;
+                if (Rand.Value <= 1f / candidates) found = target;
+            }
+            return found;
+        }
+
         public static Pawn FindNearbyAfflictedPawnAny(Pawn pawn, int radius)
         {
             List<Pawn> mapPawns = pawn.Map.mapPawns.AllPawnsSpawned.ToList();
@@ -4431,25 +4452,103 @@ namespace TorannMagic
         }
 
         /// <summary>
-        /// Per-ability target validation for autocast: skips casts the ability
-        /// verbs would only reject with a toast (cure on non-diseases, mechanite
-        /// reprogramming on healthy pawns).
+        /// Automatic casts validate the real target kind and the executing caster's
+        /// skills. Manual verbs deliberately keep their existing behavior.
         /// </summary>
-        public static bool AutocastTargetAcceptable(TMAbilityDef ability, Pawn target)
+        public static bool AutocastTargetAcceptable(Pawn caster, TMAbilityDef ability, LocalTargetInfo target)
         {
-            if (target == null || target.Dead || target.health?.hediffSet == null)
+            if (ability == null || !target.IsValid || TM_AutocastDefaults.IsManualOnly(ability))
             {
                 return false;
             }
             string baseName = BaseAbilityDefName(ability.defName);
+            if (baseName == "TM_Blink") return false; // destination evaluator only, never a generic cast job
+            if (baseName == "TM_ConsumeCorpse" || baseName == "TM_CorpseExplosion" || baseName == "TM_RaiseUndead")
+            {
+                return target.Thing is Corpse corpse && !corpse.Destroyed;
+            }
+            Pawn pawn = target.Pawn;
             if (baseName == "TM_CureDisease" || baseName == "TM_MechaniteReprogramming")
             {
-                return HasCurableSickness(target);
+                if (pawn == null || pawn.Dead || pawn.Destroyed || pawn.health?.hediffSet == null) return false;
+                return baseName == "TM_CureDisease" ? CanAutocastCureDisease(caster, ability, pawn) : CanAutocastReprogramMechanites(pawn);
             }
-            return true;
+            return pawn == null ? target.Thing == null || !target.Thing.Destroyed : !pawn.Dead && !pawn.Destroyed;
+        }
+
+        // Compatibility for callers without a caster: do not assume upgraded skills.
+        public static bool AutocastTargetAcceptable(TMAbilityDef ability, Pawn target)
+        {
+            return AutocastTargetAcceptable(null, ability, target);
+        }
+
+        private static bool CanAutocastCureDisease(Pawn caster, TMAbilityDef ability, Pawn target)
+        {
+            int versatility = caster != null ? GetSkillVersatilityLevel(caster, ability) : 0;
+            foreach (Hediff hediff in target.health.hediffSet.hediffs)
+            {
+                HediffDef def = hediff.def;
+                if (def == null || hediff is Hediff_Injury) continue;
+                // The verb enters the category branch only for its AddictionList;
+                // do not promise cures for arbitrary category entries it never uses.
+                if (TM_Data.AddictionList().Contains(def))
+                {
+                    if (CategoryCureSupported(caster, HediffCategoryList.Named("TM_Category_Hediffs").diseases, def, versatility)) return true;
+                    continue;
+                }
+                string name = def.defName;
+                if (name == "WoundInfection" || name.Contains("Flu") || name.Contains("Infection")) return true;
+                if (versatility >= 1 && (name == "GutWorms" || name == "Malaria" || def == HediffDefOf.FoodPoisoning)) return true;
+                // Scaria is unconditional in the current manual verb (operator precedence).
+                if ((versatility >= 2 && (name == "SleepingSickness" || name == "MuscleParasites")) || def == HediffDefOf.Scaria) return true;
+                if (versatility == 3 && def.makesSickThought && def.isBad && name != "Abasia") return true;
+            }
+            return false;
+        }
+
+        private static bool CanAutocastReprogramMechanites(Pawn target)
+        {
+            foreach (Hediff hediff in target.health.hediffSet.hediffs)
+            {
+                HediffDef def = hediff.def;
+                if (def == null || hediff is Hediff_Injury) continue;
+                if (TM_Data.MechaniteList().Contains(def))
+                {
+                    // Verb_MechaniteReprogramming reads category skills from the
+                    // recipient, not the caster. Keep that existing contract here.
+                    if (CategoryCureSupported(target, HediffCategoryList.Named("TM_Category_Hediffs").mechanites, def, 0)) return true;
+                    continue;
+                }
+                if (def.defName == "SensoryMechanites" || def.defName == "FibrousMechanites" || def.defName == "LymphaticMechanites") return true;
+            }
+            return false;
+        }
+
+        private static bool CategoryCureSupported(Pawn skillOwner, List<TM_CategoryHediff> categories, HediffDef def, int defaultLevel)
+        {
+            CompAbilityUserMagic comp = skillOwner?.GetCompAbilityUserMagic();
+            foreach (TM_CategoryHediff category in categories)
+            {
+                // Match the verb, including its direction of Contains.
+                if (!category.hediffDefname.Contains(def.defName)) continue;
+                int level = defaultLevel;
+                if (comp != null && category.requiredSkillName != "TM_Purify_ver")
+                {
+                    MagicPowerSkill skill = comp.MagicData.AllMagicPowerSkills.FirstOrDefault(x => x.label == category.requiredSkillName);
+                    if (skill == null) continue;
+                    level = skill.level;
+                }
+                if (level >= category.requiredSkillLevel) return true;
+            }
+            return false;
         }
 
         public static LocalTargetInfo GetAutocastTarget(Pawn caster, TM_Autocast autocasting, LocalTargetInfo potentialTarget)
+        {
+            return GetAutocastTarget(caster, autocasting, potentialTarget, null);
+        }
+
+        public static LocalTargetInfo GetAutocastTarget(Pawn caster, TM_Autocast autocasting, LocalTargetInfo potentialTarget, TMAbilityDef ability)
         {
             LocalTargetInfo target = new LocalTargetInfo();
 
@@ -4508,6 +4607,10 @@ namespace TorannMagic
                             }
                         }
                         else if (!autocasting.targetFriendly)
+                        {
+                            continue;
+                        }
+                        if (ability != null && (!AutocastTargetAcceptable(caster, ability, p) || !autocasting.ValidConditions(caster, p)))
                         {
                             continue;
                         }
@@ -4593,7 +4696,7 @@ namespace TorannMagic
             {
                 target = potentialTarget.Cell;
             }
-            return target;
+            return ability == null || AutocastTargetAcceptable(caster, ability, target) ? target : LocalTargetInfo.Invalid;
         }
 
         public static List<Building> FindConnectedWalls(Building start, float maxAllowedDistance = 1.4f, float maxDistanceFromStart = 50, bool matchFaction = true)

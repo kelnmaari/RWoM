@@ -2492,6 +2492,27 @@ namespace TorannMagic
             Scribe_Collections.Look<MightPowerSkill>(ref this.mightPowerSkill_PoisonFlask, "mightPowerSkill_PoisonFlask", (LookMode)2, new object[0]);
             Scribe_Collections.Look<MightPowerSkill>(ref this.mightPowerSkill_Elixir, "mightPowerSkill_Elixir", (LookMode)2, new object[0]);
             Scribe_Collections.Look<MightPowerSkill>(ref this.mightPowerSkill_SoothingBalm, "mightPowerSkill_SoothingBalm", (LookMode)2, new object[0]);
+            if (Scribe.mode == LoadSaveMode.PostLoadInit && this.mightPowerSkill_Custom != null)
+            {
+                Dictionary<string, int> indices = new Dictionary<string, int>();
+                for (int i = 0; i < this.mightPowerSkill_Custom.Count; i++)
+                {
+                    MightPowerSkill skill = this.mightPowerSkill_Custom[i];
+                    if (skill == null || string.IsNullOrEmpty(skill.label)) continue;
+                    skill.label = TM_CustomSkillLabels.Canonical(skill.label);
+                    int index;
+                    if (indices.TryGetValue(skill.label, out index))
+                    {
+                        if (skill.level > this.mightPowerSkill_Custom[index].level)
+                        {
+                            this.mightPowerSkill_Custom[index] = skill;
+                        }
+                        this.mightPowerSkill_Custom.RemoveAt(i--);
+                    }
+                    else indices.Add(skill.label, i);
+                }
+                this.allMightPowerSkills = null;
+            }
         }
     }
 }

@@ -1293,35 +1293,38 @@ Cantidad base: 0%</TM_LifeSteal_ver_desc>
 
   <AU_DISABLED>Desactivado</AU_DISABLED>
   <TM_GrimoireTabMode>Grimorio en la barra de habilidades</TM_GrimoireTabMode>
-  <TM_GrimoireTabModeDesc>Activado — botón del Grimorio en la barra de habilidades. Desactivado — el Grimorio pasa a ser una pestaña del panel de inspección, como las antiguas pestañas Magic/Fighter.</TM_GrimoireTabModeDesc>
-  <TM_GrimoireOpen>Abrir el Grimorio</TM_GrimoireOpen>
-  <TM_GrimoireTabHint>La ventana del Grimorio ya está abierta — ciérrala para volver.</TM_GrimoireTabHint>
-  <TM_AIMarkingDesc>Marcar con un icono a los magos hostiles en el mapa.</TM_AIMarkingDesc>
-  <TM_AIFighterMarkingDesc>Marcar con un icono a los enemigos de clases guerreras (might).</TM_AIFighterMarkingDesc>
-  <TM_AIFriendlyMarkingDesc>Marcar con un icono a los magos de facciones aliadas.</TM_AIFriendlyMarkingDesc>
-  <XPMultiplierDesc>Multiplicador de experiencia mágica y guerrera obtenida.</XPMultiplierDesc>
-  <NeedMultiplierDesc>Multiplicador del consumo de maná, vigor y otras necesidades de clase.</NeedMultiplierDesc>
-  <MagicyteChanceDesc>Probabilidad de que los animales recién nacidos sean magícitas (fuentes de maná).</MagicyteChanceDesc>
-  <TM_DeathRetaliationIsLethalDesc>Si la explosión de represalia del mago moribundo es letal; apagado, el objetivo solo queda inconsciente.</TM_DeathRetaliationIsLethalDesc>
-  <TM_DeathRetaliationChanceDesc>Probabilidad de que un mago muerto desate una explosión de represalia contra su asesino.</TM_DeathRetaliationChanceDesc>
-  <TM_DeathRetaliationDelayDesc>Retraso antes de que estalle la represalia del mago muerto.</TM_DeathRetaliationDelayDesc>
-  <TM_enableAutocastDesc>Autolanzamiento de los colonos: los hechizos con el interruptor AC activado se lanzan solos.</TM_enableAutocastDesc>
-  <TM_autocastUndraftedThresholdDesc>Porcentaje mínimo de maná para autolanzar fuera de combate.</TM_autocastUndraftedThresholdDesc>
-  <TM_autocastDraftedThresholdDesc>Porcentaje mínimo de maná para autolanzar en combate (fuego a discreción).</TM_autocastDraftedThresholdDesc>
-  <TM_autocastEvaluationFrequencyDesc>Con qué frecuencia se evalúan las condiciones del autolanzamiento. Más lento rinde mejor.</TM_autocastEvaluationFrequencyDesc>
-  <TM_autocastAnimalsDesc>Permitir autolanzamiento a criaturas invocadas y animales lanzadores.</TM_autocastAnimalsDesc>
-  <AICanCastDesc>Permitir que los magos NPC (invasores, facciones hostiles) usen habilidades en combate.</AICanCastDesc>
-  <AIHardModeDesc>Modo difícil: los magos NPC eligen hechizos con más inteligencia y agresividad.</AIHardModeDesc>
-  <TM_AggressiveAICastingDesc>Los magos NPC lanzan más a menudo y buscan objetivos activamente.</TM_AggressiveAICastingDesc>
-  <TM_SlavesCanScribeDesc>Permitir que los esclavos escriban tomos de clase (requiere Ideology).</TM_SlavesCanScribeDesc>
-  <TM_UndeadUpkeepMultiplierDesc>Multiplicador de los costes de mantenimiento de los no muertos.</TM_UndeadUpkeepMultiplierDesc>
-  <TM_ParacyteSoftCapDesc>Límite flexible de magos paracitos en el mundo; pasado, la probabilidad de aparición cae.</TM_ParacyteSoftCapDesc>
-  <TM_ParacyteMagesCountDesc>Si los paracitos cuentan para el límite de magos de la facción.</TM_ParacyteMagesCountDesc>
-  <unrestrictedBloodTypesForBloodMagicDesc>La magia de sangre funciona en cualquier peón, no solo en tipos de sangre compatibles.</unrestrictedBloodTypesForBloodMagicDesc>
-  <TM_UnrestrictedWeaponCopyDesc>Copiar y encantar armas sin importar su tipo.</TM_UnrestrictedWeaponCopyDesc>
-  <TM_ClassOptionsDesc>Opciones de clase: probabilidades de aparición, antepasados y reglas relacionadas.</TM_ClassOptionsDesc>
-  <TM_FactionOptionsDesc>Opciones de facciones y sus magos.</TM_FactionOptionsDesc>
-  <TM_EventOptionsDesc>Opciones de eventos: grietas, demonios, liches errantes y su dificultad.</TM_EventOptionsDesc>
-  <TM_GolemOptionsDesc>Opciones de gólems y su comportamiento.</TM_GolemOptionsDesc>
-  <TM_DisplayOptionsDesc>Visualización: iconos, cámara, modo del Grimorio y elementos de la interfaz.</TM_DisplayOptionsDesc>
+  <TM_GrimoireTabModeDesc>Activado: muestra un botón del Grimorio en la barra de habilidades. Desactivado: abre la misma ventana desde una pestaña del panel de inspección.</TM_GrimoireTabModeDesc>
+  <TM_GrimoireOpen>Abrir Grimorio</TM_GrimoireOpen>
+  <TM_GrimoireTabHint>La ventana del Grimorio ya está abierta.</TM_GrimoireTabHint>
+  <TM_AIMarkingDesc>Muestra iconos de clase sobre magos y combatientes que no sean colonos, incluidos los visitantes neutrales y amistosos.</TM_AIMarkingDesc>
+  <TM_AIFighterMarkingDesc>Opción antigua sin efecto independiente. Los iconos de combatientes no colonos siguen actualmente el ajuste de marcas de magos de la IA.</TM_AIFighterMarkingDesc>
+  <TM_AIFriendlyMarkingDesc>Muestra iconos de clase sobre tus colonos magos y combatientes.</TM_AIFriendlyMarkingDesc>
+  <XPMultiplierDesc>Multiplicador de la experiencia mágica y de combate obtenida al usar habilidades.</XPMultiplierDesc>
+  <NeedMultiplierDesc>Multiplicador de la regeneración de maná.</NeedMultiplierDesc>
+  <MagicyteChanceDesc>Probabilidad de obtener magicita en bruto al minar.</MagicyteChanceDesc>
+  <TM_DeathRetaliationIsLethalDesc>Permite que la represalia cause heridas mortales al propio personaje que la ejecuta, salvo los efectos de recuperación. Desactivarlo no vuelve no letal el daño a otros personajes.</TM_DeathRetaliationIsLethalDesc>
+  <TM_DeathRetaliationChanceDesc>Probabilidad de que un mago o combatiente hostil derribado prepare una represalia. Los prisioneros no pueden hacerlo.</TM_DeathRetaliationChanceDesc>
+  <TM_DeathRetaliationDelayDesc>Multiplicador de la cuenta atrás una vez iniciada la represalia; los valores altos retrasan el efecto.</TM_DeathRetaliationDelayDesc>
+  <TM_enableAutocastDesc>Permite que los colonos usen automáticamente habilidades mágicas y de combate cuyo interruptor AC esté activado.</TM_enableAutocastDesc>
+  <TM_autocastUndraftedThresholdDesc>Porcentaje mínimo de maná o aguante para el uso automático sin reclutar. También se aplica a las comprobaciones normales de uso automático de los PNJ.</TM_autocastUndraftedThresholdDesc>
+  <TM_autocastDraftedThresholdDesc>Porcentaje mínimo de maná o aguante para el uso automático estando reclutado y con fuego a discreción. Los monjes ignoran el umbral de aguante.</TM_autocastDraftedThresholdDesc>
+  <TM_autocastEvaluationFrequencyDesc>Intervalo base entre comprobaciones de uso automático, en segundos de juego. Los valores altos reducen las comprobaciones; los intervalos reales son aleatorios.</TM_autocastEvaluationFrequencyDesc>
+  <TM_autocastAnimalsDesc>Incluye animales en las búsquedas automáticas de objetivos que lo admiten, como las de curación.</TM_autocastAnimalsDesc>
+  <AICanCastDesc>Permite que magos y combatientes no colonos usen habilidades controladas por la IA.</AICanCastDesc>
+  <AIHardModeDesc>Potencia muchas habilidades mágicas y de combate de los PNJ y aumenta la probabilidad de que sus magos conozcan hechizos maestros.</AIHardModeDesc>
+  <TM_AggressiveAICastingDesc>Aumenta la actividad de lanzamiento de los PNJ y reduce a la mitad las recargas básicas y los costes de maná o aguante.</TM_AggressiveAICastingDesc>
+  <TM_SlavesCanScribeDesc>Permite que los esclavos escriban tomos y manuscritos incompletos de clase si cumplen los requisitos habituales de clase.</TM_SlavesCanScribeDesc>
+  <TM_UndeadUpkeepMultiplierDesc>Multiplicador de la penalización a la regeneración de maná por mantener no muertos; cero elimina esa penalización.</TM_UndeadUpkeepMultiplierDesc>
+  <TM_ParacyteSoftCapDesc>Carga local de paracitos tolerada antes de reducir la regeneración de maná. Cada planta cuenta como 1; si se activa la opción correspondiente, cada mago cuenta como 2.</TM_ParacyteSoftCapDesc>
+  <TM_ParacyteMagesCountDesc>Cuenta a cada mago del mapa como dos paracitos al calcular la penalización a la regeneración de maná; excluye animales, personas salvajes y Sin Rostro.</TM_ParacyteMagesCountDesc>
+  <unrestrictedBloodTypesForBloodMagicDesc>Permite recoger e incendiar sangre de otras razas sin omitir los demás requisitos de los hechizos.</unrestrictedBloodTypesForBloodMagicDesc>
+  <TM_UnrestrictedWeaponCopyDesc>Permite que el tecnomante copie armas a distancia de nivel tecnológico inferior al industrial o con acciones de disparo no estándar. Las armas cuerpo a cuerpo siguen excluidas.</TM_UnrestrictedWeaponCopyDesc>
+  <TM_ClassOptionsDesc>Elige las clases mágicas y de combate y los rasgos de apoyo habilitados, y ajusta sus probabilidades de generación.</TM_ClassOptionsDesc>
+  <TM_FactionOptionsDesc>Ajusta los multiplicadores de generación de magos y combatientes de cada facción.</TM_FactionOptionsDesc>
+  <TM_EventOptionsDesc>Abre los ajustes de dificultad de los eventos de grietas, liches errantes y asaltos demoníacos.</TM_EventOptionsDesc>
+  <TM_GolemOptionsDesc>Configura la visualización de gólems: armazones inactivos, entradas en la barra de colonos y temblor de pantalla.</TM_GolemOptionsDesc>
+  <TM_DisplayOptionsDesc>Configura iconos, cámara, ubicación del Grimorio, aspecto de los no muertos y representación de la ropa.</TM_DisplayOptionsDesc>
+  <TM_GrimoireDesc>Abre el Grimorio de este personaje: niveles de clase, recursos y habilidades.</TM_GrimoireDesc>
+  <TM_GrimoireIsekaiHint>La integración nativa de Isekai Leveling, de Jelly Creative, otorga bonificaciones al maná y aguante máximos, su regeneración, las recargas de habilidades y los costes de recursos.</TM_GrimoireIsekaiHint>
+  <TM_Grimoire>Grimorio</TM_Grimoire>
 </LanguageData>

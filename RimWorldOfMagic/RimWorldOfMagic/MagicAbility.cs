@@ -406,6 +406,13 @@ namespace TorannMagic
 
         public override bool CanCastPowerCheck(AbilityContext context, out string reason)
         {
+            // Independent legacy NPC profiles also enter here, even when their
+            // subsequent UseAbility call uses Player context. Manual checks stay unchanged.
+            if (!TMDefs.TM_AutocastDefaults.AllowsContext(base.Def as TMAbilityDef, context))
+            {
+                reason = "Manual cast only";
+                return false;
+            }
             bool flag = base.CanCastPowerCheck(context, out reason);
             bool result;
             if (flag)

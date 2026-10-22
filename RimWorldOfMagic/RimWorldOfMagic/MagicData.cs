@@ -22,79 +22,65 @@ namespace TorannMagic
         private int dominationCount = 0;
 
         public bool customPowersInitialized = false;
+        private int initializedCustomPowerDefCount = -1;
         public List<MagicPower> magicPowerCustom;
         public List<MagicPower> MagicPowersCustom  //supports customs abilities
         {
             get
             {
-                bool flag = this.magicPowerCustom == null;// || !this.customPowersInitialized;
-                if (flag)
+                // A loaded list (or an old initialized flag) does not prove that all
+                // current XML definitions have been added to this pawn.
+                if (this.magicPowerCustom == null || !this.customPowersInitialized ||
+                    this.initializedCustomPowerDefCount != DefDatabase<TM_CustomPowerDef>.DefCount)
                 {
-                    this.customPowersInitialized = true;
-                    IEnumerable<TM_CustomPowerDef> enumerable = TM_Data.CustomMagePowerDefs();
-
-                    if (magicPowerCustom == null || magicPowerCustom.Count <= 0)
+                    if (this.magicPowerCustom == null)
                     {
                         this.magicPowerCustom = new List<MagicPower>();
-                        this.magicPowerCustom.Clear();
                     }
-                    foreach (TM_CustomPowerDef current in enumerable)
+                    foreach (TM_CustomPowerDef current in TM_Data.CustomMagePowerDefs())
                     {
-                        bool newPower = false;
-                        List<AbilityUser.AbilityDef> abilityList = current.customPower.abilityDefs;
-                        bool requiresScroll = current.customPower.requiresScroll;
-                        MagicPower mp = new MagicPower(abilityList, requiresScroll);
-                        mp.maxLevel = current.customPower.maxLevel;
-                        mp.learnCost = current.customPower.learnCost;
-                        mp.costToLevel = current.customPower.costToLevel;
-                        if (current.customPower.autocasting != null)
+                        TM_CustomPower power = current.customPower;
+                        if (power.abilityDefs == null || power.abilityDefs.Count == 0 || power.abilityDefs[0] == null)
                         {
-                            // only override when the custom def defines its own node —
-                            // otherwise keep the constructor's autocast defaults
-                            mp.autocasting = current.customPower.autocasting;
+                            continue;
                         }
-                        if (!magicPowerCustom.Any(a => a.GetAbilityDef(0) == mp.GetAbilityDef(0)))
+                        EnsureCustomSkills(power);
+                        bool hasSkills = power.skills != null && power.skills.Any(skill => skill != null);
+                        List<MagicPower> powers = hasSkills ? this.magicPowerCustom : this.MagicPowersCustomStandalone;
+                        MagicPower mp = powers.FirstOrDefault(existing => existing.GetAbilityDef(0) == power.abilityDefs[0]);
+                        if (mp == null)
                         {
-                            newPower = true;
-                        }
-                        bool hasSkills = false;
-                        if (current.customPower.skills != null)
-                        {
-                            foreach (TM_CustomSkill skill in current.customPower.skills)
+                            mp = new MagicPower(power.abilityDefs, power.requiresScroll);
+                            mp.maxLevel = power.maxLevel;
+                            mp.learnCost = power.learnCost;
+                            mp.costToLevel = power.costToLevel;
+                            if (power.autocasting != null)
                             {
-                                if (skill != null)
-                                {
-                                    MagicPowerSkill mps = new MagicPowerSkill(skill.label, skill.description);
-                                    mps.levelMax = skill.levelMax;
-                                    mps.costToLevel = skill.costToLevel;
-                                    if (!MagicPowerSkill_Custom.Any(b => b.label == mps.label) && !AllMagicPowerSkills.Any(b => b.label == mps.label))
-                                    {
-                                        MagicPowerSkill_Custom.Add(mps);
-                                    }
-                                    hasSkills = true;
-                                }
+                                // Keep constructor defaults unless XML provides an override.
+                                mp.autocasting = power.autocasting;
                             }
+                            powers.Add(mp);
+                            InvalidateCustomPowerCaches();
                         }
-                        if (newPower)
-                        {
-                            if (hasSkills)
-                            {
-                                magicPowerCustom.Add(mp);
-                            }
-                            else if (!MagicPowersCustomStandalone.Any((a => a.GetAbilityDef(0) == mp.GetAbilityDef(0))))
-                            {
-                                MagicPowersCustomStandalone.Add(mp);
-                            }
-                        }
-                        if (hasSkills && current.customPower.chaosMageUseable && !AllMagicPowersForChaosMage.Contains(mp))
+                        if (hasSkills && power.chaosMageUseable && !AllMagicPowersForChaosMage.Contains(mp))
                         {
                             this.AllMagicPowersForChaosMage.Add(mp);
                         }
                     }
-                    this.allMagicPowerSkillsList = null; //force rediscovery and caching to include custom defs
+                    this.customPowersInitialized = true;
+                    this.initializedCustomPowerDefCount = DefDatabase<TM_CustomPowerDef>.DefCount;
                 }
                 return this.magicPowerCustom;
             }
+        }
+
+        private void InvalidateCustomPowerCaches()
+        {
+            this.magicPowerCustomAll = null;
+            this.allMagicPowersList = null;
+            this.allMagicPowersWithSkillsList = null;
+            this.uniquePowers = null;
+            this.hediffAbility.Clear();
         }
 
         public List<MagicPower> magicPowerCustomStandalone;
@@ -117,11 +103,11 @@ namespace TorannMagic
         {
             get
             {
+                List<MagicPower> customPowers = MagicPowersCustom;
                 if(this.magicPowerCustomAll == null)
                 {
                     this.magicPowerCustomAll = new List<MagicPower>();
-                    this.magicPowerCustomAll.Clear();
-                    this.magicPowerCustomAll.AddRange(MagicPowersCustom);
+                    this.magicPowerCustomAll.AddRange(customPowers);
                     this.magicPowerCustomAll.AddRange(MagicPowersCustomStandalone);
                 }
                 return magicPowerCustomAll;
@@ -141,6 +127,139 @@ namespace TorannMagic
                 }
                 return this.magicPowerSkill_Custom;
             }
+        }
+
+        private void InvalidateCustomSkillCaches()
+        {
+            this.allMagicPowerSkillsList = null;
+            ClearSkill_Dictionaries();
+        }
+
+        private List<MagicPowerSkill> normalizedCustomSkills;
+        private MagicPowerSkill[] normalizedCustomSkillEntries;
+        private string[] normalizedCustomSkillLabels;
+        private void NormalizeCustomSkills(bool force = false)
+        {
+            int count = this.magicPowerSkill_Custom == null ? 0 : this.magicPowerSkill_Custom.Count;
+            bool unchanged = !force && this.normalizedCustomSkills == this.magicPowerSkill_Custom &&
+                this.normalizedCustomSkillEntries != null && this.normalizedCustomSkillEntries.Length == count;
+            if (unchanged)
+            {
+                // Public List<T> index replacement does not change its count. Compare
+                // actual owners and labels without allocations on an unchanged lookup.
+                for (int i = 0; i < count; i++)
+                {
+                    MagicPowerSkill skill = this.magicPowerSkill_Custom[i];
+                    if (!ReferenceEquals(this.normalizedCustomSkillEntries[i], skill) ||
+                        this.normalizedCustomSkillLabels[i] != (skill == null ? null : skill.label))
+                    {
+                        unchanged = false;
+                        break;
+                    }
+                }
+            }
+            if (unchanged)
+            {
+                return;
+            }
+            InvalidateCustomSkillCaches();
+            this.normalizedCustomSkills = this.magicPowerSkill_Custom;
+            if (this.magicPowerSkill_Custom == null)
+            {
+                this.normalizedCustomSkillEntries = Array.Empty<MagicPowerSkill>();
+                this.normalizedCustomSkillLabels = Array.Empty<string>();
+                return;
+            }
+            Dictionary<string, int> indices = new Dictionary<string, int>();
+            for (int i = 0; i < this.magicPowerSkill_Custom.Count; i++)
+            {
+                MagicPowerSkill skill = this.magicPowerSkill_Custom[i];
+                if (skill == null || string.IsNullOrEmpty(skill.label))
+                {
+                    continue;
+                }
+                skill.label = TM_CustomSkillLabels.Canonical(skill.label);
+                // Three translated custom definitions share built-in saved trees.
+                // Move the invested owner into that tree instead of leaving a second,
+                // lower-priority owner in the custom list.
+                List<MagicPowerSkill> shared = skill.label == "TM_Shield_eff" ? MagicPowerSkill_Shield :
+                    skill.label == "TM_ConsumeCorpse_eff" || skill.label == "TM_ConsumeCorpse_ver" ? MagicPowerSkill_ConsumeCorpse : null;
+                if (shared != null)
+                {
+                    int sharedIndex = shared.FindIndex(existing => existing.label == skill.label);
+                    if (skill.level > shared[sharedIndex].level)
+                    {
+                        shared[sharedIndex] = skill;
+                    }
+                    this.magicPowerSkill_Custom.RemoveAt(i--);
+                    continue;
+                }
+                int index;
+                if (indices.TryGetValue(skill.label, out index))
+                {
+                    // Keep the highest saved investment and that object's saved metadata.
+                    // Do not sum duplicates, clamp levels, or replace a leveled object with zero.
+                    if (skill.level > this.magicPowerSkill_Custom[index].level)
+                    {
+                        this.magicPowerSkill_Custom[index] = skill;
+                    }
+                    this.magicPowerSkill_Custom.RemoveAt(i--);
+                }
+                else
+                {
+                    indices.Add(skill.label, i);
+                }
+            }
+            this.normalizedCustomSkillEntries = this.magicPowerSkill_Custom.ToArray();
+            this.normalizedCustomSkillLabels = new string[this.normalizedCustomSkillEntries.Length];
+            for (int i = 0; i < this.normalizedCustomSkillEntries.Length; i++)
+            {
+                MagicPowerSkill skill = this.normalizedCustomSkillEntries[i];
+                this.normalizedCustomSkillLabels[i] = skill == null ? null : skill.label;
+            }
+        }
+
+        private void EnsureCustomSkills(TM_CustomPower power)
+        {
+            if (power.skills == null)
+            {
+                return;
+            }
+            foreach (TM_CustomSkill definition in power.skills)
+            {
+                if (definition == null || string.IsNullOrEmpty(definition.label) ||
+                    MagicPowerSkill_Custom.Any(skill => skill != null && skill.label == definition.label))
+                {
+                    continue;
+                }
+                // Some custom powers intentionally share an existing built-in skill.
+                // Only the missing XML-defined trees belong in the custom save list.
+                if (AllMagicPowerSkills.Any(skill => skill != null && skill.label == definition.label))
+                {
+                    continue;
+                }
+                MagicPowerSkill skill = new MagicPowerSkill(definition.label, definition.description);
+                skill.levelMax = definition.levelMax;
+                skill.costToLevel = definition.costToLevel;
+                MagicPowerSkill_Custom.Add(skill);
+                InvalidateCustomSkillCaches();
+            }
+        }
+
+        private TM_CustomPower EnsureCustomSkillsFor(TMAbilityDef ability)
+        {
+            foreach (TM_CustomPowerDef definition in TM_Data.CustomMagePowerDefs())
+            {
+                TM_CustomPower power = definition.customPower;
+                if (power.abilityDefs != null && power.abilityDefs.Any(def => def != null && def.defName == ability.defName))
+                {
+                    // Skill lookup must not initialize unrelated powers, autocasts or
+                    // Chaos Mage lists, even when the pawn's old initialized flag is true.
+                    EnsureCustomSkills(power);
+                    return power;
+                }
+            }
+            return null;
         }
 
         public List<MagicPower> magicPowerIF;
@@ -201,18 +320,6 @@ namespace TorannMagic
         public List<MagicPowerSkill> magicPowerSkill_MagicMissile;
         public List<MagicPowerSkill> magicPowerSkill_Teleport;
         public List<MagicPowerSkill> magicPowerSkill_FoldReality;
-
-        // Skill trees that the original mod never defined even though hediff comps,
-        // projectiles and patches query them via GetSkill_* — the lookups returned
-        // null and the callers NRE'd (Empath and Suppressive Aura hediffs were
-        // force-removed by the game on every tick).
-        public List<MagicPowerSkill> magicPowerSkill_Empathy;
-        public List<MagicPowerSkill> magicPowerSkill_SuppressiveAura;
-        public List<MagicPowerSkill> magicPowerSkill_DistortSpirit;
-        public List<MagicPowerSkill> magicPowerSkill_SpiritDrain;
-        public List<MagicPowerSkill> magicPowerSkill_SpiritPossession;
-        public List<MagicPowerSkill> magicPowerSkill_SpiritStorm;
-        public List<MagicPowerSkill> magicPowerSkill_HarvestPassion;
 
         public List<MagicPowerSkill> magicPowerSkill_P_RayofHope;
         public List<MagicPowerSkill> magicPowerSkill_Heal;
@@ -1087,131 +1194,6 @@ namespace TorannMagic
             }
         }
 
-        public List<MagicPowerSkill> MagicPowerSkill_Empathy
-        {
-            get
-            {
-                bool flag = this.magicPowerSkill_Empathy == null;
-                if (flag)
-                {
-                    this.magicPowerSkill_Empathy = new List<MagicPowerSkill>
-                    {
-                        new MagicPowerSkill("TM_Empathy_pwr", "TM_Empathy_pwr_desc"),
-                        new MagicPowerSkill("TM_Empathy_ver", "TM_Empathy_ver_desc"),
-                        new MagicPowerSkill("TM_Empathy_eff", "TM_Empathy_eff_desc")
-                    };
-                }
-                return this.magicPowerSkill_Empathy;
-            }
-        }
-
-        public List<MagicPowerSkill> MagicPowerSkill_SuppressiveAura
-        {
-            get
-            {
-                bool flag = this.magicPowerSkill_SuppressiveAura == null;
-                if (flag)
-                {
-                    this.magicPowerSkill_SuppressiveAura = new List<MagicPowerSkill>
-                    {
-                        new MagicPowerSkill("TM_SuppressiveAura_pwr", "TM_SuppressiveAura_pwr_desc"),
-                        new MagicPowerSkill("TM_SuppressiveAura_ver", "TM_SuppressiveAura_ver_desc"),
-                        new MagicPowerSkill("TM_SuppressiveAura_eff", "TM_SuppressiveAura_eff_desc")
-                    };
-                }
-                return this.magicPowerSkill_SuppressiveAura;
-            }
-        }
-
-        public List<MagicPowerSkill> MagicPowerSkill_DistortSpirit
-        {
-            get
-            {
-                bool flag = this.magicPowerSkill_DistortSpirit == null;
-                if (flag)
-                {
-                    this.magicPowerSkill_DistortSpirit = new List<MagicPowerSkill>
-                    {
-                        new MagicPowerSkill("TM_DistortSpirit_pwr", "TM_DistortSpirit_pwr_desc"),
-                        new MagicPowerSkill("TM_DistortSpirit_ver", "TM_DistortSpirit_ver_desc"),
-                        new MagicPowerSkill("TM_DistortSpirit_eff", "TM_DistortSpirit_eff_desc")
-                    };
-                }
-                return this.magicPowerSkill_DistortSpirit;
-            }
-        }
-
-        public List<MagicPowerSkill> MagicPowerSkill_SpiritDrain
-        {
-            get
-            {
-                bool flag = this.magicPowerSkill_SpiritDrain == null;
-                if (flag)
-                {
-                    this.magicPowerSkill_SpiritDrain = new List<MagicPowerSkill>
-                    {
-                        new MagicPowerSkill("TM_SpiritDrain_pwr", "TM_SpiritDrain_pwr_desc"),
-                        new MagicPowerSkill("TM_SpiritDrain_ver", "TM_SpiritDrain_ver_desc"),
-                        new MagicPowerSkill("TM_SpiritDrain_eff", "TM_SpiritDrain_eff_desc")
-                    };
-                }
-                return this.magicPowerSkill_SpiritDrain;
-            }
-        }
-
-        public List<MagicPowerSkill> MagicPowerSkill_SpiritPossession
-        {
-            get
-            {
-                bool flag = this.magicPowerSkill_SpiritPossession == null;
-                if (flag)
-                {
-                    this.magicPowerSkill_SpiritPossession = new List<MagicPowerSkill>
-                    {
-                        new MagicPowerSkill("TM_SpiritPossession_pwr", "TM_SpiritPossession_pwr_desc"),
-                        new MagicPowerSkill("TM_SpiritPossession_ver", "TM_SpiritPossession_ver_desc"),
-                        new MagicPowerSkill("TM_SpiritPossession_eff", "TM_SpiritPossession_eff_desc")
-                    };
-                }
-                return this.magicPowerSkill_SpiritPossession;
-            }
-        }
-
-        public List<MagicPowerSkill> MagicPowerSkill_SpiritStorm
-        {
-            get
-            {
-                bool flag = this.magicPowerSkill_SpiritStorm == null;
-                if (flag)
-                {
-                    this.magicPowerSkill_SpiritStorm = new List<MagicPowerSkill>
-                    {
-                        new MagicPowerSkill("TM_SpiritStorm_pwr", "TM_SpiritStorm_pwr_desc"),
-                        new MagicPowerSkill("TM_SpiritStorm_ver", "TM_SpiritStorm_ver_desc"),
-                        new MagicPowerSkill("TM_SpiritStorm_eff", "TM_SpiritStorm_eff_desc")
-                    };
-                }
-                return this.magicPowerSkill_SpiritStorm;
-            }
-        }
-
-        public List<MagicPowerSkill> MagicPowerSkill_HarvestPassion
-        {
-            get
-            {
-                bool flag = this.magicPowerSkill_HarvestPassion == null;
-                if (flag)
-                {
-                    this.magicPowerSkill_HarvestPassion = new List<MagicPowerSkill>
-                    {
-                        new MagicPowerSkill("TM_HarvestPassion_pwr", "TM_HarvestPassion_pwr_desc"),
-                        new MagicPowerSkill("TM_HarvestPassion_ver", "TM_HarvestPassion_ver_desc"),
-                        new MagicPowerSkill("TM_HarvestPassion_eff", "TM_HarvestPassion_eff_desc")
-                    };
-                }
-                return this.magicPowerSkill_HarvestPassion;
-            }
-        }
         public List<MagicPowerSkill> MagicPowerSkill_Summon
         {
             get
@@ -3672,132 +3654,63 @@ namespace TorannMagic
         private Dictionary<TMAbilityDef, MagicPowerSkill> skillEfficiency = new Dictionary<TMAbilityDef, MagicPowerSkill>();
         public MagicPowerSkill GetSkill_Efficiency(TMAbilityDef ability)
         {
-            if (!skillEfficiency.ContainsKey(ability))
-            {
-                bool hasSkill = false;
-                string s = ability.defName.ToString();
-                char[] trim = { '_', 'I', 'V', 'X' };
-                s = s.TrimEnd(trim) + "_eff";
-                for (int i = 0; i < AllMagicPowerSkills.Count; i++)
-                {
-                    MagicPowerSkill mps = AllMagicPowerSkills[i];
-                    
-                    if (mps.label.Contains(s))
-                    {
-                        skillEfficiency.Add(ability, mps);
-                        hasSkill = true;
-                    }
-                }
-                if (!hasSkill)
-                {
-                    skillEfficiency.Add(ability, null);
-                }
-            }
-            return skillEfficiency[ability];
+            return GetSkill(ability, "_eff", skillEfficiency);
         }
 
         private Dictionary<TMAbilityDef, MagicPowerSkill> skillVersatility = new Dictionary<TMAbilityDef, MagicPowerSkill>();
         public MagicPowerSkill GetSkill_Versatility(TMAbilityDef ability)
         {
-            if (!skillVersatility.ContainsKey(ability))
-            {
-                bool hasSkill = false;
-                string s = ability.defName.ToString();
-                char[] trim = { '_', 'I', 'V', 'X' };
-                s = s.TrimEnd(trim) + "_ver";
-                for (int i = 0; i < AllMagicPowerSkills.Count; i++)
-                {
-                    MagicPowerSkill mps = AllMagicPowerSkills[i];
-                    
-                    if (mps.label.Contains(s))
-                    {
-                        skillVersatility.Add(ability, mps);
-                        hasSkill = true;
-                    }
-                }
-                if (!hasSkill) //check custom powers for different ability to skill names
-                {
-                    List<TM_CustomPowerDef> customPowers = TM_Data.CustomMagePowerDefs().ToList();
-                    for (int i = 0; i < customPowers.Count; i++)
-                    {
-                        for (int j = 0; j < customPowers[i].customPower.abilityDefs.Count; j++)
-                        {
-                            if (ability.defName == customPowers[i].customPower.abilityDefs[j].ToString())
-                            {
-                                for (int k = 0; k < AllMagicPowerSkills.Count; k++)
-                                {
-                                    MagicPowerSkill mps = AllMagicPowerSkills[k];
-                                    foreach (TM_CustomSkill cs in customPowers[i].customPower.skills)
-                                    {
-                                        if (cs.label.Contains("_ver") && cs.label == mps.label)
-                                        {
-                                            skillVersatility.Add(ability, mps);
-                                            hasSkill = true;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                if (!hasSkill)
-                {
-                    skillVersatility.Add(ability, null);
-                }
-            }
-            return skillVersatility[ability];
+            return GetSkill(ability, "_ver", skillVersatility);
         }
 
-        private Dictionary<TMAbilityDef, MagicPowerSkill> skillPower = new Dictionary<TMAbilityDef, MagicPowerSkill>();        
+        private Dictionary<TMAbilityDef, MagicPowerSkill> skillPower = new Dictionary<TMAbilityDef, MagicPowerSkill>();
         public MagicPowerSkill GetSkill_Power(TMAbilityDef ability)
         {
-            if (!skillPower.ContainsKey(ability))
+            return GetSkill(ability, "_pwr", skillPower);
+        }
+
+        private int skillLookupDefCount = -1;
+        private MagicPowerSkill GetSkill(TMAbilityDef ability, string suffix, Dictionary<TMAbilityDef, MagicPowerSkill> cache)
+        {
+            if (ability == null)
             {
-                bool hasSkill = false;
-                string s = ability.defName.ToString();
-                char[] trim = { '_', 'I', 'V', 'X' };
-                s = s.TrimEnd(trim) + "_pwr";
-                for (int i = 0; i < AllMagicPowerSkills.Count; i++)
-                {                   
-                    MagicPowerSkill mps = AllMagicPowerSkills[i];
-                    
-                    if (mps.label.Contains(s))
-                    {
-                        skillPower.Add(ability, mps);
-                        hasSkill = true;
-                    }
-                }
-                if (!hasSkill) //check custom powers for different ability to skill names
+                return null;
+            }
+            NormalizeCustomSkills();
+            int defCount = DefDatabase<TM_CustomPowerDef>.DefCount;
+            if (this.skillLookupDefCount != defCount)
+            {
+                ClearSkill_Dictionaries();
+                this.skillLookupDefCount = defCount;
+            }
+            MagicPowerSkill result;
+            if (cache.TryGetValue(ability, out result))
+            {
+                return result;
+            }
+            // Reuse both hits and misses until custom membership or the definition
+            // count changes. Discovery must not run again for every hediff tick.
+            TM_CustomPower customPower = EnsureCustomSkillsFor(ability);
+            char[] trim = { '_', 'I', 'V', 'X' };
+            string label = ability.defName.TrimEnd(trim) + suffix;
+            result = AllMagicPowerSkills.FirstOrDefault(skill => skill != null && skill.label == label);
+            if (result == null && customPower != null && customPower.skills != null)
+            {
+                // XML can map differently named abilities to one shared skill tree.
+                foreach (TM_CustomSkill definition in customPower.skills)
                 {
-                    List<TM_CustomPowerDef> customPowers = TM_Data.CustomMagePowerDefs().ToList();
-                    for (int i = 0; i < customPowers.Count; i++)
+                    if (definition != null && definition.label != null && definition.label.EndsWith(suffix))
                     {
-                        for (int j = 0; j < customPowers[i].customPower.abilityDefs.Count; j++)
+                        result = AllMagicPowerSkills.FirstOrDefault(skill => skill != null && skill.label == definition.label);
+                        if (result != null)
                         {
-                            if (ability.defName == customPowers[i].customPower.abilityDefs[j].ToString())
-                            {
-                                for (int k = 0; k < AllMagicPowerSkills.Count; k++)
-                                {
-                                    MagicPowerSkill mps = AllMagicPowerSkills[k];
-                                    foreach (TM_CustomSkill cs in customPowers[i].customPower.skills)
-                                    {
-                                        if (cs.label.EndsWith("_pwr") && cs.label == mps.label)
-                                        {
-                                            skillPower.Add(ability, mps);
-                                            hasSkill = true;
-                                        }
-                                    }
-                                }
-                            }
+                            break;
                         }
                     }
                 }
-                if (!hasSkill)
-                {
-                    skillPower.Add(ability, null);
-                }
             }
-            return skillPower[ability];
+            cache[ability] = result;
+            return result;
         }
 
         private Dictionary<HediffDef, TMAbilityDef> hediffAbility = new Dictionary<HediffDef, TMAbilityDef>();
@@ -3962,11 +3875,12 @@ namespace TorannMagic
         {
             get
             {
+                List<MagicPower> powersWithSkills = AllMagicPowersWithSkills;
                 if (allMagicPowersList == null || allMagicPowersList.Count <= 0)
                 {
                     allMagicPowersList = new List<MagicPower>();
                     allMagicPowersList.Clear();
-                    allMagicPowersList.AddRange(AllMagicPowersWithSkills);
+                    allMagicPowersList.AddRange(powersWithSkills);
                     allMagicPowersList.AddRange(this.MagicPowersStandalone);
                     allMagicPowersList.AddRange(this.MagicPowersCustomStandalone);
                 }
@@ -3979,11 +3893,14 @@ namespace TorannMagic
         {
             get
             {
+                // Initialization can invalidate aggregates; finish it before publishing
+                // the new list so an AddRange argument cannot clear its own receiver.
+                List<MagicPower> customPowers = MagicPowersCustom;
                 if (allMagicPowersWithSkillsList == null || allMagicPowersWithSkillsList.Count <= 0)
                 {
                     allMagicPowersWithSkillsList = new List<MagicPower>();
                     allMagicPowersWithSkillsList.Clear();
-                    allMagicPowersWithSkillsList.AddRange(this.MagicPowersCustom);
+                    allMagicPowersWithSkillsList.AddRange(customPowers);
                     allMagicPowersWithSkillsList.AddRange(this.MagicPowersCM);
                     allMagicPowersWithSkillsList.AddRange(this.MagicPowersW);
                     allMagicPowersWithSkillsList.AddRange(this.MagicPowersC);
@@ -4019,15 +3936,16 @@ namespace TorannMagic
         {
             get
             {
+                List<MagicPower> powers = AllMagicPowers;
                 if(uniquePowers == null || uniquePowers.Count <= 0)
                 {
                     List<MagicPower> tmpList = new List<MagicPower>();
                     tmpList.Clear();
-                    for(int i = 0; i < AllMagicPowers.Count; i++)
+                    for(int i = 0; i < powers.Count; i++)
                     {
-                        if(!tmpList.Contains(AllMagicPowers[i]))
+                        if(!tmpList.Contains(powers[i]))
                         {
-                            tmpList.Add(AllMagicPowers[i]);
+                            tmpList.Add(powers[i]);
                         }
                     }
                     uniquePowers = tmpList;
@@ -4041,6 +3959,10 @@ namespace TorannMagic
         {
             get
             {
+                // Create the custom list before normalization so its lazy creation
+                // cannot invalidate the aggregate while it is being assembled.
+                List<MagicPowerSkill> customSkills = MagicPowerSkill_Custom;
+                NormalizeCustomSkills();
                 if (allMagicPowerSkillsList == null || allMagicPowerSkillsList.Count <= 0)
                 {
                     allMagicPowerSkillsList = new List<MagicPowerSkill>();
@@ -4054,13 +3976,6 @@ namespace TorannMagic
                     allMagicPowerSkillsList.AddRange(this.MagicPowerSkill_BattleHymn);
                     allMagicPowerSkillsList.AddRange(this.MagicPowerSkill_BestowMight);
                     allMagicPowerSkillsList.AddRange(this.MagicPowerSkill_Blink);
-                    allMagicPowerSkillsList.AddRange(this.MagicPowerSkill_Empathy);
-                    allMagicPowerSkillsList.AddRange(this.MagicPowerSkill_SuppressiveAura);
-                    allMagicPowerSkillsList.AddRange(this.MagicPowerSkill_DistortSpirit);
-                    allMagicPowerSkillsList.AddRange(this.MagicPowerSkill_SpiritDrain);
-                    allMagicPowerSkillsList.AddRange(this.MagicPowerSkill_SpiritPossession);
-                    allMagicPowerSkillsList.AddRange(this.MagicPowerSkill_SpiritStorm);
-                    allMagicPowerSkillsList.AddRange(this.MagicPowerSkill_HarvestPassion);
                     allMagicPowerSkillsList.AddRange(this.MagicPowerSkill_Blizzard);
                     allMagicPowerSkillsList.AddRange(this.MagicPowerSkill_BloodForBlood);
                     allMagicPowerSkillsList.AddRange(this.MagicPowerSkill_BloodGift);
@@ -4170,7 +4085,7 @@ namespace TorannMagic
                     allMagicPowerSkillsList.AddRange(this.MagicPowerSkill_SigilSurge);
                     allMagicPowerSkillsList.AddRange(this.MagicPowerSkill_SigilDrain);
                     allMagicPowerSkillsList.AddRange(this.MagicPowerSkill_LivingWall);
-                    allMagicPowerSkillsList.AddRange(this.MagicPowerSkill_Custom);
+                    allMagicPowerSkillsList.AddRange(customSkills);
                 }
                 return allMagicPowerSkillsList;
             }
@@ -4228,6 +4143,12 @@ namespace TorannMagic
 
         public void ExposeData()
         {
+            if (Scribe.mode == LoadSaveMode.Saving)
+            {
+                // Persistence must canonicalize the current contents even when no
+                // lookup has run since an external edit to the public skill list.
+                NormalizeCustomSkills(true);
+            }
             Scribe_References.Look<Pawn>(ref this.magicPawn, "magicPawn", false);
             Scribe_Values.Look<int>(ref this.magicUserLevel, "magicUserLevel", 0, false);
             Scribe_Values.Look<int>(ref this.magicUserXP, "magicUserXP", 0, false);
@@ -4383,6 +4304,18 @@ namespace TorannMagic
             Scribe_Collections.Look<MagicPowerSkill>(ref this.magicPowerSkill_SigilDrain, "magicPowerSkill_SigilDrain", LookMode.Deep, new object[0]);
             Scribe_Collections.Look<MagicPowerSkill>(ref this.magicPowerSkill_LivingWall, "magicPowerSkill_LivingWall", LookMode.Deep, new object[0]);
 
+            if (Scribe.mode == LoadSaveMode.PostLoadInit)
+            {
+                this.normalizedCustomSkills = null;
+                this.normalizedCustomSkillEntries = null;
+                this.normalizedCustomSkillLabels = null;
+                this.skillLookupDefCount = -1;
+                NormalizeCustomSkills();
+                InvalidateCustomSkillCaches();
+                InvalidateCustomPowerCaches();
+                this.customPowersInitialized = false;
+                this.initializedCustomPowerDefCount = -1;
+            }
         }
     }
 }

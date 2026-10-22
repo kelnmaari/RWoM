@@ -2878,6 +2878,18 @@ namespace TorannMagic
             }            
         }
 
+        public static MagicPower GetAutocastMagicPower(MagicData data, TMAbilityDef def)
+        {
+            return data == null ? null : AutoCast.AutocastPolicy.MagicPowers(data).FirstOrDefault(power =>
+                power.TMabilityDefs.Contains(def) && AutoCast.AutocastPolicy.HasPlayerToggle(def, power.autocasting));
+        }
+
+        public static MightPower GetAutocastMightPower(MightData data, TMAbilityDef def)
+        {
+            return data == null ? null : AutoCast.AutocastPolicy.MightPowers(data).FirstOrDefault(power =>
+                power.TMabilityDefs.Contains(def) && AutoCast.AutocastPolicy.HasPlayerToggle(def, power.autocasting));
+        }
+
         public static GizmoResult DrawAutoCastForGizmo(Command_PawnAbility com, Rect rect, bool shrink, GizmoResult oldResult)
         {
                         
@@ -2979,7 +2991,7 @@ namespace TorannMagic
                 {
                     UIHighlighter.HighlightOpportunity(rect, com.HighlightTag);
                 }
-                if (comp != null && comp.MagicData != null && tmAbilityDef != null)
+                if (comp != null && comp.MagicData != null && tmAbilityDef != null && !TMDefs.TM_AutocastDefaults.IsManualOnly(tmAbilityDef))
                 {
                     if(com.pawnAbility.Def == TorannMagicDefOf.TM_IncitePassion)
                     {
@@ -3009,9 +3021,10 @@ namespace TorannMagic
                     }
                     if (com.pawnAbility.Def == TorannMagicDefOf.TM_Blink || com.pawnAbility.Def == TorannMagicDefOf.TM_Blink_I || com.pawnAbility.Def == TorannMagicDefOf.TM_Blink_II || com.pawnAbility.Def == TorannMagicDefOf.TM_Blink_III)
                     {
-                        magicPower = comp.MagicData.MagicPowersA.FirstOrDefault<MagicPower>((MagicPower x) => x.abilityDef == tmAbilityDef);
+                        magicPower = GetAutocastMagicPower(comp.MagicData, tmAbilityDef) ??
+                            comp.MagicData.MagicPowersA.FirstOrDefault<MagicPower>((MagicPower x) => x.abilityDef == tmAbilityDef);
 
-                        if (Input.GetMouseButtonDown(1) && Mouse.IsOver(rect)) //__result.State == GizmoState.Mouseover)
+                        if (magicPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect)) //__result.State == GizmoState.Mouseover)
                         {
                             magicPower.AutoCast = !magicPower.AutoCast;
                             return new GizmoResult(GizmoState.Mouseover, null);
@@ -3344,50 +3357,28 @@ namespace TorannMagic
                     {
                         magicPower = comp.MagicData.MagicPowersCustom.FirstOrDefault<MagicPower>((MagicPower x) => x.abilityDef == tmAbilityDef);
                     }
-                    if (comp.MagicData.AllMagicPowersWithSkills != null)
+                    MagicPower genericPower = GetAutocastMagicPower(comp.MagicData, tmAbilityDef);
+                    if (genericPower != null)
                     {
-                        // every learned power now carries autocast defaults — the
-                        // generic toggle covers all of them, custom powers included
-                        foreach (MagicPower mp in comp.MagicData.AllMagicPowersWithSkills)
+                        magicPower = genericPower;
+                        if (Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
-                            if (mp.autocasting != null && mp.autocasting.type != TMDefs.AutocastType.Null && (mp.autocasting.drafted || mp.autocasting.undrafted))
-                            {
-                                if (mp.TMabilityDefs.Contains(com.pawnAbility.Def))
-                                {
-                                    magicPower = mp;
-                                    if (Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
-                                    {
-                                        magicPower.AutoCast = !magicPower.AutoCast;
-                                        return new GizmoResult(GizmoState.Mouseover, null);
-
-                                    }
-                                }
-                            }
+                            magicPower.AutoCast = !magicPower.AutoCast;
+                            return new GizmoResult(GizmoState.Mouseover, null);
                         }
                     }
                 }
-                if (mightComp != null && mightComp.MightData != null && com.pawnAbility.Def != null)
+                if (mightComp != null && mightComp.MightData != null && tmAbilityDef != null && !TMDefs.TM_AutocastDefaults.IsManualOnly(tmAbilityDef))
                 {
                     //might abilities
-                    if (mightComp.MightData.AllMightPowersWithSkills != null)
+                    MightPower genericPower = GetAutocastMightPower(mightComp.MightData, tmAbilityDef);
+                    if (genericPower != null)
                     {
-                        // every learned power now carries autocast defaults — the
-                        // generic toggle covers all of them, custom powers included
-                        foreach (MightPower mp in mightComp.MightData.AllMightPowersWithSkills)
+                        mightPower = genericPower;
+                        if (Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
-                            if (mp.autocasting != null && mp.autocasting.type != TMDefs.AutocastType.Null && (mp.autocasting.drafted || mp.autocasting.undrafted))
-                            {
-                                if (mp.TMabilityDefs.Contains(com.pawnAbility.Def))
-                                {
-                                    mightPower = mp;
-                                    if (Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
-                                    {
-                                        mightPower.AutoCast = !mightPower.AutoCast;
-                                        return new GizmoResult(GizmoState.Mouseover, null);
-                                        
-                                    }
-                                }
-                            }
+                            mightPower.AutoCast = !mightPower.AutoCast;
+                            return new GizmoResult(GizmoState.Mouseover, null);
                         }
                     }
                     if (com.pawnAbility.Def == TorannMagicDefOf.TM_Grapple || com.pawnAbility.Def == TorannMagicDefOf.TM_Grapple_I || com.pawnAbility.Def == TorannMagicDefOf.TM_Grapple_II || com.pawnAbility.Def == TorannMagicDefOf.TM_Grapple_III)
