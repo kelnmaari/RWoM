@@ -1613,6 +1613,7 @@ namespace TorannMagic
         public static HistoryEventDef TM_SeverMagicEvent;
         public static HistoryEventDef TM_BestowMagicEvent;
         public static HistoryEventDef TM_BestowClassEvent;
+        public static HistoryEventDef TM_BestowMightEvent;
 
         //BookDefs
         public static ThingDef TM_Grimoire;
@@ -1627,6 +1628,7 @@ namespace TorannMagic
         public static JobDef TM_BestowMagic;
         public static HediffDef TM_BestowMagicClassHD;
         public static JobDef TM_BestowClass;
+        public static JobDef TM_BestowMightRitual;
 
         //Precept Defs
         public static PreceptDef TM_Mages_Abhorrent;

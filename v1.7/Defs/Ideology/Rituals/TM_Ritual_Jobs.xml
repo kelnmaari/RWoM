@@ -16,6 +16,13 @@
   </JobDef>
   
   <JobDef>
+    <defName>TM_BestowMightRitual</defName>
+    <driverClass>TorannMagic.Ideology.JobDriver_BestowMight</driverClass>
+    <reportString>Bestow martial prowess on TargetA.</reportString>
+    <casualInterruptible>false</casualInterruptible>
+  </JobDef>
+  
+  <JobDef>
     <defName>TM_BestowClass</defName>
     <driverClass>TorannMagic.Ideology.JobDriver_BestowClass</driverClass>
     <reportString>Guiding TargetA on their arcane path.</reportString>

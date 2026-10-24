@@ -42,6 +42,10 @@
         <precept>TM_BestowClassRitual</precept>
         <pattern>TM_BestowMagicClassRitual</pattern>
       </li>
+      <li>
+        <precept>TM_BestowMightRitual</precept>
+        <pattern>TM_GiftingRitualMight</pattern>
+      </li>
     </requiredRituals>
     <generalRules>
       <rulesStrings>
