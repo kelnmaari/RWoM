@@ -405,8 +405,8 @@ namespace TorannMagic.Golems
                     CompGolemEnergyHandler cgeh = InnerWorkstation.Energy;
                     if (cgeh != null)
                     {
-                        need_ge.CurLevel = cgeh.StoredEnergy;
                         need_ge.maxEnergy = cgeh.StoredEnergyMax;
+                        need_ge.CurLevel = cgeh.StoredEnergy;
                         need_ge.energyEfficiency = cgeh.ConversionEfficiency;
                     }
                 }
