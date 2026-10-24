@@ -374,7 +374,31 @@ namespace TorannMagic.ModOptions
                 {
                     traitDegree = classTrait.degreeDatas[0].degree;
                 }
-                pawn.story.traits.GainTrait(new Trait(classTrait, traitDegree, false));
+                bool spiritClass = classTrait == TorannMagicDefOf.TM_Possessor;
+                bool possessedClass = classTrait == TorannMagicDefOf.TM_Possessed;
+                if (spiritClass && pawn.def != TorannMagicDefOf.TM_SpiritTD)
+                {
+                    // the class-gain patch reserves the spirit trait for actual
+                    // spirit pawns (TM_SpiritTD); a debug grant overrides that
+                    pawn.story.traits.allTraits.Add(new Trait(classTrait, traitDegree, false));
+                }
+                else
+                {
+                    pawn.story.traits.GainTrait(new Trait(classTrait, traitDegree, false));
+                }
+                if (spiritClass)
+                {
+                    // the same class hediff and need refresh AssignSpiritEffecters
+                    // gives a freshly generated spirit pawn
+                    HealthUtility.AdjustSeverity(pawn, TorannMagicDefOf.TM_SpiritPossessorHD, .5f);
+                    pawn.needs.AddOrRemoveNeedsAsAppropriate();
+                }
+                else if (possessedClass)
+                {
+                    // AddAdvancedClass strips the possessed trait from pawns without
+                    // the possession hediff (normally applied by the possession projectile)
+                    HealthUtility.AdjustSeverity(pawn, TorannMagicDefOf.TM_SpiritPossessionHD, .5f);
+                }
 
                 // mirror the class-book mechanic: taking a class consumes the
                 // Magically Gifted / Physical Prodigy stepping-stone traits
@@ -390,8 +414,11 @@ namespace TorannMagic.ModOptions
 
                 // Only re-init the side the new class belongs to: the other comp's
                 // data stays null until its own class trait appears, and its
-                // AssignAbilities would dereference it and throw.
-                if (compMagic != null && compMagic.IsMagicUser)
+                // AssignAbilities would dereference it and throw. Spirit classes
+                // are always re-initialized: their traits are not in the builtin
+                // magic-trait index, so a stale IsMagicUser cache would skip the
+                // grant and later drop the grimoire entry point.
+                if (compMagic != null && (compMagic.IsMagicUser || spiritClass || possessedClass))
                 {
                     if (customClass != null)
                     {
@@ -529,7 +556,8 @@ namespace TorannMagic.ModOptions
                         hd.def == TorannMagicDefOf.TM_LichHD || hd.def == TorannMagicDefOf.TM_ShapeshiftHD || hd.def == TorannMagicDefOf.TM_NightshadeHD ||  hd.def == TorannMagicDefOf.TM_HediffSprint || hd.def == TorannMagicDefOf.TM_SunderArmorHD ||
                         hd.def == TorannMagicDefOf.TM_ShadowSlayerCloakHD || hd.def == TorannMagicDefOf.TM_ManaShieldHD || hd.def == TorannMagicDefOf.TM_BlurHD ||  hd.def == TorannMagicDefOf.TM_InvisibilityHD ||
                         hd.def == TorannMagicDefOf.TM_HediffFightersFocus || hd.def == TorannMagicDefOf.TM_HediffThickSkin || hd.def == TorannMagicDefOf.TM_HediffStrongBack || hd.def == TorannMagicDefOf.TM_HediffGearRepair ||
-                        hd.def == TorannMagicDefOf.TM_HediffHeavyBlow || hd.def == TorannMagicDefOf.TM_BurningFuryHD || hd.def == TorannMagicDefOf.TM_CursedHD)
+                        hd.def == TorannMagicDefOf.TM_HediffHeavyBlow || hd.def == TorannMagicDefOf.TM_BurningFuryHD || hd.def == TorannMagicDefOf.TM_CursedHD ||
+                        hd.def == TorannMagicDefOf.TM_SpiritPossessorHD || hd.def == TorannMagicDefOf.TM_SpiritPossessionHD)
                     {
                         rhd.Add(hd);
                     }
@@ -555,7 +583,24 @@ namespace TorannMagic.ModOptions
                     {
                         pawn.story.traits.allTraits.Remove(pawn.story.traits.allTraits[j]);
                         break;
-                    }                    
+                    }
+                }
+            }
+            // custom classes (spirit classes included) are not part of the builtin
+            // trait lists, but a new grant must not keep the previous custom trait
+            List<TorannMagic.TMDefs.TM_CustomClass> customClasses = TM_ClassUtility.CustomClasses;
+            if (customClasses != null)
+            {
+                for (int i = 0; i < customClasses.Count; i++)
+                {
+                    TraitDef customTrait = customClasses[i] != null ? customClasses[i].classTrait : null;
+                    for (int j = pawn.story.traits.allTraits.Count - 1; j >= 0; j--)
+                    {
+                        if (customTrait != null && pawn.story.traits.allTraits[j].def == customTrait)
+                        {
+                            pawn.story.traits.allTraits.RemoveAt(j);
+                        }
+                    }
                 }
             }
             if(pawn.story.traits.HasTrait(TorannMagicDefOf.TM_CursedTD))
