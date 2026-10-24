@@ -8648,5 +8648,39 @@ namespace TorannMagic
             }
         }
 
+        [HarmonyPatch(typeof(Game), "FinalizeInit", null)]
+        public static class TM_RequiredRitual_Migration_Patch
+        {
+            // Ideology rituals are baked into an ideology's precept set when the
+            // ideology is generated. A ritual added to a meme by a mod update never
+            // reaches ideologies stored in existing saves, so re-add any required
+            // ritual precept the meme should have whenever a game finalizes init.
+            public static void Postfix()
+            {
+                try
+                {
+                    MemeDef meme = DefDatabase<MemeDef>.GetNamedSilentFail("TM_Transcendent");
+                    PreceptDef preceptDef = DefDatabase<PreceptDef>.GetNamedSilentFail("TM_BestowMightRitual");
+                    RitualPatternDef pattern = DefDatabase<RitualPatternDef>.GetNamedSilentFail("TM_GiftingRitualMight");
+                    if (meme == null || preceptDef == null || pattern == null || Find.IdeoManager == null)
+                    {
+                        return;
+                    }
+                    foreach (Ideo ideo in Find.IdeoManager.IdeosListForReading)
+                    {
+                        if (!ideo.memes.Contains(meme) || ideo.PreceptsListForReading.Any((Precept p) => p.def == preceptDef))
+                        {
+                            continue;
+                        }
+                        ideo.AddPrecept(PreceptMaker.MakePrecept(preceptDef), init: true, fillWith: pattern);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Log.Warning("[TM] Failed to add missing required ritual precepts: " + ex.Message);
+                }
+            }
+        }
+
     }
 }

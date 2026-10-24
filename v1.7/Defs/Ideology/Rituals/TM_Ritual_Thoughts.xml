@@ -264,4 +264,46 @@
     </stages>
   </ThoughtDef>
 
+  <ThoughtDef>
+    <defName>TM_Botched_BestowMightTD</defName>
+    <thoughtClass>Thought_AttendedRitual</thoughtClass>
+    <durationDays>6</durationDays>
+    <stackLimit>3</stackLimit>
+    <stages>
+      <li>
+        <label>botched gifting ritual</label>
+        <description>The gifting ritual was botched and no martial prowess was granted.</description>
+        <baseMoodEffect>-3</baseMoodEffect>
+      </li>
+    </stages>
+  </ThoughtDef>
+
+  <ThoughtDef>
+    <defName>TM_Success_BestowMightTD</defName>
+    <thoughtClass>Thought_AttendedRitual</thoughtClass>
+    <durationDays>6</durationDays>
+    <stackLimit>3</stackLimit>
+    <stages>
+      <li>
+        <label>successful gifting ritual</label>
+        <description>The gifting ritual successfully bestowed martial prowess.</description>
+        <baseMoodEffect>3</baseMoodEffect>
+      </li>
+    </stages>
+  </ThoughtDef>
+
+  <ThoughtDef>
+    <defName>TM_Flawless_BestowMightTD</defName>
+    <thoughtClass>Thought_AttendedRitual</thoughtClass>
+    <durationDays>6</durationDays>
+    <stackLimit>3</stackLimit>
+    <stages>
+      <li>
+        <label>enlightened gifting ritual</label>
+        <description>It was as if the heavens opened up to bless the ritual and a chorus of voices sang the glory of our cause!</description>
+        <baseMoodEffect>5</baseMoodEffect>
+      </li>
+    </stages>
+  </ThoughtDef>
+
 </Defs>

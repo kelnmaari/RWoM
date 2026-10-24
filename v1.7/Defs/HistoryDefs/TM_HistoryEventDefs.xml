@@ -46,6 +46,11 @@
     <defName>TM_BestowClassEvent</defName>
     <label>inspired magic class</label>
   </HistoryEventDef>
+  
+  <HistoryEventDef>
+    <defName>TM_BestowMightEvent</defName>
+    <label>granted martial prowess</label>
+  </HistoryEventDef>
 
 
 </Defs>
