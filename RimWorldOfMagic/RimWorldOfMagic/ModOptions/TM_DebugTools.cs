@@ -461,6 +461,10 @@ namespace TorannMagic.ModOptions
                     compMight.ResolveStamina();
                 }
 
+                // the spirit class bypasses GainTrait, and the active gene state
+                // must follow debug class changes just like gameplay ones
+                TM_ClassGenes.SyncClassGenes(pawn);
+
                 if (logGrant)
                 {
                     Log.Message($"[TM] Debug: granted class '{ClassTraitLabel(classTrait)}' to {pawn.LabelShortCap}.");
@@ -532,6 +536,7 @@ namespace TorannMagic.ModOptions
                     pawn.AllComps.Add(compMight);
                     TM_Calc.InvalidateCompCache(pawn);
                 }
+                TM_ClassGenes.SyncClassGenes(pawn);
                 //if (addMagicComp || addMightComp)
                 //{
                 //    InitializeTMComps(pawn, addMagicComp, addMightComp);

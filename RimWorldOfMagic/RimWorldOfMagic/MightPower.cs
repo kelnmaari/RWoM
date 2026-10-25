@@ -165,7 +165,7 @@ namespace TorannMagic
             }
 
             LoadLegacyClassAutocast();
-            if (this.autocasting == null)
+            if (this.autocasting == null || TMDefs.TM_AutocastDefaults.NeverAutocast(this.abilityDef as TMAbilityDef))
             {
                 this.autocasting = TMDefs.TM_AutocastDefaults.For(this.abilityDef as TMAbilityDef, true);
             }

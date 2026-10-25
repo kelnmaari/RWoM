@@ -89,9 +89,30 @@ namespace TorannMagic.TMDefs
             "TM_Summon", "TM_Meteor", "TM_OrbitalStrike"
         };
 
+        // Maintained/toggle powers: casting an active one dispels it, so a pawn
+        // autocasting them would switch its own buffs off mid-fight (player report:
+        // Enchanted Body, Arcanist's Shadow). Per the autocast policy these stay
+        // manual only — autocast belongs on instant abilities without an off state.
+        // Never autocast them even if a legacy XML config appears.
+        private static readonly HashSet<string> MaintainedNoAutocast = new HashSet<string>
+        {
+            "TM_AnimalFriend", "TM_Shadow", "TM_RayofHope", "TM_Soothe", "TM_P_RayofHope",
+            "TM_BattleHymn", "TM_BladeFocus", "TM_Blur", "TM_BurningFury", "TM_ChaosTradition",
+            "TM_EnchantedAura", "TM_EnchantedBody", "TM_Entertain", "TM_FightersFocus",
+            "TM_GearRepair", "TM_HeatShield", "TM_HeavyBlow", "TM_InnerHealing", "TM_Invisibility",
+            "TM_MageLight", "TM_ManaShield", "TM_Prediction", "TM_ReverseTime", "TM_SniperFocus",
+            "TM_SoulBond", "TM_Sprint", "TM_Stoneskin", "TM_StrongBack", "TM_ThickSkin",
+            "TM_SuppressiveAura", "TM_Nightshade"
+        };
+
         public static bool IsManualOnly(TMAbilityDef def)
         {
             return def != null && NoAutocast.Contains(BaseName(def.defName));
+        }
+
+        public static bool NeverAutocast(TMAbilityDef def)
+        {
+            return def != null && MaintainedNoAutocast.Contains(BaseName(def.defName));
         }
 
         public static bool AllowsContext(TMAbilityDef def, AbilityContext context)
@@ -136,7 +157,7 @@ namespace TorannMagic.TMDefs
                 includeSelf = false
             };
 
-            if (NoAutocast.Contains(baseName))
+            if (NoAutocast.Contains(baseName) || MaintainedNoAutocast.Contains(baseName))
             {
                 // type Null: the autocast toggle is not offered and every
                 // autocast loop skips the power

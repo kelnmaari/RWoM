@@ -186,6 +186,18 @@ namespace TorannMagic
                         Messages.Message("NotPhyAdeptPawn".Translate(), MessageTypeDefOf.RejectInput);
                     }
                 }
+                // A class trait may have been granted by any branch above. Editor-made pawns
+                // can reach this point without ability comps and without the spawn-time
+                // cache sync, which left them stamina-less and grimoire-less. Bootstrap
+                // comps and resolve stamina immediately; the comp picks up powers on its
+                // next tick.
+                TorannMagic.Utils.TM_PawnTracker.EnsureClassComps(user);
+                TorannMagic.Utils.TM_PawnTracker.ResolveComps(user);
+                CompAbilityUserMight grantedMight = user.GetCompAbilityUserMight();
+                if (grantedMight != null && grantedMight.IsMightUser)
+                {
+                    grantedMight.ResolveStamina();
+                }
                 //ResolveClassPassions(user);  currently disabled
 
             }

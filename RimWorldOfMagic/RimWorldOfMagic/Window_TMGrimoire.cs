@@ -37,6 +37,20 @@ namespace TorannMagic
 
         public override Vector2 InitialSize => new Vector2(880f, 720f);
 
+        // Entry points share a single grimoire window, including tab and gizmo opens.
+        public static void OpenFor(Pawn pawn)
+        {
+            System.Collections.Generic.IList<Window> windows = Find.WindowStack.Windows;
+            for (int i = windows.Count - 1; i >= 0; i--)
+            {
+                if (windows[i] is Window_TMGrimoire)
+                {
+                    Find.WindowStack.TryRemove(windows[i], doCloseSound: false);
+                }
+            }
+            Find.WindowStack.Add(new Window_TMGrimoire(pawn));
+        }
+
         public Window_TMGrimoire(Pawn pawn)
         {
             this.pawn = pawn;
@@ -68,42 +82,46 @@ namespace TorannMagic
 
             Rect view = new Rect(0f, 0f, viewWidth, Mathf.Max(headerH + MeasureViewHeightCached(viewWidth), inRect.height));
             Widgets.BeginScrollView(inRect, ref scrollPos, view);
-
-            float y = 0f;
-            Text.Font = GameFont.Medium;
-            Label(new Rect(0f, y, viewWidth, 32f), "Grimoire", TextAnchor.MiddleLeft,
-                TorannMagic.Utils.TMIsekaiUI.HeaderGold);
-            Text.Font = GameFont.Small;
-            float nameW = Text.CalcSize(pawn.LabelShortCap).x + 8f;
-            Label(new Rect(0f, y + 30f, nameW, 18f),
-                pawn.LabelShortCap, TextAnchor.MiddleLeft, Color.white);
-            Label(new Rect(nameW, y + 30f, viewWidth - nameW, 18f),
-                "— " + ClassLabel(), TextAnchor.MiddleLeft, TorannMagic.Utils.TMIsekaiUI.LabelGold);
-            y += 50f;
-
-            if (!classDesc.NullOrEmpty())
+            try
             {
-                Text.Font = GameFont.Tiny;
-                float dh = Text.CalcHeight(classDesc, viewWidth);
-                Label(new Rect(0f, y, viewWidth, dh), classDesc, TextAnchor.UpperLeft, TextGray);
-                y += dh + 8f;
+                float y = 0f;
+                Text.Font = GameFont.Medium;
+                Label(new Rect(0f, y, viewWidth, 32f), "Grimoire", TextAnchor.MiddleLeft,
+                    TorannMagic.Utils.TMIsekaiUI.HeaderGold);
+                Text.Font = GameFont.Small;
+                float nameW = Text.CalcSize(pawn.LabelShortCap).x + 8f;
+                Label(new Rect(0f, y + 30f, nameW, 18f),
+                    pawn.LabelShortCap, TextAnchor.MiddleLeft, Color.white);
+                Label(new Rect(nameW, y + 30f, viewWidth - nameW, 18f),
+                    "— " + ClassLabel(), TextAnchor.MiddleLeft, TorannMagic.Utils.TMIsekaiUI.LabelGold);
+                y += 50f;
+
+                if (!classDesc.NullOrEmpty())
+                {
+                    Text.Font = GameFont.Tiny;
+                    float dh = Text.CalcHeight(classDesc, viewWidth);
+                    Label(new Rect(0f, y, viewWidth, dh), classDesc, TextAnchor.UpperLeft, TextGray);
+                    y += dh + 8f;
+                }
+                Text.Font = GameFont.Small;
+                y += 4f;
+
+                y = DrawResourcesBlock(view, y);
+
+                if (magic != null && magic.IsMagicUser && magic.MagicData != null)
+                {
+                    y = DrawMagicSection(view, y);
+                }
+
+                if (might != null && might.IsMightUser && might.MightData != null)
+                {
+                    y = DrawMightSection(view, y);
+                }
             }
-            Text.Font = GameFont.Small;
-            y += 4f;
-
-            y = DrawResourcesBlock(view, y);
-
-            if (magic != null && magic.MagicData != null)
+            finally
             {
-                y = DrawMagicSection(view, y);
+                Widgets.EndScrollView();
             }
-
-            if (might != null && might.MightData != null)
-            {
-                y = DrawMightSection(view, y);
-            }
-
-            Widgets.EndScrollView();
         }
 
         #region Magic
@@ -155,7 +173,7 @@ namespace TorannMagic
             foreach (MagicPower power in magic.MagicData.AllMagicPowersWithSkills)
             {
                 TMAbilityDef ability = power.abilityDef as TMAbilityDef;
-                if (ability == null || !magicFilter.Contains(ability))
+                if (ability == null || !magicRenderable.Contains(power))
                 {
                     continue;
                 }
@@ -303,30 +321,8 @@ namespace TorannMagic
 
         private List<MagicPower> GetMagicClassGroup()
         {
-            MagicData data = magic.MagicData;
-            if (pawn.story == null || pawn.story.traits == null)
-            {
-                return null;
-            }
-            if (pawn.story.traits.HasTrait(TorannMagicDefOf.InnerFire)) return data.MagicPowersIF;
-            if (pawn.story.traits.HasTrait(TorannMagicDefOf.HeartOfFrost)) return data.MagicPowersHoF;
-            if (pawn.story.traits.HasTrait(TorannMagicDefOf.StormBorn)) return data.MagicPowersSB;
-            if (pawn.story.traits.HasTrait(TorannMagicDefOf.Arcanist)) return data.MagicPowersA;
-            if (pawn.story.traits.HasTrait(TorannMagicDefOf.Paladin)) return data.MagicPowersP;
-            if (pawn.story.traits.HasTrait(TorannMagicDefOf.Summoner)) return data.MagicPowersS;
-            if (pawn.story.traits.HasTrait(TorannMagicDefOf.Druid)) return data.MagicPowersD;
-            if (pawn.story.traits.HasTrait(TorannMagicDefOf.Necromancer) || pawn.story.traits.HasTrait(TorannMagicDefOf.Lich)) return data.MagicPowersN;
-            if (pawn.story.traits.HasTrait(TorannMagicDefOf.Priest)) return data.MagicPowersPR;
-            if (pawn.story.traits.HasTrait(TorannMagicDefOf.TM_Bard)) return data.MagicPowersB;
-            if (pawn.story.traits.HasTrait(TorannMagicDefOf.Succubus)) return data.MagicPowersSD;
-            if (pawn.story.traits.HasTrait(TorannMagicDefOf.Warlock)) return data.MagicPowersWD;
-            if (pawn.story.traits.HasTrait(TorannMagicDefOf.Geomancer)) return data.MagicPowersG;
-            if (pawn.story.traits.HasTrait(TorannMagicDefOf.Technomancer)) return data.MagicPowersT;
-            if (pawn.story.traits.HasTrait(TorannMagicDefOf.BloodMage)) return data.MagicPowersBM;
-            if (pawn.story.traits.HasTrait(TorannMagicDefOf.Enchanter)) return data.MagicPowersE;
-            if (pawn.story.traits.HasTrait(TorannMagicDefOf.Chronomancer)) return data.MagicPowersC;
-            if (pawn.story.traits.HasTrait(TorannMagicDefOf.TM_Wanderer)) return data.MagicPowersW;
-            return null;
+            return magic != null && magic.IsMagicUser
+                ? TM_ClassGroups.GetMagicClassGroup(pawn, magic.MagicData) : null;
         }
 
         #endregion
@@ -379,7 +375,7 @@ namespace TorannMagic
             foreach (MightPower power in might.MightData.AllMightPowersWithSkills)
             {
                 TMAbilityDef ability = power.abilityDef as TMAbilityDef;
-                if (ability == null || !mightFilter.Contains(ability))
+                if (ability == null || !mightRenderable.Contains(power))
                 {
                     continue;
                 }
@@ -507,21 +503,8 @@ namespace TorannMagic
 
         private List<MightPower> GetMightClassGroup()
         {
-            MightData data = might.MightData;
-            if (pawn.story == null || pawn.story.traits == null)
-            {
-                return null;
-            }
-            if (pawn.story.traits.HasTrait(TorannMagicDefOf.Gladiator)) return data.MightPowersG;
-            if (pawn.story.traits.HasTrait(TorannMagicDefOf.TM_Sniper)) return data.MightPowersS;
-            if (pawn.story.traits.HasTrait(TorannMagicDefOf.Bladedancer)) return data.MightPowersB;
-            if (pawn.story.traits.HasTrait(TorannMagicDefOf.Ranger)) return data.MightPowersR;
-            if (pawn.story.traits.HasTrait(TorannMagicDefOf.Faceless)) return data.MightPowersF;
-            if (pawn.story.traits.HasTrait(TorannMagicDefOf.TM_Psionic)) return data.MightPowersP;
-            if (pawn.story.traits.HasTrait(TorannMagicDefOf.DeathKnight)) return data.MightPowersDK;
-            if (pawn.story.traits.HasTrait(TorannMagicDefOf.TM_Monk)) return data.MightPowersM;
-            if (pawn.story.traits.HasTrait(TorannMagicDefOf.TM_Wayfarer)) return data.MightPowersW;
-            return null;
+            return might != null && might.IsMightUser
+                ? TM_ClassGroups.GetMightClassGroup(pawn, might.MightData) : null;
         }
 
         #endregion
@@ -539,7 +522,7 @@ namespace TorannMagic
             }
             Rect panel = new Rect(0f, y, view.width, statRows + 14f);
             TorannMagic.Utils.TMIsekaiUI.Panel(panel);
-            int points = magic != null && magic.MagicData != null ? magic.MagicData.MagicAbilityPoints : 0;
+            int points = magic != null && magic.IsMagicUser && magic.MagicData != null ? magic.MagicData.MagicAbilityPoints : 0;
             float sy = panel.y + 7f;
             foreach (MagicPowerSkill stat in stats)
             {
@@ -577,7 +560,7 @@ namespace TorannMagic
             }
             Rect panel = new Rect(0f, y, view.width, statRows + 14f);
             TorannMagic.Utils.TMIsekaiUI.Panel(panel);
-            int points = might != null && might.MightData != null ? might.MightData.MightAbilityPoints : 0;
+            int points = might != null && might.IsMightUser && might.MightData != null ? might.MightData.MightAbilityPoints : 0;
             float sy = panel.y + 7f;
             foreach (MightPowerSkill stat in stats)
             {
@@ -695,47 +678,19 @@ namespace TorannMagic
 
         #region shared
 
-        private List<TMAbilityDef> MagicAbilityFilter(List<MagicPower> magicGroup, List<MightPower> mightGroup)
+        private List<TMAbilityDef> MagicAbilityFilter(List<MagicPower> magicGroup)
         {
-            List<TMAbilityDef> list = new List<TMAbilityDef>();
-            if (magicGroup != null)
-            {
-                foreach (MagicPower p in magicGroup)
-                {
-                    foreach (AbilityUser.AbilityDef def in p.TMabilityDefs)
-                    {
-                        if (def is TMAbilityDef tm) list.Add(tm);
-                    }
-                }
-            }
-            if (mightGroup != null)
-            {
-                foreach (MightPower p in mightGroup)
-                {
-                    foreach (AbilityUser.AbilityDef def in p.TMabilityDefs)
-                    {
-                        if (def is TMAbilityDef tm) list.Add(tm);
-                    }
-                }
-            }
-            if (magic != null)
-            {
-                if (magic.customClass != null)
-                {
-                    list.AddRange(magic.customClass.classMageAbilities);
-                }
-                if (magic.AdvancedClasses != null)
-                {
-                    foreach (TMDefs.TM_CustomClass cc in magic.AdvancedClasses)
-                    {
-                        list.AddRange(cc.classMageAbilities);
-                    }
-                }
-            }
-            if (might != null && might.customClass != null)
-            {
-                list.AddRange(might.customClass.classFighterAbilities);
-            }
+            var list = magicGroup == null ? new List<TMAbilityDef>()
+                : magicGroup.SelectMany(p => p.TMabilityDefs).OfType<TMAbilityDef>().ToList();
+            list.AddRange(OwnMagicClassDefs());
+            return list;
+        }
+
+        private List<TMAbilityDef> MightAbilityFilter(List<MightPower> mightGroup)
+        {
+            var list = mightGroup == null ? new List<TMAbilityDef>()
+                : mightGroup.SelectMany(p => p.TMabilityDefs).OfType<TMAbilityDef>().ToList();
+            list.AddRange(OwnMightClassDefs());
             return list;
         }
 
@@ -764,14 +719,14 @@ namespace TorannMagic
             long key = (long)(width * 4f);
             unchecked
             {
-                if (magic != null && magic.MagicData != null)
+                if (magic != null && magic.IsMagicUser && magic.MagicData != null)
                 {
                     foreach (MagicPower p in magic.MagicData.AllMagicPowersWithSkills)
                     {
                         key = key * 31 + p.level;
                     }
                 }
-                if (might != null && might.MightData != null)
+                if (might != null && might.IsMightUser && might.MightData != null)
                 {
                     foreach (MightPower p in might.MightData.AllMightPowersWithSkills)
                     {
@@ -792,14 +747,14 @@ namespace TorannMagic
         {
             float h = 90f;
             h += ResourcesPanelHeight();
-            if (magic != null && magic.MagicData != null)
+            if (magic != null && magic.IsMagicUser && magic.MagicData != null)
             {
                 h += 30f + 76f + 10f + 22f;                       // header + info panel + gap + section label
                 h += StatBlockHeight(magicStats, width);
                 foreach (MagicPower power in magic.MagicData.AllMagicPowersWithSkills)
                 {
                     TMAbilityDef ability = power.abilityDef as TMAbilityDef;
-                    if (ability == null || !magicFilter.Contains(ability))
+                    if (ability == null || !magicRenderable.Contains(power))
                     {
                         continue;
                     }
@@ -807,14 +762,14 @@ namespace TorannMagic
                 }
                 h += 12f;
             }
-            if (might != null && might.MightData != null)
+            if (might != null && might.IsMightUser && might.MightData != null)
             {
                 h += 30f + 64f + 10f + 22f;
                 h += StatBlockHeight(mightStats, width);
                 foreach (MightPower power in might.MightData.AllMightPowersWithSkills)
                 {
                     TMAbilityDef ability = power.abilityDef as TMAbilityDef;
-                    if (ability == null || !mightFilter.Contains(ability))
+                    if (ability == null || !mightRenderable.Contains(power))
                     {
                         continue;
                     }
@@ -848,6 +803,8 @@ namespace TorannMagic
         private List<MightPowerSkill> mightStats;
         private List<TMAbilityDef> magicFilter;
         private List<TMAbilityDef> mightFilter;
+        private HashSet<MagicPower> magicRenderable;
+        private HashSet<MightPower> mightRenderable;
         private bool filtersBuilt;
 
         private void EnsureFilters()
@@ -856,8 +813,7 @@ namespace TorannMagic
             {
                 return;
             }
-            filtersBuilt = true;
-            magicStats = magic != null && magic.MagicData != null
+            magicStats = magic != null && magic.IsMagicUser && magic.MagicData != null
                 ? new List<MagicPowerSkill>
                 {
                     magic.MagicData.MagicPowerSkill_global_regen[0],
@@ -865,7 +821,7 @@ namespace TorannMagic
                     magic.MagicData.MagicPowerSkill_global_spirit[0],
                 }
                 : new List<MagicPowerSkill>();
-            mightStats = might != null && might.MightData != null
+            mightStats = might != null && might.IsMightUser && might.MightData != null
                 ? new List<MightPowerSkill>
                 {
                     might.MightData.MightPowerSkill_global_refresh[0],
@@ -874,8 +830,138 @@ namespace TorannMagic
                     might.MightData.MightPowerSkill_global_endurance[0],
                 }
                 : new List<MightPowerSkill>();
-            magicFilter = MagicAbilityFilter(GetMagicClassGroup(), null);
-            mightFilter = MagicAbilityFilter(null, GetMightClassGroup());
+            magicFilter = MagicAbilityFilter(GetMagicClassGroup());
+            mightFilter = MightAbilityFilter(GetMightClassGroup());
+            magicRenderable = RenderableMagicPowers();
+            mightRenderable = RenderableMightPowers();
+            filtersBuilt = true;
+        }
+
+        // Shared abilities have separate saved owners in different class lists.
+        // Keep the pawn's class owner, deduplicating by the base definition rather
+        // than the currently selected rank variant.
+        private HashSet<MagicPower> RenderableMagicPowers()
+        {
+            var allowed = new HashSet<MagicPower>();
+            if (magic == null || !magic.IsMagicUser || magic.MagicData == null)
+            {
+                return allowed;
+            }
+            List<MagicPower> all = magic.MagicData.AllMagicPowersWithSkills;
+            List<TMAbilityDef> ownDefs = OwnMagicClassDefs();
+            var claimed = new HashSet<AbilityUser.AbilityDef>();
+            List<MagicPower> classGroup = magic.customClass == null ? GetMagicClassGroup() : null;
+            AddRenderable(allowed, claimed, classGroup, magicFilter, null);
+            AddRenderable(allowed, claimed, all, magicFilter, ownDefs);
+            AddRenderable(allowed, claimed, all, magicFilter, null);
+            return allowed;
+        }
+
+        private static void AddRenderable(HashSet<MagicPower> allowed, HashSet<AbilityUser.AbilityDef> claimed,
+            IEnumerable<MagicPower> powers, List<TMAbilityDef> filter, List<TMAbilityDef> ownDefs)
+        {
+            if (powers == null) return;
+            foreach (MagicPower p in powers)
+            {
+                if (!(p?.TMabilityDefs?.FirstOrDefault() is TMAbilityDef ab))
+                {
+                    continue;
+                }
+                if (ownDefs != null && !p.TMabilityDefs.Any(d => d is TMAbilityDef tm && ownDefs.Contains(tm)))
+                {
+                    continue;
+                }
+                if (p.TMabilityDefs.Any(d => d is TMAbilityDef tm && filter.Contains(tm)) && claimed.Add(ab))
+                {
+                    allowed.Add(p);
+                }
+            }
+        }
+
+        private HashSet<MightPower> RenderableMightPowers()
+        {
+            var allowed = new HashSet<MightPower>();
+            if (might == null || !might.IsMightUser || might.MightData == null)
+            {
+                return allowed;
+            }
+            List<MightPower> all = might.MightData.AllMightPowersWithSkills;
+            List<TMAbilityDef> ownDefs = OwnMightClassDefs();
+            var claimed = new HashSet<AbilityUser.AbilityDef>();
+            List<MightPower> classGroup = might.customClass == null ? GetMightClassGroup() : null;
+            AddRenderableMight(allowed, claimed, classGroup, mightFilter, null);
+            AddRenderableMight(allowed, claimed, all, mightFilter, ownDefs);
+            AddRenderableMight(allowed, claimed, all, mightFilter, null);
+            return allowed;
+        }
+
+        private static void AddRenderableMight(HashSet<MightPower> allowed, HashSet<AbilityUser.AbilityDef> claimed,
+            IEnumerable<MightPower> powers, List<TMAbilityDef> filter, List<TMAbilityDef> ownDefs)
+        {
+            if (powers == null) return;
+            foreach (MightPower p in powers)
+            {
+                if (!(p?.TMabilityDefs?.FirstOrDefault() is TMAbilityDef ab))
+                {
+                    continue;
+                }
+                if (ownDefs != null && !p.TMabilityDefs.Any(d => d is TMAbilityDef tm && ownDefs.Contains(tm)))
+                {
+                    continue;
+                }
+                if (p.TMabilityDefs.Any(d => d is TMAbilityDef tm && filter.Contains(tm)) && claimed.Add(ab))
+                {
+                    allowed.Add(p);
+                }
+            }
+        }
+
+        private List<TMAbilityDef> OwnMagicClassDefs()
+        {
+            List<TMAbilityDef> defs = new List<TMAbilityDef>();
+            if (magic == null)
+            {
+                return defs;
+            }
+            if (magic.customClass?.classMageAbilities != null)
+            {
+                defs.AddRange(magic.customClass.classMageAbilities);
+            }
+            if (magic.AdvancedClasses != null)
+            {
+                foreach (TMDefs.TM_CustomClass cc in magic.AdvancedClasses)
+                {
+                    if (cc?.classMageAbilities != null)
+                    {
+                        defs.AddRange(cc.classMageAbilities);
+                    }
+                }
+            }
+            return defs;
+        }
+
+        private List<TMAbilityDef> OwnMightClassDefs()
+        {
+            List<TMAbilityDef> defs = new List<TMAbilityDef>();
+            if (might == null)
+            {
+                return defs;
+            }
+            if (might.customClass?.classFighterAbilities != null)
+            {
+                defs.AddRange(might.customClass.classFighterAbilities);
+            }
+            if (might.AdvancedClasses != null)
+            {
+                foreach (TMDefs.TM_CustomClass cc in might.AdvancedClasses)
+                {
+                    if (cc?.classFighterAbilities != null)
+                    {
+                        defs.AddRange(cc.classFighterAbilities);
+                    }
+                }
+            }
+            return defs;
         }
 
         private float StatBlockHeight(List<MagicPowerSkill> stats, float width)

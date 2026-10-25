@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
@@ -22,6 +23,7 @@ internal static class GrimoireTests
             var c = item; yield return new("Grimoire.Visibility." + c.Item1, f => Visibility(c.Item2,c.Item3,c.Item4,c.Item5,c.Item6));
         }
         yield return new("Grimoire.Visibility.FacelessWithSharedRaceMagic", f => Visibility(true,true,true,false,true,true));
+        yield return new("Grimoire.DuplicateClassAbilitiesRenderOnce", DuplicateAbilitiesRenderOnce);
         yield return new("Grimoire.Metadata", Metadata);
         yield return new("Grimoire.LocalizationContracts", Localization);
         yield return new("Grimoire.InstalledIsekaiExactNameGate", IsekaiGate);
@@ -52,6 +54,27 @@ internal static class GrimoireTests
         Check.Equal(false,mt.IsVisible,"Non-colonist Magic gate"); Check.Equal(false,ft.IsVisible,"Non-colonist Might gate");
         Set(selector,"selected",new List<object>()); Check.Equal(false,mt.IsVisible,"No selection Magic gate"); Check.Equal(false,ft.IsVisible,"No selection Might gate");
     }
+    // Warlock, Succubus and Shadow collections each define their own power objects
+    // for the same abilities (Soul Bond, Shadow Bolt, Dominate); the grimoire must
+    // render one card per ability, preferring the pawn's own class collection.
+    static void DuplicateAbilitiesRenderOnce(RuntimeFixture f) {
+        var addRenderable = typeof(Window_TMGrimoire).GetMethod("AddRenderable", Flags, null,
+            new[] { typeof(HashSet<MagicPower>), typeof(HashSet<AbilityUser.AbilityDef>),
+                    typeof(System.Collections.Generic.IEnumerable<MagicPower>),
+                    typeof(System.Collections.Generic.List<TMAbilityDef>),
+                    typeof(System.Collections.Generic.List<TMAbilityDef>) }, null);
+        var dom = f.AddAbility("TM_Dominate");
+        var powerWD = new MagicPower(new System.Collections.Generic.List<AbilityUser.AbilityDef> { dom });
+        var powerSD = new MagicPower(new System.Collections.Generic.List<AbilityUser.AbilityDef> { dom });
+        var allowed = new HashSet<MagicPower>();
+        var claimed = new HashSet<AbilityUser.AbilityDef>();
+        var filter = new System.Collections.Generic.List<TMAbilityDef> { dom };
+        addRenderable.Invoke(null, new object[] { allowed, claimed, new System.Collections.Generic.List<MagicPower> { powerWD }, filter, null });
+        addRenderable.Invoke(null, new object[] { allowed, claimed, new System.Collections.Generic.List<MagicPower> { powerSD, powerWD }, filter, null });
+        Check.Equal(1, allowed.Count, "shared class ability renders once");
+        Check.Same(powerWD, System.Linq.Enumerable.First(allowed), "own class collection object preferred");
+    }
+
     static void Metadata(RuntimeFixture f) {
         var doc=XDocument.Load(Path.Combine(f.Repository,"About/About.xml"));
         Check.Equal("A RimWorld of Magic",doc.Root!.Element("name")!.Value,"Canonical ecosystem identity");

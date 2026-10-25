@@ -418,7 +418,7 @@ namespace TorannMagic
                             try { ResolveAutoCast(); }
                             finally { AutoCast.AutoCastContext.SelectionRestoreAllowed = true; }
                                 }
-                                else if(ModOptions.Settings.Instance.AICasting && (!this.Pawn.IsPrisoner || this.Pawn.IsFighting()))
+                                else if(ModOptions.Settings.Instance.AICasting && this.Pawn.IsFighting() && (!this.Pawn.IsPrisoner || this.Pawn.IsFighting()))
                                 {
                                     float tickMult = ModOptions.Settings.Instance.AIAggressiveCasting ? 1f : 2f;
                                     this.autocastTick = Find.TickManager.TicksGame + (int)(Rand.Range(.75f * ModOptions.Settings.Instance.autocastEvaluationFrequency, 1.25f * ModOptions.Settings.Instance.autocastEvaluationFrequency) * tickMult);
@@ -674,7 +674,7 @@ namespace TorannMagic
 
         public int MightUserLevel
         {
-            get => MightData?.MightUserLevel ?? 0;            
+            get => MightData?.MightUserLevel ?? 0;
             set
             {
                 if (value > MightData.MightUserLevel)
@@ -829,6 +829,13 @@ namespace TorannMagic
         public override void PostInitialize()
         {
             base.PostInitialize();
+            try
+            {
+                TM_ClassGenes.SyncClassGenes(base.Pawn);
+            }
+            catch (Exception)
+            {
+            }
             if(CompAbilityUserMight.MightAbilities != null) return;
 
             if (this.mightPowersInitialized == false && MightData != null)

@@ -32,6 +32,7 @@
   <v1.7>
     <li>/</li>
 	<li>v1.7</li>
+	<li IfModActive="ludeon.rimworld.biotech">v1.7/Biotech</li>
 	<li IfModActive="Poupun.IsekaiDungeonsAddon">v1.7/IsekaiCompat</li>
   </v1.7>
 </loadFolders>

@@ -51,8 +51,10 @@ namespace TorannMagic
                         if (this.CasterPawn.IsColonist)
                         {
                             ModOptions.Constants.SetPawnInFlight(true);
-                            if (playerOrderedCast)
+                            if (playerOrderedCast && ModOptions.Settings.Instance.cameraSnap)
                             {
+                                // selection (and any camera follow) must honor the
+                                // cameraSnap setting like the jump below does
                                 ThingSelectionUtility.SelectNextColonist();
                             }
                             this.CasterPawn.DeSpawn();

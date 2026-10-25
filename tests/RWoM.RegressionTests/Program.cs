@@ -53,7 +53,8 @@ internal static class Program
         FleshTargetingTests.Initialize();
         FleshBiteTests.Initialize();
         UndeadReleaseTests.Initialize();
-        var tests = MagicDataTests.Cases().Concat(AutocastTests.Cases()).Concat(CombatLogTests.Cases()).Concat(GrimoireTests.Cases()).Concat(InitializationTests.Cases()).Concat(MagicShieldTests.Cases()).Concat(DamageTests.Cases()).Concat(SelfCastTests.Cases()).Concat(AbilityProjectileTests.Cases()).Concat(CastSafetyTests.Cases()).Concat(FleshProgressTests.Cases()).Concat(FleshUiTests.Cases()).Concat(FleshPresentationTests.Cases()).Concat(FleshTargetingTests.Cases()).Concat(FleshGameplayTests.Cases()).Concat(FleshHealthEffectsTests.Cases()).Concat(FleshCastingTests.Cases()).Concat(FleshStatTests.Cases()).Concat(FleshBiteTests.Cases()).Concat(UndeadReleaseTests.Cases()).Concat(GolemEnergyTests.Cases()).Concat(SpiritClassTests.Cases()).Where(test => test.Name.Contains(filter, StringComparison.OrdinalIgnoreCase)).ToList();
+        GrimoireProgressionTests.Initialize();
+        var tests = MagicDataTests.Cases().Concat(AutocastTests.Cases()).Concat(CombatLogTests.Cases()).Concat(GrimoireTests.Cases()).Concat(InitializationTests.Cases()).Concat(MagicShieldTests.Cases()).Concat(DamageTests.Cases()).Concat(SelfCastTests.Cases()).Concat(AbilityProjectileTests.Cases()).Concat(CastSafetyTests.Cases()).Concat(FleshProgressTests.Cases()).Concat(FleshUiTests.Cases()).Concat(FleshPresentationTests.Cases()).Concat(FleshTargetingTests.Cases()).Concat(FleshGameplayTests.Cases()).Concat(FleshHealthEffectsTests.Cases()).Concat(FleshCastingTests.Cases()).Concat(FleshStatTests.Cases()).Concat(FleshBiteTests.Cases()).Concat(UndeadReleaseTests.Cases()).Concat(GolemEnergyTests.Cases()).Concat(SpiritClassTests.Cases()).Concat(ClassGroupTests.Cases()).Concat(CompBootstrapTests.Cases()).Concat(GrimoireProgressionTests.Cases()).Concat(GrimoireKureTests.Cases()).Where(test => test.Name.Contains(filter, StringComparison.OrdinalIgnoreCase)).ToList();
         if (tests.Count == 0)
             throw new ArgumentException($"No tests match '{filter}'.");
         int failures = 0;
@@ -99,6 +100,12 @@ internal static class Check
     {
         if (!EqualityComparer<T>.Default.Equals(expected, actual))
             throw new InvalidOperationException($"{message}: expected {expected}, got {actual}.");
+    }
+
+    public static void NotEqual<T>(T notExpected, T actual, string message)
+    {
+        if (EqualityComparer<T>.Default.Equals(notExpected, actual))
+            throw new InvalidOperationException($"{message}: unexpectedly {actual}.");
     }
 
     public static T NotNull<T>(T? actual, string message) where T : class =>

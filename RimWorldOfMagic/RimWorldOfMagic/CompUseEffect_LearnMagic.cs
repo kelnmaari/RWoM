@@ -547,6 +547,19 @@ namespace TorannMagic
                             ), MessageTypeDefOf.RejectInput);
                     }
                 }
+                // Editor-created pawns may not have ability-user components yet.
+                TorannMagic.Utils.TM_PawnTracker.EnsureClassComps(user);
+                TorannMagic.Utils.TM_PawnTracker.ResolveComps(user);
+                CompAbilityUserMagic grantedMagic = user.GetCompAbilityUserMagic();
+                if (grantedMagic != null && grantedMagic.IsMagicUser)
+                {
+                    grantedMagic.ResolveMana();
+                }
+                CompAbilityUserMight grantedMight = user.GetCompAbilityUserMight();
+                if (grantedMight != null && grantedMight.IsMightUser)
+                {
+                    grantedMight.ResolveStamina();
+                }
             }
             else
             {

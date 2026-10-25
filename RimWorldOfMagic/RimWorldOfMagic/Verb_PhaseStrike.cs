@@ -117,7 +117,12 @@ namespace TorannMagic
                         {
                             try
                             {
-                                ThingSelectionUtility.SelectNextColonist();
+                                // selection (and any camera follow) must honor the
+                                // cameraSnap setting like the jump below does
+                                if (ModOptions.Settings.Instance.cameraSnap)
+                                {
+                                    ThingSelectionUtility.SelectNextColonist();
+                                }
                                 this.CasterPawn.DeSpawn();
                                 //p.SetPositionDirect(this.currentTarget.Cell);
                                 SearchForTargets(arg_29_0, (2f + (float)(.5f * verVal)), map, p);

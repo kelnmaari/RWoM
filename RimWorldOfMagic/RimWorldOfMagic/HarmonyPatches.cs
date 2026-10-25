@@ -88,6 +88,21 @@ namespace TorannMagic
                  new HarmonyMethod(patchType, nameof(PawnEquipment_Drop_Postfix)), null);
             SafePatch(harmonyInstance, AccessTools.Method(typeof(Pawn_EquipmentTracker), "AddEquipment"), null,
                  new HarmonyMethod(patchType, nameof(PawnEquipment_Add_Postfix)), null);
+            // Ability-user comps are injected by the AbilityUser framework here (spawn) and by
+            // Give Class at runtime. Lookups made before injection cached a permanent "no comp"
+            // sentinel in TM_Calc, and TickConditionsMet was never re-derived for pawns whose
+            // class trait was assigned before their comps existed. Re-sync both now that the
+            // comp list is final.
+            SafePatch(harmonyInstance, AccessTools.Method(typeof(ThingWithComps), "InitializeComps"), null,
+                 new HarmonyMethod(patchType, nameof(TM_InitializeComps_CompSync_Postfix)), null);
+            SafePatch(harmonyInstance, AccessTools.Method(typeof(PregnancyUtility), "GetInheritedGenes", new Type[]
+                {
+                    typeof(Pawn),
+                    typeof(Pawn),
+                    typeof(bool).MakeByRefType()
+                }, null), null, new HarmonyMethod(typeof(TorannMagicMod), nameof(TM_ClassGene_Inheritance_Postfix), null));
+            SafePatch(harmonyInstance, AccessTools.Method(typeof(PregnancyUtility), "ApplyBirthOutcome", null, null), null,
+                 new HarmonyMethod(typeof(TorannMagicMod), nameof(TM_BirthEnchantRoll_Postfix)), null);
 
             //SafePatch(harmonyInstance, AccessTools.Method(typeof(Pawn), "get_IsColonist", null, null), null, new HarmonyMethod(typeof(TorannMagicMod), "Get_IsColonist_Polymorphed"), null);
             SafePatch(harmonyInstance, AccessTools.Method(typeof(Caravan), "get_NightResting", null, null), new HarmonyMethod(typeof(TorannMagicMod), "Get_NightResting_Undead", null), null);
@@ -821,7 +836,8 @@ namespace TorannMagic
                 return true;
             }
             private static void Postfix(TraitSet __instance, Trait trait, Pawn ___pawn)
-            {                
+            {
+                TM_ClassGenes.SyncClassGenes(___pawn);
                 List<TMDefs.TM_CustomClass> acList = TM_ClassUtility.CustomAdvancedClasses;
                 for (int i = 0; i < acList.Count; i++)
                 {
@@ -2578,6 +2594,12 @@ namespace TorannMagic
             }
         }
 
+        public static void TM_InitializeComps_CompSync_Postfix(ThingWithComps __instance)
+        {
+            if (!(__instance is Pawn pawn)) return;
+            TorannMagic.Utils.TM_PawnTracker.SyncAfterCompInit(pawn);
+        }
+
         [HarmonyPatch(typeof(Caravan_PathFollower), "CostToPayThisTick", null)]
         public class CostToPayThisTick_Base_Patch
         {
@@ -4247,7 +4269,7 @@ namespace TorannMagic
                         {
                             action = delegate
                             {
-                                Find.WindowStack.Add(new Window_TMGrimoire(grimoirePawn));
+                                Window_TMGrimoire.OpenFor(grimoirePawn);
                             },
                             Order = 65,
                             defaultLabel = "TM_Grimoire".Translate(),
@@ -8679,6 +8701,52 @@ namespace TorannMagic
                 {
                     Log.Warning("[TM] Failed to add missing required ritual precepts: " + ex.Message);
                 }
+                try
+                {
+                    // existing saves: classed pawns pick up their genes on the first load
+                    if (ModsConfig.BiotechActive)
+                    {
+                        List<Map> maps = Find.Maps;
+                        for (int i = 0; i < maps.Count; i++)
+                        {
+                            foreach (Pawn p in maps[i].mapPawns.AllPawnsSpawned)
+                            {
+                                if (p.RaceProps.Humanlike)
+                                {
+                                    TM_ClassGenes.SyncClassGenes(p);
+                                }
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Log.Warning("[TM] Failed to sync class genes on load: " + ex.Message);
+                }
+            }
+        }
+
+        // the GetInheritedGenes overload takes an out bool, which cannot be
+        // expressed in an attribute's constant type array — patched manually
+        public static void TM_ClassGene_Inheritance_Postfix(Pawn father, Pawn mother, ref List<GeneDef> __result)
+        {
+            try
+            {
+                TM_ClassGenes.ApplyInheritance(father, mother, ref __result);
+            }
+            catch (Exception)
+            {
+            }
+        }
+
+        public static void TM_BirthEnchantRoll_Postfix(ref Thing __result)
+        {
+            try
+            {
+                TM_ClassGenes.RollBirthEnchantGenes(__result as Pawn);
+            }
+            catch (Exception)
+            {
             }
         }
 
