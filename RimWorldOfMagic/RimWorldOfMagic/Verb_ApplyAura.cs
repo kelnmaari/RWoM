@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using RimWorld;
@@ -18,6 +18,11 @@ namespace TorannMagic
             if(!removedAura)
             {
                 auraApplied = ApplyAura();
+                if (auraApplied)
+                {
+                    ClassProgression.ArcanistTrials.MarkAura(Ability);
+                    ClassProgression.PaladinTrials.MarkAura(Ability);
+                }
             }
             if (auraApplied)
             {

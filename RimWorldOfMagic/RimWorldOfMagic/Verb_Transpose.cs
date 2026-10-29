@@ -88,10 +88,6 @@ namespace TorannMagic
                             {
                                 targetPawn.drafter.Drafted = tDrafted;
                             }
-                            if (ModOptions.Settings.Instance.cameraSnap)
-                            {
-                                CameraJumper.TryJumpAndSelect(p);
-                            }
                             CompAbilityUserMight comp = this.CasterPawn.GetCompAbilityUserMight();
                             MightPowerSkill ver = comp.MightData.MightPowerSkill_Transpose.FirstOrDefault((MightPowerSkill x) => x.label == "TM_Transpose_ver");
                             if (ver.level < 1)

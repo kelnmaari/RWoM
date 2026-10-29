@@ -127,8 +127,11 @@ namespace TorannMagic
                     }
                     else
                     {
+                        var trialMove = ClassProgression.ArcanistTrials.CaptureMove(Ability, summonableThing, ClassProgression.ArcanistTrials.Spell.Summon);
                         summonableThing.DeSpawn(DestroyMode.Vanish);
-                        GenPlace.TryPlaceThing(summonableThing, this.CasterPawn.Position, this.CasterPawn.Map, ThingPlaceMode.Near);
+                        Thing placedThing;
+                        bool placed = GenPlace.TryPlaceThing(summonableThing, this.CasterPawn.Position, this.CasterPawn.Map, ThingPlaceMode.Near, out placedThing);
+                        ClassProgression.ArcanistTrials.CompleteSummon(trialMove, placedThing, placed);
                         //summonableThing.Position = base.CasterPawn.Position;
                         //summonableThing.Rotation = Rot4.North;
                         //summonableThing.SetPositionDirect(base.CasterPawn.InteractionCell);

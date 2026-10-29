@@ -411,27 +411,30 @@ namespace TorannMagic
                         {
                             if ( !this.Pawn.Dead && !this.Pawn.Downed && this.Pawn.Map != null && this.Pawn.story != null && this.Pawn.story.traits != null && this.MightData != null && this.AbilityData != null && !this.Pawn.InMentalState)
                             {
-                                if (this.Pawn.IsColonist)
+                                if (!AutoCast.TM_AutocastCombat.RequiresCombat(this.Pawn))
                                 {
                                     this.autocastTick = Find.TickManager.TicksGame + (int)Rand.Range(.8f * ModOptions.Settings.Instance.autocastEvaluationFrequency, 1.2f * ModOptions.Settings.Instance.autocastEvaluationFrequency);
                                     AutoCast.AutoCastContext.SelectionRestoreAllowed = false;
                             try { ResolveAutoCast(); }
                             finally { AutoCast.AutoCastContext.SelectionRestoreAllowed = true; }
                                 }
-                                else if(ModOptions.Settings.Instance.AICasting && this.Pawn.IsFighting() && (!this.Pawn.IsPrisoner || this.Pawn.IsFighting()))
+                                else if (ModOptions.Settings.Instance.AICasting)
                                 {
                                     float tickMult = ModOptions.Settings.Instance.AIAggressiveCasting ? 1f : 2f;
                                     this.autocastTick = Find.TickManager.TicksGame + (int)(Rand.Range(.75f * ModOptions.Settings.Instance.autocastEvaluationFrequency, 1.25f * ModOptions.Settings.Instance.autocastEvaluationFrequency) * tickMult);
-                                    AutoCast.AutoCastContext.SelectionRestoreAllowed = false;
-                            try { ResolveAIAutoCast(); }
-                            finally { AutoCast.AutoCastContext.SelectionRestoreAllowed = true; }
+                                    if (AutoCast.TM_AutocastCombat.TryGetCombatOpponent(this.Pawn, out _))
+                                    {
+                                        AutoCast.AutoCastContext.SelectionRestoreAllowed = false;
+                                        try { ResolveAIAutoCast(); }
+                                        finally { AutoCast.AutoCastContext.SelectionRestoreAllowed = true; }
+                                    }
                                 }
                             }                            
                         }
-                        if (!this.Pawn.IsColonist && ModOptions.Settings.Instance.AICasting && ModOptions.Settings.Instance.AIAggressiveCasting && Find.TickManager.TicksGame > this.nextAICastAttemptTick) //Aggressive AI Casting
+                        if (AutoCast.TM_AutocastCombat.RequiresCombat(this.Pawn) && ModOptions.Settings.Instance.AICasting && ModOptions.Settings.Instance.AIAggressiveCasting && Find.TickManager.TicksGame > this.nextAICastAttemptTick) //Aggressive AI Casting
                         {
                             this.nextAICastAttemptTick = Find.TickManager.TicksGame + Rand.Range(300, 500);
-                            if (this.Pawn.jobs != null && this.Pawn.CurJobDef != TorannMagicDefOf.TMCastAbilitySelf && this.Pawn.CurJobDef != TorannMagicDefOf.TMCastAbilityVerb)
+                            if (AutoCast.TM_AutocastCombat.TryGetCombatOpponent(this.Pawn, out _) && this.Pawn.jobs != null && !AutoCast.TM_AutocastCombat.IsAbilityJob(this.Pawn.CurJob))
                             {
                                 IEnumerable<AbilityUserAIProfileDef> enumerable = this.Pawn.EligibleAIProfiles();
                                 if (enumerable != null && enumerable.Count() > 0)
@@ -456,9 +459,14 @@ namespace TorannMagic
                                                     if (pawnAbility.CanCastPowerCheck(AbilityContext.AI, out reason))
                                                     {
                                                         LocalTargetInfo target = useThisAbility.Worker.TargetAbilityFor(useThisAbility, this.Pawn);
-                                                        if (target.IsValid)
+                                                        if (target.IsValid && pawnAbility.Def is TMAbilityDef aiDef
+                                                            && AutoCast.TM_AutocastCombat.AllowsAutomaticCast(this.Pawn, aiDef, target)
+#if RW17
+                                                            && Compatibility.AbilityCastSafety.CanAutocast(pawnAbility.Verb, target)
+#endif
+                                                            )
                                                         {
-                                                            pawnAbility.UseAbility(AbilityContext.Player, target);
+                                                            AutoCast.DoJob.Execute(pawnAbility.UseAbility(AbilityContext.AI, target), this.Pawn);
                                                         }
                                                     }
                                                 }
@@ -632,43 +640,23 @@ namespace TorannMagic
             this.ResolveStamina();
         }
 
-        public bool IsMightUser => this.initializedIsMightUser ? isMightUser : this.SetIsMightUser();
+        public bool IsMightUser => ClassProgression.ClassIdentity.TryGetRole(Pawn, ClassProgression.Vocation.Warrior, out bool enabled)
+            ? enabled : this.initializedIsMightUser ? isMightUser : this.SetIsMightUser();
         public bool SetIsMightUser()
         {
+            if (ClassProgression.ClassIdentity.TryGetRole(Pawn, ClassProgression.Vocation.Warrior, out bool enabled)) return enabled;
             Pawn pawn = this.Pawn;
             if (pawn?.story == null) return this.isMightUser = false;
             this.initializedIsMightUser = true;
+            this.customClass = TM_ClassState.CurrentBaseClass(pawn, false);
+            this.customIndex = this.customClass == null ? -2 : TM_ClassUtility.CustomClasses.IndexOf(this.customClass);
+            this.AdvancedClasses = TM_ClassState.CurrentCustomClasses(pawn, false).Where(c => c.isAdvancedClass).ToList();
             if (this.customClass != null) return this.isMightUser = true;
-            if (this.customClass == null && this.customIndex == -2)
-            {
-                this.customIndex = TM_ClassUtility.CustomClassIndexOfBaseFighterClass(pawn.story.traits.allTraits);
-                if (this.customIndex >= 0)
-                {
-                    if (!TM_ClassUtility.CustomClasses[this.customIndex].isFighter)
-                    {
-                        this.customIndex = -1;
-                        return this.isMightUser = false;
-                    }
-                    this.customClass = TM_ClassUtility.CustomClasses[this.customIndex];
-                    return this.isMightUser = true;
-                }
-            }
             for (int i = pawn.story.traits.allTraits.Count - 1; i >= 0; i--)
             {
-                if (mightTraitIndexes.Contains(Pawn.story.traits.allTraits[i].def.index)) return this.isMightUser = true;
+                if (TM_ClassGroups.MightEntriesField.Any(entry => entry.trait == Pawn.story.traits.allTraits[i].def.defName)) return this.isMightUser = true;
             }
             if (AdvancedClasses.Count > 0 || TM_Calc.IsWayfarer(pawn)) return this.isMightUser = true;
-            if (TM_Calc.HasAdvancedClass(pawn))
-            {
-                foreach (TMDefs.TM_CustomClass cc in TM_ClassUtility.GetAdvancedClassesForPawn(this.Pawn))
-                {
-                    if (cc.isFighter)
-                    {
-                        this.AdvancedClasses.Add(cc);
-                        return this.isMightUser = true;
-                    }
-                }
-            }
             return this.isMightUser = false;
         }
 
@@ -1630,6 +1618,9 @@ namespace TorannMagic
 
         public void ResetSkills()
         {
+            TM_ClassState.ResetMightRuntime(this);
+            if (this.MightData == null) return;
+            foreach (MightPowerSkill skill in this.MightData.AllMightPowerSkills) skill.level = 0;
             this.MightData.MightPowerSkill_global_endurance.FirstOrDefault((MightPowerSkill x) => x.label == "TM_global_endurance_pwr").level = 0;
             this.MightData.MightPowerSkill_global_refresh.FirstOrDefault((MightPowerSkill x) => x.label == "TM_global_refresh_pwr").level = 0;
             this.MightData.MightPowerSkill_global_seff.FirstOrDefault((MightPowerSkill x) => x.label == "TM_global_seff_pwr").level = 0;
@@ -1663,6 +1654,7 @@ namespace TorannMagic
                     TMAbilityDef ability = (TMAbilityDef)this.MightData.AllMightPowers[i].TMabilityDefs[j];
                     this.RemovePawnAbility(ability);
                 }
+                this.MightData.AllMightPowers[i].level = 0;
                 this.MightData.AllMightPowers[i].learned = false;
                 this.MightData.AllMightPowers[i].autocast = false;
             }
@@ -1673,7 +1665,8 @@ namespace TorannMagic
             //base.IsInitialized = false;
             //CompAbilityUserMight.MightAbilities = null;
             //this.MightData = null;
-            this.AssignAbilities();
+            TM_ClassState.GrantCurrentMightStarts(this);
+            base.UpdateAbilities();
         }
 
         public void RemoveTMagicHediffs()
@@ -2747,6 +2740,7 @@ namespace TorannMagic
 
         public void ResolveAutoCast()
         {
+            if (AutoCast.TM_ExternalCastOwnership.IsCasting(this.Pawn)) return;
             if (ModOptions.Settings.Instance.autocastEnabled && this.Pawn.jobs != null && this.Pawn.CurJob != null && this.Pawn.CurJob.def != TorannMagicDefOf.TMCastAbilityVerb && this.Pawn.CurJob.def != TorannMagicDefOf.TMCastAbilitySelf && 
                 this.Pawn.CurJob.def != JobDefOf.Ingest && this.Pawn.CurJob.def != JobDefOf.ManTurret && this.Pawn.GetPosture() == PawnPosture.Standing && !this.Pawn.CurJob.playerForced)
             {
@@ -3631,7 +3625,8 @@ namespace TorannMagic
 
         public void ResolveAIAutoCast()
         {
-            
+            if (AutoCast.TM_ExternalCastOwnership.IsCasting(this.Pawn)) return;
+            if (!AutoCast.TM_AutocastCombat.TryGetCombatOpponent(this.Pawn, out _)) return;
             if (ModOptions.Settings.Instance.AICasting && this.Pawn.jobs != null && this.Pawn.CurJob != null && this.Pawn.CurJob.def != TorannMagicDefOf.TMCastAbilityVerb && this.Pawn.CurJob.def != TorannMagicDefOf.TMCastAbilitySelf && this.Pawn.CurJob.def != JobDefOf.Ingest && this.Pawn.CurJob.def != JobDefOf.ManTurret && this.Pawn.GetPosture() == PawnPosture.Standing)
             {
                 //Log.Message("pawn " + this.Pawn.LabelShort + " current job is " + this.Pawn.CurJob.def.defName);
@@ -4643,6 +4638,7 @@ namespace TorannMagic
             if (Scribe.mode == LoadSaveMode.PostLoadInit)
             {
                 TM_PawnTracker.ResolveMightComp(this);
+                RecoverMissingProgression();
                 Pawn abilityUser = base.Pawn;
                 int index = TM_ClassUtility.CustomClassIndexOfBaseFighterClass(abilityUser.story.traits.allTraits);
                 if (index >= 0)
@@ -5247,6 +5243,23 @@ namespace TorannMagic
                 }
                 LoadCustomClassAbilities(ac, fromPawn);
             }
+        }
+
+        public bool RecoverMissingProgression()
+        {
+            if (!IsMightUser) return false;
+            bool missing = mightData == null;
+            if (missing) mightData = new MightData(this) { MightUserXP = 0 };
+            mightData.RestoreMissingRecords();
+            // Loaded class data is already authoritative even if an older save omitted
+            // the component flag. PostInitialize must not reset its level and points.
+            mightPowersInitialized = true;
+            if (missing)
+            {
+                TM_ClassState.RestoreCurrentMightRuntime(this, true);
+                Compatibility.TM_Log.Message("SaveRecovery", "Missing might progression initialized at level 0 for " + Pawn.LabelShort);
+            }
+            return missing;
         }
 
         public void RemoveAdvancedClass(TMDefs.TM_CustomClass ac)

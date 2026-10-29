@@ -1,4 +1,4 @@
-﻿using Verse;
+using Verse;
 using RimWorld;
 using AbilityUser;
 using UnityEngine;
@@ -150,7 +150,7 @@ namespace TorannMagic
             bool flag = e != null;
             if (flag)
             {
-                e.TakeDamage(dinfo);
+                ClassProgression.LightningTrials.Damage(this, e, dinfo, ClassProgression.LightningTrials.Spell.Cloud);
                 e.TakeDamage(dinfo2);
             }
 

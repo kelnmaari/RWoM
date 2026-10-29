@@ -4,8 +4,10 @@ param(
     [string]$JecsDir = 'C:/Program Files (x86)/Steam/steamapps/workshop/content/294100/3312959701/1.7/Assemblies',
     [string]$HarmonyDir = 'C:/Program Files (x86)/Steam/steamapps/workshop/content/294100/2009463077/1.7/Assemblies',
     [string]$ModAssembly,
+    [string]$VgeDir = 'C:/Program Files (x86)/Steam/steamapps/workshop/content/294100/3609835606/1.7/Assemblies',
     [string]$ArtifactsDir = (Join-Path ([IO.Path]::GetTempPath()) ('rwom-regression-' + [Guid]::NewGuid().ToString('N'))),
-    [string]$Filter = ''
+    [string]$Filter = '',
+    [switch]$Reverse
 )
 
 $ErrorActionPreference = 'Stop'
@@ -35,12 +37,23 @@ if (!$ModAssembly) {
 $ModAssembly = [IO.Path]::GetFullPath($ModAssembly)
 if (!(Test-Path $ModAssembly -PathType Leaf)) { throw "Production DLL missing: $ModAssembly" }
 
+# Keep the optional interface implementation outside the core mod assembly and production folder.
+# A missing VGE install remains a supported core-only test environment.
+$env:RWOM_VGE_ADAPTER = ''
+if (Test-Path (Join-Path $VgeDir 'VanillaGravshipExpanded.dll')) {
+    $adapter = Join-Path $repo 'Compatibility/TorannMagic.VGE/TorannMagic.VGE.csproj'
+    & dotnet build $adapter -c Release "-p:OutputPath=$ArtifactsDir/vge/out/" "-p:BaseIntermediateOutputPath=$ArtifactsDir/vge/obj/" "-p:ModAssemblyPath=$ModAssembly" "-p:GameDir=$GameDir" "-p:VgeDir=$VgeDir" 2>&1 | Tee-Object -FilePath (Join-Path $ArtifactsDir 'vge-build.log')
+    if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+    $env:RWOM_VGE_ADAPTER = Join-Path $ArtifactsDir 'vge/out/TorannMagic.VGE.dll'
+}
+
 $harness = Join-Path $PSScriptRoot 'RWoM.RegressionTests/RWoM.RegressionTests.csproj'
 & dotnet build $harness -c Release "-p:OutputPath=$ArtifactsDir/harness/out/" "-p:BaseIntermediateOutputPath=$ArtifactsDir/harness/obj/" "-p:ModAssemblyPath=$ModAssembly" "-p:GameDir=$GameDir" "-p:JecsDir=$JecsDir" 2>&1 | Tee-Object -FilePath (Join-Path $ArtifactsDir 'harness-build.log')
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
 $testArgs = @('--repo', $repo, '--game', $GameDir, '--jecs', $JecsDir, '--mod', $ModAssembly, '--work', (Join-Path $ArtifactsDir 'cases'), '--refs', $refs, '--harmony', $HarmonyDir)
 if ($Filter) { $testArgs += @('--filter', $Filter) }
+if ($Reverse) { $testArgs += '--reverse' }
 & dotnet (Join-Path $ArtifactsDir 'harness/out/RWoM.RegressionTests.dll') @testArgs 2>&1 | Tee-Object -FilePath (Join-Path $ArtifactsDir 'test-results.log')
 $testExit = $LASTEXITCODE
 Write-Host "Regression exit code: $testExit; logs and Scribe XML: $ArtifactsDir"

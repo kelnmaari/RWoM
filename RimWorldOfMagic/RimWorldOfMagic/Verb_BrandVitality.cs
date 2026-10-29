@@ -63,9 +63,11 @@ namespace TorannMagic
                     //    newBrand.TryGetComp<HediffComp_BrandingVitality>().BranderPawn = caster;
                     //}
 
+                    var trial = ClassProgression.GolemancerTrials.CaptureBrand(this.Ability, hitPawn);
                     TM_Action.UpdateBrand(hitPawn, caster, casterComp, TorannMagicDefOf.TM_VitalityBrandHD);
 
                     UpdateHediffComp(hitPawn);
+                    ClassProgression.GolemancerTrials.CompleteBrand(trial);
                     DoBrandingEffect(hitPawn);
                 }
                 else

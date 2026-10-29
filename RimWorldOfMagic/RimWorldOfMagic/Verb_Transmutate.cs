@@ -97,7 +97,12 @@ namespace TorannMagic
 
             if(transmutateThing != null)
             {
-                TM_Action.DoTransmutate(this.CasterPawn, transmutateThing, flagNoStuffItem, flagRawResource, flagStuffItem, flagNutrition, flagCorpse);
+                var trialScope = ClassProgression.EnchanterTrials.BeginTransmutation(this.Ability, transmutateThing);
+                try
+                {
+                    TM_Action.DoTransmutate(this.CasterPawn, transmutateThing, flagNoStuffItem, flagRawResource, flagStuffItem, flagNutrition, flagCorpse);
+                }
+                finally { ClassProgression.EnchanterTrials.EndTransmutation(trialScope); }
             }
             else
             {

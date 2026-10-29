@@ -169,7 +169,12 @@ namespace TorannMagic
                     }
                 }
                 this.BF[i] = new BloodFire(this.BF[i].position, this.BF[i].pulseCount + 1);
-                GenExplosion.DoExplosion(this.BF[i].position, this.Map, .2f + (.4f * BF[i].pulseCount), TMDamageDefOf.DamageDefOf.TM_BloodBurn, this.launcher, Mathf.RoundToInt((Rand.Range(2.8f, 4.5f) * (1 + (.12f * pwrVal))) * this.arcaneDmg), .5f, TorannMagicDefOf.TM_FireWooshSD, null, null, null, null, 0f, 1, null, null, 0, false, null, 0f, 1, 0.0f, false);
+                var trial = ClassProgression.BloodMageTrials.BeginExplosion(this, this.BF[i].position);
+                try
+                {
+                    GenExplosion.DoExplosion(this.BF[i].position, this.Map, .2f + (.4f * BF[i].pulseCount), TMDamageDefOf.DamageDefOf.TM_BloodBurn, this.launcher, Mathf.RoundToInt((Rand.Range(2.8f, 4.5f) * (1 + (.12f * pwrVal))) * this.arcaneDmg), .5f, TorannMagicDefOf.TM_FireWooshSD, null, null, null, null, 0f, 1, null, null, 0, false, null, 0f, 1, 0.0f, false);
+                }
+                finally { ClassProgression.BloodMageTrials.EndExplosion(trial); }
                 if(this.BF[i].pulseCount >= 3)
                 {                    
                     this.BF.Remove(this.BF[i]);

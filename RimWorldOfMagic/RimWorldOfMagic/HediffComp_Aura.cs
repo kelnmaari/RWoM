@@ -1,4 +1,4 @@
-﻿using RimWorld;
+using RimWorld;
 using Verse;
 using UnityEngine;
 using System.Collections.Generic;
@@ -20,6 +20,8 @@ namespace TorannMagic
         public override void CompExposeData()
         {
             base.CompExposeData();
+            ClassProgression.ArcanistTrials.ExposeAura(parent);
+            ClassProgression.PaladinTrials.ExposeAura(parent);
         }
 
         public string labelCap
@@ -75,7 +77,7 @@ namespace TorannMagic
                         }
                         else
                         {
-                            HealthUtility.AdjustSeverity(pawn, this.hediffDef, 1f);
+                            ClassProgression.PaladinTrials.ApplyAura(this.parent, pawn, this.hediffDef);
                             this.nextApplyTick = Find.TickManager.TicksGame + Rand.Range(4800, 5600);
                             FleckMaker.ThrowSmoke(pawn.DrawPos, pawn.Map, 1f);
                             FleckMaker.ThrowLightningGlow(pawn.DrawPos, pawn.Map, .8f);

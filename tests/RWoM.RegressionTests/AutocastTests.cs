@@ -579,8 +579,8 @@ internal static class AutocastTests
         {
             var def = LoadHerbal(fixture, name);
             var ac = def.customPower.autocasting;
-            LoadConditions(fixture, ac.advancedConditionDefs);
             var target = NewPawn();
+            LoadConditions(fixture, ac.advancedConditionDefs);
             Need need = name == "TM_HerbalClarity" ? NewNeed<Need_Mana>(target, TorannMagicDefOf.TM_Mana) : NewNeed<Need_Mood>(target, MoodDef);
             need.CurLevel = .01f;
             Check.Equal(true, ac.ValidConditions(target, target), name + " accepts low need without buff");

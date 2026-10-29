@@ -92,6 +92,8 @@ namespace TorannMagic
             try
             {
                 FleshDevelopment.FleshMultiplayer.Register();
+                MP.RegisterSyncMethod(typeof(SpellItems.SpellItemCasting), nameof(SpellItems.SpellItemCasting.TryStart));
+                MP.RegisterSyncMethod(typeof(SpellItems.SpellItemCasting), nameof(SpellItems.SpellItemCasting.TryStartPortal));
             }
             catch (Exception ex)
             {

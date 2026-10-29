@@ -112,6 +112,7 @@ namespace TorannMagic
                 return false;
             }
             bool draftFlag = caster.Drafted;
+            bool previousFlight = ModOptions.Constants.GetPawnInFlight();
             try
             {
                 if (caster.IsColonist)
@@ -120,10 +121,6 @@ namespace TorannMagic
                     caster.DeSpawn();
                     GenSpawn.Spawn(caster, targetPos, map);
                     caster.drafter.Drafted = draftFlag;
-                    if (ModOptions.Settings.Instance.cameraSnap)
-                    {
-                        CameraJumper.TryJumpAndSelect(caster);
-                    }
                     ModOptions.Constants.SetPawnInFlight(false);
                     return true;
                 }
@@ -134,9 +131,16 @@ namespace TorannMagic
                     return true;
                 }
             }
-            catch
+            catch (Exception exception)
             {
+                Compatibility.TM_Log.Warning("ShadowStrike", "Move failed before strike; caster=" + caster.ThingID
+                    + "; target=" + target.ThingID + "; origin=" + startPos + "; destination=" + targetPos
+                    + "; casterSpawned=" + caster.Spawned + "; " + exception);
                 return false;
+            }
+            finally
+            {
+                ModOptions.Constants.SetPawnInFlight(previousFlight);
             }
         }
 
@@ -251,13 +255,6 @@ namespace TorannMagic
                     GenSpawn.Spawn(caster, startPos, map);
                     caster.drafter.Drafted = draftFlag;
                     ModOptions.Constants.SetPawnInFlight(false);
-                    if(selectedFlag)
-                    {
-                        if (ModOptions.Settings.Instance.cameraSnap)
-                        {
-                            CameraJumper.TryJumpAndSelect(caster);
-                        }
-                    }
                 }
                 else
                 {

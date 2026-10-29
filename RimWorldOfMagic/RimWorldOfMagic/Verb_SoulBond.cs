@@ -48,6 +48,7 @@ namespace TorannMagic
             caster = base.CasterPawn;
             pawn = this.currentTarget.Thing as Pawn;
 
+            var bondObservation = ClassProgression.DemonTrials.BeforeBond(this, pawn);
             CompAbilityUserMagic comp = caster.GetCompAbilityUserMagic();
             //MagicPowerSkill pwr = comp.MagicData.MagicPowerSkill_SoulBond.FirstOrDefault((MagicPowerSkill x) => x.label == "TM_SoulBond_pwr");
             //MagicPowerSkill ver = comp.MagicData.MagicPowerSkill_SoulBond.FirstOrDefault((MagicPowerSkill x) => x.label == "TM_SoulBond_ver");
@@ -70,8 +71,8 @@ namespace TorannMagic
                     }
                     else
                     {
-                        flagSD = caster.gender == Gender.Female;
-                        flagWD = caster.gender == Gender.Male;                        
+                        flagSD = ClassProgression.ClassIdentity.DemonEffect(caster, false, caster.gender == Gender.Female);
+                        flagWD = ClassProgression.ClassIdentity.DemonEffect(caster, true, caster.gender == Gender.Male);                        
                         if (comp.soulBondPawn != null)
                         {
                             oldBondPawn = comp.soulBondPawn;
@@ -133,6 +134,7 @@ namespace TorannMagic
                         caster.LabelShort
                     ), MessageTypeDefOf.RejectInput);
             }
+            ClassProgression.DemonTrials.AfterBond(bondObservation);
             return true;
         }
 

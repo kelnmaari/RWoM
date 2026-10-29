@@ -257,13 +257,6 @@ namespace TorannMagic
             if (p.IsColonist)
             {
                 p.drafter.Drafted = true;
-                if (this.isSelected)
-                {
-                    if (ModOptions.Settings.Instance.cameraSnap)
-                    {
-                        CameraJumper.TryJumpAndSelect(p);
-                    }
-                }
                 if (this.oldjobTarget != null && !this.oldjobTarget.Destroyed)
                 {
                     Job job = new Job(JobDefOf.AttackMelee, this.oldjobTarget);

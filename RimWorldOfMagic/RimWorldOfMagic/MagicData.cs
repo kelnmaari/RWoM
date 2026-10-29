@@ -3769,6 +3769,16 @@ namespace TorannMagic
 
         public MagicPower ReturnMatchingMagicPower(TMAbilityDef def)
         {
+            if (ClassProgression.ClassIdentity.TryGetDemonBranch(magicPawn, out _)
+                && def != null && (def.defName.StartsWith("TM_SoulBond", StringComparison.Ordinal)
+                    || def.defName.StartsWith("TM_ShadowBolt", StringComparison.Ordinal)
+                    || def.defName.StartsWith("TM_Dominate", StringComparison.Ordinal)))
+            {
+                var comp = magicPawn.GetCompAbilityUserMagic();
+                TM_ClassState.RestoreSharedMagicProgression(comp);
+                return TM_ClassState.PreferredMagicOwner(comp, def);
+            }
+
             for (int i = 0; i < AllMagicPowers.Count; i++)
             {
                 if (AllMagicPowers[i].TMabilityDefs.Contains(def))
@@ -4141,6 +4151,14 @@ namespace TorannMagic
             this.initialized = false;           
         }
 
+        public int RestoreMissingRecords()
+        {
+            int added = Compatibility.TM_LegacyRecovery.FillMissingRecords(this);
+            InvalidateCustomSkillCaches();
+            InvalidateCustomPowerCaches();
+            return added;
+        }
+
         public void ExposeData()
         {
             if (Scribe.mode == LoadSaveMode.Saving)
@@ -4306,6 +4324,7 @@ namespace TorannMagic
 
             if (Scribe.mode == LoadSaveMode.PostLoadInit)
             {
+                RestoreMissingRecords();
                 this.normalizedCustomSkills = null;
                 this.normalizedCustomSkillEntries = null;
                 this.normalizedCustomSkillLabels = null;

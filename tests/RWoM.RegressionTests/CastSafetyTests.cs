@@ -9,7 +9,7 @@ using Verse.AI;
 
 namespace RWoM.RegressionTests;
 
-internal static class CastSafetyTests
+internal static partial class CastSafetyTests
 {
     private static int MessagesSeen;
     public static void Initialize()
@@ -19,6 +19,27 @@ internal static class CastSafetyTests
     }
     public static IEnumerable<TestCase> Cases()
     {
+        foreach (var test in EtherShellJobCases()) yield return test;
+        foreach (var context in new[] { AbilityContext.Player, AbilityContext.AI })
+            yield return new("CastSafety.OffMap." + context, f => World(f, w =>
+            {
+                Set(w.Caster, "mapIndexOrState", (sbyte)-1);
+                w.Job.count = context == AbilityContext.Player ? 1 : 0;
+                var ability = w.Verb.Ability;
+                Set(ability, "verb", w.Verb);
+                ability.CooldownTicksLeft = 17;
+                Check.Equal(false, ability.TryCastAbility(context, w.Target), "Off-map cast rejected before resource and target checks");
+                Check.Equal(true, ability.UseAbility(context, w.Target) == null, "No caravan ability job is created");
+                Check.Equal(false, w.Verb.TryStartCastOn(w.Target), "Direct start is also rejected");
+                Check.Equal(false, w.Verb.PreCastShotCheck(w.Target, LocalTargetInfo.Invalid), "Direct pre-cast is rejected");
+                Check.Equal(false, w.Verb.TryLaunchProjectileCheck(Blank<ThingDef>(), w.Target), "Queued projectile is rejected");
+                w.Verb.state = VerbState.Bursting;
+                typeof(Verb).GetMethod("TryCastNextBurstShot", BindingFlags.NonPublic | BindingFlags.Instance)!.Invoke(w.Verb, null);
+                Check.Equal(VerbState.Idle, w.Verb.state, "Off-map burst is stopped");
+                Check.Equal(0, w.Verb.Shots, "No off-map effects execute");
+                Check.Equal(17, ability.CooldownTicksLeft, "Rejection does not charge cooldown");
+                Check.Equal(0, SpecialCostsSeen, "Rejection does not charge special resources");
+            }));
         foreach (bool manual in new[] { false, true })
             yield return new("CastSafety.ForbiddenSelf." + (manual ? "Player" : "AI"), f => World(f, w =>
             {
@@ -152,7 +173,7 @@ internal static class CastSafetyTests
         try
         {
             MessagesSeen = SpecialCostsSeen = 0; patches.RecordMessages(); patches.RecordSpecialCosts();
-            foreach (string name in new[] { "AbilityCastStartPatch", "AbilityPreCastStartPatch", "AbilityProjectileLaunchSafetyPatch" })
+            foreach (string name in new[] { "AbilityCastStartPatch", "AbilityPreCastStartPatch", "AbilityProjectileLaunchSafetyPatch", "AbilityAutomaticJobAdmissionPatch", "AbilityOffMapCastPatch", "AbilityOffMapBurstPatch" })
                 if (typeof(MagicAbility).Assembly.GetType("TorannMagic.Compatibility." + name) is Type type) patches.Add(type);
             body(new WorldState(fixture, game));
         }
@@ -166,7 +187,7 @@ internal static class CastSafetyTests
         public readonly TMAbilityDef Def;
         public readonly RecordingVerb Verb;
         public readonly Job Job;
-        private readonly Faction faction = new() { def = new FactionDef() };
+        private readonly Faction faction = new() { def = new FactionDef { isPlayer = true } };
         public WorldState(RuntimeFixture fixture, Game game)
         {
             Map = Blank<Map>(); Map.info = new MapInfo { Size = new IntVec3(20, 1, 20) };

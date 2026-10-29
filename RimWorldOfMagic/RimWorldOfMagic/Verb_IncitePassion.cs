@@ -52,11 +52,7 @@ namespace TorannMagic
             {
                 if (CheckAnyPassions(caster, hitPawn, comp))
                 {
-                    SkillRecord sr = validSkillPassions.RandomElement();
-                    if (comp != null && comp.incitePassionSkill != null)
-                    {
-                        sr = comp.incitePassionSkill;
-                    }
+                    SkillRecord sr = comp.incitePassionSkill ?? validSkillPassions.RandomElement();
                     string count = "+";
                     if (sr.passion == Passion.Major)
                     {
@@ -106,9 +102,11 @@ namespace TorannMagic
         {
             validSkillPassions = new List<SkillRecord>();
             validSkillPassions.Clear();
+            if (source?.skills?.skills == null || target?.skills == null || comp == null || source == target) return false;
             if (comp.incitePassionSkill != null)
             {
-                if (comp.incitePassionSkill.passion > target.skills.GetSkill(comp.incitePassionSkill.def).passion)
+                if (source.skills.skills.Contains(comp.incitePassionSkill)
+                    && comp.incitePassionSkill.passion > target.skills.GetSkill(comp.incitePassionSkill.def).passion)
                 {
                     return true;
                 }

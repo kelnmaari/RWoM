@@ -170,6 +170,7 @@ namespace TorannMagic
                     bldgComp.TicksToDestroy = this.duration;
                     bldgComp.Temporary = true;
                     GenSpawn.Spawn(thing, position, map, Rot4.North, WipeMode.Vanish, false);
+                    ClassProgression.SummonerTrials.Spawned(this, thing, ClassProgression.SummonerTrials.Spell.Pylon);
                 }
             }
         }

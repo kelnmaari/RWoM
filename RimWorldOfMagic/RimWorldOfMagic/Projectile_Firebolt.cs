@@ -55,7 +55,10 @@ namespace TorannMagic
             bool flag = e != null;
             if (flag)
             {
-                e.TakeDamage(dinfo);
+                var trial = type == TMDamageDefOf.DamageDefOf.Firebolt
+                    ? ClassProgression.FireboltDamageTrial.Capture(this.launcher as Pawn, e) : null;
+                var damage = e.TakeDamage(dinfo);
+                ClassProgression.FireboltDamageTrial.Complete(trial, damage?.totalDamageDealt ?? 0f);
             }
         }
     }    

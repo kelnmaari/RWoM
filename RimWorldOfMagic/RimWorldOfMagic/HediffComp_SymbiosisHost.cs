@@ -67,6 +67,7 @@ namespace TorannMagic
                     if (symbiote.DestroyedOrNull())
                     {
                         this.shouldRemove = true;
+                        return;
                     }
                     else if (symbiote.Dead || !symbiote.Downed)
                     {

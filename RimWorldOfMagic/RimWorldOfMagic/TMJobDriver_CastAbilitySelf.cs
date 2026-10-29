@@ -89,11 +89,11 @@ namespace TorannMagic
                 {
                     try
                     {
-                        this.duration = (int)((this.verb.verbProps.warmupTime * 60) * this.pawn.GetStatValue(StatDefOf.AimingDelayFactor, false));
+                        this.duration = (int)((this.verb.verbProps.warmupTime * Compatibility.AbilityTiming.WarmupFor(this.verb) * 60) * this.pawn.GetStatValue(StatDefOf.AimingDelayFactor, false));
                     }
                     catch
                     {
-                        this.duration = (int)(this.verb.verbProps.warmupTime * 60);
+                        this.duration = (int)(this.verb.verbProps.warmupTime * Compatibility.AbilityTiming.WarmupFor(this.verb) * 60);
                     }
                     LocalTargetInfo target = combatToil.actor.jobs.curJob.GetTarget(TargetIndex.A);
                     // The engine must initialize currentTarget before WarmupComplete.

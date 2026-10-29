@@ -252,6 +252,7 @@ namespace TorannMagic
                 }
                 Thing thing = ThingMaker.MakeThing(def, stuff);
                 GenSpawn.Spawn(thing, position, map, Rot4.North, WipeMode.Vanish);
+                ClassProgression.GeomancerTrials.WallSpawned(this, thing, position, map);
             }
         }
 

@@ -1,4 +1,4 @@
-﻿using RimWorld;
+using RimWorld;
 using Verse;
 using Verse.Sound;
 using AbilityUser;
@@ -55,7 +55,7 @@ namespace TorannMagic
             {
                 int DamageAmount = Mathf.RoundToInt(this.def.projectile.GetDamageAmount(1,null) + (pwrVal * 6)* this.arcaneDmg);
                 DamageInfo dinfo = new DamageInfo(this.def.projectile.damageDef, DamageAmount, 1, this.ExactRotation.eulerAngles.y, this.launcher, null, this.equipmentDef, DamageInfo.SourceCategory.ThingOrUnknown);
-                hitThing.TakeDamage(dinfo);
+                ClassProgression.LightningTrials.Damage(this, hitThing, dinfo, ClassProgression.LightningTrials.Spell.Bolt);
                 if(Rand.Chance(.6f))
                 {
                     DamageInfo dinfo2 = new DamageInfo(DamageDefOf.Stun, DamageAmount/4, 1, this.ExactRotation.eulerAngles.y, this.launcher, null, this.equipmentDef, DamageInfo.SourceCategory.ThingOrUnknown);
@@ -86,7 +86,7 @@ namespace TorannMagic
                 SoundInfo info = SoundInfo.InMap(new TargetInfo(base.Position, base.Map, false), MaintenanceType.None);
                 SoundDefOf.Thunder_OnMap.PlayOneShot(info);
             }
-            CellRect cellRect = CellRect.CenteredOn(hitThing.Position, 2);
+            CellRect cellRect = CellRect.CenteredOn(hitThing?.Position ?? this.Position, 2);
             cellRect.ClipInsideMap(map);
             for (int i = 0; i < Rand.Range(verVal, verVal * 4); i++)
             {
@@ -129,6 +129,7 @@ namespace TorannMagic
             explosion.postExplosionSpawnChance = postExplosionSpawnChance;
             explosion.postExplosionSpawnThingCount = postExplosionSpawnThingCount;
             explosion.applyDamageToExplosionCellsNeighbors = applyDamageToExplosionCellsNeighbors;
+            if (damType == TMDamageDefOf.DamageDefOf.TM_Lightning) ClassProgression.LightningTrials.StampBoltExplosion(explosion, this);
             explosion.StartExplosion(explosionSound, null);
         }
     }

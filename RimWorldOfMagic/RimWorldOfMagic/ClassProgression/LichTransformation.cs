@@ -1,0 +1,50 @@
+using System.Linq;
+using AbilityUser;
+using Verse;
+
+namespace TorannMagic.ClassProgression
+{
+    public static class LichTransformation
+    {
+        public static bool TryTransform(Pawn pawn, PawnAbility ability)
+        {
+            if (pawn == null || pawn.Dead || pawn.Downed || !pawn.Spawned || pawn.health?.hediffSet == null
+                || !ClassIdentity.TryGetState(pawn, out var state) || !ClassIdentity.IsNecromancer(pawn)
+                || ClassIdentity.IsLich(pawn) || ClassInitiation.HasLegacyClass(pawn)) return false;
+            var path = state.Find("rwom.necromancer");
+            var magic = pawn.AllComps.OfType<CompAbilityUserMagic>().FirstOrDefault();
+            if (path.Stage != InitiationStage.Ascended || magic == null || ability?.Def != TorannMagicDefOf.TM_LichForm
+                || ability.AbilityUser != magic || !magic.AbilityData.Powers.Any(a => ReferenceEquals(a, ability))
+                || !magic.MagicData.MagicPowersN.Any(p => p.learned && p.TMabilityDefs.Contains(TorannMagicDefOf.TM_LichForm))
+                || DefDatabase<HediffDef>.GetNamedSilentFail("TM_LichHD") == null) return false;
+            if (!state.ActivateLichForm()) return false;
+            // Commit form authority first. Restoration is repeatable and never edits
+            // passions, timetable, work priorities, XP, ranks or existing points.
+            ClassSpellAccess.RestoreLearned(magic);
+            pawn.Notify_DisabledWorkTypesChanged();
+            pawn.skills?.Notify_SkillDisablesChanged();
+            pawn.needs?.AddOrRemoveNeedsAsAppropriate();
+            ClassIdentity.Component(pawn).SynchronizeHealthDisplay();
+            return true;
+        }
+
+        public static void Restore(CompAbilityUserMagic magic)
+        {
+            if (magic == null || !ClassIdentity.TryGetState(magic.Pawn, out _) || !ClassIdentity.IsLich(magic.Pawn)) return;
+            RestoreHealth(magic.Pawn);
+            var deathBolt = magic.MagicData.MagicPowersN.FirstOrDefault(p => p.TMabilityDefs.Contains(TorannMagicDefOf.TM_DeathBolt));
+            if (deathBolt != null) deathBolt.learned = true;
+            magic.spell_Flight = true;
+            magic.spell_LichForm = false;
+            if (magic.AbilityData.Powers.Any(a => a.Def == TorannMagicDefOf.TM_LichForm))
+                magic.RemovePawnAbility(TorannMagicDefOf.TM_LichForm);
+        }
+
+        public static void RestoreHealth(Pawn pawn)
+        {
+            if (!ClassIdentity.TryGetState(pawn, out _) || !ClassIdentity.IsLich(pawn) || pawn?.health?.hediffSet == null) return;
+            var def = DefDatabase<HediffDef>.GetNamedSilentFail("TM_LichHD");
+            if (def != null && !pawn.health.hediffSet.HasHediff(def)) HealthUtility.AdjustSeverity(pawn, def, .5f);
+        }
+    }
+}

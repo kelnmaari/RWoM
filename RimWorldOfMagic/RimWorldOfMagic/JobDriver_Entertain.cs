@@ -48,7 +48,7 @@ namespace TorannMagic
                 {
                     if (age > duration)
                     {
-                        this.pawn.interactions.TryInteractWith(entertaineePawn, TorannMagicDefOf.TM_EntertainID);
+                        ClassProgression.BardTrials.Entertain(this.pawn, entertaineePawn);
                         FleckMaker.ThrowMicroSparks(this.pawn.DrawPos, this.pawn.Map);
                         this.EndJobWith(JobCondition.Succeeded);
                         comp.nextEntertainTick = Find.TickManager.TicksGame + 2000;

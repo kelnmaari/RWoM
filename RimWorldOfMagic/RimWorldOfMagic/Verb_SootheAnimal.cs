@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using RimWorld;
@@ -67,7 +67,9 @@ namespace TorannMagic
                     {
                         if(newPawn.kindDef.RaceProps.Animal)
                         {
+                            var druidTrial = ClassProgression.DruidTrials.CaptureAnimal(this.Ability, newPawn);
                             newPawn.mindState.mentalStateHandler.Reset();
+                            ClassProgression.DruidTrials.Complete(druidTrial);
                             newPawn.jobs.StopAll();
                             FleckMaker.ThrowMicroSparks(newPawn.Position.ToVector3().normalized, newPawn.Map);
                             float sev = Rand.Range(pwrVal, 2 * pwrVal);
@@ -191,3 +193,4 @@ namespace TorannMagic
         }
     }
 }
+

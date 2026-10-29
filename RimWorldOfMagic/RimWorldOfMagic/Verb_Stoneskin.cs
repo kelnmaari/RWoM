@@ -48,6 +48,7 @@ namespace TorannMagic
         {
             Pawn caster = base.CasterPawn;
             Pawn pawn = this.currentTarget.Thing as Pawn;
+            var trial = ClassProgression.GeomancerTrials.CaptureStoneskin(this.Ability, pawn);
 
             comp = caster.GetCompAbilityUserMagic();
             //MagicPowerSkill pwr = comp.MagicData.MagicPowerSkill_Stoneskin.FirstOrDefault((MagicPowerSkill x) => x.label == "TM_Stoneskin_pwr");
@@ -71,7 +72,7 @@ namespace TorannMagic
             if (pawn != null && pawn.health != null && pawn.health.hediffSet != null)
             {
                 IEnumerable<Pawn> enumerable = from geomancer in caster.Map.mapPawns.AllPawnsSpawned
-                                                   where (geomancer.RaceProps.Humanlike && geomancer.story.traits.HasTrait(TorannMagicDefOf.Geomancer))
+                                                   where (geomancer.RaceProps.Humanlike && (geomancer.story?.traits?.HasTrait(TorannMagicDefOf.Geomancer) == true || ClassProgression.ClassIdentity.IsGeomancer(geomancer)))
                                                    select geomancer;
                 List<Pawn> geomancers = enumerable.ToList();
                 for (int i = 0; i < geomancers.Count(); i++)
@@ -106,6 +107,7 @@ namespace TorannMagic
                 }
             }
             
+            ClassProgression.GeomancerTrials.CompleteStoneskin(trial);
             return true;
         }
 

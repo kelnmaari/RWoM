@@ -8,9 +8,27 @@ namespace TorannMagic
 {
 	public class CompUseEffect_LearnMagic : CompUseEffect
 	{
+        public override IEnumerable<FloatMenuOption> CompFloatMenuOptions(Pawn selPawn)
+        {
+            foreach (var option in ClassProgression.ClassInitiationMenu.Options(selPawn, parent)) yield return option;
+        }
+        public override AcceptanceReport CanBeUsedBy(Pawn user)
+        {
+            if (!ClassProgression.ClassIdentity.TryGetState(user, out _)) return base.CanBeUsedBy(user);
+            return ClassProgression.ClassInitiation.CanUseFoundation(user, parent, out _)
+                || ClassProgression.ClassInitiation.CanUseAdept(user, parent, out _)
+                || ClassProgression.ClassInitiation.CanUseMaster(user, parent, out _)
+                ? (AcceptanceReport)true : (AcceptanceReport)"TM_ProgressionBookUnavailable".Translate();
+        }
 
 		public override void DoEffect(Pawn user)
-		{
+        {
+            if (ClassProgression.ClassIdentity.TryGetState(user, out _))
+            {
+                if (!ClassProgression.ClassInitiation.CompleteBook(user, parent))
+                    Messages.Message("TM_ProgressionBookUnavailable".Translate(), user, MessageTypeDefOf.RejectInput, false);
+                return;
+            }
             if (parent.def != null || user.IsShambler || user.IsGhoul)
             {
                 bool customClass = false;

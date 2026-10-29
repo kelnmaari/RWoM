@@ -1,4 +1,4 @@
-﻿using RimWorld;
+using RimWorld;
 using System;
 using System.Collections.Generic;
 using Verse;
@@ -24,7 +24,7 @@ namespace TorannMagic.Thoughts
                 }
                 else
                 {
-                    if(initiator.story != null && initiator.story.traits != null && initiator.story.traits.HasTrait(TorannMagicDefOf.TM_Bard))
+                    if(initiator.story != null && initiator.story.traits != null && ClassProgression.ClassIdentity.IsBard(initiator))
                     {
                         if (initiator.jobs.curDriver.asleep)
                         {

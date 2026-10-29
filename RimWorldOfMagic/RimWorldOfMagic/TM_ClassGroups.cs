@@ -83,6 +83,8 @@ namespace TorannMagic
 
         public static List<MagicPower> GetMagicClassGroup(Pawn pawn, MagicData data)
         {
+            if (ClassProgression.ClassIdentity.TryGetState(pawn, out _))
+                return ClassProgression.ClassSpellAccess.ClassPowers(pawn, data);
             if (pawn?.story?.traits == null || data == null)
             {
                 return null;

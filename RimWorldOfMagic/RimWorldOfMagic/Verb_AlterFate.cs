@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using RimWorld;
@@ -7,6 +7,7 @@ using Verse;
 using Verse.AI;
 using UnityEngine;
 using HarmonyLib;
+using TorannMagic.ClassProgression;
 
 
 namespace TorannMagic
@@ -31,55 +32,21 @@ namespace TorannMagic
             pwrVal = TM_Calc.GetSkillPowerLevel(caster, this.Ability.Def as TMAbilityDef);
             arcaneDmg = comp.arcaneDmg;
 
+            var ownedPrediction = ChronomancerPrediction.ResolveOwned(comp, Find.Storyteller.incidentQueue);
+            string predictionLabel = comp.predictionIncidentDef?.label;
             if(comp.predictionIncidentDef != null)
             {
                 if (Rand.Chance((.25f + (.05f * pwrVal))*this.arcaneDmg)) //success end
                 {
-                    //Log.Message("remove event");
-                    List<QueuedIncident> iQue = Traverse.Create(root: Find.Storyteller.incidentQueue).Field(name: "queuedIncidents").GetValue<List<QueuedIncident>>();
-                    if(iQue != null && iQue.Count > 0)
+                    if (ChronomancerPrediction.CancelOwned(comp, Find.Storyteller.incidentQueue))
                     {
-                        for(int i = 0; i < iQue.Count; i++)
-                        {
-                            //Log.Message("checking ique " + iQue[i].FiringIncident.def.defName + " against " + comp.predictionIncidentDef.defName);
-                            if (iQue[i].FiringIncident.def == comp.predictionIncidentDef)
-                            {
-                                //Log.Message("Removing incident " + iQue[i].FiringIncident.def.defName);
-                                iQue.Remove(iQue[i]);
-                                if (Rand.Chance(.6f + (.1f * pwrVal)))
-                                {
-                                    this.confident = true;
-                                }
-                                else if (Rand.Chance(.1f))
-                                {
-                                    this.uneasy = true;
-                                }
-                                else
-                                {
-                                    this.unsure = true;
-                                }
-                                break;
-                            }
-                        }
+                        if (Rand.Chance(.6f + (.1f * pwrVal))) this.confident = true;
+                        else if (Rand.Chance(.1f)) this.uneasy = true;
+                        else this.unsure = true;
                     }
                 }
                 else if (Rand.Chance(.2f - (.02f * pwrVal))) //shifting incident
                 {
-                    //Log.Message("shift event");
-                    List<QueuedIncident> iQue = Traverse.Create(root: Find.Storyteller.incidentQueue).Field(name: "queuedIncidents").GetValue<List<QueuedIncident>>();
-                    if (iQue != null && iQue.Count > 0)
-                    {
-                        for (int i = 0; i < iQue.Count; i++)
-                        {
-                            //Log.Message("checking ique " + iQue[i].FiringIncident.def.defName + " against " + comp.predictionIncidentDef.defName);
-                            if (iQue[i].FiringIncident.def == comp.predictionIncidentDef)
-                            {
-                                //Log.Message("replacing incident " + iQue[i].FiringIncident.def.defName);
-                                iQue.Remove(iQue[i]);
-                            }
-                        }
-                    }
-
                     IEnumerable<IncidentDef> enumerable = from def in DefDatabase<IncidentDef>.AllDefs
                                                           where (def != comp.predictionIncidentDef && def.TargetAllowed(this.CasterPawn.Map))
                                                           orderby Rand.ValueSeeded(Find.TickManager.TicksGame)
@@ -92,7 +59,7 @@ namespace TorannMagic
                         if(localDef.Worker.CanFireNow(parms))
                         {
                             QueuedIncident iq = new QueuedIncident(new FiringIncident(localDef, null, parms), comp.predictionTick);
-                            Find.Storyteller.incidentQueue.Add(iq);
+                            if (!ChronomancerPrediction.ReplaceOwned(comp, Find.Storyteller.incidentQueue, ownedPrediction, iq)) break;
                             //Log.Message("queueing incident " + localDef.defName + " in " + comp.predictionTick + " ticks");
                             //localDef.Worker.TryExecute(parms);
                             if (Rand.Chance(.6f + (.1f * pwrVal)))
@@ -204,7 +171,7 @@ namespace TorannMagic
                     }
                     //Messages.Message("TM_AlterGameConditionFailed".Translate(this.CasterPawn.LabelShort, localGC.Label), MessageTypeDefOf.NeutralEvent);
                 }
-                DisplayConfidence(comp.predictionIncidentDef.label);
+                DisplayConfidence(predictionLabel);
             }
             else if(pwrVal >= 3)
             {
@@ -288,3 +255,4 @@ namespace TorannMagic
 
     }
 }
+

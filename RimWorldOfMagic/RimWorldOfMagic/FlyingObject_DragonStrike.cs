@@ -317,10 +317,6 @@ namespace TorannMagic
                 Pawn p = this.flyingThing as Pawn;
                 if (p.IsColonist)
                 {
-                    if (ModOptions.Settings.Instance.cameraSnap)
-                    {
-                        CameraJumper.TryJumpAndSelect(p);
-                    }
                     p.drafter.Drafted = this.drafted;
                 }
                 this.Destroy(DestroyMode.Vanish);

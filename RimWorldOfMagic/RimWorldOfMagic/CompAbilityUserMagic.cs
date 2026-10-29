@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -181,6 +181,7 @@ namespace TorannMagic
         public IncidentDef predictionIncidentDef = null;
         public int predictionTick = 0;
         public int predictionHash = 0;
+        public string predictionToken;
         private List<Pawn> hexedPawns = new List<Pawn>();
         //Recall fields
         //position, hediffs, needs, mana, manual recall bool, recall duration
@@ -444,6 +445,28 @@ namespace TorannMagic
                 }
                 return this.magicData;
             }
+        }
+
+        public bool RecoverMissingProgression()
+        {
+            if (!IsMagicUser) return false;
+            bool missing = magicData == null;
+            if (missing) magicData = new MagicData(this) { MagicUserXP = 0 };
+            magicData.RestoreMissingRecords();
+            if (missing)
+            {
+                TM_ClassState.RestoreCurrentMagicRuntime(this, true);
+                magicPowersInitialized = true;
+                Compatibility.TM_Log.Message("SaveRecovery", "Missing magic progression initialized at level 0 for " + Pawn.LabelShort);
+            }
+            // Loaded colonists are not newly recruited NPCs. Otherwise the next
+            // faction-check tick can erase the progression we just preserved.
+            if (Pawn.IsColonist)
+            {
+                colonistPowerCheck = true;
+                magicPowersInitializedForColonist = true;
+            }
+            return missing;
         }
 
         public override void PostDeSpawn(Map map, DestroyMode mode = DestroyMode.Vanish)
@@ -776,7 +799,11 @@ namespace TorannMagic
                         }
                         ResolveMinions();
                         ResolveSustainers();
-                        if (this.Pawn.story.traits.HasTrait(TorannMagicDefOf.Necromancer) || this.Pawn.story.traits.HasTrait(TorannMagicDefOf.Lich) || (this.customClass != null && this.customClass.isNecromancer))
+                        if (ClassProgression.ClassIdentity.TryGetState(this.Pawn, out _)
+                            ? ClassProgression.ClassIdentity.IsNecromancer(this.Pawn)
+                            : this.Pawn.story.traits.HasTrait(TorannMagicDefOf.Necromancer)
+                                || this.Pawn.story.traits.HasTrait(TorannMagicDefOf.Lich)
+                                || (this.customClass != null && this.customClass.isNecromancer))
                         {
                             ResolveUndead();
                         }
@@ -791,27 +818,33 @@ namespace TorannMagic
                 {
                     if (!this.Pawn.Dead && !this.Pawn.Downed && this.Pawn.Map != null && this.Pawn.story != null && this.Pawn.story.traits != null && this.MagicData != null && this.AbilityData != null && !this.Pawn.InMentalState)
                     {
-                        if (this.Pawn.IsColonist)
+                        if (!AutoCast.TM_AutocastCombat.RequiresCombat(this.Pawn))
                         {
                             this.autocastTick = Find.TickManager.TicksGame + (int)Rand.Range(.8f * ModOptions.Settings.Instance.autocastEvaluationFrequency, 1.2f * ModOptions.Settings.Instance.autocastEvaluationFrequency);
                             AutoCast.AutoCastContext.SelectionRestoreAllowed = false;
                             try { ResolveAutoCast(); }
                             finally { AutoCast.AutoCastContext.SelectionRestoreAllowed = true; }
+                            // Flight may now hold the pawn off-map; do not keep
+                            // running the remainder of this spawned-pawn tick.
+                            if (!this.Pawn.Spawned) return;
                         }
-                        else if (ModOptions.Settings.Instance.AICasting && this.Pawn.IsFighting() && (!this.Pawn.IsPrisoner || this.Pawn.IsFighting()) && (this.Pawn.guest != null && !this.Pawn.IsSlave))
+                        else if (ModOptions.Settings.Instance.AICasting)
                         {
                             float tickMult = ModOptions.Settings.Instance.AIAggressiveCasting ? 1f : 2f;
                             this.autocastTick = Find.TickManager.TicksGame + (int)(Rand.Range(.75f * ModOptions.Settings.Instance.autocastEvaluationFrequency, 1.25f * ModOptions.Settings.Instance.autocastEvaluationFrequency) * tickMult);
-                            AutoCast.AutoCastContext.SelectionRestoreAllowed = false;
-                            try { ResolveAIAutoCast(); }
-                            finally { AutoCast.AutoCastContext.SelectionRestoreAllowed = true; }
+                            if (AutoCast.TM_AutocastCombat.TryGetCombatOpponent(this.Pawn, out _))
+                            {
+                                AutoCast.AutoCastContext.SelectionRestoreAllowed = false;
+                                try { ResolveAIAutoCast(); }
+                                finally { AutoCast.AutoCastContext.SelectionRestoreAllowed = true; }
+                            }
                         }
                     }
                 }
-                if (!this.Pawn.IsColonist && ModOptions.Settings.Instance.AICasting && ModOptions.Settings.Instance.AIAggressiveCasting && Find.TickManager.TicksGame > this.nextAICastAttemptTick) //Aggressive AI Casting
+                if (AutoCast.TM_AutocastCombat.RequiresCombat(this.Pawn) && ModOptions.Settings.Instance.AICasting && ModOptions.Settings.Instance.AIAggressiveCasting && Find.TickManager.TicksGame > this.nextAICastAttemptTick) //Aggressive AI Casting
                 {
                     this.nextAICastAttemptTick = Find.TickManager.TicksGame + Rand.Range(300, 500);
-                    if (this.Pawn.jobs != null && this.Pawn.CurJobDef != TorannMagicDefOf.TMCastAbilitySelf && this.Pawn.CurJobDef != TorannMagicDefOf.TMCastAbilityVerb)
+                    if (AutoCast.TM_AutocastCombat.TryGetCombatOpponent(this.Pawn, out _) && this.Pawn.jobs != null && !AutoCast.TM_AutocastCombat.IsAbilityJob(this.Pawn.CurJob))
                     {
                         IEnumerable<AbilityUserAIProfileDef> enumerable = this.Pawn.EligibleAIProfiles();
                         if (enumerable != null && enumerable.Count() > 0)
@@ -836,9 +869,14 @@ namespace TorannMagic
                                             if (pawnAbility.CanCastPowerCheck(AbilityContext.AI, out reason))
                                             {
                                                 LocalTargetInfo target = useThisAbility.Worker.TargetAbilityFor(useThisAbility, this.Pawn);
-                                                if (target.IsValid)
+                                                if (target.IsValid && pawnAbility.Def is TMAbilityDef aiDef
+                                                    && AutoCast.TM_AutocastCombat.AllowsAutomaticCast(this.Pawn, aiDef, target)
+#if RW17
+                                                    && Compatibility.AbilityCastSafety.CanAutocast(pawnAbility.Verb, target)
+#endif
+                                                    )
                                                 {
-                                                    pawnAbility.UseAbility(AbilityContext.Player, target);
+                                                    AutoCast.DoJob.Execute(pawnAbility.UseAbility(AbilityContext.AI, target), this.Pawn);
                                                 }
                                             }
                                         }
@@ -851,7 +889,7 @@ namespace TorannMagic
             }
             if (Find.TickManager.TicksGame % this.overdriveFrequency == 0)
             {
-                if (this.Pawn.story.traits.HasTrait(TorannMagicDefOf.Technomancer) || (TM_ClassUtility.ClassHasAbility(TorannMagicDefOf.TM_Overdrive)))
+                if ((this.Pawn.story.traits.HasTrait(TorannMagicDefOf.Technomancer) || ClassProgression.ClassIdentity.IsTechnomancer(this.Pawn)) || (TM_ClassUtility.ClassHasAbility(TorannMagicDefOf.TM_Overdrive)))
                 {
                     ResolveTechnomancerOverdrive();
                 }
@@ -862,7 +900,7 @@ namespace TorannMagic
             }
             if (Find.TickManager.TicksGame % 601 == 0)
             {
-                if (this.Pawn.story.traits.HasTrait(TorannMagicDefOf.Warlock))
+                if (ClassProgression.ClassIdentity.IsWarlock(this.Pawn))
                 {
                     ResolveWarlockEmpathy();
                 }
@@ -873,7 +911,7 @@ namespace TorannMagic
             }
             if (Find.TickManager.TicksGame % 2001 == 0)
             {
-                if (this.Pawn.story.traits.HasTrait(TorannMagicDefOf.Succubus))
+                if (ClassProgression.ClassIdentity.IsSuccubus(this.Pawn))
                 {
                     ResolveSuccubusLovin();
                 }
@@ -956,45 +994,26 @@ namespace TorannMagic
             }
         }
 
-        public bool IsMagicUser => this.initializedIsMagicUser ? this.isMagicUser : this.SetIsMagicUser();
+        public bool IsMagicUser => ClassProgression.ClassIdentity.TryGetRole(Pawn, ClassProgression.Vocation.Mage, out bool enabled)
+            ? enabled : this.initializedIsMagicUser ? this.isMagicUser : this.SetIsMagicUser();
         public bool SetIsMagicUser()
         {
+            if (ClassProgression.ClassIdentity.TryGetRole(Pawn, ClassProgression.Vocation.Mage, out bool enabled)) return enabled;
             if (Pawn?.story == null) return this.isMagicUser = false;
             this.initializedIsMagicUser = true;
+            // Resolve against the current registry and current trait identity, not a
+            // serialized index or a cached class left behind by a live trait edit.
+            this.customClass = TM_ClassState.CurrentBaseClass(this.Pawn, true);
+            this.customIndex = this.customClass == null ? -2 : TM_ClassUtility.CustomClasses.IndexOf(this.customClass);
+            this.AdvancedClasses = TM_ClassState.CurrentCustomClasses(this.Pawn, true).Where(c => c.isAdvancedClass).ToList();
             if (this.customClass != null) return this.isMagicUser = true;
-            if (this.customClass == null && this.customIndex == -2)
-            {
-                this.customIndex = TM_ClassUtility.CustomClassIndexOfBaseMageClass(this.Pawn.story.traits.allTraits);
-                if (this.customIndex >= 0)
-                {
-                    TM_CustomClass foundCustomClass = TM_ClassUtility.CustomClasses[customIndex];
-                    if (!foundCustomClass.isMage)
-                    {
-                        this.customIndex = -1;
-                        return this.isMagicUser = false;
-                    }
-                    this.customClass = foundCustomClass;
-                    return this.isMagicUser = true;
-                }
-            }
             // If any traits are in our generated set of magic traits, we are magic.
             for (int i = Pawn.story.traits.allTraits.Count - 1; i >= 0; i--)
             {
-                if (magicTraitIndexes.Contains(Pawn.story.traits.allTraits[i].def.index))
+                if (Pawn.story.traits.allTraits[i].def.defName == "Faceless" || TM_ClassGroups.MagicEntriesField.Any(entry => entry.trait == Pawn.story.traits.allTraits[i].def.defName))
                     return this.isMagicUser = true;
             }
             if (AdvancedClasses.Count > 0 || TM_Calc.IsWanderer(Pawn)) return this.isMagicUser = true;
-            if (TM_Calc.HasAdvancedClass(this.Pawn))
-            {
-                foreach (TMDefs.TM_CustomClass cc in TM_ClassUtility.GetAdvancedClassesForPawn(this.Pawn))
-                {
-                    if (cc.isMage)
-                    {
-                        this.AdvancedClasses.Add(cc);
-                        return this.isMagicUser = true;
-                    }
-                }
-            }
             return this.isMagicUser = false;
         }
 
@@ -1158,6 +1177,12 @@ namespace TorannMagic
 
         public void ResolveFactionChange()
         {
+            if (ClassProgression.ClassSpellAccess.RestoreLearned(this))
+            {
+                this.magicPowersInitializedForColonist = true;
+                this.colonistPowerCheck = true;
+                return;
+            }
             if (!this.colonistPowerCheck)
             {
                 RemovePowers();
@@ -1214,7 +1239,7 @@ namespace TorannMagic
             bool flag = CompAbilityUserMagic.MagicAbilities == null;
             if (flag)
             {
-                if (this.magicPowersInitialized == false && this.MagicData != null)
+                if (this.magicPowersInitialized == false && this.MagicData != null && !TM_ClassState.HasSavedMagicProgression(this.MagicData))
                 {
                     MagicData.MagicUserLevel = 0;
                     MagicData.MagicAbilityPoints = 0;
@@ -1241,6 +1266,7 @@ namespace TorannMagic
 
         private void AssignAbilities()
         {
+            if (ClassProgression.ClassSpellAccess.RestoreLearned(this)) return;
             // A debug class roll or an existing save can already have leveled powers.
             // Class membership uses the base definition, not the current cast variant.
             float hardModeMasterChance = .35f;
@@ -2395,12 +2421,6 @@ namespace TorannMagic
                         {
                             this.MagicData.AllMagicPowers[z].learned = true;
                         }
-                        if (this.MagicData.AllMagicPowers[z] == this.MagicData.MagicPowersWD.FirstOrDefault((MagicPower x) => x.abilityDef == TorannMagicDefOf.TM_SoulBond) ||
-                        this.MagicData.AllMagicPowers[z] == this.MagicData.MagicPowersWD.FirstOrDefault((MagicPower x) => x.abilityDef == TorannMagicDefOf.TM_ShadowBolt) ||
-                        this.MagicData.AllMagicPowers[z] == this.MagicData.MagicPowersWD.FirstOrDefault((MagicPower x) => x.abilityDef == TorannMagicDefOf.TM_Dominate))
-                        {
-                            this.MagicData.AllMagicPowers[z].learned = false;
-                        }
                         if (this.MagicData.AllMagicPowers[z].requiresScroll)
                         {
                             this.MagicData.AllMagicPowers[z].learned = false;
@@ -2457,6 +2477,7 @@ namespace TorannMagic
 
         public void InitializeSpell()
         {
+            if (ClassProgression.ClassSpellAccess.RestoreLearned(this)) return;
             Pawn abilityUser = base.Pawn;
             if (this.IsMagicUser)
             {
@@ -2472,7 +2493,7 @@ namespace TorannMagic
                     //}                   
                     for (int j = 0; j < this.MagicData.AllMagicPowers.Count; j++)
                     {                       
-                        if (this.MagicData.AllMagicPowers[j].learned && !this.customClass.classMageAbilities.Contains(this.MagicData.AllMagicPowers[j].abilityDef))
+                        if (this.MagicData.AllMagicPowers[j].learned && TM_ClassState.IsMagicPowerAuthorized(this, this.MagicData.AllMagicPowers[j]) && TM_ClassState.PreferredMagicOwner(this, this.MagicData.AllMagicPowers[j].TMabilityDefs[0]) == this.MagicData.AllMagicPowers[j] && !this.customClass.classMageAbilities.Contains(this.MagicData.AllMagicPowers[j].abilityDef))
                         {
                             this.RemovePawnAbility(this.MagicData.AllMagicPowers[j].abilityDef);
                             this.AddPawnAbility(this.MagicData.AllMagicPowers[j].abilityDef);                            
@@ -3365,6 +3386,12 @@ namespace TorannMagic
 
         public void ResetSkills()
         {
+            // The legacy reset cannot refund initiation books/trials or novice choices.
+            // Keep enrolled owners intact until a dedicated progression reset exists.
+            if (ClassProgression.ClassIdentity.TryGetState(this.Pawn, out _)) return;
+            TM_ClassState.ResetMagicRuntime(this);
+            if (this.MagicData == null) return;
+            foreach (MagicPowerSkill skill in this.MagicData.AllMagicPowerSkills) skill.level = 0;
             this.MagicData.MagicPowerSkill_global_regen.FirstOrDefault((MagicPowerSkill x) => x.label == "TM_global_regen_pwr").level = 0;
             this.MagicData.MagicPowerSkill_global_eff.FirstOrDefault((MagicPowerSkill x) => x.label == "TM_global_eff_pwr").level = 0;
             this.MagicData.MagicPowerSkill_global_spirit.FirstOrDefault((MagicPowerSkill x) => x.label == "TM_global_spirit_pwr").level = 0;
@@ -3397,6 +3424,7 @@ namespace TorannMagic
                     TMAbilityDef ability = (TMAbilityDef)this.MagicData.AllMagicPowers[i].TMabilityDefs[j];
                     this.RemovePawnAbility(ability);
                 }
+                this.MagicData.AllMagicPowers[i].level = 0;
                 this.MagicData.AllMagicPowers[i].learned = false;
                 this.MagicData.AllMagicPowers[i].autocast = false;
             }
@@ -3407,8 +3435,8 @@ namespace TorannMagic
             //base.IsInitialized = false;
             //CompAbilityUserMagic.MagicAbilities = null;
             //this.magicData = null;
-            this.AssignAbilities();
-          
+            TM_ClassState.GrantCurrentMagicStarts(this);
+            base.UpdateAbilities();
         }
 
         private void LoadPowers()
@@ -3876,11 +3904,19 @@ namespace TorannMagic
         {
             castSuccess = false;
             string name = TM_Calc.BaseAbilityDefName(def.defName);
+            if (name == "TM_Flight")
+            {
+                if (!aiCaster && power != null && power.autocast)
+                    castSuccess = AutoCast.TM_TravelAutocast.TryExecuteFlight(this.Pawn, def, ability);
+                // Never fall through to the generic OnSelf evaluator, including
+                // drafted and external AI paths. Combat leaps have other routes.
+                return true;
+            }
             if (name == "TM_Blink")
             {
                 if (!aiCaster && !this.Pawn.Drafted && this.Pawn.CurJob != null && !this.Pawn.CurJob.playerForced)
                 {
-                    bool classTravel = this.Pawn.story.traits.HasTrait(TorannMagicDefOf.Arcanist) ||
+                    bool classTravel = ClassProgression.ClassIdentity.IsArcanist(this.Pawn) ||
                         this.Pawn.story.traits.HasTrait(TorannMagicDefOf.ChaosMage) || this.customClass != null;
                     float minDistance = ActualManaCost(def) * (classTravel ? 240 : 200);
                     bool previousSelection = AutoCast.AutoCastContext.SelectionRestoreAllowed;
@@ -3908,6 +3944,7 @@ namespace TorannMagic
 
         public void ResolveAutoCast()
         {
+            if (AutoCast.TM_ExternalCastOwnership.IsCasting(this.Pawn)) return;
             if (ModOptions.Settings.Instance.autocastEnabled && this.Pawn.jobs != null && this.Pawn.CurJob != null && this.Pawn.CurJob.def != TorannMagicDefOf.TMCastAbilityVerb && this.Pawn.CurJob.def != TorannMagicDefOf.TMCastAbilitySelf &&
                 this.Pawn.CurJob.def != JobDefOf.Ingest && this.Pawn.CurJob.def != JobDefOf.ManTurret && this.Pawn.GetPosture() == PawnPosture.Standing && !this.Pawn.CurJob.playerForced && !this.Pawn.Map.GameConditionManager.ConditionIsActive(TorannMagicDefOf.ManaDrain) && !this.Pawn.Map.GameConditionManager.ConditionIsActive(TorannMagicDefOf.TM_ManaStorm))
             {
@@ -4156,7 +4193,7 @@ namespace TorannMagic
                             }
                         }
                     }
-                    if (this.Pawn.story.traits.HasTrait(TorannMagicDefOf.Druid) || flagCM || isCustom || hasLearnedPowers)
+                    if (ClassProgression.ClassIdentity.IsDruid(this.Pawn) || flagCM || isCustom || hasLearnedPowers)
                     {
                         PawnAbility ability = null;
                         foreach (MagicPower current in AutoCast.AutocastPolicy.LegacyMagicGroup(legacyPowers, this.MagicData.MagicPowersD))
@@ -4718,7 +4755,7 @@ namespace TorannMagic
                             }
                         }
                     }
-                    if ((this.Pawn.story.traits.HasTrait(TorannMagicDefOf.Druid) || flagCM || isCustom || hasLearnedPowers))
+                    if ((ClassProgression.ClassIdentity.IsDruid(this.Pawn) || flagCM || isCustom || hasLearnedPowers))
                     {
                         PawnAbility ability = null;
                         foreach (MagicPower current in AutoCast.AutocastPolicy.LegacyMagicGroup(legacyPowers, this.MagicData.MagicPowersD))
@@ -4767,7 +4804,7 @@ namespace TorannMagic
                             }
                         }
                     }
-                    if ((this.Pawn.story.traits.HasTrait(TorannMagicDefOf.Succubus) || flagCM || isCustom || hasLearnedPowers) && this.Pawn.story.DisabledWorkTagsBackstoryAndTraits != WorkTags.Violent)
+                    if ((ClassProgression.ClassIdentity.IsSuccubus(this.Pawn) || flagCM || isCustom || hasLearnedPowers) && this.Pawn.story.DisabledWorkTagsBackstoryAndTraits != WorkTags.Violent)
                     {
                         PawnAbility ability = null;
                         foreach (MagicPower current in AutoCast.AutocastPolicy.LegacyMagicGroup(legacyPowers, this.MagicData.MagicPowersSD))
@@ -4792,7 +4829,7 @@ namespace TorannMagic
                             }
                         }
                     }
-                    if ((this.Pawn.story.traits.HasTrait(TorannMagicDefOf.Warlock) || flagCM || isCustom || hasLearnedPowers) && this.Pawn.story.DisabledWorkTagsBackstoryAndTraits != WorkTags.Violent)
+                    if ((ClassProgression.ClassIdentity.IsWarlock(this.Pawn) || flagCM || isCustom || hasLearnedPowers) && this.Pawn.story.DisabledWorkTagsBackstoryAndTraits != WorkTags.Violent)
                     {
                         PawnAbility ability = null;
                         foreach (MagicPower current in AutoCast.AutocastPolicy.LegacyMagicGroup(legacyPowers, this.MagicData.MagicPowersWD))
@@ -4918,7 +4955,8 @@ namespace TorannMagic
 
         public void ResolveAIAutoCast()
         {
-            
+            if (AutoCast.TM_ExternalCastOwnership.IsCasting(this.Pawn)) return;
+            if (!AutoCast.TM_AutocastCombat.TryGetCombatOpponent(this.Pawn, out _)) return;
             if (ModOptions.Settings.Instance.AICasting && this.Pawn.jobs != null && this.Pawn.CurJob != null && this.Pawn.CurJob.def != TorannMagicDefOf.TMCastAbilityVerb && this.Pawn.CurJob.def != TorannMagicDefOf.TMCastAbilitySelf && 
                 this.Pawn.CurJob.def != JobDefOf.Ingest && this.Pawn.CurJob.def != JobDefOf.ManTurret && this.Pawn.GetPosture() == PawnPosture.Standing)
             {
@@ -5145,6 +5183,7 @@ namespace TorannMagic
 
         private void ResolveSpiritOfLight()
         {
+            if (ClassProgression.BrightmageLifecycle.Restore(this)) return;
             if(this.SoL != null)
             {
                 //if(!this.spell_CreateLight)
@@ -5432,6 +5471,7 @@ namespace TorannMagic
             {
                 this.supportedUndead = new List<Thing>();
             }
+            ClassProgression.NecromancerControlTrial.Observe(this);
         }
 
         public void ResolveSuccubusLovin()
@@ -5534,9 +5574,42 @@ namespace TorannMagic
             }
         }
 
+        internal void ExposeTechnomancerOverdrive()
+        {
+            Scribe_References.Look(ref overdriveBuilding, "overdriveBuilding");
+            Scribe_Values.Look(ref overdriveDuration, "overdriveDuration", 0);
+            Scribe_Values.Look(ref overdrivePowerOutput, "overdrivePowerOutput", 0f);
+            Scribe_Values.Look(ref overdriveFrequency, "overdriveFrequency", 100);
+            if (Scribe.mode == LoadSaveMode.PostLoadInit)
+            {
+                if (overdriveFrequency <= 0) overdriveFrequency = 100;
+                RefreshTechnomancerOverdrive();
+            }
+        }
+
+        internal bool RefreshTechnomancerOverdrive()
+        {
+            var owners = ModOptions.Constants.GetOverdrivePawnList();
+            if (overdriveBuilding.DestroyedOrNull() || overdriveDuration <= 0)
+            {
+                owners.RemoveAll(p => p == Pawn);
+                overdriveBuilding = null;
+                overdriveDuration = 0;
+                overdrivePowerOutput = 0;
+                return false;
+            }
+            if (!overdriveBuilding.Spawned)
+            {
+                owners.RemoveAll(p => p == Pawn);
+                return false;
+            }
+            owners.AddDistinct(Pawn);
+            return true;
+        }
+
         public void ResolveTechnomancerOverdrive()
         {
-            if (this.overdriveBuilding != null)
+            if (RefreshTechnomancerOverdrive())
             {
                 List<Pawn> odPawns = ModOptions.Constants.GetOverdrivePawnList();
 
@@ -5573,9 +5646,7 @@ namespace TorannMagic
                 {
                     if (odPawns != null && odPawns.Contains(this.Pawn))
                     {
-                        ModOptions.Constants.ClearOverdrivePawns();
-                        odPawns.Remove(this.Pawn);
-                        ModOptions.Constants.SetOverdrivePawnList(odPawns);
+                        odPawns.RemoveAll(p => p == this.Pawn);
                     }
                     this.overdrivePowerOutput = 0;
                     this.overdriveBuilding = null;
@@ -5585,6 +5656,16 @@ namespace TorannMagic
 
         public void ResolveChronomancerTimeMark()
         {
+            if (ClassProgression.ClassIdentity.TryGetState(this.Pawn, out _))
+            {
+                ClassProgression.ClassSpellAccess.RestoreChronomancerChildren(this);
+                if (this.recallExpiration <= Find.TickManager.TicksGame) this.recallSet = false;
+                bool active = this.recallSet && this.recallPosition != default(IntVec3);
+                if (active) TM_ClassState.AddRuntimeAbility(this, TorannMagicDefOf.TM_Recall);
+                else this.RemovePawnAbility(TorannMagicDefOf.TM_Recall);
+                this.recallSpell = active;
+                return;
+            }
             //Log.Message("pawn " + this.Pawn.LabelShort + " recallset: " + this.recallSet + " expiration: " + this.recallExpiration + " / " + Find.TickManager.TicksGame + " recallSpell: " + this.recallSpell + " position: " + this.recallPosition);
             if(this.customClass != null && MagicData.MagicPowersC.FirstOrDefault((MagicPower x ) => x.abilityDef == TorannMagicDefOf.TM_Recall).learned && !MagicData.MagicPowersStandalone.FirstOrDefault((MagicPower x) => x.abilityDef == TorannMagicDefOf.TM_TimeMark).learned)
             {
@@ -5610,6 +5691,13 @@ namespace TorannMagic
 
         public void ResolveSustainers()
         {
+            if (ClassProgression.GolemancerLifecycle.Restore(this))
+            {
+                if (this.BrandPawns.Count > 0 && sigilSurging && this.Mana.CurLevel <= .01f)
+                    this.sigilSurging = false;
+            }
+            else
+            {
             if(this.BrandPawns != null && this.BrandPawns.Count > 0)
             {
                 if(!this.dispelBrandings)
@@ -5652,6 +5740,7 @@ namespace TorannMagic
             {
                 this.dispelLivingWall = false;
                 this.RemovePawnAbility(TorannMagicDefOf.TM_DispelLivingWall);
+            }
             }
 
             if (this.stoneskinPawns.Count() > 0)
@@ -5963,6 +6052,9 @@ namespace TorannMagic
 
         public void ResolveClassSkills()
         {
+            ClassProgression.BrightmageLifecycle.Restore(this);
+            ClassProgression.EmpathLifecycle.Restore(this);
+            ClassProgression.ClassSpellAccess.RestoreBrightmageChildren(this);
             bool flagCM = this.Pawn.story.traits.HasTrait(TorannMagicDefOf.ChaosMage);
             bool isCustom = this.customClass != null;
 
@@ -5976,7 +6068,7 @@ namespace TorannMagic
                 HealthUtility.AdjustSeverity(this.Pawn, TorannMagicDefOf.TM_CursedHD, .1f);
             }
 
-            if (this.Pawn.story.traits.HasTrait(TorannMagicDefOf.BloodMage) || (isCustom && (this.customClass.classMageAbilities.Contains(TorannMagicDefOf.TM_BloodGift) || this.customClass.classHediff == TorannMagicDefOf.TM_BloodHD)))
+            if ((this.Pawn.story.traits.HasTrait(TorannMagicDefOf.BloodMage) || ClassProgression.ClassIdentity.IsBloodMage(this.Pawn)) || (isCustom && (this.customClass.classMageAbilities.Contains(TorannMagicDefOf.TM_BloodGift) || this.customClass.classHediff == TorannMagicDefOf.TM_BloodHD)))
             {
                 if (!this.Pawn.health.hediffSet.HasHediff(HediffDef.Named("TM_BloodHD")))
                 {
@@ -5988,18 +6080,18 @@ namespace TorannMagic
                 }
             }
 
-            if (this.Pawn.story.traits.HasTrait(TorannMagicDefOf.Chronomancer) || flagCM || (isCustom && this.customClass.classMageAbilities.Contains(TorannMagicDefOf.TM_Prediction)))
+            if (ClassProgression.ClassIdentity.IsChronomancer(this.Pawn) || flagCM || (isCustom && this.customClass.classMageAbilities.Contains(TorannMagicDefOf.TM_Prediction)))
             {
                 if (this.predictionIncidentDef != null && (this.predictionTick + 30) < Find.TickManager.TicksGame)
                 {
-                    this.predictionIncidentDef = null;
-                    Find.Storyteller.incidentQueue.Clear();
+                    ClassProgression.ChronomancerPrediction.Expire(this, Find.Storyteller?.incidentQueue);
                     //Log.Message("prediction failed to execute, clearing prediction");
                 }
             }
 
 
-            if(HexedPawns != null && HexedPawns.Count <= 0 && previousHexedPawns > 0)
+            if(!ClassProgression.ShamanLifecycle.Restore(this)
+                && HexedPawns != null && HexedPawns.Count <= 0 && previousHexedPawns > 0)
             {
                 if (HexedPawns.Count > 0)
                 {
@@ -6015,7 +6107,11 @@ namespace TorannMagic
                 }
             }
 
-            if (this.Pawn.story.traits.HasTrait(TorannMagicDefOf.Enchanter) || flagCM || isCustom)
+            if (ClassProgression.ClassIdentity.TryGetState(this.Pawn, out _))
+            {
+                ClassProgression.ClassSpellAccess.RestoreEnchanterChildren(this);
+            }
+            else if (this.Pawn.story.traits.HasTrait(TorannMagicDefOf.Enchanter) || flagCM || isCustom)
             {
                 if (this.MagicData.MagicPowersE.FirstOrDefault<MagicPower>((MagicPower x) => x.abilityDef == TorannMagicDefOf.TM_EnchantedBody).learned && (this.spell_EnchantedAura == false || !this.MagicData.MagicPowersStandalone.FirstOrDefault((MagicPower x) => x.abilityDef == TorannMagicDefOf.TM_EnchantedAura).learned))
                 {
@@ -6032,7 +6128,7 @@ namespace TorannMagic
                 }
             }
 
-            if (this.Pawn.story.traits.HasTrait(TorannMagicDefOf.Technomancer) || flagCM || isCustom)
+            if ((this.Pawn.story.traits.HasTrait(TorannMagicDefOf.Technomancer) || ClassProgression.ClassIdentity.IsTechnomancer(this.Pawn)) || flagCM || isCustom)
             {
                 if (this.HasTechnoBit)
                 {
@@ -6070,7 +6166,7 @@ namespace TorannMagic
                 this.spell_Teach = true;
             }
 
-            if ((this.Pawn.story.traits.HasTrait(TorannMagicDefOf.Geomancer) || flagCM || isCustom) && this.earthSpriteType != 0 && this.earthSprites.IsValid)
+            if ((this.Pawn.story.traits.HasTrait(TorannMagicDefOf.Geomancer) || ClassProgression.ClassIdentity.IsGeomancer(this.Pawn) || flagCM || isCustom) && this.earthSpriteType != 0 && this.earthSprites.IsValid)
             {
                 if (this.nextEarthSpriteAction < Find.TickManager.TicksGame)
                 {
@@ -6116,7 +6212,11 @@ namespace TorannMagic
                 }
             }
 
-            if (this.Pawn.story.traits.HasTrait(TorannMagicDefOf.Lich))
+            if (ClassProgression.ClassIdentity.TryGetState(this.Pawn, out _))
+            {
+                ClassProgression.LichTransformation.Restore(this);
+            }
+            else if (this.Pawn.story.traits.HasTrait(TorannMagicDefOf.Lich))
             {
                 if (!this.Pawn.health.hediffSet.HasHediff(HediffDef.Named("TM_LichHD")))
                 {
@@ -6152,7 +6252,7 @@ namespace TorannMagic
                     }
                 }
 
-                if (this.Pawn.story.traits.HasTrait(TorannMagicDefOf.Succubus) || this.Pawn.story.traits.HasTrait(TorannMagicDefOf.Warlock))
+                if (ClassProgression.ClassIdentity.IsSuccubus(this.Pawn) || ClassProgression.ClassIdentity.IsWarlock(this.Pawn))
                 {
                     if (this.soulBondPawn != null)
                     {
@@ -6194,7 +6294,7 @@ namespace TorannMagic
                 }
             }
 
-            if (this.IsMagicUser && !this.Pawn.Dead & !this.Pawn.Downed && (this.Pawn.story.traits.HasTrait(TorannMagicDefOf.TM_Bard) || (isCustom && this.customClass.classMageAbilities.Contains(TorannMagicDefOf.TM_Inspire))))
+            if (this.IsMagicUser && !this.Pawn.Dead & !this.Pawn.Downed && (ClassProgression.ClassIdentity.IsBard(this.Pawn) || (isCustom && this.customClass.classMageAbilities.Contains(TorannMagicDefOf.TM_Inspire))))
             {
                 if (!this.Pawn.health.hediffSet.HasHediff(HediffDef.Named("TM_InspirationalHD")) && this.MagicData.MagicPowersB.FirstOrDefault((MagicPower x) => x.abilityDef == TorannMagicDefOf.TM_Inspire).learned)
                 {
@@ -6463,7 +6563,7 @@ namespace TorannMagic
             }
             try
             {
-                if (this.Pawn.story.traits.HasTrait(TorannMagicDefOf.Druid) && this.fertileLands.Count > 0)
+                if (ClassProgression.ClassIdentity.IsDruid(this.Pawn) && this.fertileLands.Count > 0)
                 {
                     _mpRegenRateUpkeep += TorannMagicDefOf.TM_FertileLands.upkeepRegenCost;
                 }
@@ -6472,9 +6572,10 @@ namespace TorannMagic
             {
 
             }
-            if (this.Pawn.story.traits.HasTrait(TorannMagicDefOf.Lich))
+            if (ClassProgression.ClassIdentity.IsLich(this.Pawn))
             {
-                if (this.spell_LichForm == true || (this.customClass != null && this.MagicData.ReturnMatchingMagicPower(TorannMagicDefOf.TM_LichForm).learned))
+                if (!ClassProgression.ClassIdentity.TryGetState(this.Pawn, out _)
+                    && (this.spell_LichForm == true || (this.customClass != null && this.MagicData.ReturnMatchingMagicPower(TorannMagicDefOf.TM_LichForm).learned)))
                 {
                     this.RemovePawnAbility(TorannMagicDefOf.TM_LichForm);
                     this.MagicData.ReturnMatchingMagicPower(TorannMagicDefOf.TM_LichForm).learned = false;
@@ -6711,6 +6812,7 @@ namespace TorannMagic
 
         public override void PostExposeData()
         {
+            ExposeTechnomancerOverdrive();
             //base.PostExposeData();            
             Scribe_Values.Look<bool>(ref this.magicPowersInitialized, "magicPowersInitialized", false, false);
             Scribe_Values.Look<bool>(ref this.magicPowersInitializedForColonist, "magicPowersInitializedForColonist", true, false);
@@ -6776,6 +6878,7 @@ namespace TorannMagic
             Scribe_Values.Look<bool>(ref this.doOnce, "doOnce", true, false);
             Scribe_Values.Look<int>(ref this.predictionTick, "predictionTick", 0, false);
             Scribe_Values.Look<int>(ref this.predictionHash, "predictionHash", 0, false);
+            ClassProgression.ChronomancerPrediction.ExposeComp(this);
             Scribe_References.Look<Thing>(ref this.mageLightThing, "mageLightThing", false);
             Scribe_Values.Look<bool>(ref this.mageLightActive, "mageLightActive", false, false);
             Scribe_Values.Look<bool>(ref this.mageLightSet, "mageLightSet", false, false);
@@ -6834,6 +6937,8 @@ namespace TorannMagic
             if (Scribe.mode == LoadSaveMode.PostLoadInit)
             {
                 TM_PawnTracker.ResolveMagicComp(this);
+                RecoverMissingProgression();
+                TM_ClassState.RestoreSharedMagicProgression(this);
                 Pawn abilityUser = base.Pawn;
                 int index = TM_ClassUtility.CustomClassIndexOfBaseMageClass(abilityUser.story.traits.allTraits);
                 if (index >= 0)
@@ -7980,56 +8085,15 @@ namespace TorannMagic
                                 }
                             }
                             int count = learnedList.Count;
+                            // Restore every learned spell, including NPC sets larger than
+                            // the five preview slots, and only its saved rank.
+                            foreach (MagicPower power in learnedList)
+                                TM_ChaosProgression.RestorePower(this, power);
                             for (int i = 0; i < 5; i++)
                             {
                                 if (i < count)
                                 {
                                     this.chaosPowers.Add(new TM_ChaosPowers((TMAbilityDef)learnedList[i].GetAbilityDef(0), TM_ClassUtility.GetAssociatedMagicPowerSkill(this, learnedList[i])));
-                                    foreach(MagicPower mp in learnedList)
-                                    {
-                                        for (int j = 0; j < mp.TMabilityDefs.Count; j++)
-                                        {
-                                            TMAbilityDef tmad = mp.TMabilityDefs[j] as TMAbilityDef;
-                                            if(tmad.shouldInitialize)
-                                            {
-                                                int level = mp.level;
-                                                if (mp.TMabilityDefs[level] == TorannMagicDefOf.TM_LightSkip)
-                                                {
-                                                    if (TM_Calc.GetSkillPowerLevel(this.Pawn, TorannMagicDefOf.TM_LightSkip) >= 1)
-                                                    {
-                                                        base.AddPawnAbility(TorannMagicDefOf.TM_LightSkipMass);
-                                                    }
-                                                    if (TM_Calc.GetSkillPowerLevel(this.Pawn, TorannMagicDefOf.TM_LightSkip) >= 2)
-                                                    {
-                                                        base.AddPawnAbility(TorannMagicDefOf.TM_LightSkipGlobal);
-                                                    }
-                                                }
-                                                if (tmad == TorannMagicDefOf.TM_Hex && this.HexedPawns.Count > 0)
-                                                {
-                                                    RemovePawnAbility(TorannMagicDefOf.TM_Hex_CriticalFail);
-                                                    RemovePawnAbility(TorannMagicDefOf.TM_Hex_MentalAssault);
-                                                    RemovePawnAbility(TorannMagicDefOf.TM_Hex_Pain);
-                                                    AddPawnAbility(TorannMagicDefOf.TM_Hex_CriticalFail);
-                                                    AddPawnAbility(TorannMagicDefOf.TM_Hex_MentalAssault);
-                                                    AddPawnAbility(TorannMagicDefOf.TM_Hex_Pain);
-                                                }
-                                                
-                                                RemovePawnAbility(tmad);
-                                                AddPawnAbility(tmad);
-                                            }
-                                            if(tmad.childAbilities != null && tmad.childAbilities.Count > 0)
-                                            {
-                                                foreach(TMAbilityDef ad in tmad.childAbilities)
-                                                {
-                                                    if(ad.shouldInitialize)
-                                                    {
-                                                        RemovePawnAbility(ad);
-                                                        AddPawnAbility(ad);
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
                                 }
                                 else
                                 {
@@ -8059,78 +8123,41 @@ namespace TorannMagic
 
         public void LoadCustomClassAbilities(TMDefs.TM_CustomClass cc, Pawn fromPawn = null)
         {
-            for (int i = 0; i < cc.classMageAbilities.Count; i++)
+            if (cc == null || this.MagicData == null) return;
+            TM_ClassState.RestoreSharedMagicProgression(this);
+            MagicData fromData = fromPawn?.GetCompAbilityUserMagic()?.MagicData;
+            foreach (TMAbilityDef ability in cc.classMageAbilities)
             {
-                TMAbilityDef ability = cc.classMageAbilities[i];
-                MagicData fromData = null;
-                if (fromPawn != null)
-                {
-                   fromData = fromPawn.GetCompAbilityUserMagic().MagicData;
-                }
+                MagicPower owner = TM_ClassState.PreferredMagicOwner(this, ability);
+                if (owner == null) continue;
                 if (fromData != null)
                 {
-                    foreach (MagicPower fp in fromData.AllMagicPowers)
+                    MagicPower source = TM_ClassState.PreferredMagicOwner(fromPawn.GetCompAbilityUserMagic(), ability);
+                    if (source != null && source.learned)
                     {
-                        if (fp.learned && cc.classMageAbilities.Contains(fp.abilityDef))
-                        {
-                            MagicPower mp = this.MagicData.AllMagicPowers.FirstOrDefault((MagicPower x) => x.abilityDef == fp.TMabilityDefs[0]);                            
-                            if (mp != null)
-                            {
-                                mp.learned = true;
-                                mp.level = fp.level;
-                            }
-                        }
+                        owner.learned = true;
+                        owner.level = Math.Min(source.level, owner.TMabilityDefs.Count - 1);
                     }
                 }
-
-                for (int j = 0; j < this.MagicData.AllMagicPowers.Count; j++)
+                if (!owner.learned) continue;
+                TMAbilityDef current = owner.abilityDef as TMAbilityDef;
+                if (ability.shouldInitialize) TM_ClassState.AddRuntimeAbility(this, current);
+                if (current == TorannMagicDefOf.TM_LightSkip)
                 {
-                    if (this.MagicData.AllMagicPowers[j] == this.MagicData.MagicPowersWD.FirstOrDefault((MagicPower x) => x.abilityDef == TorannMagicDefOf.TM_SoulBond) ||
-                            this.MagicData.AllMagicPowers[j] == this.MagicData.MagicPowersWD.FirstOrDefault((MagicPower x) => x.abilityDef == TorannMagicDefOf.TM_ShadowBolt) ||
-                            this.MagicData.AllMagicPowers[j] == this.MagicData.MagicPowersWD.FirstOrDefault((MagicPower x) => x.abilityDef == TorannMagicDefOf.TM_Dominate))
-                    {
-                        this.MagicData.AllMagicPowers[j].learned = false;
-                    }
-                    
-                    if (this.MagicData.AllMagicPowers[j].TMabilityDefs.Contains(cc.classMageAbilities[i]) && this.MagicData.AllMagicPowers[j].learned)
-                    {
-                        if (cc.classMageAbilities[i].shouldInitialize)
-                        {
-                            int level = this.MagicData.AllMagicPowers[j].level;                                                        
-                            base.AddPawnAbility(this.MagicData.AllMagicPowers[j].TMabilityDefs[level]);
-                            if (this.magicData.AllMagicPowers[j].TMabilityDefs[level] == TorannMagicDefOf.TM_LightSkip)
-                            {
-                                if (TM_Calc.GetSkillPowerLevel(this.Pawn, TorannMagicDefOf.TM_LightSkip) >= 1)
-                                {
-                                    base.AddPawnAbility(TorannMagicDefOf.TM_LightSkipMass);
-                                }
-                                if (TM_Calc.GetSkillPowerLevel(this.Pawn, TorannMagicDefOf.TM_LightSkip) >= 2)
-                                {
-                                    base.AddPawnAbility(TorannMagicDefOf.TM_LightSkipGlobal);
-                                }
-                            }
-                            if (cc.classMageAbilities[i] == TorannMagicDefOf.TM_Hex && this.HexedPawns.Count > 0)
-                            {
-                                RemovePawnAbility(TorannMagicDefOf.TM_Hex_CriticalFail);
-                                RemovePawnAbility(TorannMagicDefOf.TM_Hex_MentalAssault);
-                                RemovePawnAbility(TorannMagicDefOf.TM_Hex_Pain);
-                                AddPawnAbility(TorannMagicDefOf.TM_Hex_CriticalFail);
-                                AddPawnAbility(TorannMagicDefOf.TM_Hex_MentalAssault);
-                                AddPawnAbility(TorannMagicDefOf.TM_Hex_Pain);
-                            }
-                        }
-                        if (ability.childAbilities != null && ability.childAbilities.Count > 0)
-                        {
-                            for (int c = 0; c < ability.childAbilities.Count; c++)
-                            {
-                                if (ability.childAbilities[c].shouldInitialize)
-                                {
-                                    this.AddPawnAbility(ability.childAbilities[c]);
-                                }
-                            }
-                        }
-                    }
+                    if (TM_Calc.GetSkillPowerLevel(this.Pawn, TorannMagicDefOf.TM_LightSkip) >= 1)
+                        TM_ClassState.AddRuntimeAbility(this, TorannMagicDefOf.TM_LightSkipMass);
+                    if (TM_Calc.GetSkillPowerLevel(this.Pawn, TorannMagicDefOf.TM_LightSkip) >= 2)
+                        TM_ClassState.AddRuntimeAbility(this, TorannMagicDefOf.TM_LightSkipGlobal);
                 }
+                if (ability == TorannMagicDefOf.TM_Hex && this.HexedPawns.Count > 0)
+                {
+                    TM_ClassState.AddRuntimeAbility(this, TorannMagicDefOf.TM_Hex_CriticalFail);
+                    TM_ClassState.AddRuntimeAbility(this, TorannMagicDefOf.TM_Hex_MentalAssault);
+                    TM_ClassState.AddRuntimeAbility(this, TorannMagicDefOf.TM_Hex_Pain);
+                }
+                if (ability.childAbilities != null)
+                    foreach (TMAbilityDef child in ability.childAbilities)
+                        if (child.shouldInitialize) TM_ClassState.AddRuntimeAbility(this, child);
             }
         }
 
@@ -8196,11 +8223,14 @@ namespace TorannMagic
 
         public void RemoveAdvancedClass(TMDefs.TM_CustomClass ac)
         {
+            if (ac == null) return;
+            // A rejected trait can be removed before it ever creates progression.
+            MagicData data = this.MagicData;
             for (int i = 0; i < ac.classMageAbilities.Count; i++)
             {
                 TMAbilityDef ability = ac.classMageAbilities[i];
 
-                for (int j = 0; j < this.MagicData.AllMagicPowers.Count; j++)
+                for (int j = 0; data != null && j < data.AllMagicPowers.Count; j++)
                 {
                     MagicPower power = this.MagicData.AllMagicPowers[j];
                     if (power.abilityDef == ability)
@@ -8234,10 +8264,12 @@ namespace TorannMagic
                             }
                         }
                     }
-                    base.RemovePawnAbility(ability);
                 }
+                base.RemovePawnAbility(ability);
+                if (ability.childAbilities != null)
+                    foreach (TMAbilityDef child in ability.childAbilities) base.RemovePawnAbility(child);
             }
-            if (ac != null && ac.isMage && ac.isAdvancedClass)
+            if (data != null && ac.isMage && ac.isAdvancedClass)
             {
                 foreach (TMAbilityDef ability in ac.classMageAbilities)
                 {

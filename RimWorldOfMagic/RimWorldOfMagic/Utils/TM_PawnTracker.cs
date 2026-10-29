@@ -13,8 +13,9 @@ namespace TorannMagic.Utils
         // For simplicity, use this not fully optimized function to prevent bugs that would be hard to find
         public static void ResolveComps(Pawn pawn)
         {
-            ResolveMagicComp(pawn.TryGetComp<CompAbilityUserMagic>());
-            ResolveMightComp(pawn.TryGetComp<CompAbilityUserMight>());
+            if (pawn?.story?.traits == null) return;
+            ResolveMagicComp(pawn.GetCompAbilityUserMagic());
+            ResolveMightComp(pawn.GetCompAbilityUserMight());
         }
 
         // Runs right after ThingWithComps.InitializeComps (spawn setup, and PostMake
@@ -64,18 +65,34 @@ namespace TorannMagic.Utils
     [HarmonyPatch(typeof(TraitSet), nameof(TraitSet.GainTrait))]
     class TM_PawnTracker__GainTrait__Postfix
     {
+        [HarmonyPriority(Priority.First)]
+        static void Prefix(Pawn ___pawn)
+        {
+            TM_ClassState.CaptureBeforeTraitsChanged(___pawn);
+        }
+
+        [HarmonyPriority(Priority.Last)]
         static void Postfix(Pawn ___pawn)
         {
             TM_PawnTracker.ResolveComps(___pawn);
+            TM_ClassState.OnTraitsChanged(___pawn);
         }
     }
 
     [HarmonyPatch(typeof(TraitSet), nameof(TraitSet.RemoveTrait))]
     class TM_PawnTracker__RemoveTrait__Postfix
     {
+        [HarmonyPriority(Priority.First)]
+        static void Prefix(Pawn ___pawn)
+        {
+            TM_ClassState.CaptureBeforeTraitsChanged(___pawn);
+        }
+
+        [HarmonyPriority(Priority.Last)]
         static void Postfix(Pawn ___pawn)
         {
             TM_PawnTracker.ResolveComps(___pawn);
+            TM_ClassState.OnTraitsChanged(___pawn);
         }
     }
 

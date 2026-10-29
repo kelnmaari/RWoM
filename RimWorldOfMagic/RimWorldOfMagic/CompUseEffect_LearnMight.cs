@@ -9,7 +9,12 @@ namespace TorannMagic
 	{
 
 		public override void DoEffect(Pawn user)
-		{
+        {
+            if (ClassProgression.ClassIdentity.TryGetState(user, out _))
+            {
+                Messages.Message("TM_ProgressionBookUnavailable".Translate(), user, MessageTypeDefOf.RejectInput, false);
+                return;
+            }
             if (parent.def != null || user.IsShambler || user.IsGhoul)
             {
                 bool customClass = false;

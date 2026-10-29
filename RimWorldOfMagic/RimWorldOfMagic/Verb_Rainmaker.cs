@@ -32,7 +32,7 @@ namespace TorannMagic
                         if (map.weatherManager.curWeather.defName == "SnowHard" || map.weatherManager.curWeather.defName == "SnowGentle")
                         {
                             rainMakerDef = WeatherDef.Named("Clear");
-                            map.weatherManager.TransitionTo(rainMakerDef);
+                            ClassProgression.IceTrials.TransitionWeather(base.CasterPawn, map, rainMakerDef);
                             return true;
                         }
                         else
@@ -46,7 +46,7 @@ namespace TorannMagic
                                 rainMakerDef = WeatherDef.Named("SnowHard");
                             }
                             map.weatherDecider.DisableRainFor(0);
-                            map.weatherManager.TransitionTo(rainMakerDef);
+                            ClassProgression.IceTrials.TransitionWeather(base.CasterPawn, map, rainMakerDef);
                             return true;
                         }
                     }
@@ -70,7 +70,7 @@ namespace TorannMagic
                             rainMakerDef = WeatherDef.Named("Clear");
                             isViolent = false;
                         }
-                        map.weatherManager.TransitionTo(rainMakerDef);
+                        ClassProgression.IceTrials.TransitionWeather(base.CasterPawn, map, rainMakerDef);
 
                     }
                     else
@@ -96,7 +96,7 @@ namespace TorannMagic
                             }
                         }
                         map.weatherDecider.DisableRainFor(0);
-                        map.weatherManager.TransitionTo(rainMakerDef);
+                        ClassProgression.IceTrials.TransitionWeather(base.CasterPawn, map, rainMakerDef);
                     }
                     if (isViolent)
                     {

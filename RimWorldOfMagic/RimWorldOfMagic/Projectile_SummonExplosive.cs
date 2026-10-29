@@ -93,7 +93,7 @@ namespace TorannMagic
                     tempPod.spawnCount = 1;
                     try
                     {
-                        Projectile_SummonExplosive.SingleSpawnLoop(tempPod, shiftPos, map, this.launcher, this.duration);
+                        Projectile_SummonExplosive.SingleSpawnLoop(tempPod, shiftPos, map, this.launcher, this.duration, this);
                     }
                     catch
                     {
@@ -122,7 +122,7 @@ namespace TorannMagic
             this.age = this.duration;           
         }
 
-        public static void SingleSpawnLoop(SpawnThings spawnables, IntVec3 position, Map map, Thing launcher, int duration)
+        public static void SingleSpawnLoop(SpawnThings spawnables, IntVec3 position, Map map, Thing launcher, int duration, Projectile_SummonExplosive trialSource = null)
         {
             bool flag = spawnables.def != null;
             if (flag)
@@ -159,6 +159,7 @@ namespace TorannMagic
                     bldgComp.Temporary = true;
                     bldgComp.TicksToDestroy = duration;
                     GenSpawn.Spawn(thing, position, map, Rot4.North, WipeMode.Vanish, false);
+                    ClassProgression.SummonerTrials.Spawned(trialSource, thing, ClassProgression.SummonerTrials.Spell.Explosive);
                 }
             }
         }

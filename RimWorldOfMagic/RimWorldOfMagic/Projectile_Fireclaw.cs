@@ -689,6 +689,7 @@ namespace TorannMagic
 			explosion.postExplosionSpawnChance = postExplosionSpawnChance;
 			explosion.postExplosionSpawnThingCount = postExplosionSpawnThingCount;
 			explosion.applyDamageToExplosionCellsNeighbors = applyDamageToExplosionCellsNeighbors;
+            ClassProgression.FireclawTrial.Stamp(explosion, this.thingIDNumber);
             explosion.StartExplosion(explosionSound, null);
 		}
 

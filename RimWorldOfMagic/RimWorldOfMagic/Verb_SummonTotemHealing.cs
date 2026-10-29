@@ -62,6 +62,7 @@ namespace TorannMagic
                 tempPod.spawnCount = 1;
                 try
                 {
+                    var trial = ClassProgression.ShamanTrials.CaptureSpawn(this.Ability);
                     this.totem = TM_Action.SingleSpawnLoop(caster, tempPod, shiftPos, map, 2500 + (125 * verVal), true, false, caster.Faction, false, ThingDefOf.WoodLog);
                     this.totem.SetFaction(caster.Faction);
                     Building_TMTotem_Healing totemBuilding = this.totem as Building_TMTotem_Healing;
@@ -70,6 +71,7 @@ namespace TorannMagic
                         totemBuilding.pwrVal = pwrVal;
                         totemBuilding.verVal = verVal;
                         totemBuilding.arcanePwr = comp.arcaneDmg;
+                        ClassProgression.ShamanTrials.CompleteSpawn(trial, totemBuilding);
                     }
                     for (int i = 0; i < 3; i++)
                     {

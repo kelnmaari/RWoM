@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using Verse;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,7 +18,9 @@ namespace TorannMagic
 {
     public static class TM_ClassUtility
     {
-        public static List<TM_CustomClass> CustomClasses;
+        // Initialize before deferred definition loading so registry consumers can
+        // safely observe an empty list during partial startup.
+        public static List<TM_CustomClass> CustomClasses = new List<TM_CustomClass>();
         public static readonly List<TM_CustomClass> CustomBaseClasses = new List<TM_CustomClass>();
         public static readonly List<TM_CustomClass> CustomMageClasses = new List<TM_CustomClass>();
         public static readonly List<TM_CustomClass> CustomFighterClasses = new List<TM_CustomClass>();
@@ -67,12 +69,26 @@ namespace TorannMagic
         //public static TM_CustomClass[] CustomFighterClasses;
         //public static TM_CustomClass[] CustomAdvancedClasses;
 
+        public static void RefreshBuiltinClassIndexes()
+        {
+            NonCustomMagicAndMightTraitIndexes.Clear();
+            foreach (string name in TM_ClassGroups.MagicEntriesField.Select(entry => entry.trait)
+                .Concat(TM_ClassGroups.MightEntriesField.Select(entry => entry.trait)).Distinct())
+            {
+                TraitDef trait = DefDatabase<TraitDef>.GetNamedSilentFail(name);
+                if (trait != null) NonCustomMagicAndMightTraitIndexes.Add(trait.index);
+            }
+        }
+
         public static void LoadCustomClasses()
         {
-            TM_CustomClassDef named = TM_CustomClassDef.Named("TM_CustomClasses");
-            if (named == null) return;
+            // A mod-settings file without the CustomClass key deserializes the
+            // dictionary as null; LoadCustomClasses runs before the callback that
+            // initializes it, so initialize it here before building the category caches.
+            Settings.Instance.CustomClass ??= new Dictionary<string, bool>();
 
-            CustomClasses = named.customClasses;
+            TM_CustomClassDef named = TM_CustomClassDef.Named("TM_CustomClasses");
+            CustomClasses = named?.customClasses ?? new List<TM_CustomClass>();
             //CustomAdvancedClassTraitIndexMap.Clear();
             //var CustomBaseClassesList = new List<TM_CustomClass>();
             //var CustomMageClassesList = new List<TM_CustomClass>();
@@ -83,8 +99,11 @@ namespace TorannMagic
             CustomFighterClasses.Clear();
             CustomAdvancedClasses.Clear();
 
+            // A broken XML row or an unresolved cross-reference must not kill the
+            // whole registry: skip incomplete entries instead of throwing here.
             IEnumerable<TM_CustomClass> enabledCustomClasses = CustomClasses.Where(cc =>
-                Settings.Instance.CustomClass.TryGetValue(cc.classTrait.ToString(), true));
+                cc != null && cc.classTrait != null
+                && Settings.Instance.CustomClass.TryGetValue(cc.classTrait.ToString(), true));
 
             foreach (TM_CustomClass cc in enabledCustomClasses)
             {
@@ -128,21 +147,26 @@ namespace TorannMagic
                 //CustomAdvancedClasses = CustomAdvancedClassesList.ToArray();
             }
             LoadClassIndexes();
+            // Deferred startup/settings reload can replace classes after the UI
+            // has already cached its trait lists. Rebuild only registry-derived lists.
+            TM_Data.ResetClassCaches();
             
         }
 
         public static void LoadClassIndexes()
         {
             CustomClassTraitIndexes = new Dictionary<ushort, int>();
+            if (CustomClasses == null) return;
             for (int i = 0; i < CustomClasses.Count; i++)
             {
+                if (CustomClasses[i]?.classTrait == null) continue;
                 CustomClassTraitIndexes[CustomClasses[i].classTrait.index] = i;
             }
         }
 
         public static List<TraitDef> CustomClassTraitDefs
         {
-            get => CustomClasses.Select(t => t.classTrait).ToList();           
+            get => CustomClasses.Where(t => t?.classTrait != null).Select(t => t.classTrait).ToList();
         }
 
         private static Dictionary<ushort, int> CustomClassTraitIndexes;  // Dictionary to more quickly determine trait's CustomClasses index
@@ -170,6 +194,7 @@ namespace TorannMagic
         {
             for (int i = 0; i < CustomClasses.Count; i++)
             {
+                if (CustomClasses[i]?.classTrait == null || trait == null) continue;
                 if (CustomClasses[i].classTrait.defName == trait.defName)
                 {
                     return i;
@@ -363,3 +388,4 @@ namespace TorannMagic
         }
     }
 }
+

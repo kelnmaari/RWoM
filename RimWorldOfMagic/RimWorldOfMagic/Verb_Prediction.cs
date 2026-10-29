@@ -41,7 +41,9 @@ namespace TorannMagic
                 }
                 else
                 {
+                    var trial = ClassProgression.ChronomancerTrials.CapturePrediction(this.Ability, pawn);
                     HealthUtility.AdjustSeverity(pawn, TorannMagicDefOf.TM_PredictionHD, .5f + pwrVal);
+                    ClassProgression.ChronomancerTrials.CompletePrediction(trial);
                     //TM_MoteMaker.ThrowNoteMote(pawn.DrawPos, pawn.Map, .8f);
                     magicPower.AutoCast = true;
                 }

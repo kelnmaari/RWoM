@@ -209,6 +209,7 @@ namespace TorannMagic
                         }
                         
                         comp.summonedMinions.Add(newPawn);
+                        ClassProgression.SummonerTrials.Spawned(this, newPawn, ClassProgression.SummonerTrials.Spell.Minion);
                         if (newPawn.Faction != null && newPawn.Faction != Faction.OfPlayer)
                         {
                             Lord lord = null;

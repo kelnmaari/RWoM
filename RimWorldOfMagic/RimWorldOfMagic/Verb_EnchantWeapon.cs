@@ -66,8 +66,10 @@ namespace TorannMagic
             {
                 if (pawn.equipment != null && pawn.equipment.Primary != null && pawn.equipment.Primary.def.IsMeleeWeapon)
                 {
+                    var trial = ClassProgression.EnchanterTrials.CaptureEnchantment(this.Ability, pawn);
                     RemoveExistingEnchantment(pawn);
                     ApplyEnchantment(pawn);
+                    ClassProgression.EnchanterTrials.CompleteEnchantment(trial);
                 }
                 else if(this.CasterPawn.IsColonist)
                 {

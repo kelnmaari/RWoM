@@ -1,4 +1,4 @@
-﻿using RimWorld;
+using RimWorld;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -148,11 +148,11 @@ namespace TorannMagic
 
                         try
                         {
-                            this.duration = (int)((this.verb.verbProps.warmupTime * 60) * this.pawn.GetStatValue(StatDefOf.AimingDelayFactor, false));
+                            this.duration = (int)((this.verb.verbProps.warmupTime * Compatibility.AbilityTiming.WarmupFor(this.verb) * 60) * this.pawn.GetStatValue(StatDefOf.AimingDelayFactor, false));
                         }
                         catch
                         {
-                            this.duration = (int)(this.verb.verbProps.warmupTime * 60);
+                            this.duration = (int)(this.verb.verbProps.warmupTime * Compatibility.AbilityTiming.WarmupFor(this.verb) * 60);
                         }
 
                         if (this.pawn.RaceProps.Humanlike)
@@ -309,11 +309,11 @@ namespace TorannMagic
                             //yield return toil2;
                             try
                             {
-                                this.duration = (int)((this.verb.verbProps.warmupTime * 60) * this.pawn.GetStatValue(StatDefOf.AimingDelayFactor, false));
+                                this.duration = (int)((this.verb.verbProps.warmupTime * Compatibility.AbilityTiming.WarmupFor(this.verb) * 60) * this.pawn.GetStatValue(StatDefOf.AimingDelayFactor, false));
                             }
                             catch
                             {
-                                this.duration = (int)(this.verb.verbProps.warmupTime * 60);
+                                this.duration = (int)(this.verb.verbProps.warmupTime * Compatibility.AbilityTiming.WarmupFor(this.verb) * 60);
                             }
                             LocalTargetInfo target = base.TargetLocA;
                             Toil toil = new Toil();

@@ -218,7 +218,7 @@ namespace TorannMagic
 
         private void AgeThing(Thing thing)
         {
-
+            var trial = ClassProgression.ChronomancerTrials.CaptureReverse(this.Ability, thing, false);
             thing.HitPoints = Mathf.Clamp(thing.HitPoints + Mathf.RoundToInt((200 + (100 * pwrVal)) * this.arcaneDmg), 0, thing.MaxHitPoints);
             if (thing is Apparel apparelThing)
             {
@@ -227,16 +227,19 @@ namespace TorannMagic
                     Traverse.Create(root: apparelThing).Field(name: "wornByCorpseInt").SetValue(false);
                 }
             }
+            ClassProgression.ChronomancerTrials.CompleteReverse(trial);
             TransmutateEffects(thing.Position, 4);
         }
 
         private void AgeFood(Thing thing)
         {
+            var trial = ClassProgression.ChronomancerTrials.CaptureReverse(this.Ability, thing, true);
             CompRottable compRot = thing.TryGetComp<CompRottable>();
             if(compRot != null)
             {
                 compRot.RotProgress = compRot.RotProgress * (.4f - (.125f * pwrVal));
             }
+            ClassProgression.ChronomancerTrials.CompleteReverse(trial);
         }
 
         private void AgeCorpse(Thing thing)

@@ -75,7 +75,9 @@ namespace TorannMagic
                         {
                             if (Rand.Chance(TM_Calc.GetSpellSuccessChance(this.CasterPawn, victim, true)))
                             {
-                                HealthUtility.AdjustSeverity(victim, HediffDef.Named("TM_DeathMarkCurse"), (Rand.Range(1f + pwrVal, 4 + 2 * pwrVal) * this.arcaneDmg));
+                                float markSeverity = Rand.Range(1f + pwrVal, 4 + 2 * pwrVal) * this.arcaneDmg;
+                                HealthUtility.AdjustSeverity(victim, HediffDef.Named("TM_DeathMarkCurse"), markSeverity);
+                                ClassProgression.NecromancerDeathMarkTrial.Applied(this.CasterPawn, victim, this.Ability, markSeverity);
                                 TM_MoteMaker.ThrowSiphonMote(victim.DrawPos, victim.Map, 1.4f);
                                 if (comp.Pawn.health.hediffSet.HasHediff(HediffDef.Named("TM_LichHD"), false))
                                 {

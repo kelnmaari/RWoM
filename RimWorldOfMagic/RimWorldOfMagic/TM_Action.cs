@@ -1592,10 +1592,6 @@ namespace TorannMagic
             pawn.DeSpawn();
             GenPlace.TryPlaceThing(pawn, comp.recallPosition, comp.recallMap, ThingPlaceMode.Near);
             pawn.drafter.Drafted = draftFlag;
-            if (selectFlag && ModOptions.Settings.Instance.cameraSnap)
-            {
-                CameraJumper.TryJumpAndSelect(pawn);
-            }
             comp.recallPosition = default(IntVec3);
         }
 
@@ -1901,10 +1897,6 @@ namespace TorannMagic
                         if (p.IsColonist)
                         {
                             p.drafter.Drafted = true;
-                            if (ModOptions.Settings.Instance.cameraSnap)
-                            {
-                                CameraJumper.TryJumpAndSelect(p);
-                            }
                         }
                         surgeText = "Teleportation";
                         ModOptions.Constants.SetPawnInFlight(false);
@@ -2118,6 +2110,7 @@ namespace TorannMagic
                 //    }
                 //}
 
+                var trial = ClassProgression.EnchanterTrials.CaptureRawConversion(caster, transmutateThing);
                 int transStackCount = 0;
                 if (transmutateThing.stackCount > 250)
                 {
@@ -2144,14 +2137,18 @@ namespace TorannMagic
                         //Log.Message("transumtation resource " + current.defName + " base value " + current.BaseMarketValue + " value count converts to " + newMatCount);
                     }
                 }
+                bool trialPaymentDestroyed = false;
                 if (!transmutateThing.DestroyedOrNull() && transStackCount <= 0)
                 {
                     transmutateThing.Destroy(DestroyMode.Vanish);
                 }
                 else
                 {
-                    transmutateThing.SplitOff(transStackCount).Destroy(DestroyMode.Vanish);
+                    Thing payment = transmutateThing.SplitOff(transStackCount);
+                    payment.Destroy(DestroyMode.Vanish);
+                    trialPaymentDestroyed = payment.Destroyed;
                 }
+                ClassProgression.EnchanterTrials.RawResourceConsumed(trial, transStackCount, trialPaymentDestroyed);
                 Thing thing = null;
                 if (newThingDef != null)
                 {
@@ -2165,7 +2162,9 @@ namespace TorannMagic
 
                 if (thing != null)
                 {
-                    GenPlace.TryPlaceThing(thing, transmutateThing.Position, caster.Map, ThingPlaceMode.Near, null);
+                    int trialOutputCount = thing.stackCount;
+                    bool placed = GenPlace.TryPlaceThing(thing, transmutateThing.Position, caster.Map, ThingPlaceMode.Near, null);
+                    ClassProgression.EnchanterTrials.CompleteRawConversion(trial, newThingDef, trialOutputCount, placed);
                     TM_Action.TransmutateEffects(transmutateThing.Position, caster);
                 }
             }
@@ -2863,11 +2862,10 @@ namespace TorannMagic
 
         public static void RemoveSymbiosisCommand(Pawn symbiote)
         {
-            Hediff symbioteHD = symbiote.health.hediffSet.GetFirstHediffOfDef(TorannMagicDefOf.TM_OutOfBodyHD);
-            Pawn host = symbioteHD.TryGetComp<HediffComp_SymbiosisCaster>().symbiosisHost;
-
-            Hediff hostHD = host.health.hediffSet.GetFirstHediffOfDef(TorannMagicDefOf.TM_SymbiosisHD);
-            if (hostHD != null)
+            Hediff symbioteHD = symbiote?.health?.hediffSet?.GetFirstHediffOfDef(TorannMagicDefOf.TM_OutOfBodyHD);
+            Pawn host = symbioteHD?.TryGetComp<HediffComp_SymbiosisCaster>()?.symbiosisHost;
+            Hediff hostHD = host?.health?.hediffSet?.GetFirstHediffOfDef(TorannMagicDefOf.TM_SymbiosisHD);
+            if (hostHD?.TryGetComp<HediffComp_SymbiosisHost>()?.symbiote == symbiote && hostHD != null)
             {
                 host.health.RemoveHediff(hostHD);
             }

@@ -12,6 +12,10 @@ namespace TorannMagic
     public class HediffComp_SuppressiveAura : HediffComp
     {
 
+        public bool ownTrialActivation;
+        public Pawn trialCaster;
+        internal MagicPower trialOwner;
+
         private bool initialized = false;
         private bool removeNow = false;
 
@@ -27,6 +31,8 @@ namespace TorannMagic
         public override void CompExposeData()
         {
             base.CompExposeData();
+            Scribe_Values.Look(ref ownTrialActivation, "empathOwnTrialActivation", false);
+            Scribe_References.Look(ref trialCaster, "empathTrialCaster");
         }
 
         public string labelCap
@@ -87,7 +93,9 @@ namespace TorannMagic
                             {
                                 if (p != Pawn && !TM_Calc.IsEmpath(p) && Rand.Chance(TM_Calc.GetSpellSuccessChance(Pawn, p, true)))
                                 {
+                                    var trial = ClassProgression.EmpathTrials.CaptureSuppression(this, p);
                                     HealthUtility.AdjustSeverity(p, TorannMagicDefOf.TM_EmotionSuppressionHD, .5f + (.1f * pwrVal));
+                                    ClassProgression.EmpathTrials.CompleteSuppression(trial);
                                     if(p.needs != null)
                                     {
                                         if (p.needs.joy != null)

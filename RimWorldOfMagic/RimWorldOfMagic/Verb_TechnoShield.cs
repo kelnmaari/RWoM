@@ -88,6 +88,7 @@ namespace TorannMagic
 
         private void ApplyHediffs(Pawn target)
         {
+            var trial = ClassProgression.TechnomancerTrials.CaptureShield(this.Ability, target);
             if (this.pwrVal == 3)
             {
                 HealthUtility.AdjustSeverity(target, TorannMagicDefOf.TM_TechnoShieldHD_III, (110 + (30 * verVal))*comp.arcaneDmg);
@@ -104,6 +105,7 @@ namespace TorannMagic
             {
                 HealthUtility.AdjustSeverity(target, TorannMagicDefOf.TM_TechnoShieldHD, (110 + (30 * verVal))*comp.arcaneDmg);
             }
+            ClassProgression.TechnomancerTrials.CompleteShield(trial);
         }
     }
 }

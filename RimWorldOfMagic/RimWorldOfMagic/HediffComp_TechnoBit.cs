@@ -164,7 +164,9 @@ namespace TorannMagic
                             Building repairBuilding = damagedThing as Building;
                             if (repairBuilding != null)
                             {
+                                var trial = ClassProgression.TechnomancerTrials.CaptureRepair(this, repairBuilding);
                                 repairBuilding.HitPoints = Mathf.Min(Mathf.RoundToInt(repairBuilding.HitPoints + (Rand.Range(8, 12) + (.5f * EffVal))), repairBuilding.MaxHitPoints);
+                                ClassProgression.TechnomancerTrials.CompleteRepair(trial);
                                 comp.Mana.CurLevel -= (.03f - .0006f * EffVal);
                                 comp.MagicUserXP += Rand.Range(4, 5);
                                 this.ticksBitWorking = 8;
@@ -188,7 +190,9 @@ namespace TorannMagic
                         Building repairBuilding = damagedThing as Building;
                         if (repairBuilding != null)
                         {
+                            var trial = ClassProgression.TechnomancerTrials.CaptureRepair(this, repairBuilding);
                             repairBuilding.HitPoints = Mathf.Min(repairBuilding.HitPoints + (25 + (2*EffVal)), repairBuilding.MaxHitPoints);
+                            ClassProgression.TechnomancerTrials.CompleteRepair(trial);
                             comp.Mana.CurLevel -= (.05f - .0008f * EffVal);
                             comp.MagicUserXP += Rand.Range(9, 11);
                             this.ticksBitWorking = 8;

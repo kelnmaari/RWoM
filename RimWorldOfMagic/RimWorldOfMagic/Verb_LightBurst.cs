@@ -99,7 +99,9 @@ namespace TorannMagic
                             for (int j = 0; j < bpr.Count; j++)
                             {
                                 TM_Action.DamageEntities(p, bpr[j], distanceMultiplier * (baseDamage + (.3f * pwrVal)), TMDamageDefOf.DamageDefOf.TM_BurningLight, this.CasterPawn);                                
+                                var trial = ClassProgression.BrightmageTrials.CaptureBurst(this.Ability, p);
                                 HealthUtility.AdjustSeverity(p, TorannMagicDefOf.TM_LightBurstHD, distanceMultiplier * lightPotency * (.1f + (.015f * pwrVal)));
+                                ClassProgression.BrightmageTrials.CompleteBurst(trial);
                             }
                         }
                     }

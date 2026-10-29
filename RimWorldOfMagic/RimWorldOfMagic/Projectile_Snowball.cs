@@ -39,6 +39,7 @@ namespace TorannMagic
                 pwrVal = 3;
                 verVal = 3;
             }
+            using (ClassProgression.IceTrials.Creating(this.localAbilityDef == TorannMagicDefOf.TM_Snowball && this.def.defName == "Projectile_Snowball" ? pawn : null, ClassProgression.IceTrials.Spell.Snowball))
             GenExplosion.DoExplosion(base.Position, map, Mathf.RoundToInt(this.def.projectile.explosionRadius + (0.7f * (float)pwrVal)), TMDamageDefOf.DamageDefOf.Snowball, this.launcher, (int)((this.def.projectile.GetDamageAmount(1,null) + 3*pwrVal) * this.arcaneDmg), 0, SoundDefOf.Crunch, def, this.equipmentDef, null, null, 0f, 1, null, null, 0, false, null, 0f, 1, 0f, false);
             CellRect cellRect = CellRect.CenteredOn(base.Position, 3 + (verVal * 1));
 			cellRect.ClipInsideMap(map);
@@ -89,6 +90,8 @@ namespace TorannMagic
 			explosion.postExplosionSpawnChance = postExplosionSpawnChance;
 			explosion.postExplosionSpawnThingCount = postExplosionSpawnThingCount;
 			explosion.applyDamageToExplosionCellsNeighbors = applyDamageToExplosionCellsNeighbors;
+            if (this.localAbilityDef == TorannMagicDefOf.TM_Snowball && this.def.defName == "Projectile_Snowball" && damType == TMDamageDefOf.DamageDefOf.Snowball)
+                ClassProgression.IceTrials.Stamp(explosion, instigator as Pawn, ClassProgression.IceTrials.Spell.Snowball);
             explosion.StartExplosion(explosionSound, null);
 		}
 

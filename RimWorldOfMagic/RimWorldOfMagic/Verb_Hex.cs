@@ -65,11 +65,13 @@ namespace TorannMagic
                 {
                     if (Rand.Chance(.4f + (.1f * pwrVal) * TM_Calc.GetSpellSuccessChance(this.CasterPawn, newPawn, true)))
                     {
+                        var trial = ClassProgression.ShamanTrials.CaptureHex(this.Ability, newPawn);
                         HealthUtility.AdjustSeverity(newPawn, TorannMagicDefOf.TM_HexHD, 1f);
                         if(!comp.HexedPawns.Contains(newPawn))
                         {
                             comp.HexedPawns.Add(newPawn);                            
                         }
+                        ClassProgression.ShamanTrials.CompleteHex(trial);
                         addAbilities = true;
                         TM_MoteMaker.ThrowGenericMote(TorannMagicDefOf.Mote_Hex, newPawn.DrawPos, newPawn.Map, .6f, .1f, .2f, .2f, 0, 0, 0, 0);
                     }

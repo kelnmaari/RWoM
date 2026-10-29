@@ -79,13 +79,14 @@ namespace TorannMagic
                     }
                     else
                     {
+                        bool explicitBranch = ClassProgression.ClassIdentity.TryGetDemonBranch(pawn, out bool selectedWarlock);
                         bool soulPawnHasHediff = false;
                         using (IEnumerator<Hediff> enumerator = soulPawn.health.hediffSet.hediffs.GetEnumerator())
                         {
                             while (enumerator.MoveNext())
                             {
                                 Hediff rec = enumerator.Current;
-                                if (rec.def.defName == "TM_SoulBondPhysicalHD")
+                                if (rec.def.defName == "TM_SoulBondPhysicalHD" && (!explicitBranch || !selectedWarlock))
                                 {
                                     soulPawnHasHediff = true;
                                     if (rec.Severity != .5f + comp.MagicData.MagicPowerSkill_SoulBond.FirstOrDefault((MagicPowerSkill x) => x.label == "TM_SoulBond_ver").level)
@@ -94,7 +95,7 @@ namespace TorannMagic
                                         HealthUtility.AdjustSeverity(soulPawn, HediffDef.Named("TM_SoulBondPhysicalHD"), 0.5f + comp.MagicData.MagicPowerSkill_SoulBond.FirstOrDefault((MagicPowerSkill x) => x.label == "TM_SoulBond_ver").level);
                                     }
                                 }
-                                else if(rec.def.defName == "TM_SoulBondMentalHD")
+                                else if(rec.def.defName == "TM_SoulBondMentalHD" && (!explicitBranch || selectedWarlock))
                                 {
                                     soulPawnHasHediff = true;
                                     if (rec.Severity != .5f + comp.MagicData.MagicPowerSkill_SoulBond.FirstOrDefault((MagicPowerSkill x) => x.label == "TM_SoulBond_ver").level)
@@ -107,16 +108,22 @@ namespace TorannMagic
                         }
                         if(!soulPawnHasHediff)
                         {
-                            if(this.Pawn.gender == Gender.Female)
+                            if(ClassProgression.ClassIdentity.DemonEffect(this.Pawn, false, this.Pawn.gender == Gender.Female))
                             {
                                 HealthUtility.AdjustSeverity(soulPawn, HediffDef.Named("TM_SoulBondPhysicalHD"), -4f);
                                 HealthUtility.AdjustSeverity(soulPawn, HediffDef.Named("TM_SoulBondPhysicalHD"), 0.5f + comp.MagicData.MagicPowerSkill_SoulBond.FirstOrDefault((MagicPowerSkill x) => x.label == "TM_SoulBond_ver").level);
                             }
-                            else if(this.Pawn.gender == Gender.Male)
+                            else if(ClassProgression.ClassIdentity.DemonEffect(this.Pawn, true, this.Pawn.gender == Gender.Male))
                             {
                                 HealthUtility.AdjustSeverity(soulPawn, HediffDef.Named("TM_SoulBondMentalHD"), -4f);
                                 HealthUtility.AdjustSeverity(soulPawn, HediffDef.Named("TM_SoulBondMentalHD"), 0.5f + comp.MagicData.MagicPowerSkill_SoulBond.FirstOrDefault((MagicPowerSkill x) => x.label == "TM_SoulBond_ver").level);
                             }
+                        }
+                        if (ClassProgression.ClassIdentity.TryGetDemonBranch(pawn, out bool warlock))
+                        {
+                            var host = soulPawn.health.hediffSet.GetFirstHediffOfDef(HediffDef.Named(warlock ? "TM_SoulBondMentalHD" : "TM_SoulBondPhysicalHD"));
+                            var bond = host?.TryGetComp<HediffComp_SoulBondHost>();
+                            if (bond != null) bond.BonderPawn = pawn;
                         }
                         if(this.parent.Severity != .5f + comp.MagicData.MagicPowerSkill_SoulBond.FirstOrDefault((MagicPowerSkill x) => x.label == "TM_SoulBond_pwr").level)
                         {

@@ -41,6 +41,7 @@ namespace TorannMagic
                 pwrVal = 3;
                 verVal = 3;
             }
+            using (ClassProgression.IceTrials.Creating(this.localAbilityDef == TorannMagicDefOf.TM_Icebolt && this.def.defName == "Projectile_Icebolt" ? pawn : null, ClassProgression.IceTrials.Spell.Icebolt))
             GenExplosion.DoExplosion(base.Position, map, 0.4f, TMDamageDefOf.DamageDefOf.Iceshard, this.launcher, Mathf.RoundToInt(this.def.projectile.GetDamageAmount(1,null) * this.arcaneDmg), 0, this.def.projectile.soundExplode, def, this.equipmentDef, null, null, 0f, 1, null, null, 0, false, null, 0f, 1, 0f, false);
             CellRect cellRect = CellRect.CenteredOn(base.Position, 3);
             cellRect.ClipInsideMap(map);
@@ -92,6 +93,8 @@ namespace TorannMagic
             explosion.postExplosionSpawnChance = postExplosionSpawnChance;
             explosion.postExplosionSpawnThingCount = postExplosionSpawnThingCount;
             explosion.applyDamageToExplosionCellsNeighbors = applyDamageToExplosionCellsNeighbors;
+            if (this.localAbilityDef == TorannMagicDefOf.TM_Icebolt && this.def.defName == "Projectile_Icebolt" && damType == TMDamageDefOf.DamageDefOf.Iceshard)
+                ClassProgression.IceTrials.Stamp(explosion, instigator as Pawn, ClassProgression.IceTrials.Spell.Icebolt);
             explosion.StartExplosion(explosionSound, null);
         }
     }

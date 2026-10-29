@@ -37,6 +37,8 @@ namespace TorannMagic
         protected Thing assignedTarget;
         protected Thing flyingThing;
         Pawn pawn;
+        public Pawn TrialCaster => pawn;
+        public ClassProgression.BrightmageTrials.LanceSource trialSource;
         private List<Pawn> filteredTargets = new List<Pawn>();
 
         public DamageInfo? impactDamage;
@@ -97,6 +99,7 @@ namespace TorannMagic
         public override void ExposeData()
         {
             base.ExposeData();
+            Scribe_Deep.Look(ref trialSource, "rwomLightLanceTrialSource");
             Scribe_Values.Look<Vector3>(ref this.origin, "origin", default(Vector3), false);
             Scribe_Values.Look<Vector3>(ref this.destination, "destination", default(Vector3), false);
             Scribe_Values.Look<int>(ref this.ticksToImpact, "ticksToImpact", 0, false);
@@ -250,7 +253,12 @@ namespace TorannMagic
             {
                 for(int k =0; k < targets.Count; k++)
                 {
-                    TM_Action.DamageEntities(targets[k], null, (4 + (.6f*pwrVal)) * arcaneDmg * this.lightPotency, TMDamageDefOf.DamageDefOf.TM_BurningLight, pawn);
+                    var trialScope = ClassProgression.BrightmageTrials.EnterEmitter(this, targets[k]);
+                    try
+                    {
+                        TM_Action.DamageEntities(targets[k], null, (4 + (.6f*pwrVal)) * arcaneDmg * this.lightPotency, TMDamageDefOf.DamageDefOf.TM_BurningLight, pawn);
+                    }
+                    finally { ClassProgression.BrightmageTrials.ExitEmitter(trialScope); }
                 }           
             }
         }

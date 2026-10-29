@@ -608,7 +608,11 @@ namespace TorannMagic.Golems
             if(!pawnMaster.DestroyedOrNull() && !pawnMaster.Dead)
             {
                 CompAbilityUserMagic masterComp = pawnMaster.GetCompAbilityUserMagic();
-                if(TM_Calc.IsMagicUser(pawnMaster) && masterComp != null && masterComp.MagicData != null && masterComp.MagicData.AllMagicPowersWithSkills.FirstOrDefault((MagicPower x) => x.abilityDef == TorannMagicDefOf.TM_Golemancy).learned)
+                MagicPower owner = masterComp == null ? null :
+                    ClassProgression.ClassIdentity.TryGetState(pawnMaster, out _)
+                    ? ClassProgression.GolemancerLifecycle.GetLearnedNativeOwner(masterComp, TorannMagicDefOf.TM_Golemancy)
+                    : masterComp.MagicData.AllMagicPowersWithSkills.FirstOrDefault(x => x.abilityDef == TorannMagicDefOf.TM_Golemancy);
+                if(TM_Calc.IsMagicUser(pawnMaster) && owner?.learned == true)
                 {
                     float pSev = .5f + masterComp.MagicData.GetSkill_Power(TorannMagicDefOf.TM_Golemancy).level;
                     float eSev = .5f + masterComp.MagicData.GetSkill_Efficiency(TorannMagicDefOf.TM_Golemancy).level;

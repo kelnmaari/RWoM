@@ -79,9 +79,11 @@ namespace TorannMagic
 
         public void ApplyBloodShield(Pawn pawn)
         {
+            var trial = ClassProgression.BloodMageTrials.CaptureShield(this.Ability, pawn);
             HealthUtility.AdjustSeverity(pawn, HediffDef.Named("TM_BloodShieldHD"), (100f + (10f * pwrVal))*arcaneDmg);
             HediffComp_BloodShield comp = pawn.health.hediffSet.GetFirstHediffOfDef(HediffDef.Named("TM_BloodShieldHD"), false).TryGetComp<HediffComp_BloodShield>();
             comp.linkedPawn = this.CasterPawn;
+            ClassProgression.BloodMageTrials.CompleteShield(trial);
             SoundInfo info = SoundInfo.InMap(new TargetInfo(pawn.Position, pawn.Map, false), MaintenanceType.None);
             info.pitchFactor = .75f;
             SoundDefOf.EnergyShield_Reset.PlayOneShot(info);

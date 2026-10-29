@@ -15,6 +15,12 @@ namespace TorannMagic
         public bool removeNow = false;
 
         public int blurTick = 0;
+        public bool ownPredictionTrialSource;
+        public override void CompExposeData()
+        {
+            base.CompExposeData();
+            Scribe_Values.Look(ref ownPredictionTrialSource, "rwomOwnPredictionTrialSource", false);
+        }
         private int predictionFrequency = 120;
 
         public string labelCap

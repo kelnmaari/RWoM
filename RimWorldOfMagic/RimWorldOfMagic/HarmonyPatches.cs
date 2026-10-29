@@ -277,7 +277,7 @@ namespace TorannMagic
 
             if (Prefs.DevMode)
             {
-                Log.Message($"[TM] Harmony: {harmonyInstance.GetPatchedMethods().Count()} methods patched.");
+                Compatibility.TM_Log.Message("Harmony", $"[TM] Harmony: {harmonyInstance.GetPatchedMethods().Count()} methods patched.");
             }
         }
 
@@ -295,7 +295,7 @@ namespace TorannMagic
             }
             catch (Exception ex)
             {
-                Log.Error("[TM] Failed to scan for attribute patch classes: " + ex);
+                Compatibility.TM_Log.Error("Harmony", "[TM] Failed to scan for attribute patch classes: " + ex);
                 return;
             }
             int applied = 0;
@@ -308,12 +308,12 @@ namespace TorannMagic
                 }
                 catch (Exception ex)
                 {
-                    Log.Error($"[TM] Attribute patch {patchClass.Name} failed: {ex.Message}");
+                    Compatibility.TM_Log.Error("Harmony", $"[TM] Attribute patch {patchClass.Name} failed: {ex.Message}");
                 }
             }
             if (Prefs.DevMode)
             {
-                Log.Message($"[TM] Harmony: applied {applied}/{patchClasses.Count} attribute patch classes.");
+                Compatibility.TM_Log.Message("Harmony", $"[TM] Harmony: applied {applied}/{patchClasses.Count} attribute patch classes.");
             }
         }
 
@@ -326,14 +326,14 @@ namespace TorannMagic
             {
                 if (original == null)
                 {
-                    Log.Warning("[TM] Skipping Harmony patch: target method not found (API change in this game version).");
+                    Compatibility.TM_Log.Warning("Harmony", "[TM] Skipping Harmony patch: target method not found (API change in this game version).");
                     return;
                 }
                 harmonyInstance.Patch(original, prefix, postfix, transpiler, finalizer);
             }
             catch (Exception ex)
             {
-                Log.Warning("[TM] Harmony patch failed on " + (original?.FullDescription() ?? "null") + ": " + ex.Message);
+                Compatibility.TM_Log.Warning("Harmony", "[TM] Harmony patch failed on " + (original?.FullDescription() ?? "null") + ": " + ex.Message);
             }
         }
 
@@ -892,7 +892,7 @@ namespace TorannMagic
                                 mComp.RemoveAdvancedClass(TM_ClassUtility.GetCustomClassOfTrait(trait.def));
                             }
                             //clean up magic comp if this is the last remaining item keeping the pawn a magic user
-                            if (!mComp.IsMagicUser && ___pawn.health.hediffSet.HasHediff(TorannMagicDefOf.TM_MagicUserHD)) 
+                            if (mComp != null && !mComp.IsMagicUser && ___pawn.health.hediffSet.HasHediff(TorannMagicDefOf.TM_MagicUserHD))
                             {
                                 bool addMagicComp = false;
                                 ModOptions.TM_DebugTools.RemoveMagicComp(mComp);
@@ -922,7 +922,7 @@ namespace TorannMagic
                             {
                                 pComp.RemoveAdvancedClass(TM_ClassUtility.GetCustomClassOfTrait(trait.def));
                             }
-                            if (!pComp.IsMightUser && ___pawn.health.hediffSet.HasHediff(TorannMagicDefOf.TM_MightUserHD))
+                            if (pComp != null && !pComp.IsMightUser && ___pawn.health.hediffSet.HasHediff(TorannMagicDefOf.TM_MightUserHD))
                             {
                                 bool addMightComp = false;
                                 ModOptions.TM_DebugTools.RemoveMightComp(pComp);
@@ -1515,7 +1515,7 @@ namespace TorannMagic
         {
             if (clickedThing != null && clickedThing.def == TorannMagicDefOf.TM_Artifact_BracersOfThePacifist)
             {
-                if (context.FirstSelectedPawn != null && context.FirstSelectedPawn.story != null && (context.FirstSelectedPawn.story.traits.HasTrait(TorannMagicDefOf.Priest) || context.FirstSelectedPawn.WorkTagIsDisabled(WorkTags.Violent)))
+                if (context.FirstSelectedPawn != null && context.FirstSelectedPawn.story != null && (ClassProgression.ClassIdentity.IsPriest(context.FirstSelectedPawn) || context.FirstSelectedPawn.WorkTagIsDisabled(WorkTags.Violent)))
                 {
                     string labelShort = clickedThing.LabelShort;
                     __result = new FloatMenuOption("TM_ViolentCannotEquip".Translate(context.FirstSelectedPawn.LabelShort, labelShort), null);
@@ -1559,7 +1559,7 @@ namespace TorannMagic
         //        {
         //            string labelShort = equipment.LabelShort;
         //            FloatMenuOption nve_option;
-        //            if (!(pawn.story.traits.HasTrait(TorannMagicDefOf.Priest) || pawn.WorkTagIsDisabled(WorkTags.Violent)))
+        //            if (!(ClassProgression.ClassIdentity.IsPriest(pawn) || pawn.WorkTagIsDisabled(WorkTags.Violent)))
         //            {
         //                for (int j = 0; j < opts.Count; j++)
         //                {                            
@@ -1601,12 +1601,15 @@ namespace TorannMagic
             //public static void Postfix(Vector3 clickPos, Pawn pawn, ref List<FloatMenuOption> opts)
             public static void Postfix(FloatMenuContext context, ref List<FloatMenuOption> options, Pawn ___makingFor)
             {
-                Pawn pawn = ___makingFor;
-                if (pawn == null)
+                // Use the current menu's selection/map, not the static legacy pawn
+                // slot, which is unset for multiselect and can outlive a failed menu.
+                Pawn pawn = context?.allSelectedPawns?.Count == 1 ? context.allSelectedPawns[0] : null;
+                if (options == null || pawn?.story?.traits == null || !pawn.Spawned || pawn.Map != context.map)
                 {
                     return;
                 }
                 IntVec3 c = IntVec3.FromVector3(context.clickPosition);
+                if (!c.IsValid || !c.InBounds(context.map)) return;
                 Enchantment.CompEnchant comp = pawn.TryGetComp<Enchantment.CompEnchant>();
                 CompAbilityUserMagic pawnComp = pawn.GetCompAbilityUserMagic();
                 if (comp != null && pawnComp != null && pawnComp.IsMagicUser && pawn.story != null && pawn.story.traits != null && !pawn.story.traits.HasTrait(TorannMagicDefOf.Faceless))
@@ -1651,6 +1654,7 @@ namespace TorannMagic
                     foreach (Thing current in c.GetThingList(pawn.Map))
                     {
                         Thing t = current;
+                        if (t?.def == null) continue;
                         if (t != null && t.def.EverHaulable && t.def.defName.ToString().Contains("TM_EStone_"))
                         {
                             if (!pawn.CanReach(t, PathEndMode.ClosestTouch, Danger.Deadly, false, false, TraverseMode.ByPawn))
@@ -1686,10 +1690,10 @@ namespace TorannMagic
                                 t.Label
                                 ) + " (" + "NoPath".Translate() + ")", null, MenuOptionPriority.Default, null, null, 0f, null, null));
                             }
-                            else if (pawnComp.Mana.CurLevel < .5f)
+                            else if (pawnComp.Mana == null || pawnComp.Mana.CurLevel < .5f)
                             {
                                 options.Add(new FloatMenuOption("TM_NeedManaForEnchant".Translate(
-                                pawnComp.Mana.CurLevel.ToString("0.000")
+                                (pawnComp.Mana?.CurLevel ?? 0f).ToString("0.000")
                                 ), null, MenuOptionPriority.Default, null, null, 0f, null, null));
                             }
                             else// if (item.stackCount == 1)
@@ -2681,7 +2685,7 @@ namespace TorannMagic
         [HarmonyPatch(typeof(WeatherEvent_LightningStrike), "FireEvent", null)]
         public class LightningStrike_DarkThunderstorm_Patch
         {
-            public static bool Prefix(ref WeatherEvent_LightningStrike __instance)
+            public static void Prefix(WeatherEvent_LightningStrike __instance)
             {
                 //Log.Message("thunder strike");
                 Map map = Traverse.Create(root: __instance).Field(name: "map").GetValue<Map>();
@@ -2702,7 +2706,7 @@ namespace TorannMagic
                         //Log.Message("" + loc);
                     }
                 }
-                return true;
+                // Never suppress vanilla weather or other mods' FireEvent patches.
             }
         }
 
@@ -2937,6 +2941,14 @@ namespace TorannMagic
         {
             public static bool Prefix(IncidentWorker __instance, ref IncidentParms parms, ref bool __result)
             {
+                // The queued object remains in the native queue during TryFire.
+                // Let its original execution proceed even if its predictor moved away.
+                bool returningPrediction = ClassProgression.ChronomancerPrediction.IsReturningPrediction(Find.Storyteller?.incidentQueue, parms);
+                if (returningPrediction)
+                {
+                    if (__instance?.def != null) parms.customLetterLabel = "Predicted " + (__instance.def.letterLabel ?? __instance.def.label);
+                }
+                bool predictionQueued = false;
                 if (__instance != null && __instance.def != null && parms != null && __instance.def.defName != "VisitorGroup" && __instance.def.defName != "VisitorGroupMax" && !__instance.def.defName.Contains("Cult") && parms.quest == null && !parms.forced && !__instance.def.workerClass.ToString().StartsWith("Rumor_Code"))
                 {
                     try
@@ -2964,9 +2976,9 @@ namespace TorannMagic
                                                     if (comp.predictionIncidentDef != null)
                                                     {
                                                         //Log.Message("attempt to execute prediction " + comp.predictionIncidentDef.defName);
-                                                        if (comp.predictionIncidentDef == __instance.def && parms.GetHashCode() == comp.predictionHash)
+                                                        if (ClassProgression.ChronomancerPrediction.Matches(comp, parms, Find.Storyteller.incidentQueue))
                                                         {
-                                                            comp.predictionIncidentDef = null;
+                                                            ClassProgression.ChronomancerPrediction.Clear(comp);
                                                             if (__instance.def.letterLabel != null)
                                                             {
                                                                 parms.customLetterLabel = "Predicted " + __instance.def.letterLabel;
@@ -2985,6 +2997,9 @@ namespace TorannMagic
                                                 }
                                             }
                                         }
+                                        // Give the matching local owner a chance to clear its
+                                        // metadata above, but never predict this queued retry again.
+                                        if (returningPrediction) return true;
                                         for (int j = 0; j < predictingPawnsAvailable.Count; j++)
                                         {
                                             CompAbilityUserMagic comp = predictingPawnsAvailable[j].GetCompAbilityUserMagic();
@@ -2997,11 +3012,11 @@ namespace TorannMagic
                                                     //Log.Message("prediction is " + __instance.def.defName + " and can fire now: " + __instance.CanFireNow(parms, false));
                                                     int ticksTillIncident = Mathf.RoundToInt((Rand.Range(1800, 3600) * (1 + (.15f * ver.level))));  // from .72 to 1.44 hours, plus bonus (1.05 - 2.1)
                                                     //Log.Message("prediction of " + parms.GetHashCode());                                                                             //Log.Message("pushing " + __instance.def.defName + " to iq for " + ticksTillIncident  + " ticks");
-                                                    comp.predictionIncidentDef = __instance.def;
-                                                    comp.predictionTick = Find.TickManager.TicksGame + ticksTillIncident;
-                                                    comp.predictionHash = parms.GetHashCode();
-                                                    QueuedIncident iq = new QueuedIncident(new FiringIncident(__instance.def, null, parms), comp.predictionTick);
-                                                    Find.Storyteller.incidentQueue.Add(iq);
+                                                    QueuedIncident iq = new QueuedIncident(new FiringIncident(__instance.def, null, parms), Find.TickManager.TicksGame + ticksTillIncident);
+                                                    if (!ClassProgression.ChronomancerPrediction.TryEnqueue(comp, Find.Storyteller.incidentQueue, iq)) return true;
+                                                    predictionQueued = true;
+                                                    __result = true;
+                                                    ClassProgression.ChronomancerTrials.RecordPrediction(comp, iq);
                                                     string labelText = "TM_PredictionLetter".Translate(__instance.def.label);
                                                     string text = "TM_PredictionText".Translate(predictingPawnsAvailable[j].LabelShort, __instance.def.label, Mathf.RoundToInt(ticksTillIncident / 2500));
                                                     //Log.Message("attempting to push letter");
@@ -3021,7 +3036,9 @@ namespace TorannMagic
                     }
                     catch (NullReferenceException ex)
                     {
-                        return true;
+                        // Presentation failures after queue insertion must not also
+                        // execute the same incident immediately.
+                        return !predictionQueued;
                     }
                 }
                 return true;
@@ -4094,7 +4111,7 @@ namespace TorannMagic
                 Pawn pawn = __instance.caster as Pawn;
                 CompAbilityUserMagic comp = pawn.GetCompAbilityUserMagic();
                 if (comp != null && pawn.RaceProps.Humanlike && pawn.GetPosture() == PawnPosture.Standing && comp.HasTechnoWeapon && (pawn.story != null && pawn.story.traits != null &&
-                    ((pawn.story.traits.HasTrait(TorannMagicDefOf.Technomancer) || pawn.story.traits.HasTrait(TorannMagicDefOf.ChaosMage) || TM_ClassUtility.ClassHasAbility(TorannMagicDefOf.TM_TechnoWeapon, comp, null)))) &&
+                    (((pawn.story.traits.HasTrait(TorannMagicDefOf.Technomancer) || ClassProgression.ClassIdentity.IsTechnomancer(pawn)) || pawn.story.traits.HasTrait(TorannMagicDefOf.ChaosMage) || TM_ClassUtility.ClassHasAbility(TorannMagicDefOf.TM_TechnoWeapon, comp, null)))) &&
                     comp.useElementalShotToggle && pawn.equipment.Primary.def.IsRangedWeapon && pawn.equipment.Primary.def.techLevel >= TechLevel.Industrial)
                 {
                     int verVal = comp.MagicData.MagicPowerSkill_TechnoWeapon.FirstOrDefault((MagicPowerSkill x) => x.label == "TM_TechnoWeapon_ver").level;
@@ -4241,6 +4258,7 @@ namespace TorannMagic
             if (__result == null) return;
             if (__instance.Faction != Faction.OfPlayer) return;
             if (!__instance.Spawned) return;
+            __result = TorannMagic.Compatibility.TM_SpiritCommands.AppendLeaveBody(__result, __instance);
             //if (!(__instance != null && __result != null))
             //{
             //    return;
@@ -4379,7 +4397,7 @@ namespace TorannMagic
                             gizmoList.Add(ct);
                         }
                     }
-                    if ((__instance.story.traits.HasTrait(TorannMagicDefOf.Technomancer) || __instance.story.traits.HasTrait(TorannMagicDefOf.ChaosMage) || TM_ClassUtility.ClassHasAbility(TorannMagicDefOf.TM_TechnoBit, compMagic, compMight)) && compMagic.HasTechnoBit)
+                    if (((__instance.story.traits.HasTrait(TorannMagicDefOf.Technomancer) || ClassProgression.ClassIdentity.IsTechnomancer(__instance)) || __instance.story.traits.HasTrait(TorannMagicDefOf.ChaosMage) || TM_ClassUtility.ClassHasAbility(TorannMagicDefOf.TM_TechnoBit, compMagic, compMight)) && compMagic.HasTechnoBit)
                     {
                         Command_Toggle ct = (Command_Toggle)compMagic.GetGizmoCommands("technoBit");
                         if (ct != null)
@@ -4393,7 +4411,7 @@ namespace TorannMagic
                         }
                     }
 
-                    if ((__instance.story.traits.HasTrait(TorannMagicDefOf.Technomancer) || __instance.story.traits.HasTrait(TorannMagicDefOf.ChaosMage) || TM_ClassUtility.ClassHasAbility(TorannMagicDefOf.TM_TechnoWeapon, compMagic, compMight)) && compMagic.HasTechnoWeapon)
+                    if (((__instance.story.traits.HasTrait(TorannMagicDefOf.Technomancer) || ClassProgression.ClassIdentity.IsTechnomancer(__instance)) || __instance.story.traits.HasTrait(TorannMagicDefOf.ChaosMage) || TM_ClassUtility.ClassHasAbility(TorannMagicDefOf.TM_TechnoWeapon, compMagic, compMight)) && compMagic.HasTechnoWeapon)
                     {
                         Command_Toggle ct = (Command_Toggle)compMagic.GetGizmoCommands("elementalShot");
                         if (ct != null)
@@ -4421,28 +4439,6 @@ namespace TorannMagic
                     __result = gizmoList;
                 }
             }
-            else if (TM_Calc.IsPossessedBySpirit(__instance) && __instance.RaceProps.Animal)
-            {
-                if (Find.Selector.NumSelected == 1)
-                {
-                    var gizmoList = __result.ToList();
-                    Pawn p = __instance;
-                    Command_Action itemUnpossess = new Command_Action
-                    {
-                        action = new Action(delegate
-                        {
-                            p.drafter.Drafted = false;
-                            TM_Action.RemovePossession(p, p.Position, false);
-                        }),
-                        Order = 49,
-                        defaultLabel = TM_TextPool.TM_RemovePossess,
-                        defaultDesc = TM_TextPool.TM_RemovePossessDesc,
-                        icon = ContentFinder<Texture2D>.Get("UI/remove_spiritpossession", true),
-                    };
-                    gizmoList.Add(itemUnpossess);
-                    __result = gizmoList;
-                }
-            }            
         }
 
         /// <summary>
@@ -5864,7 +5860,7 @@ namespace TorannMagic
                         if (instigator != null && instigator.equipment != null && instigator.equipment.Primary != null && instigator.equipment.Primary.def.IsMeleeWeapon)
                         {
                             //Log.Message("checking instigator melee bonus ");                            
-                            if (Rand.Chance(.2f) && instigator.story != null && instigator.story.traits != null && instigator.story.traits.HasTrait(TorannMagicDefOf.Paladin))
+                            if (Rand.Chance(.2f) && instigator.story != null && instigator.story.traits != null && ClassProgression.ClassIdentity.IsPaladin(instigator))
                             {
                                 CompAbilityUserMagic comp = instigator.GetCompAbilityUserMagic();
                                 if (comp != null)
@@ -6365,7 +6361,7 @@ namespace TorannMagic
                     Building bldg2 = target.Thing as Building;
                     if (bldg2 != null)
                     {
-                        if (pawn.story.traits.HasTrait(TorannMagicDefOf.TM_Empath) || pawn.story.traits.HasTrait(TorannMagicDefOf.TM_Apothecary) || pawn.story.traits.HasTrait(TorannMagicDefOf.TM_Shaman) || pawn.story.traits.HasTrait(TorannMagicDefOf.TM_Commander) || pawn.story.traits.HasTrait(TorannMagicDefOf.Chronomancer) || pawn.story.traits.HasTrait(TorannMagicDefOf.TM_Monk) || pawn.story.traits.HasTrait(TorannMagicDefOf.DeathKnight) || pawn.story.traits.HasTrait(TorannMagicDefOf.BloodMage) || pawn.story.traits.HasTrait(TorannMagicDefOf.Enchanter) || pawn.story.traits.HasTrait(TorannMagicDefOf.Necromancer) || pawn.story.traits.HasTrait(TorannMagicDefOf.Ranger) || pawn.story.traits.HasTrait(TorannMagicDefOf.Priest) || pawn.story.traits.HasTrait(TorannMagicDefOf.TM_Bard) || pawn.story.traits.HasTrait(TorannMagicDefOf.Geomancer) || pawn.story.traits.HasTrait(TorannMagicDefOf.Faceless) || pawn.story.traits.HasTrait(TorannMagicDefOf.Gladiator) || pawn.story.traits.HasTrait(TorannMagicDefOf.Bladedancer) || pawn.story.traits.HasTrait(TorannMagicDefOf.Druid) || pawn.story.traits.HasTrait(TorannMagicDefOf.Summoner))
+                        if (pawn.story.traits.HasTrait(TorannMagicDefOf.TM_Empath) || pawn.story.traits.HasTrait(TorannMagicDefOf.TM_Apothecary) || ClassProgression.ClassIdentity.IsShaman(pawn) || pawn.story.traits.HasTrait(TorannMagicDefOf.TM_Commander) || ClassProgression.ClassIdentity.IsChronomancer(pawn) || pawn.story.traits.HasTrait(TorannMagicDefOf.TM_Monk) || pawn.story.traits.HasTrait(TorannMagicDefOf.DeathKnight) || ClassProgression.ClassIdentity.IsBloodMage(pawn) || ClassProgression.ClassIdentity.IsEnchanter(pawn) || pawn.story.traits.HasTrait(TorannMagicDefOf.Necromancer) || pawn.story.traits.HasTrait(TorannMagicDefOf.Ranger) || ClassProgression.ClassIdentity.IsPriest(pawn) || ClassProgression.ClassIdentity.IsBard(pawn) || ClassProgression.ClassIdentity.IsGeomancer(pawn) || pawn.story.traits.HasTrait(TorannMagicDefOf.Faceless) || pawn.story.traits.HasTrait(TorannMagicDefOf.Gladiator) || pawn.story.traits.HasTrait(TorannMagicDefOf.Bladedancer) || ClassProgression.ClassIdentity.IsDruid(pawn) || ClassProgression.ClassIdentity.IsSummoner(pawn))
                         {
                             __result = false;
                             return false;
@@ -7861,7 +7857,7 @@ namespace TorannMagic
                 CompAbilityUserMagic comp = initiator.GetCompAbilityUserMagic();
                 if (initiator.story?.traits != null)
                 {
-                    if ((initiator.story.traits.HasTrait(TorannMagicDefOf.TM_Bard) || TM_ClassUtility.ClassHasAbility(TorannMagicDefOf.TM_Entertain, comp, null)))
+                    if ((ClassProgression.ClassIdentity.IsBard(initiator) || TM_ClassUtility.ClassHasAbility(TorannMagicDefOf.TM_Entertain, comp, null)))
                     {
                         MagicPowerSkill ver = comp.MagicData.MagicPowerSkill_Entertain.FirstOrDefault((MagicPowerSkill x) => x.label == "TM_Entertain_ver");
                         __result = __result / (1 + ver.level);
@@ -7977,7 +7973,7 @@ namespace TorannMagic
                     {
                         CompAbilityUserMagic comp = ___pawn.GetCompAbilityUserMagic();
 
-                        if (comp != null && comp.IsMagicUser && (comp.Pawn.story.traits.HasTrait(TorannMagicDefOf.TM_Bard) || TM_ClassUtility.ClassHasAbility(TorannMagicDefOf.TM_Entertain, comp, null)))
+                        if (comp != null && comp.IsMagicUser && (ClassProgression.ClassIdentity.IsBard(comp.Pawn) || TM_ClassUtility.ClassHasAbility(TorannMagicDefOf.TM_Entertain, comp, null)))
                         {
                             MagicPowerSkill pwr = comp.MagicData.MagicPowerSkill_Entertain.FirstOrDefault((MagicPowerSkill x) => x.label == "TM_Entertain_pwr");
                             if ((Find.TickManager.TicksGame - ___lastInteractionTime) > (3000 - (450 * pwr.level)))
@@ -8376,7 +8372,7 @@ namespace TorannMagic
                 if (p.RaceProps.Humanlike && p.skills != null)
                 {
                     CompAbilityUserMagic comp = p.GetCompAbilityUserMagic();
-                    if (p.workSettings.WorkIsActive(WorkTypeDefOf.Doctor) && comp != null && (p.story.traits.HasTrait(TorannMagicDefOf.TM_Golemancer) || TM_ClassUtility.ClassHasAbility(TorannMagicDefOf.TM_RuneCarving, comp, null)))
+                    if (p.workSettings.WorkIsActive(WorkTypeDefOf.Doctor) && comp != null && (ClassProgression.ClassIdentity.TryGetState(p, out _) ? ClassProgression.GolemancerLifecycle.GetLearnedNativeOwner(comp, TorannMagicDefOf.TM_RuneCarving) != null : (p.story.traits.HasTrait(TorannMagicDefOf.TM_Golemancer) || TM_ClassUtility.ClassHasAbility(TorannMagicDefOf.TM_RuneCarving, comp, null))))
                     {
                         if (comp.MagicData.MagicPowersGolemancer.FirstOrDefault<MagicPower>((MagicPower x) => x.abilityDef == TorannMagicDefOf.TM_RuneCarving).learned && recipe.PawnSatisfiesSkillRequirements(p) && p.health.capacities.CapableOf(PawnCapacityDefOf.Manipulation) && p.health.capacities.CapableOf(PawnCapacityDefOf.Moving) && !p.skills.GetSkill(SkillDefOf.Artistic).TotallyDisabled && !p.skills.GetSkill(SkillDefOf.Crafting).TotallyDisabled)
                         {
@@ -8452,7 +8448,7 @@ namespace TorannMagic
                 if (p.RaceProps.Humanlike && p.skills != null)
                 {
                     CompAbilityUserMagic comp = p.GetCompAbilityUserMagic();
-                    if (p.workSettings.WorkIsActive(WorkTypeDefOf.Doctor) && comp != null && (p.story.traits.HasTrait(TorannMagicDefOf.Druid) || TM_ClassUtility.ClassHasAbility(TorannMagicDefOf.TM_RegrowLimb, comp, null)))
+                    if (p.workSettings.WorkIsActive(WorkTypeDefOf.Doctor) && comp != null && (ClassProgression.ClassIdentity.IsDruid(p) || TM_ClassUtility.ClassHasAbility(TorannMagicDefOf.TM_RegrowLimb, comp, null)))
                     {
                         if (comp.MagicData.MagicPowersD.FirstOrDefault<MagicPower>((MagicPower x) => x.abilityDef == TorannMagicDefOf.TM_RegrowLimb).learned && recipe.PawnSatisfiesSkillRequirements(p) && p.health.capacities.CapableOf(PawnCapacityDefOf.Manipulation) && p.health.capacities.CapableOf(PawnCapacityDefOf.Moving))
                         {

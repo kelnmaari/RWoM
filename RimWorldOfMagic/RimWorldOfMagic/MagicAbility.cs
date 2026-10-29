@@ -1,4 +1,4 @@
-﻿using AbilityUser;
+using AbilityUser;
 using RimWorld;
 using System;
 using System.Collections.Generic;
@@ -12,6 +12,9 @@ namespace TorannMagic
 {
     public class MagicAbility : PawnAbility
     {
+        public override Verse.AI.Job UseAbility(AbilityContext context, LocalTargetInfo target)
+            => Odyssey.ManualTravelSafety.IsTravel(this) ? Odyssey.ManualTravelSafety.UseAbility(this, context, target) : base.UseAbility(context, target);
+
        
         public CompAbilityUserMagic MagicUser
         {
@@ -91,6 +94,7 @@ namespace TorannMagic
 
         public override void PostAbilityAttempt()  //commented out in CompAbilityUserMagic
         {
+            if (!Odyssey.ManualTravelSafety.TakePayment(this)) return;
             //base.PostAbilityAttempt();
             
             
@@ -104,7 +108,7 @@ namespace TorannMagic
             }
             if(Rand.Chance(MagicUser.arcalleumCooldown))
             {
-                this.CooldownTicksLeft = 4;
+                this.CooldownTicksLeft = Compatibility.AbilityTiming.Cooldown(4);
             }
             if (this.magicDef != null)
             {

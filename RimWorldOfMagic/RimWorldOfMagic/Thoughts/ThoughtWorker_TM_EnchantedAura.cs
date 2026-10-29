@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Verse;
 using RimWorld;
 using System.Linq;
@@ -20,7 +20,7 @@ namespace TorannMagic.Thoughts
                 {
                     return false;
                 }
-                if (pawn.story.traits.HasTrait(TorannMagicDefOf.Undead) || pawn.story.traits.HasTrait(TorannMagicDefOf.Lich) || pawn.story.traits.HasTrait(TorannMagicDefOf.Enchanter))
+                if (pawn.story.traits.HasTrait(TorannMagicDefOf.Undead) || ClassProgression.ClassIdentity.IsLich(pawn) || pawn.story.traits.HasTrait(TorannMagicDefOf.Enchanter))
                 {
                     return false;
                 }

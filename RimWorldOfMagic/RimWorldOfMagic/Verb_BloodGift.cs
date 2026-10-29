@@ -16,6 +16,9 @@ namespace TorannMagic
             bool arg_40_0;
 
             Pawn pawn = this.CasterPawn;
+            // This ritual consumes map filth and inflicts physical cuts. A caravan
+            // or an interrupted cast must never execute it without a live caster.
+            if (pawn == null || !pawn.Spawned || pawn.Map == null || pawn.Dead || pawn.Downed) return false;
             Map map = this.CasterPawn.Map;
             CompAbilityUserMagic comp = pawn.GetCompAbilityUserMagic();
             int verVal = pawn.GetCompAbilityUserMagic().MagicData.MagicPowerSkill_BloodGift.FirstOrDefault((MagicPowerSkill x) => x.label == "TM_BloodGift_ver").level;
@@ -49,7 +52,7 @@ namespace TorannMagic
                 validParts.Clear();
                 for(int i = 0; i < bodyparts.Count; i++)
                 {
-                    if(bodyparts[i].def.bleedRate != 0 && bodyparts[i].depth == BodyPartDepth.Outside && bodyparts[i].coverageAbs > 0)
+                    if(BloodGiftSafety.CanCut(pawn, bodyparts[i], 6f))
                     {
                         validParts.Add(bodyparts[i]);
                     }                    

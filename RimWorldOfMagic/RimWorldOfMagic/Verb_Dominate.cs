@@ -78,7 +78,7 @@ namespace TorannMagic
                     if (Rand.Chance(TM_Calc.GetSpellSuccessChance(p, hitPawn, true)))
                     {
                         Hediff hediff = new Hediff();
-                        if (p.gender == Gender.Female || p.story.traits.HasTrait(TorannMagicDefOf.Succubus))
+                        if (ClassProgression.ClassIdentity.DemonEffect(p, false, p.gender == Gender.Female || p.story.traits.HasTrait(TorannMagicDefOf.Succubus)))
                         {
                             if (pwrVal == 3)
                             {
@@ -105,7 +105,7 @@ namespace TorannMagic
                                 TM_MoteMaker.ThrowShadowMote(hitPawn.Position.ToVector3(), map, Rand.Range(.6f, 1f));
                             }
                         }
-                        if (p.gender == Gender.Male || p.story.traits.HasTrait(TorannMagicDefOf.Warlock))
+                        if (ClassProgression.ClassIdentity.DemonEffect(p, true, p.gender == Gender.Male || p.story.traits.HasTrait(TorannMagicDefOf.Warlock)))
                         {
                             if (pwrVal == 3)
                             {

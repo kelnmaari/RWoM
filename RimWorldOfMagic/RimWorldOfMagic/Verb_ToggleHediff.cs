@@ -30,7 +30,9 @@ namespace TorannMagic
                     }
                     else
                     {
+                        var empathTrial = ClassProgression.EmpathTrials.CaptureAura(this.Ability);
                         HealthUtility.AdjustSeverity(caster, hdDef, hdDef.initialSeverity);
+                        ClassProgression.EmpathTrials.CompleteAura(empathTrial);
                         if (caster.Map != null)
                         {
                             FleckMaker.ThrowLightningGlow(caster.DrawPos, caster.Map, 1f);

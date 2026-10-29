@@ -86,7 +86,9 @@ namespace TorannMagic
                                 DrawEffects(caster, p);
                                 Need n = p.needs.mood;
                                 float curLvl = Mathf.Clamp(n.CurLevel, 0, maxMoodBurn);
+                                var trial = ClassProgression.EmpathTrials.CaptureMood(this.Ability, p);
                                 n.CurLevel -= curLvl;
+                                ClassProgression.EmpathTrials.CompleteMood(trial);
                                 TM_Action.DamageEntities(p, null, n.CurLevel * 20f, DamageDefOf.Stun, caster);
                                 if(Rand.Chance(curLvl + .25f) && p.Faction != caster.Faction)
                                 {

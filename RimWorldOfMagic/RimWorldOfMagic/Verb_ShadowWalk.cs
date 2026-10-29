@@ -69,10 +69,6 @@ namespace TorannMagic
                         this.CasterPawn.DeSpawn();
                         GenSpawn.Spawn(p, this.currentTarget.Cell, map);
                         p.drafter.Drafted = draftFlag;
-                        if (ModOptions.Settings.Instance.cameraSnap)
-                        {
-                            CameraJumper.TryJumpAndSelect(p);
-                        }
                         ModOptions.Constants.SetPawnInFlight(false);                        
                     }
                     else

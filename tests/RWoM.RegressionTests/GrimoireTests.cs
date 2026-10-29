@@ -24,6 +24,10 @@ internal static class GrimoireTests
         }
         yield return new("Grimoire.Visibility.FacelessWithSharedRaceMagic", f => Visibility(true,true,true,false,true,true));
         yield return new("Grimoire.DuplicateClassAbilitiesRenderOnce", DuplicateAbilitiesRenderOnce);
+        yield return new("Grimoire.VariantRankIsNotSkillLevel", VariantRanks);
+        yield return new("Weather.DarkThunderstormPrefixCannotCancelVanilla", LightningPrefix);
+        yield return new("Grimoire.ThreeColumnsFitScreen", ThreeColumnsFitScreen);
+        yield return new("Grimoire.LearningItemsPreserveCustomOwners", LearningItemsPreserveCustomOwners);
         yield return new("Grimoire.Metadata", Metadata);
         yield return new("Grimoire.LocalizationContracts", Localization);
         yield return new("Grimoire.InstalledIsekaiExactNameGate", IsekaiGate);
@@ -75,9 +79,74 @@ internal static class GrimoireTests
         Check.Same(powerWD, System.Linq.Enumerable.First(allowed), "own class collection object preferred");
     }
 
+    static void VariantRanks(RuntimeFixture f) {
+        var progress = typeof(Window_TMGrimoire).GetMethod("PowerRankProgress", Flags)!;
+        string Rank(int level, int max, bool learned) => (string)progress.Invoke(null, new object[] { level, max, learned })!;
+        Check.Equal("", Rank(0, 0, true), "single variant has no misleading 0/0 header");
+        Check.Equal("", Rank(0, 0, false), "locked single variant has no rank counter");
+        Check.Equal("1 / 4", Rank(0, 3, true), "base variant is first rank");
+        Check.Equal("3 / 4", Rank(2, 3, true), "upgraded variant uses one-based rank");
+        Check.Equal("4 / 4", Rank(3, 3, true), "last variant rank");
+        Check.Equal("0 / 4", Rank(0, 3, false), "unlearned remains unlearned");
+        var data = new MagicData();
+        var skill = data.MagicPowerSkill_Firebolt[0]; skill.level = 4;
+        var ability = f.AddAbility("TM_Firebolt");
+        Check.Same(skill, data.GetSkill_Power(ability), "grimoire uses invested skill owner");
+        Check.Equal(4, data.GetSkill_Power(ability).level, "investment unchanged");
+        Check.Equal(6, data.GetSkill_Power(ability).levelMax, "independent skill cap unchanged");
+        string source = File.ReadAllText(Path.Combine(f.Repository, "RimWorldOfMagic/RimWorldOfMagic/Window_TMGrimoire.cs"));
+        Check.Equal(2, Regex.Matches(source, @"PowerTitle\(ability.LabelCap, power.level, power.maxLevel, power.learned\)").Count, "both magic and might use rank presentation");
+        Check.Equal(2, Regex.Matches(source, @"if \(power.maxLevel <= 0\)").Count, "both learned single-variant actions avoid max");
+    }
+    static void LightningPrefix(RuntimeFixture f) {
+        var type = typeof(MagicData).Assembly.GetTypes().Single(t => t.Name == "LightningStrike_DarkThunderstorm_Patch");
+        var prefix = type.GetMethod("Prefix")!;
+        Check.Equal(typeof(void), prefix.ReturnType, "weather prefix has no cancellation return");
+        Check.Equal(false, prefix.GetParameters().Any(p => p.ParameterType.IsByRef), "weather instance cannot be replaced");
+
+    }
+
+    static void ThreeColumnsFitScreen(RuntimeFixture f) {
+        var fit = typeof(Window_TMGrimoire).GetMethod("FitWindow", Flags)!;
+        var columns = typeof(Window_TMGrimoire).GetMethod("Columns", Flags)!;
+        foreach (var screen in new[] { new UnityEngine.Vector2(1920,1080), new UnityEngine.Vector2(1366,768), new UnityEngine.Vector2(1024,768), new UnityEngine.Vector2(800,600) }) {
+            var size = (UnityEngine.Vector2)fit.Invoke(null, new object[] { screen.x, screen.y })!;
+            Check.Equal(true, size.x <= screen.x - 30 && size.y <= screen.y - 30, "window fits UI-scaled screen");
+            if (size.x - 36 < 1040) continue; // compact path has no side columns
+            var rect = new UnityEngine.Rect(7, 9, size.x - 36, size.y - 36);
+            var parts = (UnityEngine.Rect[])columns.Invoke(null, new object[] { rect })!;
+            Check.Equal(true, parts.All(r => r.width > 0 && r.height > 0), "positive column areas");
+            Check.Equal(true, parts[0].xMax < parts[1].x && parts[1].xMax < parts[2].x, "no overlap");
+            Check.Equal(rect.xMax, parts[2].xMax, "right column stays inside window");
+            Check.Equal(true, parts[1].width >= 480, "skill cards retain usable width");
+        }
+    }
+    static void LearningItemsPreserveCustomOwners(RuntimeFixture f) {
+        var a = f.AddAbility("AddonLearningFixture"); var b = f.AddAbility("MissingScrollFixture");
+        a.learnItem = Blank<ThingDef>(); a.learnItem.defName = "AddonScrollFixture";
+        var known = new MagicPower(new List<AbilityUser.AbilityDef> { a }) { learned = true, level = 0 };
+        var unknown = new MagicPower(new List<AbilityUser.AbilityDef> { a }) { learned = false };
+        var missing = new MagicPower(new List<AbilityUser.AbilityDef> { b }) { requiresScroll = true };
+        var fighter = new MightPower(new List<AbilityUser.AbilityDef> { a });
+        var window = Blank<Window_TMGrimoire>();
+        Set(window, "magicRenderable", new HashSet<MagicPower> { known, unknown, missing });
+        Set(window, "mightRenderable", new HashSet<MightPower> { fighter });
+        var method = typeof(Window_TMGrimoire).GetMethod("RequiredLearningItems", Flags)!;
+        var rows = (List<TMAbilityDef>)method.Invoke(window, null)!;
+        Check.Equal(2, rows.Count, "shared addon item appears once; unresolved required item retained");
+        Check.Equal(true, rows.Contains(a) && rows.Contains(b), "actual definitions retained");
+        Check.Equal(true, known.learned, "known spell remains learned");
+        Check.Equal(false, unknown.learned, "view does not teach or migrate addon power");
+        unknown.learned = true; fighter.learned = true;
+        rows = (List<TMAbilityDef>)method.Invoke(window, null)!;
+        Check.Equal(1, rows.Count, "learning refreshes item list without reopening");
+        Check.Same(b, rows[0], "only still-unlearned requirement remains");
+    }
+
     static void Metadata(RuntimeFixture f) {
         var doc=XDocument.Load(Path.Combine(f.Repository,"About/About.xml"));
-        Check.Equal("A RimWorld of Magic",doc.Root!.Element("name")!.Value,"Canonical ecosystem identity");
+        Check.Equal("A RimWorld of Magic (Continued)",doc.Root!.Element("name")!.Value,"User-approved fork display name");
+        Check.Equal("1.6,1.7",string.Join(",",doc.Root.Element("supportedVersions")!.Elements("li").Select(x=>x.Value)),"Supported versions");
         Check.Equal("Torann.ARimworldOfMagic",doc.Root.Element("packageId")!.Value,"Stable package ID");
         Check.Equal(true,System.Text.Encoding.UTF8.GetByteCount(doc.Root.Element("description")!.Value)<=8000,"Workshop description byte budget");
     }

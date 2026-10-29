@@ -1,4 +1,4 @@
-﻿using AbilityUser;
+using AbilityUser;
 using RimWorld;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +10,10 @@ using TorannMagic.Ideology;
 namespace TorannMagic
 {
     public class MightAbility : PawnAbility
-    {        
+    {
+        public override Verse.AI.Job UseAbility(AbilityContext context, LocalTargetInfo target)
+            => Odyssey.ManualTravelSafety.IsTravel(this) ? Odyssey.ManualTravelSafety.UseAbility(this, context, target) : base.UseAbility(context, target);
+        
 
         public int CastingTicks
         {
@@ -91,6 +94,7 @@ namespace TorannMagic
 
         public override void PostAbilityAttempt()  
         {
+            if (!Odyssey.ManualTravelSafety.TakePayment(this)) return;
             //base.PostAbilityAttempt();
             
             if (!this.Pawn.IsColonist && ModOptions.Settings.Instance.AIAggressiveCasting)// for AI
@@ -103,7 +107,7 @@ namespace TorannMagic
             }
             if (Rand.Chance(MightUser.arcalleumCooldown))
             {
-                this.CooldownTicksLeft = 4;
+                this.CooldownTicksLeft = Compatibility.AbilityTiming.Cooldown(4);
             }
             bool flag = this.mightDef != null;
             if (flag)

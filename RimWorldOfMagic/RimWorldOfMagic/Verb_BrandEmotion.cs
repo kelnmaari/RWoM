@@ -49,9 +49,11 @@ namespace TorannMagic
 
                 if (casterComp != null && hitPawn.health != null && hitPawn.health.hediffSet != null && hitPawn != caster)
                 {
+                    var trial = ClassProgression.GolemancerTrials.CaptureBrand(this.Ability, hitPawn);
                     TM_Action.UpdateBrand(hitPawn, caster, casterComp, TorannMagicDefOf.TM_EmotionBrandHD);
 
                     UpdateHediffComp(hitPawn);
+                    ClassProgression.GolemancerTrials.CompleteBrand(trial);
                     DoBrandingEffect(hitPawn);
                     //RemoveOldBrand(hitPawn);
 

@@ -96,7 +96,7 @@ namespace TorannMagic
                         victim = cellList[i].GetFirstPawn(pawn.Map);
                         if (victim != null && !victim.Dead && !victim.Downed)
                         {
-                            HealthUtility.AdjustSeverity(victim, TorannMagicDefOf.TM_GravitySlowHD, .5f);
+                            ClassProgression.DemonTrials.AdjustSlow(this, victim, .5f);
                         }
                     }
                 }
@@ -142,7 +142,7 @@ namespace TorannMagic
                             if (Rand.Chance(TM_Calc.GetSpellSuccessChance(this.pawn, victim) - .4f))
                             {
                                 Vector3 launchVector = GetVector(base.Position, victim.Position);
-                                HealthUtility.AdjustSeverity(victim, TorannMagicDefOf.TM_GravitySlowHD, (.4f + (.1f * verVal)));
+                                ClassProgression.DemonTrials.AdjustSlow(this, victim, (.4f + (.1f * verVal)));
                                 LaunchFlyingObect(victim.Position + (2f * (1 + (.4f * pwrVal)) * launchVector).ToIntVec3(), victim);
                             }
                         }
@@ -162,7 +162,7 @@ namespace TorannMagic
                         {
                             if (Rand.Chance(TM_Calc.GetSpellSuccessChance(this.pawn, victim) - .4f))
                             {
-                                HealthUtility.AdjustSeverity(victim, TorannMagicDefOf.TM_GravitySlowHD, .3f + (.1f * verVal));
+                                ClassProgression.DemonTrials.AdjustSlow(this, victim, .3f + (.1f * verVal));
                             }
                         }
                     }

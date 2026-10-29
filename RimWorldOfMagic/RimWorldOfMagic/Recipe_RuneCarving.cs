@@ -69,9 +69,10 @@ namespace TorannMagic
 
 		public override void ApplyOnPawn(Pawn pawn, BodyPartRecord part, Pawn billDoer, List<Thing> ingredients, Bill bill)
 		{
+			var trial = ClassProgression.GolemancerTrials.CaptureRune(this, billDoer, pawn, part, bill);
 			if (billDoer != null)
 			{
-				if (this.CheckRuneCarvingFail(billDoer, pawn, ingredients, part, bill))
+				if (this.CheckRuneCarvingFail(billDoer, pawn, ingredients, part, bill, trial))
 				{
 					return;
 				}
@@ -82,10 +83,16 @@ namespace TorannMagic
 				});
 			}
 			RunePart(pawn, billDoer, part);
+			ClassProgression.GolemancerTrials.CompleteRune(trial);
 		}
 
 		public bool CheckRuneCarvingFail(Pawn surgeon, Pawn patient, List<Thing> ingredients, BodyPartRecord part, Bill bill)
 		{
+            return CheckRuneCarvingFail(surgeon, patient, ingredients, part, bill, null);
+        }
+
+        private bool CheckRuneCarvingFail(Pawn surgeon, Pawn patient, List<Thing> ingredients, BodyPartRecord part, Bill bill, ClassProgression.GolemancerTrials.RuneSnapshot trial)
+        {
 			CompAbilityUserMagic comp = surgeon.GetCompAbilityUserMagic();
 			if (bill.recipe.surgerySuccessChanceFactor >= 1f)
 			{
@@ -96,7 +103,7 @@ namespace TorannMagic
 			if (comp.IsMagicUser)
 			{
 				bool canRuneCarve = false;
-				if (comp.customClass != null && comp.MagicData.MagicPowersGolemancer.FirstOrDefault((MagicPower x) => x.abilityDef == TorannMagicDefOf.TM_RuneCarving).learned)
+				if ((ClassProgression.ClassIdentity.TryGetState(surgeon, out _) || comp.customClass != null) && comp.MagicData.MagicPowersGolemancer.Any(x => x.abilityDef == TorannMagicDefOf.TM_RuneCarving && x.learned))
 				{
 					canRuneCarve = true;
 				}
@@ -138,7 +145,9 @@ namespace TorannMagic
 						int pwrVal = surgeon.GetCompAbilityUserMagic().MagicData.MagicPowerSkill_RuneCarving.FirstOrDefault((MagicPowerSkill x) => x.label == "TM_RuneCarving_pwr").level;
 						int verVal = surgeon.GetCompAbilityUserMagic().MagicData.MagicPowerSkill_RuneCarving.FirstOrDefault((MagicPowerSkill x) => x.label == "TM_RuneCarving_ver").level;
 						float successChance = num + (pwrVal * -.05f) + (verVal * .1f);
-						comp.Mana.CurLevel -= manaNeeded;
+						float trialManaBefore = comp.Mana.CurLevel;
+                        comp.Mana.CurLevel -= manaNeeded;
+                        ClassProgression.GolemancerTrials.RecordRunePayment(trial, trialManaBefore, comp.Mana.CurLevel, manaNeeded);
 						int xpGain = Mathf.RoundToInt(TorannMagicDefOf.TM_RuneCarving.manaCost * 180 * comp.xpGain);
 						comp.MagicUserXP += xpGain;
 						MoteMaker.ThrowText(surgeon.DrawPos, surgeon.MapHeld, "XP +" + num, -1f);

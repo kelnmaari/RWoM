@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using RimWorld;
@@ -70,24 +70,29 @@ namespace TorannMagic
             {
                 if (!hitPawn.DestroyedOrNull() & !hitPawn.Dead && hitPawn.Spawned && map != null)
                 {
+                    var druidTrial = ClassProgression.DruidTrials.CaptureRegeneration(this.Ability, hitPawn);
                     if (pwrVal == 3)
                     {
                         HealthUtility.AdjustSeverity(hitPawn, TorannMagicDefOf.TM_Regeneration_III, Rand.Range(1f + verVal, 3f + (verVal * 3)) * this.arcaneDmg);
+                        ClassProgression.DruidTrials.Complete(druidTrial);
                         TM_MoteMaker.ThrowRegenMote(hitPawn.DrawPos, map, 1f + (.2f * (verVal + pwrVal)));
                     }
                     else if (pwrVal == 2)
                     {
                         HealthUtility.AdjustSeverity(hitPawn, TorannMagicDefOf.TM_Regeneration_II, Rand.Range(1f + verVal, 3f + (verVal * 3)) * this.arcaneDmg);
+                        ClassProgression.DruidTrials.Complete(druidTrial);
                         TM_MoteMaker.ThrowRegenMote(hitPawn.DrawPos, map, 1f + (.2f * (verVal + pwrVal)));
                     }
                     else if (pwrVal == 1)
                     {
                         HealthUtility.AdjustSeverity(hitPawn, TorannMagicDefOf.TM_Regeneration_I, Rand.Range(1f + verVal, 3f + (verVal * 3)) * this.arcaneDmg);
+                        ClassProgression.DruidTrials.Complete(druidTrial);
                         TM_MoteMaker.ThrowRegenMote(hitPawn.DrawPos, map, 1f + (.2f * (verVal + pwrVal)));
                     }
                     else
                     {
                         HealthUtility.AdjustSeverity(hitPawn, TorannMagicDefOf.TM_Regeneration, Rand.Range(1f + verVal, 3f + (verVal * 3)) * this.arcaneDmg);
+                        ClassProgression.DruidTrials.Complete(druidTrial);
                         TM_MoteMaker.ThrowRegenMote(hitPawn.DrawPos, map, 1f + (.2f * (verVal + pwrVal)));
                     }
                 }
@@ -105,3 +110,4 @@ namespace TorannMagic
         }
     }
 }
+

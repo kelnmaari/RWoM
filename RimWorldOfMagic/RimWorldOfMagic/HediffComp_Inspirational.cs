@@ -80,23 +80,23 @@ namespace TorannMagic
                         drawPosAbove.z += .5f;
                         if (verVal == 0 && !flag1 && !flag2 && !flag3)
                         {
-                            inspiredPawn.mindState.inspirationHandler.TryStartInspiration(id);
+                            ClassProgression.BardTrials.Inspire(this.parent, inspiredPawn, id);
                             TM_MoteMaker.ThrowExclamationMote(drawPosAbove, inspiredPawn.Map, .5f);
                         }
                         else if (verVal == 1 && !flag2 && !flag3)
                         {
-                            inspiredPawn.mindState.inspirationHandler.TryStartInspiration(id);
+                            ClassProgression.BardTrials.Inspire(this.parent, inspiredPawn, id);
                             TM_MoteMaker.ThrowExclamationMote(drawPosAbove, inspiredPawn.Map, .7f);
                         }
                         else if (verVal == 2 && !flag3)
                         {
-                            inspiredPawn.mindState.inspirationHandler.TryStartInspiration(id);
+                            ClassProgression.BardTrials.Inspire(this.parent, inspiredPawn, id);
                             TM_MoteMaker.ThrowExclamationMote(drawPosAbove, inspiredPawn.Map, Rand.Range(.5f, .7f));
                             TM_MoteMaker.ThrowExclamationMote(drawPosAbove, inspiredPawn.Map, Rand.Range(.5f, .7f));
                         }
                         else if (verVal == 3)
                         {
-                            inspiredPawn.mindState.inspirationHandler.TryStartInspiration(id);
+                            ClassProgression.BardTrials.Inspire(this.parent, inspiredPawn, id);
                             TM_MoteMaker.ThrowExclamationMote(drawPosAbove, inspiredPawn.Map, Rand.Range(.5f, .7f));
                             TM_MoteMaker.ThrowExclamationMote(drawPosAbove, inspiredPawn.Map, Rand.Range(.5f, .7f));
                             TM_MoteMaker.ThrowExclamationMote(drawPosAbove, inspiredPawn.Map, Rand.Range(.5f, .7f));

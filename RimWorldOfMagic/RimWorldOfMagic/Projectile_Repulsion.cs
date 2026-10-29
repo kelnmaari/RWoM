@@ -146,7 +146,9 @@ namespace TorannMagic
                     }
                     FlyingObject_Spinning flyingObject = (FlyingObject_Spinning)GenSpawn.Spawn(ThingDef.Named("FlyingObject_Spinning"), pawn.Position, pawn.Map);
                     flyingObject.speed = 25 + force;
+                    var trial = ClassProgression.DemonTrials.BeforeEffect(this, pawn, true);
                     flyingObject.Launch(pawn, targetCell, pawn);
+                    ClassProgression.DemonTrials.AfterEffect(trial, flyingObject);
                 }
             }
         }

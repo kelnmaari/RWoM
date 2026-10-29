@@ -87,8 +87,12 @@ internal static class ClassGroupTests
             .SetValue(data, powers);
         var pawn = new Pawn();
         pawn.story = new Pawn_StoryTracker(pawn) { traits = new TraitSet(pawn) };
-        var trait = new TraitDef { defName = "TM_Commander" };
-        DefDatabase<TraitDef>.Add(trait);
+        var trait = DefDatabase<TraitDef>.GetNamedSilentFail("TM_Commander");
+        if (trait == null)
+        {
+            trait = new TraitDef { defName = "TM_Commander" };
+            DefDatabase<TraitDef>.Add(trait);
+        }
         pawn.story.traits.allTraits.Add(new Trait(trait));
         var group = TM_ClassGroups.GetMightClassGroup(pawn, data);
         Check.Same(powers, group, "Commander trait resolves the MightPowersC group for the Grimoire");

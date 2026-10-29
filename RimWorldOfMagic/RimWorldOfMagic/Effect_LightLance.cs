@@ -94,8 +94,10 @@ namespace TorannMagic
                     def = TorannMagicDefOf.FlyingObject_LightLance
                 };
                 Pawn casterPawn = base.CasterPawn;
+                var trial = ClassProgression.BrightmageTrials.CaptureSpawn(this.Ability);
                 FlyingObject_LightLance flyingObject = (FlyingObject_LightLance)GenSpawn.Spawn(ThingDef.Named("FlyingObject_LightLance"), this.CasterPawn.Position, this.CasterPawn.Map);
                 flyingObject.Launch(this.CasterPawn, t.Cell, launchedThing);
+                ClassProgression.BrightmageTrials.CompleteSpawn(trial, flyingObject);
             }
         }
 

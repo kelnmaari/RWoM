@@ -10,6 +10,8 @@ namespace TorannMagic.ModOptions
     public class Settings : Verse.ModSettings
     {
         public float xpMultiplier = 1f;
+        public float abilityCooldownMultiplier = 1f;
+        public float abilityWarmupMultiplier = 1f;
         public float needMultiplier = 1f;        
         public bool AICasting = true;
         public bool AIAggressiveCasting = true;
@@ -135,6 +137,8 @@ namespace TorannMagic.ModOptions
         public override void ExposeData()
         {
             Scribe_Values.Look<float>(ref this.xpMultiplier, "xpMultiplier", 1f, false);
+            Scribe_Values.Look(ref abilityCooldownMultiplier, "abilityCooldownMultiplier", 1f);
+            Scribe_Values.Look(ref abilityWarmupMultiplier, "abilityWarmupMultiplier", 1f);
             Scribe_Values.Look<float>(ref this.needMultiplier, "needMultiplier", 1f, false);            
             Scribe_Values.Look<bool>(ref this.AICasting, "AICasting", true, false);
             Scribe_Values.Look<bool>(ref this.AIAggressiveCasting, "AIAggressiveCasting", true, false);

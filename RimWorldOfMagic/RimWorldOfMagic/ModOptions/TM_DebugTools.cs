@@ -18,6 +18,54 @@ namespace TorannMagic.ModOptions
 {
     public static class TM_DebugTools
     {
+        [DebugAction("RWoM", "T: Elemental Rift - Earth", actionType = DebugActionType.ToolMap, allowedGameStates = AllowedGameStates.PlayingOnMap)]
+        public static void ElementalRiftEarth() => SpawnElementalRift(0);
+        [DebugAction("RWoM", "T: Elemental Rift - Fire", actionType = DebugActionType.ToolMap, allowedGameStates = AllowedGameStates.PlayingOnMap)]
+        public static void ElementalRiftFire() => SpawnElementalRift(1);
+        [DebugAction("RWoM", "T: Elemental Rift - Water", actionType = DebugActionType.ToolMap, allowedGameStates = AllowedGameStates.PlayingOnMap)]
+        public static void ElementalRiftWater() => SpawnElementalRift(2);
+        [DebugAction("RWoM", "T: Elemental Rift - Air", actionType = DebugActionType.ToolMap, allowedGameStates = AllowedGameStates.PlayingOnMap)]
+        public static void ElementalRiftAir() => SpawnElementalRift(3);
+
+        private static void SpawnElementalRift(int element)
+        {
+            Map map = Find.CurrentMap;
+            IntVec3 cell = UI.MouseCell();
+            if (map == null || map.Size.x <= 16 || map.Size.z <= 16 || !cell.InBounds(map)
+                || cell.DistanceToEdge(map) < 8 || !cell.Standable(map) || cell.Roofed(map)
+                || cell.Fogged(map) || cell.GetThingList(map).Any(t => t is Building || t is Pawn || t.def.category == ThingCategory.Item))
+            {
+                Messages.Message("Choose a clear, unroofed cell at least 8 cells from the map edge.", MessageTypeDefOf.RejectInput);
+                return;
+            }
+            if (Settings.Instance.riftChallenge <= 0)
+            {
+                Messages.Message("Enable elemental rifts in RWoM settings first.", MessageTypeDefOf.RejectInput);
+                return;
+            }
+            GameConditionDef conditionDef = GameConditionDef.Named("ElementalAssault");
+            if (map.gameConditionManager.ConditionIsActive(conditionDef))
+            {
+                Messages.Message("An elemental assault is already active on this map.", MessageTypeDefOf.RejectInput);
+                return;
+            }
+            Faction faction = Find.FactionManager.FirstFactionOfDef(TorannMagicDefOf.TM_ElementalFaction);
+            if (faction == null)
+            {
+                Messages.Message("This world has no elemental faction.", MessageTypeDefOf.RejectInput);
+                return;
+            }
+            Faction.OfPlayer.TryAffectGoodwillWith(faction, -200, false, false, null, null);
+            TM_Action.ForceFactionDiscoveryAndRelation(TorannMagicDefOf.TM_ElementalFaction);
+            IncidentDef incident = DefDatabase<IncidentDef>.GetNamed("ElementalAssault");
+            var condition = (Conditions.GameCondition_ElementalAssault)GameConditionMaker.MakeCondition(conditionDef,
+                Mathf.RoundToInt(incident.durationDays.RandomInRange * 60000f));
+            condition.ConfigureDebug(cell, element);
+            map.gameConditionManager.RegisterCondition(condition);
+            Messages.Message("Elemental rift created: " + new[] { "Earth", "Fire", "Water", "Air" }[element]
+                + ". Unpause to begin the assault.", condition.thing, MessageTypeDefOf.ThreatBig);
+        }
+
         [DebugAction("RWoM", "Spawn Scrolls", actionType =DebugActionType.ToolMap, allowedGameStates = AllowedGameStates.PlayingOnMap)]
         public static void SpawnScrolls()
         {
@@ -64,17 +112,17 @@ namespace TorannMagic.ModOptions
                     IntVec3 cell = UI.MouseCell();
                     if (map == null || !cell.InBounds(map))
                     {
-                        Messages.Message("[RWoM] No valid cell under the cursor.", MessageTypeDefOf.RejectInput);
+                        Messages.Message("No valid cell under the cursor.", MessageTypeDefOf.RejectInput);
                         return;
                     }
                     Thing thing = ThingMaker.MakeThing(captured);
                     if (GenPlace.TryPlaceThing(thing, cell, map, ThingPlaceMode.Near))
                     {
-                        Messages.Message("[RWoM] Spawned " + captured.LabelCap + ".", MessageTypeDefOf.PositiveEvent);
+                        Messages.Message("Spawned " + captured.LabelCap + ".", MessageTypeDefOf.PositiveEvent);
                     }
                     else
                     {
-                        Messages.Message("[RWoM] Could not place " + captured.LabelCap + " here.", MessageTypeDefOf.RejectInput);
+                        Messages.Message("Could not place " + captured.LabelCap + " here.", MessageTypeDefOf.RejectInput);
                     }
                 }));
             }
@@ -129,7 +177,7 @@ namespace TorannMagic.ModOptions
             }
             if (sideA == null || sideB == null)
             {
-                Messages.Message("[RWoM] No two mutually hostile factions found on this map/world.", MessageTypeDefOf.RejectInput);
+                Messages.Message("No two mutually hostile factions found on this map/world.", MessageTypeDefOf.RejectInput);
                 return;
             }
 
@@ -139,7 +187,7 @@ namespace TorannMagic.ModOptions
                 .ToList();
             if (kinds.Count == 0)
             {
-                Messages.Message("[RWoM] No Seer mage pawnkinds found.", MessageTypeDefOf.RejectInput);
+                Messages.Message("No Seer mage pawnkinds found.", MessageTypeDefOf.RejectInput);
                 return;
             }
 
@@ -154,7 +202,7 @@ namespace TorannMagic.ModOptions
                 {
                     p.Destroy(DestroyMode.Vanish);
                 }
-                Messages.Message("[RWoM] Spawn failed (no valid cells).", MessageTypeDefOf.RejectInput);
+                Messages.Message("Spawn failed (no valid cells).", MessageTypeDefOf.RejectInput);
                 return;
             }
 
@@ -167,7 +215,7 @@ namespace TorannMagic.ModOptions
             Verse.AI.Group.LordMaker.MakeNewLord(sideB, new LordJob_AssaultThings(sideB, listA.Cast<Verse.Thing>().ToList(), float.MaxValue), map);
 
             string classNote = randomClasses ? " with random classes" : "";
-            Messages.Message($"[RWoM] Mage duel{classNote}: {sideA.Name} ({listA.Count}) vs {sideB.Name} ({listB.Count}).",
+            Messages.Message($"Mage duel{classNote}: {sideA.Name} ({listA.Count}) vs {sideB.Name} ({listB.Count}).",
                 MessageTypeDefOf.ThreatBig);
         }
 
@@ -244,7 +292,7 @@ namespace TorannMagic.ModOptions
             }
             catch (Exception ex)
             {
-                Log.Warning("[RWoM] Debug: random class roll failed for " + pawn.LabelShortCap + ": " + ex.Message);
+                Compatibility.TM_Log.Warning("Classes", "Debug: random class roll failed for " + pawn.LabelShortCap + ": " + ex.Message);
             }
         }
 
@@ -281,7 +329,7 @@ namespace TorannMagic.ModOptions
             }
             catch (Exception ex)
             {
-                Log.Warning("[RWoM] Debug: random power level roll failed: " + ex.Message);
+                Compatibility.TM_Log.Warning("Classes", "Debug: random power level roll failed: " + ex.Message);
             }
         }
 
@@ -376,6 +424,10 @@ namespace TorannMagic.ModOptions
                 }
                 bool spiritClass = classTrait == TorannMagicDefOf.TM_Possessor;
                 bool possessedClass = classTrait == TorannMagicDefOf.TM_Possessed;
+                // GainTrait immediately invokes AddAdvancedClass, which requires
+                // possession to exist already or removes this trait reentrantly.
+                if (possessedClass)
+                    HealthUtility.AdjustSeverity(pawn, TorannMagicDefOf.TM_SpiritPossessionHD, .5f);
                 if (spiritClass && pawn.def != TorannMagicDefOf.TM_SpiritTD)
                 {
                     // the class-gain patch reserves the spirit trait for actual
@@ -392,12 +444,6 @@ namespace TorannMagic.ModOptions
                     // gives a freshly generated spirit pawn
                     HealthUtility.AdjustSeverity(pawn, TorannMagicDefOf.TM_SpiritPossessorHD, .5f);
                     pawn.needs.AddOrRemoveNeedsAsAppropriate();
-                }
-                else if (possessedClass)
-                {
-                    // AddAdvancedClass strips the possessed trait from pawns without
-                    // the possession hediff (normally applied by the possession projectile)
-                    HealthUtility.AdjustSeverity(pawn, TorannMagicDefOf.TM_SpiritPossessionHD, .5f);
                 }
 
                 // mirror the class-book mechanic: taking a class consumes the
@@ -467,13 +513,19 @@ namespace TorannMagic.ModOptions
 
                 if (logGrant)
                 {
-                    Log.Message($"[TM] Debug: granted class '{ClassTraitLabel(classTrait)}' to {pawn.LabelShortCap}.");
+                    Compatibility.TM_Log.Message("Classes", $"Debug: granted class '{ClassTraitLabel(classTrait)}' to {pawn.LabelShortCap}.");
                 }
             }
             catch (Exception ex)
             {
-                Log.Error("[TM] Debug GiveClass failed: " + ex);
+                Compatibility.TM_Log.Error("Classes", "Debug GiveClass failed: " + ex);
             }
+        }
+
+        [DebugAction("RWoM", "Repair Missing Class Data", actionType = DebugActionType.ToolMapForPawns, allowedGameStates = AllowedGameStates.PlayingOnMap)]
+        public static void RepairMissingClassData(Pawn pawn)
+        {
+            Compatibility.TM_LegacyRecovery.RepairWithReport(pawn);
         }
 
         [DebugAction("RWoM", "Remove Class", actionType = DebugActionType.ToolMapForPawns, allowedGameStates = AllowedGameStates.PlayingOnMap)]
@@ -495,7 +547,7 @@ namespace TorannMagic.ModOptions
                     }
                     catch(NullReferenceException ex)
                     {
-                        Log.Warning("failed to remove magic comp");
+                        Compatibility.TM_Log.Warning("Classes", "failed to remove magic comp");
                     }
                 }
                 CompAbilityUserMight compMight = pawn.GetCompAbilityUserMight();
@@ -509,7 +561,7 @@ namespace TorannMagic.ModOptions
                     }
                     catch(NullReferenceException ex)
                     {
-                        Log.Warning("failed to remove might comp");
+                        Compatibility.TM_Log.Warning("Classes", "failed to remove might comp");
                     }
                 }
                 if (pawn.story != null && pawn.story.traits != null)
@@ -733,7 +785,7 @@ namespace TorannMagic.ModOptions
                         }
                         catch (Exception arg)
                         {
-                            Log.Error("Could not instantiate or initialize a ThingComp: " + arg);
+                            Compatibility.TM_Log.Error("Classes", "Could not instantiate or initialize a ThingComp: " + arg);
                             comps.Remove(thingComp);
                         }
                     }
@@ -748,7 +800,7 @@ namespace TorannMagic.ModOptions
                         }
                         catch (Exception arg)
                         {
-                            Log.Error("Could not instantiate or initialize a ThingComp: " + arg);
+                            Compatibility.TM_Log.Error("Classes", "Could not instantiate or initialize a ThingComp: " + arg);
                             comps.Remove(thingComp);
                         }
                     }
@@ -807,7 +859,7 @@ namespace TorannMagic.ModOptions
                     }
                     catch (NullReferenceException ex)
                     {
-                        Log.Warning("failed to give mana");
+                        Compatibility.TM_Log.Warning("Classes", "failed to give mana");
                     }
                 }
                 CompAbilityUserMight compMight = pawn.GetCompAbilityUserMight();
@@ -819,7 +871,7 @@ namespace TorannMagic.ModOptions
                     }
                     catch (NullReferenceException ex)
                     {
-                        Log.Warning("failed to give stamina");
+                        Compatibility.TM_Log.Warning("Classes", "failed to give stamina");
                     }
                 }                
             }
