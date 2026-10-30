@@ -434,6 +434,7 @@ namespace TorannMagic
         }
 
         private MagicData magicData = null;
+        internal MagicData ExistingMagicData => magicData;
         public MagicData MagicData
         {
             get

@@ -10,6 +10,15 @@ namespace RWoM.RegressionTests;
 
 internal static class SoulStoneHolderTests
 {
+    public sealed class UnexpectedStoneDamageWorker : DamageWorker
+    {
+        public static int Calls;
+        public override DamageResult Apply(DamageInfo dinfo, Thing victim)
+        {
+            Calls++;
+            throw new InvalidOperationException("Occupied soulstone allowed damage worker execution: " + dinfo.Def.defName);
+        }
+    }
     public static IEnumerable<TestCase> Cases()
     {
         yield return new("SoulStoneHolder.ExactNativeCaptureImplantAndRecovery", CaptureImplant);
@@ -87,6 +96,26 @@ internal static class SoulStoneHolderTests
         using var f = new SpiritRebirthStateTests.Fixture(r); var state = f.Begin();
         f.Hold(f.Host, f.Original); Invoke(state, "TryEnterHost", f.Original, f.Host);
         var stone = Stone(); Invoke(stone, "TryCapture", f.Original, f.Host, false);
+        stone.def.useHitPoints = true;
+        stone.HitPoints = 73;
+        UnexpectedStoneDamageWorker.Calls = 0;
+        foreach (string name in new[] { "Flame", "Bomb" })
+        {
+            // Keep the actual Thing.TakeDamage pipeline; the worker is a tripwire
+            // proving occupied absorption exits before damage or ignition work.
+            var damageDef = new DamageDef { defName = name, harmsHealth = true,
+                workerClass = typeof(UnexpectedStoneDamageWorker),
+                igniteChanceByTargetFlammability = new SimpleCurve { new CurvePoint(0f, 1f), new CurvePoint(1f, 1f) } };
+            var result = stone.TakeDamage(new DamageInfo(damageDef, 1000000f));
+            Check.Equal(0f, result.totalDamageDealt, name + " native damage pipeline reports no damage");
+            Check.Equal(73, stone.HitPoints, name + " leaves occupied stone HP unchanged");
+            Check.Equal(false, stone.Destroyed, name + " cannot destroy occupied stone");
+            Check.Same(f.Original, stone.ContainedSpirit, name + " preserves actual contained original");
+            var emptyProbe = Stone(); var damage = new DamageInfo(damageDef, 1000000f);
+            emptyProbe.PreApplyDamage(ref damage, out bool absorbed);
+            Check.Equal(false, absorbed, name + " empty shell retains ordinary damage admission");
+        }
+        Check.Equal(0, UnexpectedStoneDamageWorker.Calls, "absorbed damage never invokes worker");
         foreach (var mode in new[] { DestroyMode.Vanish, DestroyMode.KillFinalize }) stone.Destroy(mode);
         Check.Equal(false, stone.Destroyed, "occupied stone survives destruction attempts");
         Check.Same(f.Original, stone.ContainedSpirit, "soul retained after repeated destruction");

@@ -96,10 +96,16 @@ namespace TorannMagic.ClassProgression
 
         public override void Destroy(DestroyMode mode = DestroyMode.Vanish)
         {
-            // Until safe world release exists, an occupied stone cannot be consumed
-            // or destroyed, including repeated cleanup and failed implantation.
+            // An occupied stone is indestructible. Map abandonment remains distinct
+            // from damage and must retain native ownership until that map is discarded.
             if (contents.Count != 0) return;
             base.Destroy(mode);
+        }
+
+        public override void PreApplyDamage(ref DamageInfo dinfo, out bool absorbed)
+        {
+            if (contents.Count != 0) { absorbed = true; return; }
+            base.PreApplyDamage(ref dinfo, out absorbed);
         }
 
         public override bool CanStackWith(Thing other)
