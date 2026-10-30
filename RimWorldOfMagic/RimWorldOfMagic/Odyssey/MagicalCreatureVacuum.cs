@@ -11,6 +11,7 @@ namespace TorannMagic.Odyssey
         public static bool IsNaturallyVacuumImmune(Pawn pawn)
         {
             if (!ModsConfig.OdysseyActive || pawn == null) return false;
+            if (ClassProgression.SpiritRebirthFormPolicy.IsEthereal(pawn)) return true;
             if (pawn is TMPawnGolem || (pawn.def != null && pawn.def == TorannMagicDefOf.TM_SpiritTD)) return true;
             var hediffs = pawn.health?.hediffSet?.hediffs;
             if (hediffs == null) return false;

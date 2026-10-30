@@ -16,6 +16,7 @@ namespace TorannMagic.ClassProgression
 
         public static bool Restore(CompAbilityUserMagic comp)
         {
+            if (SpiritRebirthBodyEffects.SuppressFormerBodyEffects(comp?.Pawn)) return true;
             if (comp?.Pawn == null || !ClassIdentity.TryGetState(comp.Pawn, out _)) return false;
             var pawns = comp.BrandPawns;
             var defs = comp.BrandDefs;

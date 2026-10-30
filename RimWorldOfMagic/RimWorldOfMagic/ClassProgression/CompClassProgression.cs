@@ -88,6 +88,7 @@ namespace TorannMagic.ClassProgression
         public override void CompTick()
         {
             base.CompTick();
+            if (spiritRebirth?.DepletionPending == true) SpiritRebirthEnergy.Retry(parent as Pawn);
             if (state?.Find("rwom.summoner")?.Stage == InitiationStage.Foundation && Find.TickManager.TicksGame % 30 == 0)
                 SummonerTrials.Observe(parent as Pawn, Find.TickManager.TicksGame);
         }

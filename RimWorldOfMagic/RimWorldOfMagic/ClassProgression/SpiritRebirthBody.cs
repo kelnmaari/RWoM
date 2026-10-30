@@ -1,0 +1,48 @@
+using HarmonyLib;
+using RimWorld;
+using Verse;
+
+namespace TorannMagic.ClassProgression
+{
+    internal static class SpiritRebirthBody
+    {
+        internal static bool TryNeedAdmission(Pawn pawn, NeedDef need, out bool admitted)
+        {
+            admitted = false;
+            // Physical form deliberately includes depletion awaiting safe custody.
+            // Its existing Spirit need must survive to retry; casting is stricter.
+            if (need == null || !SpiritRebirthFormPolicy.IsEthereal(pawn)) return false;
+            admitted = need == TorannMagicDefOf.TM_SpiritND || need == TorannMagicDefOf.TM_Mana;
+            return true;
+        }
+
+        internal static bool TryStat(Pawn pawn, StatDef stat, out float value)
+        {
+            value = 0f;
+            if (stat == null || !SpiritRebirthFormPolicy.IsEthereal(pawn)) return false;
+            if (stat != StatDefOf.Mass && stat != StatDefOf.Flammability && stat != StatDefOf.ToxicResistance
+                && stat != StatDefOf.ComfyTemperatureMin && stat != StatDefOf.ComfyTemperatureMax
+                && stat != StatDefOf.MoveSpeed) return false;
+            var defaults = TorannMagicDefOf.TM_SpiritTD?.statBases;
+            if (defaults == null) return false;
+            foreach (var entry in defaults)
+            {
+                if (entry == null || entry.stat != stat) continue;
+                value = entry.value;
+                return true;
+            }
+            return false;
+        }
+    }
+
+    [HarmonyPatch(typeof(StatExtension), nameof(StatExtension.GetStatValue), new[] { typeof(Thing), typeof(StatDef), typeof(bool), typeof(int) })]
+    public static class SpiritRebirthBodyStatPatch
+    {
+        // Keep temporary and immutable native caches physical. A form transition
+        // changes the returned value immediately without changing shared race defs.
+        public static void Postfix(Thing thing, StatDef stat, ref float __result)
+        {
+            if (thing is Pawn pawn && SpiritRebirthBody.TryStat(pawn, stat, out float value)) __result = value;
+        }
+    }
+}

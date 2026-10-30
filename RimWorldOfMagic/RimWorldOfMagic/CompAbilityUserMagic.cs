@@ -6055,6 +6055,7 @@ namespace TorannMagic
 
         public void ResolveClassSkills()
         {
+            if (ClassProgression.SpiritRebirthBodyEffects.SuppressFormerBodyEffects(Pawn)) return;
             ClassProgression.BrightmageLifecycle.Restore(this);
             ClassProgression.EmpathLifecycle.Restore(this);
             ClassProgression.ClassSpellAccess.RestoreBrightmageChildren(this);

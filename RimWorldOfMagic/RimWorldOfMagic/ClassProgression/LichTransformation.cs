@@ -30,6 +30,7 @@ namespace TorannMagic.ClassProgression
 
         public static void Restore(CompAbilityUserMagic magic)
         {
+            if (SpiritRebirthBodyEffects.SuppressFormerBodyEffects(magic?.Pawn)) return;
             if (magic == null || !ClassIdentity.TryGetState(magic.Pawn, out _) || !ClassIdentity.IsLich(magic.Pawn)) return;
             RestoreHealth(magic.Pawn);
             var deathBolt = magic.MagicData.MagicPowersN.FirstOrDefault(p => p.TMabilityDefs.Contains(TorannMagicDefOf.TM_DeathBolt));
@@ -42,6 +43,7 @@ namespace TorannMagic.ClassProgression
 
         public static void RestoreHealth(Pawn pawn)
         {
+            if (SpiritRebirthBodyEffects.SuppressFormerBodyEffects(pawn)) return;
             if (!ClassIdentity.TryGetState(pawn, out _) || !ClassIdentity.IsLich(pawn) || pawn?.health?.hediffSet == null) return;
             var def = DefDatabase<HediffDef>.GetNamedSilentFail("TM_LichHD");
             if (def != null && !pawn.health.hediffSet.HasHediff(def)) HealthUtility.AdjustSeverity(pawn, def, .5f);

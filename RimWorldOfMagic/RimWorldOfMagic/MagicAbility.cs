@@ -186,7 +186,9 @@ namespace TorannMagic
                     if (this.Pawn.needs != null && this.Pawn.needs.AllNeeds != null && this.Pawn.needs.TryGetNeed(this.magicDef.requiredNeed) != null)
                     {
                         Need nd = this.Pawn.needs.TryGetNeed(this.magicDef.requiredNeed);
-                        nd.CurLevel -= ActualNeedCost(magicDef, this.MagicUser);
+                        if (nd is Need_Spirit spirit && ClassProgression.SpiritRebirthEnergy.Marked(this.Pawn))
+                            spirit.SpendSpirit(ActualNeedCost(magicDef, this.MagicUser), deferCollapse: true);
+                        else nd.CurLevel -= ActualNeedCost(magicDef, this.MagicUser);
                         this.MagicUser.MagicUserXP += Mathf.Clamp((int)((magicDef.needXPFactor * this.MagicUser.xpGain * ModOptions.Settings.Instance.xpMultiplier) * magicDef.needCost),0,9999);
                     }
                     else
@@ -414,6 +416,16 @@ namespace TorannMagic
             {
                 reason = "TM_SpiritRebirthCastUnavailable".Translate();
                 return false;
+            }
+            if (ClassProgression.SpiritRebirthEnergy.Marked(Pawn) && magicDef?.requiredNeed == TorannMagicDefOf.TM_SpiritND)
+            {
+                var spirit = ClassProgression.SpiritRebirthEnergy.Need(Pawn);
+                float cost = ActualNeedCost(magicDef, MagicUser);
+                if (spirit == null || float.IsNaN(cost) || float.IsInfinity(cost) || cost < 0f || spirit.CurLevel < cost)
+                {
+                    reason = "TM_SpiritRebirthCastUnavailable".Translate();
+                    return false;
+                }
             }
             // Independent legacy NPC profiles also enter here, even when their
             // subsequent UseAbility call uses Player context. Manual checks stay unchanged.

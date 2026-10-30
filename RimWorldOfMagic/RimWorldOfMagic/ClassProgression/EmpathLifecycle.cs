@@ -8,6 +8,7 @@ namespace TorannMagic.ClassProgression
     {
         public static bool Restore(CompAbilityUserMagic comp)
         {
+            if (SpiritRebirthBodyEffects.SuppressFormerBodyEffects(comp?.Pawn)) return true;
             if (comp?.Pawn == null || !ClassIdentity.TryGetState(comp.Pawn, out var state)) return false;
             var path = state.Find("rwom.empath");
             if ((state.Vocation & Vocation.Mage) != 0 && path?.Domain == DisciplineDomain.Magic

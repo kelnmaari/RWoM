@@ -24,7 +24,8 @@ namespace TorannMagic.ClassProgression
         }
 
         public static float StatOffset(Pawn pawn, StatDef stat)
-            => Offset(Demon(pawn), stat) + Offset(Priest(pawn), stat) + Offset(Necromancer(pawn), stat) + Offset(Lich(pawn), stat) + Offset(Fire(pawn), stat) + Offset(Ice(pawn), stat) + Offset(Lightning(pawn), stat) + Offset(Arcanist(pawn), stat) + Offset(Paladin(pawn), stat) + Offset(Summoner(pawn), stat) + Offset(Druid(pawn), stat) + Offset(Technomancer(pawn), stat) + Offset(Geomancer(pawn), stat) + Offset(BloodMage(pawn), stat) + Offset(Enchanter(pawn), stat) + Offset(Chronomancer(pawn), stat) + Offset(Brightmage(pawn), stat) + Offset(Golemancer(pawn), stat) + Offset(Empath(pawn), stat) + Offset(Shaman(pawn), stat) + (Bard(pawn)?.DataAtDegree(BardDegree(pawn))?.statOffsets?.Where(x => x.stat == stat).Sum(x => x.value) ?? 0f);
+            => SpiritRebirthBodyEffects.SuppressFormerBodyEffects(pawn) ? 0f
+                : Offset(Demon(pawn), stat) + Offset(Priest(pawn), stat) + Offset(Necromancer(pawn), stat) + Offset(Lich(pawn), stat) + Offset(Fire(pawn), stat) + Offset(Ice(pawn), stat) + Offset(Lightning(pawn), stat) + Offset(Arcanist(pawn), stat) + Offset(Paladin(pawn), stat) + Offset(Summoner(pawn), stat) + Offset(Druid(pawn), stat) + Offset(Technomancer(pawn), stat) + Offset(Geomancer(pawn), stat) + Offset(BloodMage(pawn), stat) + Offset(Enchanter(pawn), stat) + Offset(Chronomancer(pawn), stat) + Offset(Brightmage(pawn), stat) + Offset(Golemancer(pawn), stat) + Offset(Empath(pawn), stat) + Offset(Shaman(pawn), stat) + (Bard(pawn)?.DataAtDegree(BardDegree(pawn))?.statOffsets?.Where(x => x.stat == stat).Sum(x => x.value) ?? 0f);
 
         private static TraitDef Fire(Pawn pawn)
         {
@@ -240,10 +241,12 @@ namespace TorannMagic.ClassProgression
         }
 
         public static WorkTags DisabledWork(Pawn pawn)
-            => (Priest(pawn)?.disabledWorkTags ?? WorkTags.None) | (Lich(pawn)?.disabledWorkTags ?? WorkTags.None) | (Bard(pawn)?.disabledWorkTags ?? WorkTags.None);
+            => SpiritRebirthBodyEffects.SuppressFormerBodyEffects(pawn) ? WorkTags.None
+                : (Priest(pawn)?.disabledWorkTags ?? WorkTags.None) | (Lich(pawn)?.disabledWorkTags ?? WorkTags.None) | (Bard(pawn)?.disabledWorkTags ?? WorkTags.None);
 
         public static TraitDef Lich(Pawn pawn)
         {
+            if (SpiritRebirthBodyEffects.SuppressFormerBodyEffects(pawn)) return null;
             if (!ClassIdentity.TryGetState(pawn, out _) || !ClassIdentity.IsLich(pawn)) return null;
             // Suppressed native traits still own their effects; never revive or double them.
             if (pawn.story?.traits?.allTraits.Any(t => t.def == TorannMagicDefOf.Lich) == true) return null;
@@ -251,7 +254,8 @@ namespace TorannMagic.ClassProgression
         }
 
         public static float StatFactor(Pawn pawn, StatDef stat)
-            => Lich(pawn)?.DataAtDegree(0)?.statFactors?.FirstOrDefault(s => s.stat == stat)?.value ?? 1f;
+            => SpiritRebirthBodyEffects.SuppressFormerBodyEffects(pawn) ? 1f
+                : Lich(pawn)?.DataAtDegree(0)?.statFactors?.FirstOrDefault(s => s.stat == stat)?.value ?? 1f;
     }
 
     [HarmonyPatch(typeof(Pawn_StoryTracker), nameof(Pawn_StoryTracker.DisabledWorkTagsBackstoryAndTraits), MethodType.Getter)]

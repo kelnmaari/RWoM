@@ -119,15 +119,25 @@ internal static partial class CastSafetyTests
     static SpiritRebirthState MarkSpirit(Pawn pawn)
     {
         var comp = new CompClassProgression { parent = pawn }; pawn.AllComps.Add(comp);
+        if (pawn.Spawned)
+        {
+            pawn.Map.spawnedThings ??= new ThingOwner<Thing>(pawn.Map);
+            pawn.def.stackLimit = 1;
+            Check.Equal(true, pawn.Map.spawnedThings.TryAdd(pawn, false), "native map owns marked cast original");
+        }
+        pawn.needs ??= new Pawn_NeedsTracker(pawn);
+        pawn.needs.AllNeeds.Add(new Need_Spirit(pawn) { def = TorannMagicDefOf.TM_SpiritND, CurLevel = 65f });
         typeof(CompClassProgression).GetMethod("BeginSpiritRebirth", BindingFlags.Instance | BindingFlags.NonPublic)!.Invoke(comp, null);
         return Check.NotNull(comp.SpiritRebirth, "test explicitly opts original pawn in");
     }
 
     sealed class SpiritCastingDefinitions : IDisposable
     {
+        readonly NeedDef priorSpiritNeed = TorannMagicDefOf.TM_SpiritND;
         readonly TM_CustomClassDef[] previous = DefDatabase<TM_CustomClassDef>.AllDefsListForReading.ToArray();
         public SpiritCastingDefinitions(RuntimeFixture f)
         {
+            TorannMagicDefOf.TM_SpiritND = new NeedDef { defName = "SpiritCastingEnergy", needClass = typeof(Need_Spirit) };
             GrimoireProgressionTests.LoadBaseDefinitions(f);
             var xml = XDocument.Load(Path.Combine(f.Repository, "v1.7/Defs/CustomDefs/TM_CustomClassDef.xml"));
             var native = xml.Descendants("li").Single(e => (string?)e.Element("classTrait") == "TM_Possessor");
@@ -136,6 +146,6 @@ internal static partial class CastSafetyTests
             DefDatabase<TM_CustomClassDef>.Clear(); DefDatabase<TM_CustomClassDef>.Add(new TM_CustomClassDef { defName = "TM_CustomClasses", customClasses = [spec] });
             LanguageDatabase.activeLanguage.keyedReplacements["TM_SpiritRebirthCastUnavailable"] = new LoadedLanguage.KeyedReplacement { key = "TM_SpiritRebirthCastUnavailable", value = "Unavailable in current spirit form" };
         }
-        public void Dispose() { DefDatabase<TM_CustomClassDef>.Clear(); foreach (var definition in previous) DefDatabase<TM_CustomClassDef>.Add(definition); }
+        public void Dispose() { TorannMagicDefOf.TM_SpiritND = priorSpiritNeed; DefDatabase<TM_CustomClassDef>.Clear(); foreach (var definition in previous) DefDatabase<TM_CustomClassDef>.Add(definition); }
     }
 }

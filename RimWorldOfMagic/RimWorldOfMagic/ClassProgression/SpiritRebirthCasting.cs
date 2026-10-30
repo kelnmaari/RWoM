@@ -11,7 +11,7 @@ namespace TorannMagic.ClassProgression
         {
             // A trait, race, or native possession alone never opts a legacy pawn in.
             if (ClassIdentity.Component(pawn)?.SpiritRebirth == null) return true;
-            if (pawn.Dead || !SpiritRebirthState.TryGet(pawn, out var state) || state.Form != SpiritRebirthForm.Ethereal) return false;
+            if (!SpiritRebirthEnergy.CanCast(pawn)) return false;
             return IsSpiritAbility(ability);
         }
 

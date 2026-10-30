@@ -4828,7 +4828,12 @@ namespace TorannMagic
             //Damage received (percent) - continue;
 
             public static bool Prefix(Pawn __instance, ref DamageInfo dinfo, out bool absorbed)
-            {              
+            {
+                if (ClassProgression.SpiritRebirthEnergy.AbsorbDamage(__instance, dinfo.Amount))
+                {
+                    absorbed = true;
+                    return false;
+                }
                 Thing instigator = dinfo.Instigator as Thing;
                 absorbed = false;
                 if (instigator != null && __instance?.health?.hediffSet != null)
@@ -8023,6 +8028,11 @@ namespace TorannMagic
             //public static FieldInfo pawn = typeof(Pawn_NeedsTracker).GetField("pawn", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.GetField);
             public static bool Prefix(Pawn_NeedsTracker __instance, NeedDef nd, Pawn ___pawn, ref bool __result)
             {
+                if (ClassProgression.SpiritRebirthBody.TryNeedAdmission(___pawn, nd, out bool admitted))
+                {
+                    __result = admitted;
+                    return false;
+                }
                 //Traverse traverse = Traverse.Create(__instance);
                 Pawn pawn = ___pawn;
                 if (pawn != null)

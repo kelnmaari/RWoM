@@ -18,6 +18,27 @@ namespace TorannMagic.ClassProgression
         private bool recoveryRequired;
         private int recoveryTicks;
         private int lastRecoveryTick = -1;
+        private bool depletionPending;
+        private Thing_SoulStone depletionStone;
+        private int depletionRetryAt;
+        private bool depletionWarningIssued;
+        public bool DepletionPending => depletionPending;
+        internal Thing_SoulStone DepletionStone => depletionStone;
+        internal int DepletionRetryAt => depletionRetryAt;
+        internal void DeferDepletionRetry(int tick) { depletionRetryAt = tick + 250; }
+        internal bool TakeDepletionWarning()
+        {
+            if (depletionWarningIssued) return false;
+            depletionWarningIssued = true;
+            return true;
+        }
+        internal bool BeginDepletion(Pawn pawn)
+        {
+            if (!IsCurrent(pawn) || !SpiritRebirthFormPolicy.IsEthereal(pawn)) return false;
+            depletionPending = true;
+            return true;
+        }
+        internal void RememberDepletionStone(Thing_SoulStone candidate) { depletionStone = candidate; }
 
         public int Version => version;
         public SpiritRebirthForm Form => form;
@@ -125,6 +146,10 @@ namespace TorannMagic.ClassProgression
             host = null;
             stone = destination;
             form = SpiritRebirthForm.Stone;
+            depletionPending = false;
+            depletionStone = null;
+            depletionRetryAt = 0;
+            depletionWarningIssued = false;
             recoveryRequired = true;
             recoveryTicks = 0;
             lastRecoveryTick = -1;
@@ -169,6 +194,10 @@ namespace TorannMagic.ClassProgression
             Scribe_Values.Look(ref recoveryRequired, "recoveryRequired", false);
             Scribe_Values.Look(ref recoveryTicks, "recoveryTicks", 0);
             Scribe_Values.Look(ref lastRecoveryTick, "lastRecoveryTick", -1);
+            Scribe_Values.Look(ref depletionPending, "depletionPending", false);
+            Scribe_References.Look(ref depletionStone, "depletionStone");
+            Scribe_Values.Look(ref depletionRetryAt, "depletionRetryAt", 0);
+            Scribe_Values.Look(ref depletionWarningIssued, "depletionWarningIssued", false);
             if (Scribe.mode == LoadSaveMode.PostLoadInit && version == 1)
             {
                 // Foundation saves had no Stone form or recovery debt.

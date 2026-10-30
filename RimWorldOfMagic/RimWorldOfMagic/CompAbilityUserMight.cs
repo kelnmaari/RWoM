@@ -3863,6 +3863,7 @@ namespace TorannMagic
 
         public void ResolveClassSkills()               
         {
+            if (ClassProgression.SpiritRebirthBodyEffects.SuppressFormerBodyEffects(Pawn)) return;
             if (this.MightUserLevel >= 20 && (this.skill_Teach == false || !this.MightData.MightPowersStandalone.FirstOrDefault<MightPower>((MightPower x) => x.abilityDef == TorannMagicDefOf.TM_TeachMight).learned))
             {
                 this.MightData.MightPowersStandalone.FirstOrDefault<MightPower>((MightPower x) => x.abilityDef == TorannMagicDefOf.TM_TeachMight).learned = true;
