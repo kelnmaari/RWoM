@@ -40,6 +40,7 @@ internal static class SpiritRebirthStateTests
             Current.Game = (Game)RuntimeHelpers.GetUninitializedObject(typeof(Game));
             if (DefDatabase<DesignationDef>.DefCount == 0) DefDatabase<DesignationDef>.Add(new DesignationDef { defName = "SpiritRebirthTestDesignation" });
             var map = (Map)RuntimeHelpers.GetUninitializedObject(typeof(Map));
+            map.spawnedThings = new ThingOwner<Thing>(map);
             map.designationManager = new DesignationManager(map);
             Set(Current.Game, "maps", new List<Map> { map });
             var original = PawnWithComps(true, true);
@@ -54,6 +55,17 @@ internal static class SpiritRebirthStateTests
         {
             Check.Equal(true, Invoke(Comp, "BeginSpiritRebirth"), "explicit transaction creates marker once");
             return Comp.SpiritRebirth;
+        }
+        public void PlaceForCustody(Pawn pawn)
+        {
+            // Structural placement fixture: actual 1.7 map holder, not a full SpawnSetup.
+            Check.Equal(true, Current.Game.Maps[0].spawnedThings.TryAdd(pawn, false), "native map owner accepts original");
+            Set(pawn, "mapIndexOrState", (sbyte)0);
+        }
+        public void UnplaceForCustody(Pawn pawn)
+        {
+            Current.Game.Maps[0].spawnedThings.Remove(pawn);
+            Set(pawn, "mapIndexOrState", (sbyte)-1);
         }
         public HediffComp_SpiritPossession Hold(Pawn host, Pawn original)
         {
@@ -111,11 +123,11 @@ internal static class SpiritRebirthStateTests
         Check.Equal(false, state.HasValidHost(f.Original), "stale saved host loses authority immediately");
         Check.Equal(false, SpiritRebirthState.TryGetPossessingSpirit(f.Host, out _), "empty actual host rejected");
         Check.Equal(false, Invoke(state, "TryLeaveHost", f.Original, f.Host), "unplaced original cannot complete release");
-        Set(f.Original, "mapIndexOrState", (sbyte)0);
+        f.PlaceForCustody(f.Original);
         Check.Equal(false, Invoke(state, "TryLeaveHost", f.Original, f.Other), "foreign release rejected");
         Check.Equal(true, Invoke(state, "TryLeaveHost", f.Original, f.Host), "placed original explicitly returns to ethereal");
         Check.Equal(SpiritRebirthForm.Ethereal, state.Form, "release form"); Check.Equal(true, state.Host == null, "release clears host only");
-        Set(f.Original, "mapIndexOrState", (sbyte)-1);
+        f.UnplaceForCustody(f.Original);
         holder.TryAdd(f.Original, false); Check.Equal(true, Invoke(state, "TryEnterHost", f.Original, f.Host), "repeated entry uses actual custody");
         possession.parent.pawn = f.Other;
         Check.Equal(false, state.HasValidHost(f.Original), "foreign hediff parent rejected");
@@ -198,9 +210,9 @@ internal static class SpiritRebirthStateTests
         using var f = new Fixture(r); var state = Recovering(f);
         Check.Equal(false, state.CanVoluntarilyLeaveHost(f.Original), "recovery blocks voluntary departure");
         var originalHolder = f.Original.holdingOwner; originalHolder.Remove(f.Original);
-        Set(f.Original, "mapIndexOrState", (sbyte)0);
+        f.PlaceForCustody(f.Original);
         Check.Equal(false, Invoke(state, "TryLeaveHost", f.Original, f.Host), "placing spirit cannot bypass recovery release gate");
-        Set(f.Original, "mapIndexOrState", (sbyte)-1); originalHolder.TryAdd(f.Original, false);
+        f.UnplaceForCustody(f.Original); originalHolder.TryAdd(f.Original, false);
         Invoke(state, "TickRecovery", f.Original, f.Host, 10);
         Invoke(state, "TickRecovery", f.Original, f.Host, 11);
         Check.Equal(1, state.RecoveryTicks, "partial progress exists before depletion");
@@ -234,7 +246,7 @@ internal static class SpiritRebirthStateTests
         Check.Equal(true, state.CanVoluntarilyLeaveHost(f.Original), "full seven days unlocks departure");
         Invoke(state, "TickRecovery", f.Original, f.Other, 10001 + SpiritRebirthState.RecoveryDurationTicks);
         Check.Equal(SpiritRebirthState.RecoveryDurationTicks, state.RecoveryTicks, "recovery saturates");
-        next.GetDirectlyHeldThings().Remove(f.Original); Set(f.Original, "mapIndexOrState", (sbyte)0);
+        next.GetDirectlyHeldThings().Remove(f.Original); f.PlaceForCustody(f.Original);
         Check.Equal(true, Invoke(state, "TryLeaveHost", f.Original, f.Other), "actual placed spirit can depart after week");
     }
 

@@ -70,7 +70,9 @@ internal static class SpiritNativeResurrectionTests
             DefDatabase<PawnCapacityDef>.Clear(); foreach (var def in prior) DefDatabase<PawnCapacityDef>.Add(def);
         }
     }
-    static void Resurrect(RuntimeFixture r, bool cleanup, bool player, bool restoreWork = false, bool manualPrioritiesOff = false)
+    internal static void WithPreparedCorpse(RuntimeFixture r, Action<Pawn, Corpse> action)
+        => Resurrect(r, true, false, prepared: action);
+    static void Resurrect(RuntimeFixture r, bool cleanup, bool player, bool restoreWork = false, bool manualPrioritiesOff = false, Action<Pawn, Corpse>? prepared = null)
     {
         using var fixture = new SpiritRebirthStateTests.Fixture(r);
         var rootField = typeof(Current).GetField("rootInt", BindingFlags.Static | BindingFlags.NonPublic)!;
@@ -153,6 +155,9 @@ internal static class SpiritNativeResurrectionTests
             var restoreWorkMethod = workSnapshotType.GetMethod("Restore", BindingFlags.Instance | BindingFlags.NonPublic)!;
             Check.Equal(true, captureWork.Invoke(null, new object[] { pawn }) == null, "ordinary corpse with lost tracker has no invented pre-death work snapshot");
             object? workSnapshot = null;
+            // Transaction tests share only native preparation; their callback owns
+            // all physical cleanup, real resurrection and payment assertions.
+            if (prepared != null) { prepared(pawn, corpse); return; }
             if (cleanup)
             {
                 Check.Equal(1, pawn.health.hediffSet.GetMissingPartsCommonAncestors().Count, "prime missing limb before cleanup");

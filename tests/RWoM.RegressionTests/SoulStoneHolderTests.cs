@@ -116,7 +116,7 @@ internal static class SoulStoneHolderTests
             Check.Equal(false, absorbed, name + " empty shell retains ordinary damage admission");
         }
         Check.Equal(0, UnexpectedStoneDamageWorker.Calls, "absorbed damage never invokes worker");
-        foreach (var mode in new[] { DestroyMode.Vanish, DestroyMode.KillFinalize }) stone.Destroy(mode);
+        foreach (var mode in new[] { DestroyMode.Vanish, DestroyMode.KillFinalize, DestroyMode.Deconstruct }) stone.Destroy(mode);
         Check.Equal(false, stone.Destroyed, "occupied stone survives destruction attempts");
         Check.Same(f.Original, stone.ContainedSpirit, "soul retained after repeated destruction");
         var empty = Stone();

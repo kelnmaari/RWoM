@@ -4,7 +4,7 @@ using Verse;
 
 namespace TorannMagic.ClassProgression
 {
-    // No item def or player activation until the complete release pipeline exists.
+    // Item presentation only; generation and implantation activation remain separate.
     // The container owns the original pawn, never a progression snapshot or clone.
     public sealed class Thing_SoulStone : ThingWithComps, IThingHolder
     {
@@ -12,6 +12,17 @@ namespace TorannMagic.ClassProgression
 
         public Thing_SoulStone() { contents = new ThingOwner<Pawn>(this, true); }
         public Pawn ContainedSpirit => contents.Count == 1 ? contents[0] : null;
+        public override string LabelNoCount => ContainedSpirit == null ? base.LabelNoCount
+            : "TM_SoulStoneOccupiedLabel".Translate(base.LabelNoCount, ContainedSpirit.LabelShort).ToString();
+        public override string GetInspectString()
+        {
+            string inherited = base.GetInspectString();
+            var spirit = ContainedSpirit;
+            if (spirit == null) return inherited;
+            string details = "TM_SoulStoneContainedSpirit".Translate(spirit.LabelShort).ToString()
+                + "\n" + "TM_SoulStoneRecoveryDebt".Translate().ToString();
+            return inherited.NullOrEmpty() ? details : inherited + "\n" + details;
+        }
         public ThingOwner GetDirectlyHeldThings() => contents;
         public void GetChildHolders(List<IThingHolder> outChildren)
             => ThingOwnerUtility.AppendThingHoldersFromThings(outChildren, contents);
@@ -21,15 +32,18 @@ namespace TorannMagic.ClassProgression
             if (Destroyed || contents.Count != 0 || !SpiritRebirthState.TryGet(original, out var state)
                 || !state.CanEnterStone(original, expectedHost, hostDied)) return false;
 
-            var source = original.holdingOwner;
+            // In 1.7 a spawned Pawn also has a native map ThingOwner. It must
+            // undergo DeSpawn, not be removed as though this were an inventory.
+            bool wasSpawned = original.Spawned;
+            var source = wasSpawned ? null : original.holdingOwner;
             var map = original.Map;
             var position = original.Position;
             var rotation = original.Rotation;
             bool committed = false;
             try
             {
-                if (source != null) source.Remove(original);
-                else original.DeSpawn(DestroyMode.WillReplace);
+                if (wasSpawned) original.DeSpawn(DestroyMode.WillReplace);
+                else source.Remove(original);
                 if (!contents.TryAdd(original, false)) return false;
                 committed = state.TryEnterStone(original, this, expectedHost, hostDied);
                 return committed;

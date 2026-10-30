@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+  <TM_SoulStoneOccupiedLabel>{0}（{1}）</TM_SoulStoneOccupiedLabel>
+  <TM_SoulStoneContainedSpirit>容纳的灵魂：{0}</TM_SoulStoneContainedSpirit>
+  <TM_SoulStoneRecoveryDebt>植入后：须在活着的宿主体内恢复整整七天，才能主动离开。</TM_SoulStoneRecoveryDebt>
+</LanguageData>

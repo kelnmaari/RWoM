@@ -20,7 +20,7 @@ internal static class SpiritRebirthRitualEligibilityTests
     }
     static T Blank<T>() where T : class => (T)RuntimeHelpers.GetUninitializedObject(typeof(T));
     public static bool SkipGraphics() => false;
-    sealed class Fixture : IDisposable
+    internal sealed class Fixture : IDisposable
     {
         readonly object graphicsHarmony;
         readonly Type harmonyType;

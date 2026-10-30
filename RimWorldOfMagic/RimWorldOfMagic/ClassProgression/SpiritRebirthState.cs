@@ -33,6 +33,8 @@ namespace TorannMagic.ClassProgression
             version = CurrentVersion;
             form = SpiritRebirthForm.Ethereal;
         }
+        internal static SpiritRebirthState CreateRitualPending(Pawn original)
+            => new SpiritRebirthState(original) { form = SpiritRebirthForm.Dormant };
 
         public static bool TryGet(Pawn pawn, out SpiritRebirthState state)
         {
@@ -102,7 +104,7 @@ namespace TorannMagic.ClassProgression
         {
             if (!IsCurrent(pawn) || pawn.Dead) return false;
             if (form == SpiritRebirthForm.Ethereal)
-                return !hostDied && expectedHost == null && host == null && pawn.Spawned && pawn.holdingOwner == null;
+                return !hostDied && expectedHost == null && host == null && SpiritRebirthFormPolicy.HasMapCustody(pawn);
             return form == SpiritRebirthForm.Possessed && ReferenceEquals(host, expectedHost) && host != null
                 && host.Dead == hostDied && Holds(host, pawn, hostDied);
         }
@@ -149,7 +151,7 @@ namespace TorannMagic.ClassProgression
         {
             if (!IsCurrent(pawn) || form != SpiritRebirthForm.Possessed || host == null || !ReferenceEquals(host, expectedHost)
                 || host.Dead || host.Destroyed || (recoveryRequired && recoveryTicks < RecoveryDurationTicks)
-                || pawn.Dead || !pawn.Spawned || pawn.holdingOwner != null
+                || pawn.Dead || !SpiritRebirthFormPolicy.HasMapCustody(pawn)
                 || Possession(expectedHost)?.GetDirectlyHeldThings()?.Contains(pawn) == true) return false;
             host = null;
             form = SpiritRebirthForm.Ethereal;

@@ -83,6 +83,39 @@ namespace TorannMagic
             this.hediffAbility.Clear();
         }
 
+        // The caller supplies only the validated canonical Spirit family. Never
+        // touch the aggregate getter here: it initializes unrelated addon trees.
+        internal MagicPower EnsureSpiritOwner(TM_CustomPower definition)
+        {
+            var owner = (magicPowerCustom ?? Enumerable.Empty<MagicPower>())
+                .Concat(magicPowerCustomStandalone ?? Enumerable.Empty<MagicPower>())
+                .FirstOrDefault(p => p?.TMabilityDefs != null && p.TMabilityDefs.Count > 0
+                    && ReferenceEquals(p.TMabilityDefs[0], definition.abilityDefs[0]));
+            if (owner == null)
+            {
+                owner = new MagicPower(definition.abilityDefs, definition.requiresScroll)
+                {
+                    maxLevel = definition.maxLevel, learnCost = definition.learnCost,
+                    costToLevel = definition.costToLevel,
+                    learned = !definition.requiresScroll && ((TMAbilityDef)definition.abilityDefs[0]).learnChance >= 1f
+                };
+                if (definition.autocasting != null) owner.autocasting = definition.autocasting.CopyForOwner();
+                if (definition.skills?.Any(s => s != null) == true)
+                    (magicPowerCustom ?? (magicPowerCustom = new List<MagicPower>())).Add(owner);
+                else MagicPowersCustomStandalone.Add(owner);
+                InvalidateCustomPowerCaches();
+            }
+            foreach (var skill in definition.skills ?? new List<TM_CustomSkill>())
+            {
+                if (skill == null || string.IsNullOrEmpty(skill.label)
+                    || MagicPowerSkill_Custom.Any(s => s != null && TM_CustomSkillLabels.Canonical(s.label) == skill.label)) continue;
+                MagicPowerSkill_Custom.Add(new MagicPowerSkill(skill.label, skill.description)
+                    { levelMax = skill.levelMax, costToLevel = skill.costToLevel });
+                InvalidateCustomSkillCaches();
+            }
+            return owner;
+        }
+
         public List<MagicPower> magicPowerCustomStandalone;
         public List<MagicPower> MagicPowersCustomStandalone  //supports customs abilities
         {

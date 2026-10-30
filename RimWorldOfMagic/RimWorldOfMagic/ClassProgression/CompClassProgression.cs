@@ -10,6 +10,28 @@ namespace TorannMagic.ClassProgression
         private ClassProgressionState state;
         private SpiritRebirthState spiritRebirth;
         public SpiritRebirthState SpiritRebirth => spiritRebirth;
+        private SpiritRebirthRitualTransaction spiritRitual;
+        internal SpiritRebirthRitualTransaction SpiritRitual => spiritRitual;
+        internal bool TryBeginSpiritRitual(SpiritRebirthRitualTransaction receipt)
+        {
+            if (spiritRitual != null || receipt == null || !ReferenceEquals(receipt.Original, parent)) return false;
+            spiritRitual = receipt;
+            return true;
+        }
+        internal bool EnsureSpiritRitualPending(SpiritRebirthRitualTransaction receipt)
+        {
+            var pawn = parent as Pawn;
+            if (receipt == null || !ReferenceEquals(spiritRitual, receipt) || !ReferenceEquals(receipt.Original, pawn)
+                || pawn == null || pawn.Dead || pawn.Destroyed) return false;
+            if (spiritRebirth == null) spiritRebirth = SpiritRebirthState.CreateRitualPending(pawn);
+            return SpiritRebirthState.TryGet(pawn, out var state) && state.Form == SpiritRebirthForm.Dormant;
+        }
+        internal bool ClearRefundedSpiritRitual(SpiritRebirthRitualTransaction receipt)
+        {
+            if (!ReferenceEquals(spiritRitual, receipt) || receipt == null || !receipt.FullyRefunded) return false;
+            spiritRitual = null;
+            return true;
+        }
 
         // Reserved for a future explicit corpse conversion transaction. No spawn,
         // loading, trait, or legacy migration path calls this entry point.
@@ -111,9 +133,10 @@ namespace TorannMagic.ClassProgression
         public override void PostExposeData()
         {
             base.PostExposeData();
-            if (Scribe.mode == LoadSaveMode.Saving && state == null && spiritRebirth == null) return;
+            if (Scribe.mode == LoadSaveMode.Saving && state == null && spiritRebirth == null && spiritRitual == null) return;
             Scribe_Deep.Look(ref state, "TM_classProgression");
             Scribe_Deep.Look(ref spiritRebirth, "TM_spiritRebirth");
+            Scribe_Deep.Look(ref spiritRitual, "TM_spiritRitual");
             Scribe_Values.Look(ref tomeQuestAvailableAtTick, "TM_tomeQuestAvailableAtTick", 0);
         }
     }
