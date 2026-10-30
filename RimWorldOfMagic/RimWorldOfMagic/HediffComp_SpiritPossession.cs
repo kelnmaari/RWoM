@@ -222,6 +222,7 @@ namespace TorannMagic
                 if (ClassProgression.SpiritRebirthState.TryGet(original, out var state)
                     && state.HasValidHost(original) && ReferenceEquals(state.Host, Pawn))
                 {
+                    ClassProgression.SpiritRebirthHealthForm.TryRefreshPending(original);
                     original.GetCompAbilityUserMagic()?.CompTick();
                     original.GetCompAbilityUserMight()?.CompTick();
                     state.TickRecovery(original, Pawn, Find.TickManager.TicksGame);

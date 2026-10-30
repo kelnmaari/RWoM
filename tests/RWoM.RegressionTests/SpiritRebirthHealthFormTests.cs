@@ -69,8 +69,10 @@ internal static class SpiritRebirthHealthFormTests
             Check.Equal(150f, need.MaxLevel, "inactive marker does not grant saved Spirit skill capacity");
         });
         foreach (bool dlc in new[] { true, false })
-        yield return new("SpiritRebirthHealthForm.NativeHealthSingletonStagesAndRemoval." + (dlc ? "Royalty" : "NoDlc"), r =>
-        {
+        yield return new("SpiritRebirthHealthForm.NativeHealthSingletonStagesAndRemoval." + (dlc ? "Royalty" : "NoDlc"), r => RunNative(r, dlc));
+    }
+    internal static void RunNative(RuntimeFixture r, bool dlc, Action<SpiritRebirthStateTests.Fixture, HediffDef, Need_Spirit>? continuation = null)
+    {
             using var settings = new SkillSettings();
             using var f = new SpiritRebirthStateTests.Fixture(r);
             using var caps = (IDisposable)Activator.CreateInstance(typeof(SpiritNativeResurrectionTests).GetNestedType("CapacityDefinitions", BindingFlags.NonPublic)!, true)!;
@@ -119,6 +121,7 @@ internal static class SpiritRebirthHealthFormTests
             Check.Equal(1.85f, f.Original.GetStatValue(StatDefOf.PsychicSensitivity, cacheStaleAfterTicks: 1000), "power transition clears prior psychic stat cache");
             Check.Same(need, f.Original.needs.AllNeeds.Single(), "form updates retain existing need owner");
             Check.Equal(0f, need.CurLevel, "form updates never refill zero energy");
+            if (continuation != null) { continuation(f, defs.Own, need); return; }
             Set(f.Comp.SpiritRebirth, "form", SpiritRebirthForm.Dormant);
             Check.Equal(true, effect.CurStage == null, "inactive form becomes neutral before reconciliation");
             Check.Equal(true, Reconcile(f.Original), "inactive owned effect removed");
@@ -128,7 +131,6 @@ internal static class SpiritRebirthHealthFormTests
             Check.Equal(originalConsciousness, f.Original.health.capacities.GetLevel(PawnCapacityDefOf.Consciousness), "native health cache reset after removal");
             Check.Equal(35f, f.Original.GetStatValue(StatDefOf.CarryingCapacity, cacheStaleAfterTicks: 1000), "native carrying cache reset after removal");
             Check.Equal(1f, f.Original.GetStatValue(StatDefOf.PsychicSensitivity, cacheStaleAfterTicks: 1000), "native psychic cache reset after removal");
-        });
     }
     sealed class SkillSettings : IDisposable
     {

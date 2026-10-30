@@ -73,6 +73,7 @@ namespace TorannMagic.ClassProgression
             if (!SpiritRebirthEnergy.Marked(pawn)) return false;
             int now = Find.TickManager.TicksGame;
             if (!SpiritRebirthBody.RetainsNeeds(pawn) || !clock.Observe(now)) return true;
+            SpiritRebirthHealthForm.TryRefreshPending(pawn);
             TickAbilities(comp, true);
             if (!SpiritRebirthBody.RetainsNeeds(pawn)) return true;
             for (int i = comp.chainedAbilitiesList.Count - 1; i >= 0; i--)
@@ -128,6 +129,7 @@ namespace TorannMagic.ClassProgression
             var pawn = stone?.ContainedSpirit;
             if (!SpiritRebirthState.TryGet(pawn, out var state) || !state.HasValidStone(pawn)
                 || !ReferenceEquals(state.Stone, stone)) return;
+            SpiritRebirthHealthForm.TryRefreshPending(pawn);
             pawn.GetCompAbilityUserMagic()?.CompTick();
             pawn.GetCompAbilityUserMight()?.CompTick();
         }

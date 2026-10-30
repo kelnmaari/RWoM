@@ -22,6 +22,20 @@ namespace TorannMagic.ClassProgression
         private Thing_SoulStone depletionStone;
         private int depletionRetryAt;
         private bool depletionWarningIssued;
+        private bool healthFormDirty;
+        private int healthFormRetryAt;
+        private bool healthFormWarningIssued;
+        internal bool HealthFormDirty => healthFormDirty;
+        internal int HealthFormRetryAt => healthFormRetryAt;
+        internal void MarkHealthFormDirty() { healthFormDirty = true; healthFormRetryAt = 0; }
+        internal void CompleteHealthFormRefresh() { healthFormDirty = false; healthFormRetryAt = 0; healthFormWarningIssued = false; }
+        internal void DeferHealthFormRefresh(int tick) { healthFormRetryAt = tick + 250; }
+        internal bool TakeHealthFormWarning()
+        {
+            if (healthFormWarningIssued) return false;
+            healthFormWarningIssued = true;
+            return true;
+        }
         public bool DepletionPending => depletionPending;
         internal Thing_SoulStone DepletionStone => depletionStone;
         internal int DepletionRetryAt => depletionRetryAt;
@@ -53,6 +67,7 @@ namespace TorannMagic.ClassProgression
             this.original = original;
             version = CurrentVersion;
             form = SpiritRebirthForm.Ethereal;
+            MarkHealthFormDirty();
         }
         internal static SpiritRebirthState CreateRitualPending(Pawn original)
             => new SpiritRebirthState(original) { form = SpiritRebirthForm.Dormant };
@@ -62,6 +77,7 @@ namespace TorannMagic.ClassProgression
             if (!IsCurrent(pawn) || form != SpiritRebirthForm.Dormant || host != null || stone != null
                 || receipt == null || !receipt.CanCommitRelease(pawn)) return false;
             form = SpiritRebirthForm.Ethereal;
+            MarkHealthFormDirty();
             return true;
         }
 
@@ -154,6 +170,7 @@ namespace TorannMagic.ClassProgression
             host = null;
             stone = destination;
             form = SpiritRebirthForm.Stone;
+            MarkHealthFormDirty();
             depletionPending = false;
             depletionStone = null;
             depletionRetryAt = 0;
@@ -176,6 +193,7 @@ namespace TorannMagic.ClassProgression
             stone = null;
             host = candidate;
             form = SpiritRebirthForm.Possessed;
+            MarkHealthFormDirty();
             lastRecoveryTick = -1;
             return true;
         }
@@ -188,6 +206,7 @@ namespace TorannMagic.ClassProgression
                 || Possession(expectedHost)?.GetDirectlyHeldThings()?.Contains(pawn) == true) return false;
             host = null;
             form = SpiritRebirthForm.Ethereal;
+            MarkHealthFormDirty();
             lastRecoveryTick = -1;
             return true;
         }
@@ -202,6 +221,9 @@ namespace TorannMagic.ClassProgression
             Scribe_Values.Look(ref recoveryRequired, "recoveryRequired", false);
             Scribe_Values.Look(ref recoveryTicks, "recoveryTicks", 0);
             Scribe_Values.Look(ref lastRecoveryTick, "lastRecoveryTick", -1);
+            Scribe_Values.Look(ref healthFormDirty, "healthFormDirty", false);
+            Scribe_Values.Look(ref healthFormRetryAt, "healthFormRetryAt", 0);
+            Scribe_Values.Look(ref healthFormWarningIssued, "healthFormWarningIssued", false);
             Scribe_Values.Look(ref depletionPending, "depletionPending", false);
             Scribe_References.Look(ref depletionStone, "depletionStone");
             Scribe_Values.Look(ref depletionRetryAt, "depletionRetryAt", 0);
@@ -218,6 +240,7 @@ namespace TorannMagic.ClassProgression
             }
             if (Scribe.mode == LoadSaveMode.PostLoadInit && version == CurrentVersion)
             {
+                MarkHealthFormDirty(); // Rebuild native caches lazily, after ownership resolves.
                 // Repair malformed counters conservatively, without awarding time.
                 // A valid ongoing recovery keeps both progress and tick baseline.
                 if (recoveryTicks < 0 || recoveryTicks > RecoveryDurationTicks)

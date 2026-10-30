@@ -52,6 +52,7 @@ namespace TorannMagic.ClassProgression
                 else source.Remove(original);
                 if (!contents.TryAdd(original, false)) return false;
                 committed = state.TryEnterStone(original, this, expectedHost, hostDied);
+                if (committed) SpiritRebirthHealthForm.TryRefreshPending(original);
                 return committed;
             }
             finally
@@ -95,6 +96,7 @@ namespace TorannMagic.ClassProgression
                 contents.Remove(original);
                 if (!target.TryAdd(original, false)) return false;
                 committed = state.TryEnterHost(original, candidate);
+                if (committed) SpiritRebirthHealthForm.TryRefreshPending(original);
                 return committed;
             }
             finally

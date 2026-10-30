@@ -46,7 +46,37 @@ namespace TorannMagic.ClassProgression
         internal static bool Owns(Hediff hediff)
             => hediff is Hediff_SpiritRebirthForm && Definition?.hediffClass == typeof(Hediff_SpiritRebirthForm) && hediff.def == Definition;
 
-        internal static bool Reconcile(Pawn pawn)
+        // Dirty state requests maintenance; it never authorizes a physical form.
+        internal static void TryRefreshPending(Pawn pawn)
+        {
+            if (!SpiritRebirthState.TryGet(pawn, out var state) || !state.HealthFormDirty
+                || !(SpiritRebirthFormPolicy.IsSpawnedEthereal(pawn) || state.HasValidStone(pawn)
+                    || state.HasValidHost(pawn) || SpiritRebirthRitualTransaction.IsPendingAccountingOwner(pawn))) return;
+            int tick = Find.TickManager?.TicksGame ?? 0;
+            if (tick < state.HealthFormRetryAt) return;
+            try
+            {
+                if (pawn.health?.hediffSet == null || Definition?.hediffClass != typeof(Hediff_SpiritRebirthForm)
+                    || (HasForm(pawn) && !(TorannMagicDefOf.TM_SpiritPossessorHD?.stages?.Count > 0)))
+                {
+                    state.DeferHealthFormRefresh(tick);
+                    return;
+                }
+                // A preceding native callback may have removed the hediff before
+                // throwing. Invalidate this pawn even when this retry has no delta.
+                ReconcileCore(pawn, true);
+                state.CompleteHealthFormRefresh();
+            }
+            catch (System.Exception exception)
+            {
+                state.DeferHealthFormRefresh(tick);
+                if (state.TakeHealthFormWarning())
+                    Compatibility.TM_Log.Warning("SpiritHealthForm", "Form refresh deferred for " + pawn.ThingID + ": " + exception);
+            }
+        }
+
+        internal static bool Reconcile(Pawn pawn) => ReconcileCore(pawn, false);
+        private static bool ReconcileCore(Pawn pawn, bool forceCacheRefresh)
         {
             var health = pawn?.health;
             if (health?.hediffSet == null) return false;
@@ -76,11 +106,11 @@ namespace TorannMagic.ClassProgression
                 float severity = System.Math.Min(definition.maxSeverity, .5f + Skill(pawn, "TM_SpiritPossession_pwr"));
                 if (effect.Severity != severity) { effect.Severity = severity; health.Notify_HediffChanged(effect); changed = true; }
             }
-            if (changed)
+            if (changed || forceCacheRefresh)
             {
                 health.hediffSet.DirtyCache();
                 // Other stats can depend on the affected capacities/stat factors.
-                // Clear only this pawn's entries, and only on an actual mutation.
+                // Clear only this pawn's entries on a mutation or pending refresh.
                 foreach (var stat in DefDatabase<StatDef>.AllDefsListForReading)
                     if (stat.cacheable || stat.immutable) stat.Worker.ClearCacheForThing(pawn);
             }
