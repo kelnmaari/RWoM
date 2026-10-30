@@ -13,6 +13,9 @@ namespace TorannMagic.ClassProgression
             // Its existing Spirit need must survive to retry; casting is stricter.
             if (need == null || !RetainsNeeds(pawn)) return false;
             admitted = need == TorannMagicDefOf.TM_SpiritND || need == TorannMagicDefOf.TM_Mana;
+            if (admitted && SpiritRebirthRitualTransaction.IsPendingAccountingOwner(pawn)
+                && !SpiritRebirthRitualTransaction.IsPreparing(pawn))
+                admitted = pawn.needs?.TryGetNeed(need) != null;
             return true;
         }
 
@@ -20,6 +23,7 @@ namespace TorannMagic.ClassProgression
         // This grants no physical form properties to either the owner or host.
         internal static bool RetainsNeeds(Pawn pawn)
             => SpiritRebirthFormPolicy.IsEthereal(pawn)
+                || SpiritRebirthRitualTransaction.IsPendingAccountingOwner(pawn)
                 || (pawn != null && !pawn.Dead && SpiritRebirthState.TryGet(pawn, out var state)
                     && (state.HasValidStone(pawn) || state.HasValidHost(pawn)));
 

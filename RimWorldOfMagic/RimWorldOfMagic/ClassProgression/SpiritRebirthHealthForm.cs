@@ -7,6 +7,8 @@ namespace TorannMagic.ClassProgression
     {
         internal const string DefinitionName = "TM_SpiritRebirthForm";
         private static HediffDef Definition => DefDatabase<HediffDef>.GetNamedSilentFail(DefinitionName);
+        internal static bool HasForm(Pawn pawn)
+            => SpiritRebirthFormPolicy.IsEthereal(pawn) || SpiritRebirthRitualTransaction.IsPreparing(pawn);
 
         private static int Skill(Pawn pawn, string label)
         {
@@ -50,7 +52,7 @@ namespace TorannMagic.ClassProgression
             if (health?.hediffSet == null) return false;
             var definition = Definition;
             if (definition == null || definition.hediffClass != typeof(Hediff_SpiritRebirthForm)) return false;
-            bool active = SpiritRebirthFormPolicy.IsEthereal(pawn)
+            bool active = HasForm(pawn)
                 && TorannMagicDefOf.TM_SpiritPossessorHD?.stages?.Count > 0;
             bool changed = false;
             Hediff effect = null;
@@ -92,7 +94,7 @@ namespace TorannMagic.ClassProgression
         {
             get
             {
-                if (!SpiritRebirthHealthForm.Owns(this) || !SpiritRebirthFormPolicy.IsEthereal(pawn)) return null;
+                if (!SpiritRebirthHealthForm.Owns(this) || !SpiritRebirthHealthForm.HasForm(pawn)) return null;
                 var stages = TorannMagicDefOf.TM_SpiritPossessorHD?.stages;
                 if (stages == null) return null;
                 for (int i = stages.Count - 1; i >= 0; i--)
@@ -104,7 +106,7 @@ namespace TorannMagic.ClassProgression
         public override void PostTick()
         {
             if (!SpiritRebirthHealthForm.Owns(this)) { base.PostTick(); return; }
-            if (!SpiritRebirthFormPolicy.IsEthereal(pawn)) SpiritRebirthHealthForm.Reconcile(pawn);
+            if (!SpiritRebirthHealthForm.HasForm(pawn)) SpiritRebirthHealthForm.Reconcile(pawn);
             if (CurStage != null) base.PostTick();
         }
         public override void PostTickInterval(int delta)

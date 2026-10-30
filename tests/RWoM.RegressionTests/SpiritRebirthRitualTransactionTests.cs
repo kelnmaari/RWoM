@@ -143,6 +143,11 @@ internal static class SpiritRebirthRitualTransactionTests
     {
         var progression = ClassIdentity.Component(c.Original); var state = progression.State;
         var name = c.Original.Name; var skills = c.Original.skills; var inventory = c.Original.inventory;
+        var magic = c.Original.GetComp<CompAbilityUserMagic>();
+        var minion = PawnWithComps(false, false).pawn;
+        var undead = PawnWithComps(false, false).pawn;
+        magic.summonedMinions.Add(minion); magic.supportedUndead.Add(undead);
+        var minions = magic.summonedMinions; var supported = magic.supportedUndead;
         string id = c.Original.GetUniqueLoadID();
         Check.Equal("ConvertedHeld", c.Execute(), "real cleanup/native revival/payment succeeds into inactive custody");
         Check.Equal(false, c.Original.Dead, "actual original revived"); Check.Equal(true, c.Corpse.Destroyed, "actual corpse consumed by native resurrection");
@@ -155,6 +160,10 @@ internal static class SpiritRebirthRitualTransactionTests
         Check.Equal(SpiritRebirthForm.Dormant, progression.SpiritRebirth.Form, "paid conversion remains inactive until form pipeline");
         Check.Equal("ConvertedHeld", c.Execute(), "duplicate returns recorded conversion without rerunning");
         Check.Equal(0, inventory.innerContainer.Count, "duplicate cannot debit again");
+        Check.Same(minions, magic.summonedMinions, "native conversion retains summoned list owner");
+        Check.Same(supported, magic.supportedUndead, "native conversion retains undead list owner");
+        Check.Same(minion, magic.summonedMinions.Single(), "conversion and duplicate retain exact existing minion");
+        Check.Same(undead, magic.supportedUndead.Single(), "conversion and duplicate retain exact existing undead");
         RuntimeLog.AssertClean();
     }
     static void Rejected(Context c)

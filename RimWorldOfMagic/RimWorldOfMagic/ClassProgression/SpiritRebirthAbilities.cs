@@ -8,7 +8,7 @@ namespace TorannMagic.ClassProgression
         // Deliberately not wired to lifecycle/activation yet.
         internal static bool Ensure(Pawn original)
         {
-            if (!SpiritRebirthFormPolicy.IsEthereal(original)) return false;
+            if (!SpiritRebirthFormPolicy.IsEthereal(original) && !SpiritRebirthRitualTransaction.IsPreparing(original)) return false;
             var comp = original.GetComp<CompAbilityUserMagic>();
             if (comp == null || TorannMagicDefOf.TM_Possessor == null) return false;
             var classes = DefDatabase<TM_CustomClassDef>.GetNamedSilentFail("TM_CustomClasses")?.customClasses;

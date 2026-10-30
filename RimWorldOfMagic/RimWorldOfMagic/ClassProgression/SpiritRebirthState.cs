@@ -57,6 +57,14 @@ namespace TorannMagic.ClassProgression
         internal static SpiritRebirthState CreateRitualPending(Pawn original)
             => new SpiritRebirthState(original) { form = SpiritRebirthForm.Dormant };
 
+        internal bool TryCommitRitualRelease(Pawn pawn, SpiritRebirthRitualTransaction receipt)
+        {
+            if (!IsCurrent(pawn) || form != SpiritRebirthForm.Dormant || host != null || stone != null
+                || receipt == null || !receipt.CanCommitRelease(pawn)) return false;
+            form = SpiritRebirthForm.Ethereal;
+            return true;
+        }
+
         public static bool TryGet(Pawn pawn, out SpiritRebirthState state)
         {
             state = ClassIdentity.Component(pawn)?.SpiritRebirth;

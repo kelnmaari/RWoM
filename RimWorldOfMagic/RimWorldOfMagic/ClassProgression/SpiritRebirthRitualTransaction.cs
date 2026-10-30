@@ -12,7 +12,7 @@ namespace TorannMagic.ClassProgression
 
     // Saved accounting on the original. Resources belong to its native inventory;
     // this record is never a second holder of either resources or the Pawn.
-    internal sealed class SpiritRebirthRitualTransaction : IExposable
+    internal sealed partial class SpiritRebirthRitualTransaction : IExposable
     {
         public sealed class Debit : IExposable
         {
@@ -71,7 +71,7 @@ namespace TorannMagic.ClassProgression
                 if (workTicks < SpiritRebirthRitualEligibility.RitualTicks || job == null || caster?.CurJob != job
                     || job.targetA.Thing != selectedCircle || caster.Position != selectedCircle?.InteractionCell
                     || SpiritRebirthRitualEligibility.Rejection(caster, selectedCircle, selectedCorpse, selectedOriginal) != SpiritRebirthRitualRejection.None
-                    || !InventoryValid(selectedOriginal) || caster.carryTracker == null
+                    || !InventoryValid(selectedOriginal) || !InventoryValid(caster) || caster.carryTracker == null
                     || (caster.carryTracker.CarriedThing != null && caster.carryTracker.CarriedThing != selectedCorpse)
                     || !Reserved(caster, job, selectedCircle, 1) || !Reserved(caster, job, selectedCorpse, 1)
                     || !ValidStaging(caster, selectedCircle, job, staged)
@@ -122,6 +122,7 @@ namespace TorannMagic.ClassProgression
         {
             SpiritRebirthWorkSettings work = null;
             Exception failure = null;
+            bool custodySecured = false;
             try
             {
                 work = SpiritRebirthWorkSettings.Capture(original);
@@ -160,7 +161,7 @@ namespace TorannMagic.ClassProgression
             {
                 // A result reference does not own a Pawn. Secure the actual original
                 // even when resurrection throws after detaching/destroying its corpse.
-                try { if (attempted && !EnsureOwnership()) recoveryRequired = true; }
+                try { if (attempted && !(custodySecured = EnsureOwnership())) recoveryRequired = true; }
                 catch (Exception error) { recoveryRequired = true; failure = failure ?? error; }
                 finally
                 {
@@ -177,7 +178,8 @@ namespace TorannMagic.ClassProgression
                         foreach (var debit in debits) debit.source = null;
                     }
                 }
-                if (failure != null) Compatibility.TM_Log.Warning("SpiritRitual", "Conversion/payment interrupted; saved custody receipt retained: " + failure.Message);
+                if (failure != null) Compatibility.TM_Log.Warning("SpiritRitual", "Conversion/payment interrupted; custody verified=" + custodySecured + ": " + failure);
+                if (attempted && !custodySecured) throw new InvalidOperationException("Original has no verified native custody after ritual conversion.", failure);
             }
         }
 
@@ -199,9 +201,7 @@ namespace TorannMagic.ClassProgression
             if (creator != null && !creator.Destroyed && carry != null && carry.Count == 0
                 && ReferenceEquals(carry.Owner, creator.carryTracker) && carry.TryAdd(original, false))
                 return ReferenceEquals(original.holdingOwner, carry) && carry.Contains(original);
-            if (worlds == null) return false;
-            worlds.PassToWorld(original, PawnDiscardDecideMode.KeepForever);
-            return worlds.Contains(original);
+            return TryInventoryFallback();
         }
 
         private SpiritRitualResult Resume()
@@ -313,6 +313,7 @@ namespace TorannMagic.ClassProgression
 
         public void ExposeData()
         {
+            ExposeReleaseData();
             Scribe_Values.Look(ref version, "version", 0);
             Scribe_References.Look(ref original, "original"); Scribe_References.Look(ref creator, "creator");
             Scribe_References.Look(ref circle, "circle"); Scribe_References.Look(ref corpse, "corpse");
