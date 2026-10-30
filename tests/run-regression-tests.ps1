@@ -54,7 +54,17 @@ if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 $testArgs = @('--repo', $repo, '--game', $GameDir, '--jecs', $JecsDir, '--mod', $ModAssembly, '--work', (Join-Path $ArtifactsDir 'cases'), '--refs', $refs, '--harmony', $HarmonyDir)
 if ($Filter) { $testArgs += @('--filter', $Filter) }
 if ($Reverse) { $testArgs += '--reverse' }
-& dotnet (Join-Path $ArtifactsDir 'harness/out/RWoM.RegressionTests.dll') @testArgs 2>&1 | Tee-Object -FilePath (Join-Path $ArtifactsDir 'test-results.log')
-$testExit = $LASTEXITCODE
+# Tests install and remove scoped Harmony patches after earlier cases have warmed
+# native methods. Inlining can retain an unpatched copy in a caller and make the
+# same case fail only late in a run. Keep interception stable in this child process;
+# do not change the game's runtime, production build, or the caller's environment.
+$previousNoInline = $env:COMPlus_JitNoInline
+try {
+    $env:COMPlus_JitNoInline = '1'
+    Write-Host 'Harness runtime: COMPlus_JitNoInline=1 (scoped late Harmony interception)'
+    & dotnet (Join-Path $ArtifactsDir 'harness/out/RWoM.RegressionTests.dll') @testArgs 2>&1 | Tee-Object -FilePath (Join-Path $ArtifactsDir 'test-results.log')
+    $testExit = $LASTEXITCODE
+}
+finally { $env:COMPlus_JitNoInline = $previousNoInline }
 Write-Host "Regression exit code: $testExit; logs and Scribe XML: $ArtifactsDir"
 exit $testExit

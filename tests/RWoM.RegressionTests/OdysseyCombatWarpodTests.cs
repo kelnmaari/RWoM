@@ -54,8 +54,6 @@ internal static class OdysseyCombatWarpodTests
         return false;
     }
     static bool EmptyDestroy(Thing __instance) { emptyDestroys++; return false; }
-    static Assembly? saveAssembly;
-    static void SaveAssemblies(ref IEnumerable<Assembly> __result) { if (saveAssembly != null) __result = __result.Append(saveAssembly); }
     static ThingOwner Owner(Projectile pod) => ((IThingHolder)pod).GetDirectlyHeldThings();
     static object Adapter(string method, params object[] args) => T("MagicalCombatWarpod").GetMethod(method)!.Invoke(null, args)!;
 
@@ -234,6 +232,12 @@ internal static class OdysseyCombatWarpodTests
         blockAllCargo = true; Adapter("Impact", pod);
         var defs = DefDatabase<ThingDef>.AllDefsListForReading.ToArray();
         var capacities = DefDatabase<PawnCapacityDef>.AllDefsListForReading.ToArray();
+        // Register the optional assembly through the native registry. Patching its
+        // tiny iterator getter after type lookup has warmed can miss inlined callers.
+        var optionalPack = (ModContentPack)RuntimeHelpers.GetUninitializedObject(typeof(ModContentPack));
+        optionalPack.assemblies = new ModAssemblyHandler(optionalPack);
+        optionalPack.assemblies.loadedAssemblies.Add(world.Vge2);
+        LoadedModManager.RunningModsListForReading.Add(optionalPack);
         try
         {
             if (capacities.Length == 0) DefDatabase<PawnCapacityDef>.Add(new PawnCapacityDef { defName = "WarpodFixtureCapacity" });
@@ -241,8 +245,6 @@ internal static class OdysseyCombatWarpodTests
             foreach (var def in new[] { pod.def, payload, item.def, pawn.def }) DefDatabase<ThingDef>.Add(def);
             Set(pod, "launcher", null!); Set(pod, "launchingFaction", null!);
             Set(Current.Game, "uniqueIDsManager", new UniqueIDsManager());
-            saveAssembly = world.Vge2;
-            world.Patches.Apply(typeof(GenTypes).GetProperty("AllActiveAssemblies", BindingFlags.Static | BindingFlags.NonPublic)!.GetMethod!, typeof(OdysseyCombatWarpodTests).GetMethod(nameof(SaveAssemblies), BindingFlags.Static | BindingFlags.NonPublic)!, true);
             // GenTypes caches failed lookups even across ClearCache(). Registering the optional
             // fixture assembly therefore needs its own name cache, restored when this scope ends.
             using var typeLookupCache = new TypeLookupCache();
@@ -266,7 +268,7 @@ internal static class OdysseyCombatWarpodTests
             float before = HP(world.Main); Check.Equal(true, world.Intercept(loaded), "loaded marker dominates repeat native interception");
             Check.Equal(before, HP(world.Main), "loaded landing cannot pay again");
         }
-        finally { saveAssembly = null; DefDatabase<ThingDef>.Clear(); foreach (var d in defs) DefDatabase<ThingDef>.Add(d); DefDatabase<PawnCapacityDef>.Clear(); foreach (var d in capacities) DefDatabase<PawnCapacityDef>.Add(d); }
+        finally { LoadedModManager.RunningModsListForReading.Remove(optionalPack); DefDatabase<ThingDef>.Clear(); foreach (var d in defs) DefDatabase<ThingDef>.Add(d); DefDatabase<PawnCapacityDef>.Clear(); foreach (var d in capacities) DefDatabase<PawnCapacityDef>.Add(d); }
     }
     static void NativeDrop()
     {
