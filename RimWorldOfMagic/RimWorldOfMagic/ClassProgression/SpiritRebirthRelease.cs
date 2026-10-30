@@ -9,6 +9,28 @@ namespace TorannMagic.ClassProgression
     internal sealed partial class SpiritRebirthRitualTransaction
     {
         private bool releasePreparing, releaseSpawnCompleted, releaseInventoryRecovery, released;
+        private Func<bool> releaseCommitGuard;
+
+        internal Thing RecoveryCircle => circle;
+        internal bool CanOrderPaidRecovery(Pawn caster, Pawn selectedOriginal, Thing selectedCircle)
+            => caster != null && ReferenceEquals(caster, creator) && ReferenceEquals(selectedOriginal, original)
+                && ReferenceEquals(selectedCircle, circle) && PaidOriginal(original) && !released
+                && !caster.Dead && !caster.Destroyed && !caster.Downed && caster.Spawned && caster.Map == map
+                && caster.IsColonistPlayerControlled && RecoveryInventoryValid() && caster.carryTracker != null
+                && (caster.carryTracker.CarriedThing == null || CreatorCarriesOriginal())
+                && circle is Building_TMMagicCircle largeCircle && SpiritRebirthStaging.MapOwns(circle, map)
+                && circle.Faction == caster.Faction && !RimWorld.ForbidUtility.IsForbidden(circle, caster)
+                && !largeCircle.IsActive && !largeCircle.IsPending && largeCircle.MageList.Count == 0
+                && SpiritRebirthState.TryGet(original, out var state) && state.Form == SpiritRebirthForm.Dormant
+                && state.Host == null && state.Stone == null
+                && (CreatorCarriesOriginal() || KnownInventoryRecovery()
+                    || (SpiritRebirthFormPolicy.HasMapCustody(original) && original.Map == map));
+
+        internal bool RecoveryDestinationValid(Pawn caster, IntVec3 cell) => DestinationValid(caster, map, cell);
+        internal bool RecoveryCarriesOriginal(Pawn caster) => ReferenceEquals(caster, creator) && CreatorCarriesOriginal();
+        internal bool RecoveryCompleted(Pawn caster)
+            => ReferenceEquals(caster, creator) && PaidOriginal(original) && released
+                && SpiritRebirthFormPolicy.IsSpawnedEthereal(original) && original.Map == map;
 
         private bool PendingOriginal(Pawn pawn)
             => version == 1 && ReferenceEquals(original, pawn) && pawn != null && !pawn.Dead
@@ -68,7 +90,8 @@ namespace TorannMagic.ClassProgression
         internal bool CanCommitRelease(Pawn pawn)
             => IsPreparing(pawn) && SpiritRebirthFormPolicy.HasMapCustody(pawn)
                 && ReferenceEquals(ClassIdentity.Component(pawn)?.SpiritRitual, this)
-                && creator != null && !creator.Dead && !creator.Destroyed && creator.Spawned && creator.Map == map;
+                && creator != null && !creator.Dead && !creator.Destroyed && creator.Spawned && creator.Map == map
+                && (releaseCommitGuard == null || releaseCommitGuard());
 
         private bool DestinationValid(Pawn caster, Map destination, IntVec3 cell)
         {
@@ -84,6 +107,12 @@ namespace TorannMagic.ClassProgression
         }
 
         internal SpiritReleaseResult TryRelease(Pawn caster, Map destination, IntVec3 cell)
+            => ReleaseCore(caster, destination, cell, null);
+
+        internal SpiritReleaseResult TryReleaseWithGuard(Pawn caster, Map destination, IntVec3 cell, Func<bool> commitGuard)
+            => commitGuard == null ? SpiritReleaseResult.Rejected : ReleaseCore(caster, destination, cell, commitGuard);
+
+        private SpiritReleaseResult ReleaseCore(Pawn caster, Map destination, IntVec3 cell, Func<bool> commitGuard)
         {
             if (caster == null || !PaidOriginal(original) || !ReferenceEquals(caster, creator)
                 || !SpiritRebirthState.TryGet(original, out var state)) return SpiritReleaseResult.Rejected;
@@ -101,6 +130,8 @@ namespace TorannMagic.ClassProgression
             var source = creator.carryTracker.GetDirectlyHeldThings();
             try
             {
+                releaseCommitGuard = commitGuard;
+                if (releaseCommitGuard != null && !releaseCommitGuard()) return SpiritReleaseResult.RecoveryRequired;
                 releasePreparing = true;
                 SpiritRebirthActionPolicy.ClearExistingJobs(original);
                 if (!SpiritRebirthAbilities.Ensure(original) || original.needs == null || original.health?.hediffSet == null)
@@ -112,7 +143,8 @@ namespace TorannMagic.ClassProgression
                 // Dormant remains visible to every callback until final commit.
                 if (!resumeSpawned)
                 {
-                    if (!CreatorCarriesOriginal() || !DestinationValid(caster, destination, cell))
+                    if (!CreatorCarriesOriginal() || !DestinationValid(caster, destination, cell)
+                        || (releaseCommitGuard != null && !releaseCommitGuard()))
                         return SpiritReleaseResult.RecoveryRequired;
                     GenSpawn.Spawn(original, cell, destination, original.Rotation, WipeMode.Vanish);
                     releaseSpawnCompleted = SpiritRebirthFormPolicy.HasMapCustody(original) && original.Map == destination;
@@ -134,7 +166,7 @@ namespace TorannMagic.ClassProgression
             finally
             {
                 try { if (!released) RestoreReleaseCustody(source); }
-                finally { inFlight.Remove(original); }
+                finally { releaseCommitGuard = null; inFlight.Remove(original); }
             }
         }
 
@@ -176,7 +208,7 @@ namespace TorannMagic.ClassProgression
             if (!PendingOriginal(original) || !ReferenceEquals(caster, creator) || released
                 || !SpiritRebirthState.TryGet(original, out var state) || state.Form != SpiritRebirthForm.Dormant
                 || caster == null || caster.Dead || !caster.Spawned || caster.Map != map
-                || !(KnownInventoryRecovery() || ((releasePreparing || releaseInventoryRecovery)
+                || !(KnownInventoryRecovery() || ((PaidOriginal(original) || releasePreparing || releaseInventoryRecovery)
                     && SpiritRebirthFormPolicy.HasMapCustody(original) && original.Map == map))
                 || creator?.carryTracker == null || creator.carryTracker.GetDirectlyHeldThings().Count != 0
                 || !RecoveryInventoryValid() || !inFlight.Add(original)) return false;

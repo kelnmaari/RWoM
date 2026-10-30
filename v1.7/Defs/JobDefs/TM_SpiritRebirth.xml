@@ -7,4 +7,12 @@
     <casualInterruptible>false</casualInterruptible>
     <carryThingAfterJob>true</carryThingAfterJob>
   </JobDef>
+  <JobDef>
+    <defName>TM_SpiritRebirthRecovery</defName>
+    <driverClass>TorannMagic.ClassProgression.JobDriver_SpiritRebirthRecovery</driverClass>
+    <reportString>completing the interrupted spirit rebirth ritual.</reportString>
+    <casualInterruptible>false</casualInterruptible>
+    <carryThingAfterJob>true</carryThingAfterJob>
+    <dropThingBeforeJob>false</dropThingBeforeJob>
+  </JobDef>
 </Defs>
