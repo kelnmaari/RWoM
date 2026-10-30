@@ -11,10 +11,17 @@ namespace TorannMagic.ClassProgression
             admitted = false;
             // Physical form deliberately includes depletion awaiting safe custody.
             // Its existing Spirit need must survive to retry; casting is stricter.
-            if (need == null || !SpiritRebirthFormPolicy.IsEthereal(pawn)) return false;
+            if (need == null || !RetainsNeeds(pawn)) return false;
             admitted = need == TorannMagicDefOf.TM_SpiritND || need == TorannMagicDefOf.TM_Mana;
             return true;
         }
+
+        // Custody changes must not discard the original's energy/upkeep records.
+        // This grants no physical form properties to either the owner or host.
+        internal static bool RetainsNeeds(Pawn pawn)
+            => SpiritRebirthFormPolicy.IsEthereal(pawn)
+                || (pawn != null && !pawn.Dead && SpiritRebirthState.TryGet(pawn, out var state)
+                    && (state.HasValidStone(pawn) || state.HasValidHost(pawn)));
 
         internal static bool TryStat(Pawn pawn, StatDef stat, out float value)
         {

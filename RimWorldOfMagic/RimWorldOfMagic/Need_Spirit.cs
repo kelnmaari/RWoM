@@ -96,6 +96,7 @@ namespace TorannMagic
         {
             get
             {
+                if (ClassProgression.SpiritRebirthHealthForm.TryCapacity(pawn, out float capacity)) return capacity;
                 float maxBase = 100f;
                 if(this.pawn.story != null && this.pawn.story.Adulthood != null && this.pawn.story.Adulthood.identifier == "tm_ancient_spirit")
                 {

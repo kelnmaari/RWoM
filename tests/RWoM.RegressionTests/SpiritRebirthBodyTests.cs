@@ -49,6 +49,20 @@ internal static class SpiritRebirthBodyTests
                 Check.Equal(0f, mana.CurLevel, "refresh does not refill Mana");
                 Check.Equal(0f, spirit.CurLevel, "refresh does not refill Spirit");
                 Check.Equal(false, f.Magic.IsMagicUser, "need overlay does not change vocation");
+                f.Hold(f.Host, f.Original);
+                Check.Equal(true, SpiritRebirthStateTests.Invoke(f.Comp.SpiritRebirth, "TryEnterHost", f.Original, f.Host), "actual host takes original");
+                f.Original.needs.AddOrRemoveNeedsAsAppropriate();
+                Check.Same(spirit, f.Original.needs.TryGetNeed(TorannMagicDefOf.TM_SpiritND), "held original retains Spirit need");
+                Check.Same(mana, f.Original.needs.TryGetNeed(TorannMagicDefOf.TM_Mana), "held original retains Mana upkeep owner");
+                var stoneDef = (ThingDef)RuntimeHelpers.GetUninitializedObject(typeof(ThingDef));
+                stoneDef.defName = "BodySoulStone"; stoneDef.thingClass = typeof(Thing_SoulStone); stoneDef.category = ThingCategory.Item; stoneDef.stackLimit = 1;
+                var stone = new Thing_SoulStone { def = stoneDef };
+                Check.Equal(true, SpiritRebirthStateTests.Invoke(stone, "TryCapture", f.Original, f.Host, false), "stone takes actual original");
+                f.Original.needs.AddOrRemoveNeedsAsAppropriate();
+                Check.Same(spirit, f.Original.needs.TryGetNeed(TorannMagicDefOf.TM_SpiritND), "stone retains Spirit need");
+                Check.Same(mana, f.Original.needs.TryGetNeed(TorannMagicDefOf.TM_Mana), "stone retains Mana upkeep owner");
+                Check.Equal(0f, spirit.CurLevel, "custody changes never refill Spirit");
+                Check.Equal(0f, mana.CurLevel, "custody changes never refill Mana");
                 f.Host.needs.AddOrRemoveNeedsAsAppropriate();
                 Check.NotNull(f.Host.needs.TryGetNeed(rest), "host retains physical rest");
             }

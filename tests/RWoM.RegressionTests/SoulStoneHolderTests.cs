@@ -138,8 +138,15 @@ internal static class SoulStoneHolderTests
         using var f = new SpiritRebirthStateTests.Fixture(r);
         var defs = DefDatabase<ThingDef>.AllDefsListForReading.ToArray();
         var capacities = DefDatabase<PawnCapacityDef>.AllDefsListForReading.ToArray();
+        var needDefs = DefDatabase<NeedDef>.AllDefsListForReading.ToArray();
+        var priorMana = TorannMagicDefOf.TM_Mana; var priorSpirit = TorannMagicDefOf.TM_SpiritND;
+        var culture = System.Globalization.CultureInfo.CurrentCulture;
+        using var patches = new FleshStatTests.ProductionPatches();
+        patches.Add(typeof(TorannMagicMod.Pawn_NeedsTracker_Patch));
         try
         {
+            System.Globalization.CultureInfo.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
+            Set(Current.Game, "tickManager", new TickManager());
             // Minimal native Pawn graph, as in CombatWarpod.FullHolderScribe;
             // serialize the actual Pawn and its actual progression comp, no envelope.
             var pawn = f.Original;
@@ -147,7 +154,18 @@ internal static class SoulStoneHolderTests
             pawn.def.race = new RaceProperties { body = new BodyDef { corePart = new BodyPartRecord { def = new BodyPartDef() } } };
             pawn.def.comps = new List<CompProperties> { new CompProperties { compClass = typeof(CompClassProgression) } };
             Set(pawn, "comps", new List<ThingComp> { f.Comp });
-            pawn.story = null; pawn.needs = null; pawn.Name = null;
+            pawn.story = null; pawn.Name = null;
+            pawn.ageTracker = new Pawn_AgeTracker(pawn);
+            Set(pawn.ageTracker, "ageBiologicalTicksInt", 25L * 3600000L);
+            pawn.def.race.lifeStageAges = [new LifeStageAge { minAge = 13, def = new LifeStageDef { developmentalStage = DevelopmentalStage.Adult } }];
+            Set(pawn.ageTracker, "cachedLifeStageIndex", 0);
+            DefDatabase<NeedDef>.Clear();
+            TorannMagicDefOf.TM_Mana = new NeedDef { defName = "StoneScribeMana", needClass = typeof(Need_Mana), onlyIfCausedByHediff = true };
+            TorannMagicDefOf.TM_SpiritND = new NeedDef { defName = "StoneScribeSpirit", needClass = typeof(Need_Spirit), onlyIfCausedByHediff = true };
+            DefDatabase<NeedDef>.Add(TorannMagicDefOf.TM_Mana); DefDatabase<NeedDef>.Add(TorannMagicDefOf.TM_SpiritND);
+            pawn.needs.AllNeeds.Clear();
+            pawn.needs.AllNeeds.Add(new Need_Spirit(pawn) { def = TorannMagicDefOf.TM_SpiritND, CurLevel = 33f });
+            pawn.needs.AllNeeds.Add(new Need_Mana(pawn) { def = TorannMagicDefOf.TM_Mana, CurLevel = .27f });
             f.Comp.BeginNewProgression(Vocation.WarriorMage);
             f.Comp.State.TryAddFoundation("rwom.necromancer", DisciplineDomain.Magic);
             f.Comp.DelayNextTomeQuest(1234);
@@ -173,6 +191,9 @@ internal static class SoulStoneHolderTests
             Check.Equal(true, SpiritRebirthState.TryGet(soul, out var restored), "original reference resolves to loaded Pawn");
             Check.Same(loaded, restored.Stone, "state reference resolves to actual loaded stone");
             Check.Equal(true, restored.HasValidStone(soul), "loaded state and holder reciprocal");
+            soul.needs.AddOrRemoveNeedsAsAppropriate();
+            Check.Equal(33f, Check.NotNull(soul.needs.TryGetNeed(TorannMagicDefOf.TM_SpiritND), "loaded original Spirit need").CurLevel, "saved Spirit energy survives load and refresh");
+            Check.Equal(.27f, Check.NotNull(soul.needs.TryGetNeed(TorannMagicDefOf.TM_Mana), "loaded original Mana need").CurLevel, "saved upkeep mana survives load and refresh");
             Check.Equal(true, restored.RecoveryRequired, "recovery debt survives native save");
             Check.Equal(0, restored.RecoveryTicks, "stone never advances recovery");
             var comp = soul.GetComp<CompClassProgression>();
@@ -185,6 +206,9 @@ internal static class SoulStoneHolderTests
         {
             DefDatabase<ThingDef>.Clear(); foreach (var def in defs) DefDatabase<ThingDef>.Add(def);
             DefDatabase<PawnCapacityDef>.Clear(); foreach (var def in capacities) DefDatabase<PawnCapacityDef>.Add(def);
+            TorannMagicDefOf.TM_Mana = priorMana; TorannMagicDefOf.TM_SpiritND = priorSpirit;
+            DefDatabase<NeedDef>.Clear(); foreach (var def in needDefs) DefDatabase<NeedDef>.Add(def);
+            System.Globalization.CultureInfo.CurrentCulture = culture;
         }
     }
 
