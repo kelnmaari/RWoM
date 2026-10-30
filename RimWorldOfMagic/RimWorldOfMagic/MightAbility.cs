@@ -501,6 +501,11 @@ namespace TorannMagic
 
         public override bool CanCastPowerCheck(AbilityContext context, out string reason)
         {
+            if (!ClassProgression.SpiritRebirthCasting.Allows(Pawn, Def))
+            {
+                reason = "TM_SpiritRebirthCastUnavailable".Translate();
+                return false;
+            }
             bool flag = base.CanCastPowerCheck(context, out reason);
             bool result;
             if (flag)

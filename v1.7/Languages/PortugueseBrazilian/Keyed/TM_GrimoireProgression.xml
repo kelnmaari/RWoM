@@ -223,4 +223,5 @@
   <TM_ProgressionEmpathAscensionRequirements>Requer um empata de nível mestre, um círculo mágico grande e uma Pedra da perspicácia mágica. O ritual leva uma hora de jogo; somente a conclusão consome a pedra e desbloqueia Simbiose. Não cria um hospedeiro nem um vínculo de simbiose.</TM_ProgressionEmpathAscensionRequirements>
   <TM_ProgressionEmpathAttunementAction>Sintonia do empata: 100 de prata, 1 hora (prova pacífica)</TM_ProgressionEmpathAttunementAction>
   <TM_ProgressionEmpathAttunementNeedsOffering>Requer uma pilha acessível com pelo menos 100 de prata, ou que o personagem já carregue 100 de prata.</TM_ProgressionEmpathAttunementNeedsOffering>
+  <TM_SpiritRebirthCastUnavailable>Esta habilidade não está disponível na forma atual do espírito.</TM_SpiritRebirthCastUnavailable>
 </LanguageData>

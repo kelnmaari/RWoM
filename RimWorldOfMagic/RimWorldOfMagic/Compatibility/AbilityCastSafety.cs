@@ -13,7 +13,8 @@ namespace TorannMagic.Compatibility
         {
             if (!(verb is Verb_UseAbility abilityVerb) || !(abilityVerb.Ability?.Def is TMAbilityDef)) return true;
             // Caravans and other off-map holders cannot execute map abilities.
-            return verb.caster != null && verb.caster.Spawned && verb.caster.Map != null;
+            return verb.caster != null && verb.caster.Spawned && verb.caster.Map != null
+                && ClassProgression.SpiritRebirthCasting.Allows(verb.CasterPawn, abilityVerb.Ability.Def);
         }
 
         public static bool AllowsSelfTarget(Thing caster, TMAbilityDef ability, LocalTargetInfo target)

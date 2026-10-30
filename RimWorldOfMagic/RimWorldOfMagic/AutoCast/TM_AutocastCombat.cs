@@ -90,6 +90,7 @@ namespace TorannMagic.AutoCast
 
         public static bool AllowsAutomaticCast(Pawn caster, TMAbilityDef ability, LocalTargetInfo target)
         {
+            if (!ClassProgression.SpiritRebirthCasting.Allows(caster, ability)) return false;
             if (RequiresCombat(caster) && !TryGetCombatOpponent(caster, out _)) return false;
             return UsefulTarget(caster, ability, target);
         }

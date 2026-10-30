@@ -223,4 +223,5 @@
   <TM_ProgressionEmpathAscensionRequirements>Требуются эмпат ступени мастера, большой магический круг и один камень магической проницательности. Ритуал длится один игровой час; камень расходуется и симбиоз открывается только при завершении. Ритуал не создаёт носителя или связь симбиоза.</TM_ProgressionEmpathAscensionRequirements>
   <TM_ProgressionEmpathAttunementAction>Настройка эмпата: 100 серебра, 1 час (мирное испытание)</TM_ProgressionEmpathAttunementAction>
   <TM_ProgressionEmpathAttunementNeedsOffering>Требуется доступная стопка не менее чем из 100 серебра либо 100 серебра при персонаже.</TM_ProgressionEmpathAttunementNeedsOffering>
+  <TM_SpiritRebirthCastUnavailable>Эта способность недоступна в текущей форме Духа.</TM_SpiritRebirthCastUnavailable>
 </LanguageData>

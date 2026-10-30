@@ -223,4 +223,5 @@
   <TM_ProgressionEmpathAscensionRequirements>Потрібні емпат ступеня майстра, велике магічне коло й один камінь магічної проникливості. Ритуал триває одну ігрову годину; камінь витрачається, а симбіоз відкривається лише після завершення. Ритуал не створює носія чи зв&apos;язку симбіозу.</TM_ProgressionEmpathAscensionRequirements>
   <TM_ProgressionEmpathAttunementAction>Налаштування емпата: 100 срібла, 1 година (мирне випробування)</TM_ProgressionEmpathAttunementAction>
   <TM_ProgressionEmpathAttunementNeedsOffering>Потрібна доступна купка щонайменше зі 100 срібла або 100 срібла при персонажі.</TM_ProgressionEmpathAttunementNeedsOffering>
+  <TM_SpiritRebirthCastUnavailable>Ця здібність недоступна в поточній формі Духа.</TM_SpiritRebirthCastUnavailable>
 </LanguageData>

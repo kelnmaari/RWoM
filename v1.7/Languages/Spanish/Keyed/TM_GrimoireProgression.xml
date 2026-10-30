@@ -223,4 +223,5 @@
   <TM_ProgressionEmpathAscensionRequirements>Requiere un émpata de rango maestro, un círculo mágico grande y una Gema de Perspicacia Arcana. El ritual dura una hora de juego; solo al completarlo se consume la gema y se desbloquea Simbiosis. No crea un huésped ni un vínculo de simbiosis.</TM_ProgressionEmpathAscensionRequirements>
   <TM_ProgressionEmpathAttunementAction>Sintonización del émpata: 100 de plata, 1 hora (prueba pacífica)</TM_ProgressionEmpathAttunementAction>
   <TM_ProgressionEmpathAttunementNeedsOffering>Requiere una pila accesible de al menos 100 de plata, o que el personaje ya lleve 100 de plata.</TM_ProgressionEmpathAttunementNeedsOffering>
+  <TM_SpiritRebirthCastUnavailable>Esta habilidad no está disponible en la forma actual del espíritu.</TM_SpiritRebirthCastUnavailable>
 </LanguageData>

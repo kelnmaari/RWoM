@@ -410,6 +410,11 @@ namespace TorannMagic
 
         public override bool CanCastPowerCheck(AbilityContext context, out string reason)
         {
+            if (!ClassProgression.SpiritRebirthCasting.Allows(Pawn, Def))
+            {
+                reason = "TM_SpiritRebirthCastUnavailable".Translate();
+                return false;
+            }
             // Independent legacy NPC profiles also enter here, even when their
             // subsequent UseAbility call uses Player context. Manual checks stay unchanged.
             if (!TMDefs.TM_AutocastDefaults.AllowsContext(base.Def as TMAbilityDef, context))

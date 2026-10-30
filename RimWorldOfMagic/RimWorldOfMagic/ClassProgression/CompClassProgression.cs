@@ -8,6 +8,19 @@ namespace TorannMagic.ClassProgression
     public sealed class CompClassProgression : ThingComp
     {
         private ClassProgressionState state;
+        private SpiritRebirthState spiritRebirth;
+        public SpiritRebirthState SpiritRebirth => spiritRebirth;
+
+        // Reserved for a future explicit corpse conversion transaction. No spawn,
+        // loading, trait, or legacy migration path calls this entry point.
+        internal bool BeginSpiritRebirth()
+        {
+            var pawn = parent as Pawn;
+            if (spiritRebirth != null || pawn == null || pawn.Dead || pawn.Destroyed
+                || !ReferenceEquals(ClassIdentity.Component(pawn), this)) return false;
+            spiritRebirth = new SpiritRebirthState(pawn);
+            return true;
+        }
         private int tomeQuestAvailableAtTick;
         public int TomeQuestAvailableAtTick => tomeQuestAvailableAtTick;
         public void DelayNextTomeQuest(int now)
@@ -98,8 +111,9 @@ namespace TorannMagic.ClassProgression
         public override void PostExposeData()
         {
             base.PostExposeData();
-            if (Scribe.mode == LoadSaveMode.Saving && state == null) return;
+            if (Scribe.mode == LoadSaveMode.Saving && state == null && spiritRebirth == null) return;
             Scribe_Deep.Look(ref state, "TM_classProgression");
+            Scribe_Deep.Look(ref spiritRebirth, "TM_spiritRebirth");
             Scribe_Values.Look(ref tomeQuestAvailableAtTick, "TM_tomeQuestAvailableAtTick", 0);
         }
     }
