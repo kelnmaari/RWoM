@@ -13,7 +13,8 @@ namespace TorannMagic.ClassProgression
         static bool Caster(Pawn p) => p != null && !p.Dead && p.Spawned && p.Faction != null && p.story?.traits?.HasTrait(TorannMagicDefOf.Faceless) != true;
         static DisciplineProgress Path(Pawn p, bool aura)
         {
-            if (!Caster(p) || !ClassIdentity.TryGetState(p, out var state) || (state.Vocation & Vocation.Mage) == 0) return null;
+            if (!Caster(p) || !ClassIdentity.TryGetState(p, out var state) || (state.Vocation & Vocation.Mage) == 0
+                || ClassIdentity.Profile("rwom.empath")?.domain != DisciplineDomain.Magic) return null;
             var path = state.Find("rwom.empath");
             return path?.Domain == DisciplineDomain.Magic && path.Stage == (aura ? InitiationStage.Adept : InitiationStage.Foundation)
                 && !path.CompletedTrials.Contains(aura ? MasteryTrialId : FoundationTrialId) && Owner(p, aura) != null ? path : null;

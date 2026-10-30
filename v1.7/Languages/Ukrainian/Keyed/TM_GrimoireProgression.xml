@@ -214,4 +214,13 @@
   <TM_ProgressionGolemancerAttunementAction>Налаштування шляху «големант»: 100 срібла, 1 година (мирне випробування)</TM_ProgressionGolemancerAttunementAction>
   <TM_ProgressionGolemancerAttunementHint>Мирна альтернатива: вправа налаштування на великому магічному колі за 100 срібла й одну ігрову годину. Вона завершує поточне випробування, але не замінює книгу й не підвищує ступінь.</TM_ProgressionGolemancerAttunementHint>
   <TM_ProgressionGolemancerAttunementNeedsOffering>Потрібна доступна стопка щонайменше 100 срібла або вже перенесені 100 срібла.</TM_ProgressionGolemancerAttunementNeedsOffering>
+  <TM_ProgressionEmpath>емпат</TM_ProgressionEmpath>
+  <TM_ProgressionEmpathFoundationTrial>Застосуйте назавжди вивчену здатність «Вбивця розуму» й справді знизьте настрій ворожої цілі.</TM_ProgressionEmpathFoundationTrial>
+  <TM_ProgressionEmpathMasteryTrial>Власною пригнічувальною аурою вперше надайте емоційний захист іншому вільному живому союзнику. Поновлення наявного захисту не зараховується.</TM_ProgressionEmpathMasteryTrial>
+  <TM_ProgressionEmpathAttunementHint>Мирна альтернатива: завершіть вправу налаштування біля великого магічного кола за 100 срібла й одну ігрову годину. Вона завершує поточне випробування, але не замінює книгу й не підвищує ступінь.</TM_ProgressionEmpathAttunementHint>
+  <TM_ProgressionEmpathAscensionAction>Вознесіння емпата</TM_ProgressionEmpathAscensionAction>
+  <TM_ProgressionEmpathAscensionNeedsOffering>Камінь магічної проникливості має бути доступним або вже перебувати при персонажі.</TM_ProgressionEmpathAscensionNeedsOffering>
+  <TM_ProgressionEmpathAscensionRequirements>Потрібні емпат ступеня майстра, велике магічне коло й один камінь магічної проникливості. Ритуал триває одну ігрову годину; камінь витрачається, а симбіоз відкривається лише після завершення. Ритуал не створює носія чи зв&apos;язку симбіозу.</TM_ProgressionEmpathAscensionRequirements>
+  <TM_ProgressionEmpathAttunementAction>Налаштування емпата: 100 срібла, 1 година (мирне випробування)</TM_ProgressionEmpathAttunementAction>
+  <TM_ProgressionEmpathAttunementNeedsOffering>Потрібна доступна купка щонайменше зі 100 срібла або 100 срібла при персонажі.</TM_ProgressionEmpathAttunementNeedsOffering>
 </LanguageData>

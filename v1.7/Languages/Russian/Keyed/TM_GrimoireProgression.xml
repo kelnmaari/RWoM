@@ -214,4 +214,13 @@
   <TM_ProgressionGolemancerAttunementAction>Настройка пути «големант»: 100 серебра, 1 час (мирное испытание)</TM_ProgressionGolemancerAttunementAction>
   <TM_ProgressionGolemancerAttunementHint>Мирная альтернатива: упражнение настройки на большом магическом круге за 100 серебра и один игровой час. Оно завершает текущее испытание, но не заменяет книгу и не повышает ступень.</TM_ProgressionGolemancerAttunementHint>
   <TM_ProgressionGolemancerAttunementNeedsOffering>Нужна доступная стопка не менее 100 серебра или уже переносимые 100 серебра.</TM_ProgressionGolemancerAttunementNeedsOffering>
+  <TM_ProgressionEmpath>эмпат</TM_ProgressionEmpath>
+  <TM_ProgressionEmpathFoundationTrial>Примените постоянно изученную способность «Убийца разума» и действительно снизьте настроение враждебной цели.</TM_ProgressionEmpathFoundationTrial>
+  <TM_ProgressionEmpathMasteryTrial>Своей подавляющей аурой впервые наложите эмоциональную защиту на другого свободного живого союзника. Обновление уже действующей защиты не засчитывается.</TM_ProgressionEmpathMasteryTrial>
+  <TM_ProgressionEmpathAttunementHint>Мирная альтернатива: завершите упражнение настройки у большого магического круга за 100 серебра и один игровой час. Оно завершает текущее испытание, но не заменяет книгу и не повышает ступень.</TM_ProgressionEmpathAttunementHint>
+  <TM_ProgressionEmpathAscensionAction>Вознесение эмпата</TM_ProgressionEmpathAscensionAction>
+  <TM_ProgressionEmpathAscensionNeedsOffering>Камень магической проницательности должен быть доступен или уже находиться при персонаже.</TM_ProgressionEmpathAscensionNeedsOffering>
+  <TM_ProgressionEmpathAscensionRequirements>Требуются эмпат ступени мастера, большой магический круг и один камень магической проницательности. Ритуал длится один игровой час; камень расходуется и симбиоз открывается только при завершении. Ритуал не создаёт носителя или связь симбиоза.</TM_ProgressionEmpathAscensionRequirements>
+  <TM_ProgressionEmpathAttunementAction>Настройка эмпата: 100 серебра, 1 час (мирное испытание)</TM_ProgressionEmpathAttunementAction>
+  <TM_ProgressionEmpathAttunementNeedsOffering>Требуется доступная стопка не менее чем из 100 серебра либо 100 серебра при персонаже.</TM_ProgressionEmpathAttunementNeedsOffering>
 </LanguageData>

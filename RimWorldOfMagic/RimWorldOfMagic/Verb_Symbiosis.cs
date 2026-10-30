@@ -48,7 +48,9 @@ namespace TorannMagic
                 pwrVal = TM_Calc.GetSkillPowerLevel(caster, this.Ability.Def as TMAbilityDef);                
             }
 
-            if(hitPawn != null && hitPawn.RaceProps != null && hitPawn.RaceProps.Humanlike && !TM_Calc.IsUndead(hitPawn) && hitPawn.Faction == caster.Faction)
+            if(hitPawn != null && hitPawn != caster && !hitPawn.Dead && !caster.Dead
+                && !caster.health.hediffSet.HasHediff(TorannMagicDefOf.TM_OutOfBodyHD)
+                && hitPawn.RaceProps != null && hitPawn.RaceProps.Humanlike && !TM_Calc.IsUndead(hitPawn) && hitPawn.Faction == caster.Faction)
             {
                 if (!hitPawn.health.hediffSet.HasHediff(TorannMagicDefOf.TM_SymbiosisHD))
                 {
@@ -70,6 +72,7 @@ namespace TorannMagic
                         if (hd_sc != null)
                         {
                             hd_sc.symbiosisHost = hitPawn;
+                            flag = hdc?.TryGetComp<HediffComp_SymbiosisHost>()?.symbiote == caster;
                         }
                     }
                 }

@@ -147,7 +147,12 @@ internal static class ClassAscensionJobTests
                 Check.Equal(true, otherArcanistLearned.SequenceEqual(otherArcanistPowers.Select(power => power.learned)), "ascension changes no other Arcanist spell ownership");
                 Check.Equal(true, path.CompletedTrials.Contains("rwom.arcanist.ascension"), "ascension records exact Arcanist trial");
             }
-            if (empath) Check.Equal(false, p.magic.spell_Resurrection, "Empath does not grant Resurrection");
+            if (empath)
+            {
+                Check.Equal(false, p.magic.spell_Resurrection, "Empath does not grant Resurrection");
+                Check.Equal(false, p.pawn.health.hediffSet.hediffs.Any(h => h.def == TorannMagicDefOf.TM_OutOfBodyHD || h.def == TorannMagicDefOf.TM_SymbiosisHD), "ascension teaches Symbiosis without casting it");
+                Check.Equal(0, p.pawn.story.traits.allTraits.Count, "ritual offering does not invoke gem trait-granting effect");
+            }
             if (golemancer) Check.Equal(false, p.magic.spell_Resurrection, "other ultimate unchanged");
             if (shaman) Check.Equal(false, p.magic.spell_Resurrection, "other ultimate unchanged");
             if (brightmage) Check.Equal(false, p.magic.spell_Resurrection, "other ultimate unchanged");

@@ -214,4 +214,13 @@
   <TM_ProgressionGolemancerAttunementAction>sintonización de golemante: 100 de plata, 1 hora (prueba pacífica)</TM_ProgressionGolemancerAttunementAction>
   <TM_ProgressionGolemancerAttunementHint>Alternativa pacífica: realiza un ejercicio de sintonización en un círculo mágico grande por 100 de plata y una hora de juego. Completa la prueba actual, pero no sustituye el libro ni avanza la etapa.</TM_ProgressionGolemancerAttunementHint>
   <TM_ProgressionGolemancerAttunementNeedsOffering>Requiere una pila accesible de al menos 100 de plata o 100 de plata ya transportadas.</TM_ProgressionGolemancerAttunementNeedsOffering>
+  <TM_ProgressionEmpath>émpata</TM_ProgressionEmpath>
+  <TM_ProgressionEmpathFoundationTrial>Usa tu habilidad Asesino mental aprendida permanentemente para reducir de verdad el ánimo de un objetivo hostil.</TM_ProgressionEmpathFoundationTrial>
+  <TM_ProgressionEmpathMasteryTrial>Usa tu propia Aura supresora para otorgar una nueva protección emocional a otro aliado vivo y libre. Renovar una protección existente no cuenta.</TM_ProgressionEmpathMasteryTrial>
+  <TM_ProgressionEmpathAttunementHint>Alternativa pacífica: completa un ejercicio de sintonización en un círculo mágico grande por 100 de plata y una hora de juego. Completa la prueba actual, pero no sustituye el libro ni permite avanzar de etapa.</TM_ProgressionEmpathAttunementHint>
+  <TM_ProgressionEmpathAscensionAction>Ascender como émpata</TM_ProgressionEmpathAscensionAction>
+  <TM_ProgressionEmpathAscensionNeedsOffering>Debe haber una Gema de Perspicacia Arcana accesible o ya en posesión del personaje.</TM_ProgressionEmpathAscensionNeedsOffering>
+  <TM_ProgressionEmpathAscensionRequirements>Requiere un émpata de rango maestro, un círculo mágico grande y una Gema de Perspicacia Arcana. El ritual dura una hora de juego; solo al completarlo se consume la gema y se desbloquea Simbiosis. No crea un huésped ni un vínculo de simbiosis.</TM_ProgressionEmpathAscensionRequirements>
+  <TM_ProgressionEmpathAttunementAction>Sintonización del émpata: 100 de plata, 1 hora (prueba pacífica)</TM_ProgressionEmpathAttunementAction>
+  <TM_ProgressionEmpathAttunementNeedsOffering>Requiere una pila accesible de al menos 100 de plata, o que el personaje ya lleve 100 de plata.</TM_ProgressionEmpathAttunementNeedsOffering>
 </LanguageData>

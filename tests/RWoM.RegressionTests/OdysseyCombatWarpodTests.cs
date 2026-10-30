@@ -20,6 +20,7 @@ internal static class OdysseyCombatWarpodTests
         yield return new("Odyssey.CombatWarpod.PayloadOwnershipRetryAndDiscovery", f => Run(() => Ownership()));
         yield return new("Odyssey.CombatWarpod.FrozenBoundaryMovesAndRotates", f => Run(() => Moves()));
         yield return new("Odyssey.CombatWarpod.FullHolderScribe", f => Run(() => Save(f)));
+        yield return new("Odyssey.CombatWarpod.FullHolderScribeAfterMissingTypeLookup", f => Run(() => SaveAfterMissingTypeLookup(f)));
         yield return new("Odyssey.CombatWarpod.NativeItemPlacement", f => Run(() => NativeDrop()));
     }
     static Type T(string name) => typeof(MagicData).Assembly.GetType("TorannMagic.Odyssey." + name)!;
@@ -206,6 +207,26 @@ internal static class OdysseyCombatWarpodTests
         var direction = (Vector3)typeof(Projectile).GetField("destination", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(pod)! - (Vector3)typeof(Projectile).GetField("origin", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(pod)!;
         Check.Equal(true, direction.sqrMagnitude > 0f, "landing retains nonzero rendering direction");
     }
+    sealed class TypeLookupCache : IDisposable
+    {
+        readonly FieldInfo field = typeof(GenTypes).GetField("typeCache", BindingFlags.Static | BindingFlags.NonPublic)!;
+        readonly object previous;
+        public TypeLookupCache()
+        {
+            previous = field.GetValue(null)!;
+            field.SetValue(null, Activator.CreateInstance(field.FieldType));
+        }
+        public void Dispose() => field.SetValue(null, previous);
+    }
+    static void SaveAfterMissingTypeLookup(RuntimeFixture fixture)
+    {
+        using var cache = new TypeLookupCache();
+        Check.Equal<Type?>(null, GenTypes.GetTypeInAnyAssembly("VanillaGravshipExpanded2.Projectile_Warpod"),
+            "optional assembly is not registered before the save fixture");
+        Save(fixture);
+        Check.Equal<Type?>(null, GenTypes.GetTypeInAnyAssembly("VanillaGravshipExpanded2.Projectile_Warpod"),
+            "save fixture restores the caller's missing-type cache");
+    }
     static void Save(RuntimeFixture fixture)
     {
         using var world = new World(true); var pod = world.Pod(); var item = Item(); var pawn = Passenger(); Owner(pod).TryAdd(item); Owner(pod).TryAdd(pawn);
@@ -222,6 +243,11 @@ internal static class OdysseyCombatWarpodTests
             Set(Current.Game, "uniqueIDsManager", new UniqueIDsManager());
             saveAssembly = world.Vge2;
             world.Patches.Apply(typeof(GenTypes).GetProperty("AllActiveAssemblies", BindingFlags.Static | BindingFlags.NonPublic)!.GetMethod!, typeof(OdysseyCombatWarpodTests).GetMethod(nameof(SaveAssemblies), BindingFlags.Static | BindingFlags.NonPublic)!, true);
+            // GenTypes caches failed lookups even across ClearCache(). Registering the optional
+            // fixture assembly therefore needs its own name cache, restored when this scope ends.
+            using var typeLookupCache = new TypeLookupCache();
+            Check.Same(pod.GetType(), GenTypes.GetTypeInAnyAssembly(pod.GetType().FullName!),
+                "native Scribe type lookup sees the registered optional assembly");
             var path = Path.Combine(fixture.WorkingDirectory, "full-warpod.xml");
             try { Scribe.saver.InitSaving(path, "regression"); Scribe_Deep.Look(ref pod, "pod"); Scribe.saver.FinalizeSaving(); } finally { Scribe.ForceStop(); }
             Projectile loaded = null!;

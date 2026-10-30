@@ -214,4 +214,13 @@
   <TM_ProgressionGolemancerAttunementAction>golemancer attunement: 100 silver, 1 hour (peaceful trial)</TM_ProgressionGolemancerAttunementAction>
   <TM_ProgressionGolemancerAttunementHint>Peaceful alternative: at a large magic circle, complete an attunement exercise for 100 silver and one game hour. It completes the current trial, not the book or stage.</TM_ProgressionGolemancerAttunementHint>
   <TM_ProgressionGolemancerAttunementNeedsOffering>Requires a reachable stack of at least 100 silver, or 100 silver already carried.</TM_ProgressionGolemancerAttunementNeedsOffering>
+  <TM_ProgressionEmpath>empath</TM_ProgressionEmpath>
+  <TM_ProgressionEmpathFoundationTrial>Use your permanently learned Mind Killer to actually drain a hostile target&apos;s mood.</TM_ProgressionEmpathFoundationTrial>
+  <TM_ProgressionEmpathMasteryTrial>Use your own Suppressive Aura to grant new emotional protection to another free living ally. Refreshing existing protection does not count.</TM_ProgressionEmpathMasteryTrial>
+  <TM_ProgressionEmpathAttunementHint>Peaceful alternative: at a large magic circle, complete an attunement exercise for 100 silver and one game hour. It completes the current trial, not the book or stage.</TM_ProgressionEmpathAttunementHint>
+  <TM_ProgressionEmpathAscensionAction>Ascend as empath</TM_ProgressionEmpathAscensionAction>
+  <TM_ProgressionEmpathAscensionNeedsOffering>A Gem of Arcane Insight must be reachable or already carried.</TM_ProgressionEmpathAscensionNeedsOffering>
+  <TM_ProgressionEmpathAscensionRequirements>Requires a Master empath, a large magic circle and one Gem of Arcane Insight. The ritual takes one game hour; only completion consumes the gem and unlocks Symbiosis. It does not create a host or a Symbiosis link.</TM_ProgressionEmpathAscensionRequirements>
+  <TM_ProgressionEmpathAttunementAction>empath attunement: 100 silver, 1 hour (peaceful trial)</TM_ProgressionEmpathAttunementAction>
+  <TM_ProgressionEmpathAttunementNeedsOffering>Requires a reachable stack of at least 100 silver, or 100 silver already carried.</TM_ProgressionEmpathAttunementNeedsOffering>
 </LanguageData>

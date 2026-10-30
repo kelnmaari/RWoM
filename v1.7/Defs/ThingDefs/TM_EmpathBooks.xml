@@ -127,7 +127,7 @@
         <useLabel>Read {0_label}</useLabel>
       </li>
       <li Class="CompProperties_UseEffect">
-        <compClass>TorannMagic.ClassProgression.CompUseEffect_EmpathBook</compClass>
+        <compClass>TorannMagic.ClassProgression.CompUseEffect_MasterTome</compClass>
       </li>
     </comps>
     <graphicData>

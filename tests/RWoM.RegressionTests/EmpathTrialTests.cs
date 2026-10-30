@@ -16,6 +16,7 @@ internal static class EmpathTrialTests
         yield return new("EmpathTrial.AuraActivationAndNewSuppression", Suppression);
         yield return new("EmpathTrial.NativeToggleAndAuraPulse", NativeAura);
         yield return new("EmpathTrial.AuraNativeScribeSource", Save);
+        yield return new("EmpathTrial.MissingOrWrongProfileFailsClosed", ProfileBoundary);
     }
     sealed class Fixture : IDisposable
     {
@@ -90,6 +91,27 @@ internal static class EmpathTrialTests
         var s = EmpathTrials.CaptureMood(a, w.Target); w.Target.needs.mood.CurLevel -= .3f; w.Owner(false).learned = false; Check.Equal(false, EmpathTrials.CompleteMood(s), "owner drift rejected"); w.Owner(false).learned = true;
         s = EmpathTrials.CaptureMood(a, w.Target); w.Target.needs.mood.CurLevel -= .3f; Check.Equal(true, EmpathTrials.CompleteMood(s), "actual hostile mood decrease qualifies"); Check.Equal(false, EmpathTrials.CompleteMood(s), "one shot"); Check.Equal(InitiationStage.Foundation, w.Path.Stage, "ritual required");
     }
+    static void ProfileBoundary(RuntimeFixture f)
+    {
+        foreach (bool aura in new[] { false, true })
+        foreach (bool missing in new[] { false, true })
+        {
+            using var w = new Fixture(f); using var hooks = new Hooks();
+            var profile = ClassIdentity.Profile("rwom.empath");
+            var ability = w.Ability(aura);
+            if (aura) w.Adept();
+            var source = aura ? w.Aura() : null;
+            var mood = aura ? null : EmpathTrials.CaptureMood(ability, w.Target);
+            var suppression = aura ? EmpathTrials.CaptureSuppression(source!, w.Target) : null;
+            Check.Equal(true, aura ? suppression != null : mood != null, "valid profile captures trial");
+            if (missing) DefDatabase<ClassDisciplineDef>.Clear(); else profile.domain = DisciplineDomain.Might;
+            Check.Equal(true, aura ? EmpathTrials.CaptureSuppression(source!, w.Target) == null : EmpathTrials.CaptureMood(ability, w.Target) == null, "invalid profile cannot capture trial");
+            if (aura) HealthUtility.AdjustSeverity(w.Target, TorannMagicDefOf.TM_EmotionSuppressionHD, .5f);
+            else w.Target.needs.mood.CurLevel -= .3f;
+            Check.Equal(false, aura ? EmpathTrials.CompleteSuppression(suppression) : EmpathTrials.CompleteMood(mood), "profile loss after capture cannot award trial");
+            Check.Equal(false, w.Path.CompletedTrials.Contains(aura ? EmpathTrials.MasteryTrialId : EmpathTrials.FoundationTrialId), "invalid profile preserves trial state");
+        }
+    }
     static void Suppression(RuntimeFixture f)
     {
         using var w = new Fixture(f); using var hooks = new Hooks(); var source = w.Aura(false); w.Adept();
@@ -118,19 +140,21 @@ internal static class EmpathTrialTests
         Check.Equal(true, w.Target.health.hediffSet.HasHediff(TorannMagicDefOf.TM_EmotionSuppressionHD), "actual pulse created suppression"); Check.Equal(true, w.Path.CompletedTrials.Contains(EmpathTrials.MasteryTrialId), "native pulse qualifies");
         Cast(new Verb_ToggleHediff { Ability = a }, w.Caster); Check.Equal(false, w.Caster.health.hediffSet.HasHediff(TorannMagicDefOf.TM_SuppressiveAuraHD), "native toggle off preserved");
     }
-    public sealed class Envelope : IExposable
+    public sealed class Envelope(Pawn pawn) : IExposable
     {
-        public Hediff aura = null!;
-        public void ExposeData() => Scribe_Deep.Look(ref aura, "aura");
+        public HediffSet hediffs = null!;
+        // Native HediffSet restores each child's pawn during cross-reference resolution.
+        public void ExposeData() => Scribe_Deep.Look(ref hediffs, "hediffs", pawn);
     }
     static void Save(RuntimeFixture f)
     {
-        using var w = new Fixture(f); using var hooks = new Hooks(); var source = w.Aura(); var data = new Envelope { aura = source.parent }; string file = Path.Combine(f.WorkingDirectory, "empath-aura.xml");
+        using var w = new Fixture(f); using var hooks = new Hooks(); var source = w.Aura(); var data = new Envelope(w.Caster) { hediffs = w.Caster.health.hediffSet }; string file = Path.Combine(f.WorkingDirectory, "empath-aura.xml");
         try { Scribe.saver.InitSaving(file, "trial"); Scribe_Deep.Look(ref data, "data"); Scribe.saver.FinalizeSaving(); } finally { Scribe.ForceStop(); }
         Envelope loaded = null!;
-        try { Scribe.loader.InitLoading(file); Scribe_Deep.Look(ref loaded, "data"); var directory = (LoadedObjectDirectory)typeof(CrossRefHandler).GetField("loadedObjectDirectory", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(Scribe.loader.crossRefs)!; directory.RegisterLoaded(w.Caster); Scribe.loader.FinalizeLoading(); } finally { Scribe.ForceStop(); }
-        var saved = loaded.aura.TryGetComp<HediffComp_SuppressiveAura>(); Check.Same(w.Caster, saved.trialCaster, "native source caster reference resolves"); Check.Same(w.Caster, loaded.aura.pawn, "native parent pawn reference resolves"); Check.Equal(true, saved.ownTrialActivation, "activation marker persists");
-        w.Caster.health.hediffSet.hediffs.Clear(); w.Caster.health.hediffSet.hediffs.Add(loaded.aura); w.Adept(); nearby = w.Target; success = 1; Set(Find.TickManager, "ticksGameInt", 500); float adjustment = 0; saved.CompPostTick(ref adjustment); Check.Equal(true, w.Path.CompletedTrials.Contains(EmpathTrials.MasteryTrialId), "loaded actual source pulse qualifies");
+        try { Scribe.loader.InitLoading(file); Scribe_Deep.Look(ref loaded, "data", w.Caster); var directory = (LoadedObjectDirectory)typeof(CrossRefHandler).GetField("loadedObjectDirectory", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(Scribe.loader.crossRefs)!; directory.RegisterLoaded(w.Caster); Scribe.loader.FinalizeLoading(); } finally { Scribe.ForceStop(); }
+        var aura = loaded.hediffs.GetFirstHediffOfDef(TorannMagicDefOf.TM_SuppressiveAuraHD);
+        var saved = aura.TryGetComp<HediffComp_SuppressiveAura>(); Check.Same(w.Caster, saved.trialCaster, "native source caster reference resolves"); Check.Same(w.Caster, aura.pawn, "native parent pawn reference resolves"); Check.Equal(true, saved.ownTrialActivation, "activation marker persists");
+        w.Caster.health.hediffSet = loaded.hediffs; w.Adept(); nearby = w.Target; success = 1; Set(Find.TickManager, "ticksGameInt", 500); float adjustment = 0; saved.CompPostTick(ref adjustment); Check.Equal(true, w.Path.CompletedTrials.Contains(EmpathTrials.MasteryTrialId), "loaded actual source pulse qualifies");
     }
     static Pawn? nearby; static float success = 1;
     static bool Nearby(ref List<Pawn> __result) { __result = nearby == null ? new() : new() { nearby }; return false; }

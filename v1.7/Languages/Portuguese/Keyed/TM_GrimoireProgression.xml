@@ -214,4 +214,13 @@
   <TM_ProgressionGolemancerAttunementAction>sintonização de golemante: 100 de prata, 1 hora (prova pacífica)</TM_ProgressionGolemancerAttunementAction>
   <TM_ProgressionGolemancerAttunementHint>Alternativa pacífica: conclua um exercício de sintonia num círculo mágico grande por 100 de prata e uma hora de jogo. Conclui a prova atual, mas não substitui o livro nem avança a etapa.</TM_ProgressionGolemancerAttunementHint>
   <TM_ProgressionGolemancerAttunementNeedsOffering>Requer uma pilha acessível com pelo menos 100 de prata ou 100 de prata já transportadas.</TM_ProgressionGolemancerAttunementNeedsOffering>
+  <TM_ProgressionEmpath>empata</TM_ProgressionEmpath>
+  <TM_ProgressionEmpathFoundationTrial>Usa a tua habilidade Assassino da mente aprendida permanentemente para reduzir efetivamente o humor de um alvo hostil.</TM_ProgressionEmpathFoundationTrial>
+  <TM_ProgressionEmpathMasteryTrial>Usa a tua própria Aura esmagadora para conceder uma nova proteção emocional a outro aliado vivo e livre. Renovar uma proteção existente não conta.</TM_ProgressionEmpathMasteryTrial>
+  <TM_ProgressionEmpathAttunementHint>Alternativa pacífica: conclui um exercício de sintonização num círculo mágico grande por 100 de prata e uma hora de jogo. Conclui a prova atual, mas não substitui o livro nem permite avançar de etapa.</TM_ProgressionEmpathAttunementHint>
+  <TM_ProgressionEmpathAscensionAction>Ascender como empata</TM_ProgressionEmpathAscensionAction>
+  <TM_ProgressionEmpathAscensionNeedsOffering>É necessária uma Pedra da perspicácia mágica acessível ou já transportada pelo personagem.</TM_ProgressionEmpathAscensionNeedsOffering>
+  <TM_ProgressionEmpathAscensionRequirements>Requer um empata de grau mestre, um círculo mágico grande e uma Pedra da perspicácia mágica. O ritual demora uma hora de jogo; só a sua conclusão consome a pedra e desbloqueia Simbiose. Não cria um hospedeiro nem uma ligação de simbiose.</TM_ProgressionEmpathAscensionRequirements>
+  <TM_ProgressionEmpathAttunementAction>Sintonização do empata: 100 de prata, 1 hora (prova pacífica)</TM_ProgressionEmpathAttunementAction>
+  <TM_ProgressionEmpathAttunementNeedsOffering>Requer uma pilha acessível com pelo menos 100 de prata, ou que o personagem já transporte 100 de prata.</TM_ProgressionEmpathAttunementNeedsOffering>
 </LanguageData>

@@ -67,6 +67,7 @@ namespace TorannMagic
                     hitPawn.skills.GetSkill(sr.def).passion = sr.passion;
                     sr.passion = Passion.None;
                     comp.incitePassionSkill = null;
+                    flag = true;
                     for (int i = 0; i < 4; i++)
                     {
                         Vector3 headOffset = caster.DrawPos;

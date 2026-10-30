@@ -113,12 +113,12 @@ internal static class EmpathProgressionTests
         public static ThingDef BookDef(string name)
         {
             var d = (ThingDef)RuntimeHelpers.GetUninitializedObject(typeof(ThingDef));
-            d.defName = name; d.thingClass = typeof(Thing); d.category = ThingCategory.Item; d.destroyable = true; d.stackLimit = 75; d.drawerType = DrawerType.RealtimeOnly;
+            d.defName = name; d.thingClass = typeof(ThingWithComps); d.comps = new List<CompProperties>(); d.category = ThingCategory.Item; d.destroyable = true; d.stackLimit = 75; d.drawerType = DrawerType.RealtimeOnly;
             return d;
         }
-        public Thing Book(ThingDef def)
+        public ThingWithComps Book(ThingDef def)
         {
-            var book = new Thing { def = def, stackCount = 2 };
+            var book = new ThingWithComps { def = def, stackCount = 2 };
             Check.Equal(true, Caster.inventory.innerContainer.TryAdd(book), "native inventory owns book"); return book;
         }
         public void Dispose()
@@ -250,7 +250,8 @@ internal static class EmpathProgressionTests
         foreach(var name in new[]{"Torn_BookOfEmpathy","BookOfEmpathy","TM_MasterTomeEmpath"}) {
             var book=books.Root!.Elements().Single(e=>(string?)e.Element("defName")==name);
             Check.Equal("ResourceBase",(string?)book.Attribute("ParentName"),"no legacy book inheritance");
-            Check.Equal(true,book.Element("comps")!.Elements().Any(e=>(string?)e.Element("compClass")=="TorannMagic.ClassProgression.CompUseEffect_EmpathBook"),"controlled book use");
+            var effect = name == "TM_MasterTomeEmpath" ? "CompUseEffect_MasterTome" : "CompUseEffect_EmpathBook";
+            Check.Equal(true,book.Element("comps")!.Elements().Any(e=>(string?)e.Element("compClass")=="TorannMagic.ClassProgression."+effect),"controlled book use");
             Check.Equal(true,book.Element("recipeMaker")==null,"no unintended book crafting");
         }
         foreach(var lang in new[]{"English","Russian","Ukrainian","Spanish","Portuguese","PortugueseBrazilian","ChineseSimplified"}) {

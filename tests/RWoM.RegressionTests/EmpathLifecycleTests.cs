@@ -19,6 +19,7 @@ internal static class EmpathLifecycleTests
         yield return new("EmpathLifecycle.NativeSavedSourcesAndNeedsSurviveRestore", Save);
         yield return new("EmpathLifecycle.SelectedInciteValidatesActualSourceSkill", Selection);
         yield return new("EmpathLifecycle.NativeSelectedAndRandomInciteTransferOnce", NativeIncite);
+        yield return new("EmpathLifecycle.NativeSymbiosisCreatesAndRemovesReciprocalPair", NativeSymbiosis);
         yield return new("EmpathLifecycle.InvalidSymbiosisSourceAndStaleRemovalAreSafe", Removal);
     }
     sealed class Fixture : IDisposable
@@ -26,6 +27,7 @@ internal static class EmpathLifecycleTests
         readonly Game previous = Current.Game;
         readonly System.Globalization.CultureInfo culture = System.Globalization.CultureInfo.CurrentCulture;
         readonly HediffDef[] defs = DefDatabase<HediffDef>.AllDefsListForReading.ToArray();
+        readonly PawnCapacityDef[] capacities = DefDatabase<PawnCapacityDef>.AllDefsListForReading.ToArray();
         readonly TM_CustomPowerDef[] customs = DefDatabase<TM_CustomPowerDef>.AllDefsListForReading.ToArray();
         readonly ClassDisciplineDef[] profiles = DefDatabase<ClassDisciplineDef>.AllDefsListForReading.ToArray();
         readonly HediffDef oldEmpath = TorannMagicDefOf.TM_EmpathHD, oldHost = TorannMagicDefOf.TM_SymbiosisHD, oldBody = TorannMagicDefOf.TM_OutOfBodyHD;
@@ -39,6 +41,7 @@ internal static class EmpathLifecycleTests
         {
             System.Globalization.CultureInfo.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
             LoadBaseDefinitions(r);
+            if (DefDatabase<PawnCapacityDef>.DefCount == 0) DefDatabase<PawnCapacityDef>.Add(new PawnCapacityDef { defName = "EmpathLifecycleCapacity" });
             var xml = XDocument.Load(Path.Combine(r.Repository, "v1.7/Defs/CustomDefs/TM_CustomPowerDef.xml"));
             DefDatabase<TM_CustomPowerDef>.Clear();
             foreach (var name in new[] { "TM_Empathy", "TM_MindKiller", "TM_SuppressiveAura", "TM_HarvestPassion", "TM_Symbiosis" })
@@ -92,13 +95,13 @@ internal static class EmpathLifecycleTests
             System.Globalization.CultureInfo.CurrentCulture = culture;
             TorannMagicDefOf.TM_EmpathHD = oldEmpath; TorannMagicDefOf.TM_SymbiosisHD = oldHost; TorannMagicDefOf.TM_OutOfBodyHD = oldBody;
             DefDatabase<HediffDef>.Clear(); foreach (var d in defs) DefDatabase<HediffDef>.Add(d);
+            DefDatabase<PawnCapacityDef>.Clear(); foreach (var d in capacities) DefDatabase<PawnCapacityDef>.Add(d);
             DefDatabase<ClassDisciplineDef>.Clear(); foreach (var d in profiles) DefDatabase<ClassDisciplineDef>.Add(d);
             DefDatabase<TM_CustomPowerDef>.Clear(); foreach (var d in customs) DefDatabase<TM_CustomPowerDef>.Add(d); TM_Data.ResetDefinitionCaches();
         }
     }
     static bool SkipHealthBoundary() => false;
     static bool DrawPosition(ref UnityEngine.Vector3 __result) { __result = UnityEngine.Vector3.zero; return false; }
-    static bool PostCast(bool inResult, ref bool outResult) { outResult = inResult; return false; }
     sealed class IncitePresentation : IDisposable
     {
         readonly Type type = Assembly.Load("0Harmony").GetType("HarmonyLib.Harmony")!;
@@ -110,7 +113,6 @@ internal static class EmpathLifecycleTests
             foreach (var method in typeof(TM_MoteMaker).GetMethods().Where(m => m.Name == "ThrowGenericMote")) Patch(method, nameof(SkipHealthBoundary));
             foreach (var method in typeof(MoteMaker).GetMethods().Where(m => m.Name == "ThrowText")) Patch(method, nameof(SkipHealthBoundary));
             foreach (var method in typeof(Messages).GetMethods().Where(m => m.Name == "Message")) Patch(method, nameof(SkipHealthBoundary));
-            Patch(typeof(AbilityUser.Verb_UseAbility).GetMethod("PostCastShot")!, nameof(PostCast));
         }
         void Patch(MethodInfo method, string name)
         { var hook = Activator.CreateInstance(type.Assembly.GetType("HarmonyLib.HarmonyMethod")!, typeof(EmpathLifecycleTests).GetMethod(name, BindingFlags.Static | BindingFlags.NonPublic)!)!; type.GetMethod("Patch")!.Invoke(harmony, [method, hook, null, null, null]); }
@@ -121,18 +123,82 @@ internal static class EmpathLifecycleTests
         foreach (bool selected in new[] { true, false })
         {
             using var f = new Fixture(r); using var presentation = new IncitePresentation(); using var language = new SpellItemEffectTests.LanguageScope(r.Repository);
+            using var payment = new NativePayment(r, f, TorannMagicDefOf.TM_IncitePassion);
             f.Magic.incitePassionSkill = selected ? f.SourceSkill : null;
-            var ability = new AbilityUser.PawnAbility(f.Magic); Set(ability, "powerDef", TorannMagicDefOf.TM_IncitePassion);
+            var ability = new MagicAbility(f.Magic) { Def = TorannMagicDefOf.TM_IncitePassion };
             var verb = new Verb_IncitePassion { Ability = ability }; Set(verb, "caster", f.Caster); Set(verb, "currentTarget", new LocalTargetInfo(f.Host));
             var cast = typeof(Verb_IncitePassion).GetMethod("TryCastShot", Fields)!;
-            cast.Invoke(verb, null);
+            Check.Equal(true, (bool)cast.Invoke(verb, null)!, "actual successful transfer reports success through native PostCastShot");
             Check.Equal(Passion.None, f.SourceSkill.passion, "native Incite spends actual source passion");
             Check.Equal(Passion.Major, f.HostSkill.passion, "native Incite transfers actual target passion");
             Check.Equal(true, f.Magic.incitePassionSkill == null, "native selection clears after success");
-            cast.Invoke(verb, null); EmpathLifecycle.Restore(f.Magic);
+            payment.CompleteAndAssert(ability);
+            Check.Equal(false, (bool)cast.Invoke(verb, null)!, "no-improvement repeat reports failure"); EmpathLifecycle.Restore(f.Magic);
             Check.Equal(Passion.None, f.SourceSkill.passion, "repeat/restore does not recreate source passion");
             Check.Equal(Passion.Major, f.HostSkill.passion, "repeat/restore preserves actual transferred passion");
         }
+    }
+    // The verb and native job-finish payment callback are exercised separately; only presentation and unrelated physiology are suppressed.
+    sealed class NativePayment : IDisposable
+    {
+        readonly TMAbilityDef def;
+        readonly Fixture fixture;
+        readonly NeedDef oldNeed, oldMoodDef;
+        readonly float oldCost, oldXp, oldRecharge;
+        readonly TorannMagic.ModOptions.Settings settings = TorannMagic.ModOptions.Settings.Instance;
+        public NativePayment(RuntimeFixture r, Fixture f, TMAbilityDef ability)
+        {
+            fixture = f; def = ability; oldNeed = def.requiredNeed; oldCost = def.needCost; oldXp = def.needXPFactor; oldMoodDef = f.Mood.def; oldRecharge = def.MainVerb.SecondsToRecharge;
+            var xml = XDocument.Load(Path.Combine(r.Repository, "v1.7/Defs/AbilityDefs/Abilities_TMagic_Empath.xml")).Root!.Elements().Single(e => (string?)e.Element("defName") == def.defName);
+            Check.Equal("Mood", xml.Element("requiredNeed")!.Value, "shipped native need");
+            f.Mood.def ??= new NeedDef { defName = "Mood" };
+            def.requiredNeed = f.Mood.def; def.needCost = float.Parse(xml.Element("needCost")!.Value, System.Globalization.CultureInfo.InvariantCulture);
+            def.needXPFactor = float.Parse(xml.Element("needXPFactor")!.Value, System.Globalization.CultureInfo.InvariantCulture);
+            def.MainVerb.SecondsToRecharge = float.Parse(xml.Element("MainVerb")!.Element("SecondsToRecharge")!.Value, System.Globalization.CultureInfo.InvariantCulture);
+            f.Mood.CurLevel = 1f;
+            TorannMagic.ModOptions.Settings.Instance = new TorannMagic.ModOptions.Settings { AIAggressiveCasting = false };
+        }
+        public void CompleteAndAssert(MagicAbility ability)
+        {
+            float expected = fixture.Mood.CurLevel - MagicAbility.ActualNeedCost(def, fixture.Magic);
+            ability.PostAbilityAttempt();
+            Check.Equal(expected, fixture.Mood.CurLevel, "native callback consumes required Mood exactly once");
+            Check.Equal(UnityEngine.Mathf.RoundToInt(ability.MaxCastingTicks * fixture.Magic.coolDown), ability.CooldownTicksLeft, "native callback sets cooldown");
+            Check.Equal(true, ability.CooldownTicksLeft > 0, "shipped cooldown is active");
+        }
+        public void Dispose() { def.requiredNeed = oldNeed; def.needCost = oldCost; def.needXPFactor = oldXp; fixture.Mood.def = oldMoodDef; def.MainVerb.SecondsToRecharge = oldRecharge; TorannMagic.ModOptions.Settings.Instance = settings; }
+    }
+    static void NativeSymbiosis(RuntimeFixture r)
+    {
+        using var f = new Fixture(r); using var presentation = new IncitePresentation(); using var language = new SpellItemEffectTests.LanguageScope(r.Repository);
+        using var payment = new NativePayment(r, f, TorannMagicDefOf.TM_Symbiosis);
+        f.Caster.health.hediffSet.hediffs.Remove(f.BodyHD); f.Host.health.hediffSet.hediffs.Remove(f.HostHD);
+        var ability = new MagicAbility(f.Magic) { Def = TorannMagicDefOf.TM_Symbiosis };
+        var verb = new Verb_Symbiosis { Ability = ability }; Set(verb, "caster", f.Caster); Set(verb, "currentTarget", new LocalTargetInfo(f.Host));
+        var cast = typeof(Verb_Symbiosis).GetMethod("TryCastShot", Fields)!;
+        Set(verb, "currentTarget", new LocalTargetInfo(f.Caster));
+        Check.Equal(false, (bool)cast.Invoke(verb, null)!, "self link is rejected");
+        Check.Equal(false, f.Caster.health.hediffSet.HasHediff(TorannMagicDefOf.TM_SymbiosisHD), "self rejection creates no host effect");
+        Set(verb, "currentTarget", new LocalTargetInfo(f.Host));
+        Check.Equal(true, (bool)cast.Invoke(verb, null)!, "native reciprocal creation reports success");
+        var body = f.Caster.health.hediffSet.GetFirstHediffOfDef(TorannMagicDefOf.TM_OutOfBodyHD);
+        var host = f.Host.health.hediffSet.GetFirstHediffOfDef(TorannMagicDefOf.TM_SymbiosisHD);
+        Check.Same(f.Host, body.TryGetComp<HediffComp_SymbiosisCaster>().symbiosisHost, "native cast links caster to actual host");
+        Check.Same(f.Caster, host.TryGetComp<HediffComp_SymbiosisHost>().symbiote, "native cast links host to actual caster");
+        payment.CompleteAndAssert(ability);
+        Check.Equal(false, (bool)cast.Invoke(verb, null)!, "already-linked target reports failure");
+        Set(verb, "currentTarget", new LocalTargetInfo(f.Other));
+        Check.Equal(false, (bool)cast.Invoke(verb, null)!, "bound caster cannot overwrite its host link");
+        Check.Equal(false, f.Other.health.hediffSet.HasHediff(TorannMagicDefOf.TM_SymbiosisHD), "rejected second host has no effect");
+        Check.Same(f.Host, body.TryGetComp<HediffComp_SymbiosisCaster>().symbiosisHost, "rejected second cast preserves reciprocal host reference");
+        Set(verb, "currentTarget", LocalTargetInfo.Invalid);
+        Check.Equal(false, (bool)cast.Invoke(verb, null)!, "invalid target reports failure");
+        EmpathLifecycle.Restore(f.Magic);
+        Check.Same(body, f.Caster.health.hediffSet.GetFirstHediffOfDef(TorannMagicDefOf.TM_OutOfBodyHD), "restore preserves native caster effect");
+        Check.Same(host, f.Host.health.hediffSet.GetFirstHediffOfDef(TorannMagicDefOf.TM_SymbiosisHD), "restore preserves native host effect");
+        TM_Action.RemoveSymbiosisCommand(f.Caster);
+        Check.Equal(false, f.Caster.health.hediffSet.hediffs.Contains(body), "actual caster effect removed");
+        Check.Equal(false, f.Host.health.hediffSet.hediffs.Contains(host), "actual reciprocal host effect removed");
     }
     static void Passive(RuntimeFixture r)
     {
