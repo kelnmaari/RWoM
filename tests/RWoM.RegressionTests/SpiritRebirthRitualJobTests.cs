@@ -19,6 +19,93 @@ internal static class SpiritRebirthRitualJobTests
     }
     public static IEnumerable<TestCase> Cases()
     {
+        foreach (string scenario in new[] { "NativeObservedWorkAndCompletion", "CancelledWorkSave", "InterruptedReleaseCleanup" })
+        yield return new("SpiritRitualJob." + scenario, r => SpiritRebirthRitualTransactionTests.Run(r, c =>
+        {
+            Check.NotNull(Production("JobDriver_SpiritRebirth").GetProperty("WorkTicks", BindingFlags.Instance | BindingFlags.NonPublic), "saved observed work counter exists");
+            using var setup = new Fixture(c);
+            using var release = new SpiritRebirthReleaseTests.ReleaseFixture(r, c);
+            using var pathFinder = new PathFinder(c.Map); c.Map.pathFinder = pathFinder;
+            c.Creator.pather = new Pawn_PathFollower(c.Creator);
+            c.Creator.thinker = new Pawn_Thinker(c.Creator);
+            c.Creator.def.race.thinkTreeMain = new ThinkTreeDef { thinkRoot = new ThinkNode_Priority() };
+            var job = (Job)Production("SpiritRebirthRitualJob").GetMethod("Create", BindingFlags.Static | BindingFlags.NonPublic)!.Invoke(null, [c.Creator, c.Circle, c.Corpse])!;
+            c.Creator.jobs.EndCurrentJob(JobCondition.InterruptForced, startNewJob: false, canReturnToPool: false);
+            try { c.Creator.jobs.StartJob(job, addToJobsThisTick: false); }
+            catch { RuntimeLog.AssertClean(); throw; }
+            Check.Same(job, c.Creator.CurJob, "native StartJob installs actual job");
+            var driver = c.Creator.jobs.curDriver;
+            if (scenario == "NativeObservedWorkAndCompletion")
+            {
+                var carried = Check.NotNull(c.Creator.carryTracker.CarriedThing, "native initial toils already picked up first trip");
+                string carriedId = carried.GetUniqueLoadID();
+                SaveJobGraph(r, c, "mid-haul");
+                job = c.Creator.CurJob; driver = c.Creator.jobs.curDriver;
+                var loadedCarried = Check.NotNull(c.Creator.carryTracker.CarriedThing, "native carry graph restores picked cargo");
+                Check.Equal(false, ReferenceEquals(carried, loadedCarried), "carry cargo actually deep-loaded");
+                Check.Equal(carriedId, loadedCarried.GetUniqueLoadID(), "same saved cargo load identity");
+                Check.Same(c.Creator.carryTracker.GetDirectlyHeldThings(), loadedCarried.holdingOwner, "loaded cargo exact native owner");
+                Check.Equal(true, c.Creator.pather.Moving, "native saved path movement intent retained");
+                Check.Equal(3, driver.CurToilIndex, "native loaded driver remains at drop approach");
+            }
+            var staging = driver.GetType().GetProperty("Staging", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(driver)!;
+            int trips = (int)staging.GetType().GetProperty("TripCount", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(staging)!;
+            // Prepared-work fixture: actual native transfers, no walking claim.
+            for (int i = 0; i < trips; i++)
+            {
+                Check.Equal(true, (bool)Call(staging, "Pickup", c.Creator, job, i)!, "prepare exact native carry");
+                Check.Equal(true, (bool)Call(staging, "Drop", c.Creator, job, i)!, "prepare exact native staging");
+            }
+            Set(driver, "tripIndex", trips);
+            c.Creator.pather.StopDead();
+            var toils = (List<Toil>)typeof(JobDriver).GetField("toils", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(driver)!;
+            driver.JumpToToil(toils.Last());
+            int Work() => (int)driver.GetType().GetProperty("WorkTicks", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(driver)!;
+            void Tick(int tick) { Set(Find.TickManager, "ticksGameInt", tick); c.Creator.jobs.JobTrackerTick(); }
+            for (int i = 1; i <= 9999; i++) Tick(i);
+            Check.Equal(9999, Work(), "only observed native scheduler ticks accumulate");
+            Check.Equal(true, c.Original.Dead, "9999 ticks cannot convert");
+            var oldJob = job;
+            c.Creator.jobs.jobQueue.EnqueueLast(JobMaker.MakeJob(JobDefOf.Wait_MaintainPosture));
+            SaveJobGraph(r, c);
+            job = c.Creator.CurJob; driver = c.Creator.jobs.curDriver;
+            Check.Equal(false, ReferenceEquals(oldJob, job), "native current job deep-loads as new object");
+            Check.Same(job, driver.job, "native job tracker binds loaded driver to loaded job");
+            Check.Same(c.Creator, driver.pawn, "native job tracker binds external creator anchor");
+            Check.Equal(1, c.Creator.jobs.jobQueue.Count, "native queued job survives");
+            Check.Equal(9999, Work(), "load setup does not add work");
+            Check.Equal(true, c.Map.reservationManager.ReservationsReadOnly.All(x => x.Claimant == c.Creator && x.Job == job), "native loaded reservation graph points to loaded current job");
+            Tick(9999); Check.Equal(9999, Work(), "duplicate tick grants zero work");
+            if (scenario == "CancelledWorkSave")
+            {
+                c.Creator.jobs.EndCurrentJob(JobCondition.InterruptForced, startNewJob: false, canReturnToPool: false);
+                c.Creator.jobs.StartJob(JobMaker.MakeJob(JobDefOf.Wait_MaintainPosture), addToJobsThisTick: false);
+                Check.Equal(true, c.Original.Dead, "cancelled loaded work cannot resurrect");
+                Check.Equal(350, c.Map.spawnedThings.Where(x => x.def == c.Magicyte.def || x.def == c.Silver.def).Sum(x => x.stackCount), "cancelled staged payment remains native map resources");
+                Check.Equal(false, c.Map.reservationManager.ReservationsReadOnly.Any(x => x.Job == job), "native cleanup releases ritual claims");
+                RuntimeLog.AssertClean(); return;
+            }
+            if (scenario == "InterruptedReleaseCleanup")
+            {
+                failingSpawn = c.Original;
+                try { using var fault = new Fault(typeof(PawnComponentsUtility).GetMethod(nameof(PawnComponentsUtility.AddComponentsForSpawn))!, nameof(FailReleaseSpawn)); Tick(50000); }
+                finally { failingSpawn = null; }
+                Check.Equal(SpiritRebirthForm.Dormant, ClassIdentity.Component(c.Original).SpiritRebirth.Form, "failed release stays inactive");
+                Check.Same(c.Creator.inventory.innerContainer, c.Original.holdingOwner, "driver cleanup retains exact paid original in native inventory");
+                c.Creator.jobs.StartJob(JobMaker.MakeJob(JobDefOf.Wait_MaintainPosture), addToJobsThisTick: false);
+                Check.Same(c.Creator.inventory.innerContainer, c.Original.holdingOwner, "native subsequent job does not drop paid original");
+                var problems = (List<string>)typeof(RuntimeLog).GetField("Problems", BindingFlags.Static | BindingFlags.NonPublic)!.GetValue(null)!;
+                Check.Equal(true, problems.Count > 0 && problems.All(p => p.Contains("injected ritual release")), "only explicit release failure diagnostic");
+                RuntimeLog.Clear(); return;
+            }
+            Tick(50000);
+            Check.Equal(false, c.Original.Dead, "one observed tick after gap completes real resurrection");
+            Check.Equal(SpiritRebirthForm.Ethereal, ClassIdentity.Component(c.Original).SpiritRebirth.Form, "native release commits exact original");
+            Check.Same(c.Map.spawnedThings, c.Original.holdingOwner, "native same-Pawn map custody");
+            Check.Equal(true, c.Corpse.Destroyed, "same corpse consumed once");
+            Check.Equal(0, c.Map.spawnedThings.Where(x => x.def == c.Magicyte.def || x.def == c.Silver.def).Sum(x => x.stackCount), "exact 300 plus 50 staged payment consumed once");
+            RuntimeLog.AssertClean();
+        }));
         yield return new("SpiritRitualJob.NativePostSplitCallbackException", r => SplitCallback(r, true));
         yield return new("SpiritRitualJob.NativePreAbsorbCallbackException", r => SplitCallback(r, false));
         yield return new("SpiritRitualJob.WholeSourceNativeDespawnException", r => SplitCallback(r, false, true));
@@ -118,6 +205,45 @@ internal static class SpiritRebirthRitualJobTests
             });
         });
     }
+    static void SaveJobGraph(RuntimeFixture r, SpiritRebirthRitualTransactionTests.Context c, string checkpoint = "work9999")
+    {
+        var defs = DefDatabase<ThingDef>.AllDefsListForReading.ToArray();
+        try
+        {
+            foreach (var def in new[] { c.Magicyte.def, c.Silver.def, c.Corpse.def })
+                if (DefDatabase<ThingDef>.GetNamedSilentFail(def.defName) == null) DefDatabase<ThingDef>.Add(def);
+            var path = Path.Combine(r.WorkingDirectory, "ritual-native-job-graph-" + checkpoint + ".xml");
+            JobGraph saved = new(c.Creator, c.Map);
+            try { Scribe.saver.InitSaving(path, "regression"); Scribe_Deep.Look(ref saved, "graph", c.Creator, c.Map); Scribe.saver.FinalizeSaving(); }
+            finally { Scribe.ForceStop(); }
+            c.Creator.pather.StopDead(); // Retire the old native request, not the saved movement intent.
+            JobGraph loaded = null!;
+            try
+            {
+                Scribe.loader.InitLoading(path); Scribe_Deep.Look(ref loaded, "graph", c.Creator, c.Map);
+                var directory = (LoadedObjectDirectory)typeof(CrossRefHandler).GetField("loadedObjectDirectory", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(Scribe.loader.crossRefs)!;
+                foreach (var anchor in c.Map.spawnedThings.Cast<ILoadReferenceable>().Concat(new ILoadReferenceable[] { c.Map, c.Original }).Distinct()) directory.RegisterLoaded(anchor);
+                Scribe.loader.FinalizeLoading();
+            }
+            finally { Scribe.ForceStop(); }
+            RuntimeLog.AssertClean();
+        }
+        finally { DefDatabase<ThingDef>.Clear(); foreach (var def in defs) DefDatabase<ThingDef>.Add(def); }
+    }
+    public sealed class JobGraph : IExposable
+    {
+        readonly Pawn pawn; readonly Map map;
+        Pawn_JobTracker jobs; Pawn_CarryTracker carry; ReservationManager reservations; Pawn_PathFollower pather;
+        public JobGraph(Pawn pawn, Map map) { this.pawn = pawn; this.map = map; jobs = pawn.jobs; carry = pawn.carryTracker; reservations = map.reservationManager; pather = pawn.pather; }
+        public void ExposeData()
+        {
+            Scribe_Deep.Look(ref jobs, "jobs", pawn);
+            Scribe_Deep.Look(ref carry, "carry", pawn);
+            Scribe_Deep.Look(ref reservations, "reservations", map);
+            Scribe_Deep.Look(ref pather, "pather", pawn);
+            if (Scribe.mode == LoadSaveMode.LoadingVars) { pawn.jobs = jobs; pawn.carryTracker = carry; map.reservationManager = reservations; pawn.pather = pather; }
+        }
+    }
     static void SplitCallback(RuntimeFixture r, bool postSplit, bool whole = false)
     {
         SpiritRebirthRitualTransactionTests.Run(r, c =>
@@ -185,6 +311,8 @@ internal static class SpiritRebirthRitualJobTests
         return (job, driver.GetType().GetProperty("Staging", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(driver)!);
     }
     static ThingOwner? refusedOwner;
+    static Pawn? failingSpawn;
+    static void FailReleaseSpawn(Pawn pawn) { if (ReferenceEquals(pawn, failingSpawn)) throw new InvalidOperationException("injected ritual release"); }
     static bool RefuseCarry(ThingOwner __instance, ref bool __result)
     {
         if (!ReferenceEquals(__instance, refusedOwner)) return true;
@@ -193,11 +321,11 @@ internal static class SpiritRebirthRitualJobTests
     sealed class Fault : IDisposable
     {
         readonly object harmony; readonly string id = "rwom.ritual-haul-fault." + Guid.NewGuid();
-        public Fault()
+        public Fault(MethodBase? target = null, string callback = nameof(RefuseCarry))
         {
             var assembly = Assembly.Load("0Harmony"); harmony = Activator.CreateInstance(assembly.GetType("HarmonyLib.Harmony")!, id)!;
-            var method = Activator.CreateInstance(assembly.GetType("HarmonyLib.HarmonyMethod")!, typeof(SpiritRebirthRitualJobTests).GetMethod(nameof(RefuseCarry), BindingFlags.NonPublic | BindingFlags.Static)!)!;
-            harmony.GetType().GetMethod("Patch")!.Invoke(harmony, [typeof(ThingOwner<Thing>).GetMethod("TryAdd", [typeof(Thing), typeof(bool)])!, method, null, null, null]);
+            var method = Activator.CreateInstance(assembly.GetType("HarmonyLib.HarmonyMethod")!, typeof(SpiritRebirthRitualJobTests).GetMethod(callback, BindingFlags.NonPublic | BindingFlags.Static)!)!;
+            harmony.GetType().GetMethod("Patch")!.Invoke(harmony, [target ?? typeof(ThingOwner<Thing>).GetMethod("TryAdd", [typeof(Thing), typeof(bool)])!, method, null, null, null]);
         }
         public void Dispose() => harmony.GetType().GetMethod("UnpatchAll")!.Invoke(harmony, [id]);
     }
@@ -205,12 +333,15 @@ internal static class SpiritRebirthRitualJobTests
     {
         readonly JobDef[] jobs = DefDatabase<JobDef>.AllDefsListForReading.ToArray();
         readonly StatDef oldCarry = StatDefOf.CarryingCapacity;
+        readonly JobDef oldWait = JobDefOf.Wait_MaintainPosture;
         readonly FieldInfo mainThread = typeof(UnityData).GetField("mainThreadId", BindingFlags.Static | BindingFlags.NonPublic)!;
         readonly object? priorThread;
         public Fixture(SpiritRebirthRitualTransactionTests.Context c)
         {
             priorThread = mainThread.GetValue(null); mainThread.SetValue(null, Environment.CurrentManagedThreadId);
             DefDatabase<JobDef>.Add(new JobDef { defName = "TM_SpiritRebirth", driverClass = Production("JobDriver_SpiritRebirth") });
+            JobDefOf.Wait_MaintainPosture = new JobDef { defName = "RitualFollowupWait", driverClass = typeof(JobDriver_Wait) };
+            DefDatabase<JobDef>.Add(JobDefOf.Wait_MaintainPosture);
             StatDefOf.CarryingCapacity = new StatDef { defName = "RitualCarryCapacity", defaultBaseValue = 100f, minValue = 0, maxValue = 1000, workerClass = typeof(StatWorker) };
             c.Creator.ageTracker = new Pawn_AgeTracker(c.Creator);
             c.Creator.def.race.lifeStageAges = [new LifeStageAge { def = new LifeStageDef { developmentalStage = DevelopmentalStage.Adult } }];
@@ -237,6 +368,7 @@ internal static class SpiritRebirthRitualJobTests
         {
             DefDatabase<JobDef>.Clear(); foreach (var d in jobs) DefDatabase<JobDef>.Add(d);
             StatDefOf.CarryingCapacity = oldCarry; mainThread.SetValue(null, priorThread);
+            JobDefOf.Wait_MaintainPosture = oldWait;
         }
     }
 }

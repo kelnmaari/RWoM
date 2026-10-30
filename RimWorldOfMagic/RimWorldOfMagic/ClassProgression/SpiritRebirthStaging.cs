@@ -37,6 +37,14 @@ namespace TorannMagic.ClassProgression
         internal Thing Circle => circle;
         internal Thing SourceAt(int index) => trips[index].source;
         internal IntVec3 CellAt(int index) => trips[index].cell;
+        internal IntVec3 ReleaseCell => trips[trips.Count - 1].cell;
+        internal bool WorkValid(Pawn pawn, Job job)
+            => ValidActor(pawn, job) && pawn.Position == circle.InteractionCell && pawn.carryTracker.CarriedThing == null
+                && Reserved(circle, 1) && Reserved(circle.InteractionCell, -1)
+                && trips.Count > 0 && trips.All(t => t.dropped && StagedValid(t) && !t.staged.IsForbidden(pawn)
+                    && Reserved(t.staged, t.count) && Reserved(t.cell, -1))
+                && trips.Where(t => t.resource == TorannMagicDefOf.RawMagicyte).Sum(t => t.count) == SpiritRebirthRitualEligibility.MagicyteCost
+                && trips.Where(t => t.resource == ThingDefOf.Silver).Sum(t => t.count) == SpiritRebirthRitualEligibility.SilverCost;
 
         internal static SpiritRebirthStaging Discover(Pawn pawn, Job job, Thing circle, Corpse corpse)
         {
