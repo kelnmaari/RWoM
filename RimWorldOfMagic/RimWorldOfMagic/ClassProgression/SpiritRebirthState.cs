@@ -25,6 +25,38 @@ namespace TorannMagic.ClassProgression
         private bool healthFormDirty;
         private int healthFormRetryAt;
         private bool healthFormWarningIssued;
+        private Map pendingDeathMap;
+        private int pendingDeathId;
+        internal bool HasPendingMapDeath(Pawn pawn)
+            => IsCurrent(pawn) && pendingDeathMap != null && pendingDeathId > 0
+                && (form == SpiritRebirthForm.Possessed || form == SpiritRebirthForm.Dormant);
+        internal bool MatchesPendingMapDeath(Pawn pawn, Map map, int id)
+            => IsCurrent(pawn) && id > 0 && pendingDeathId == id && ReferenceEquals(pendingDeathMap, map)
+                && (form == SpiritRebirthForm.Possessed || form == SpiritRebirthForm.Dormant);
+        internal bool BeginPendingMapDeath(Pawn pawn, Pawn deadHost, SpiritPendingHostCollapse receipt)
+        {
+            if (pendingDeathMap != null || pendingDeathId != 0 || receipt == null || !receipt.Registered
+                || !ReferenceEquals(receipt.Original, pawn) || receipt.SourceHostId != deadHost?.thingIDNumber
+                || !ReferenceEquals(receipt.Keeper.map, deadHost.Map) || !CanEnterStone(pawn, deadHost, true)) return false;
+            // Authorization alone never clears the still-owning source graph.
+            pendingDeathMap = receipt.Keeper.map; pendingDeathId = receipt.Id;
+            return true;
+        }
+        internal bool SecurePendingMapDeath(Pawn pawn, SpiritPendingHostCollapse receipt)
+        {
+            if (receipt == null || !ReferenceEquals(receipt.Original, pawn) || !receipt.OwnsOriginal
+                || !MatchesPendingMapDeath(pawn, receipt.Keeper.map, receipt.Id)) return false;
+            if (form != SpiritRebirthForm.Dormant) { form = SpiritRebirthForm.Dormant; host = null; MarkHealthFormDirty(); }
+            return true;
+        }
+        internal bool TryCompletePendingMapDeath(Pawn pawn, SpiritPendingHostCollapse receipt)
+        {
+            if (receipt == null || !receipt.Registered || !ReferenceEquals(receipt.Original, pawn) || !receipt.OwnsOriginal) return false;
+            if (HasValidStone(pawn) && ReferenceEquals(stone, receipt.Stone)) return true;
+            if (!SecurePendingMapDeath(pawn, receipt) || !StoneHolds(receipt.Stone, pawn)) return false;
+            CommitStone(receipt.Stone);
+            return true;
+        }
         internal bool HealthFormDirty => healthFormDirty;
         internal int HealthFormRetryAt => healthFormRetryAt;
         internal void MarkHealthFormDirty() { healthFormDirty = true; healthFormRetryAt = 0; }
@@ -167,6 +199,12 @@ namespace TorannMagic.ClassProgression
                 || host.Destroyed || host.Dead != hostDied
                 || !ReferenceEquals(Possession(host)?.parent?.pawn, host)
                 || Possession(host)?.GetDirectlyHeldThings()?.Contains(pawn) != false) return false;
+            CommitStone(destination);
+            return true;
+        }
+
+        private void CommitStone(Thing_SoulStone destination)
+        {
             host = null;
             stone = destination;
             form = SpiritRebirthForm.Stone;
@@ -178,7 +216,8 @@ namespace TorannMagic.ClassProgression
             recoveryRequired = true;
             recoveryTicks = 0;
             lastRecoveryTick = -1;
-            return true;
+            pendingDeathMap = null;
+            pendingDeathId = 0;
         }
 
         internal bool TryEnterHost(Pawn pawn, Pawn candidate)
@@ -218,6 +257,8 @@ namespace TorannMagic.ClassProgression
             Scribe_References.Look(ref original, "originalPawn");
             Scribe_References.Look(ref host, "hostPawn");
             Scribe_References.Look(ref stone, "soulStone");
+            Scribe_References.Look(ref pendingDeathMap, "pendingDeathMap");
+            Scribe_Values.Look(ref pendingDeathId, "pendingDeathId");
             Scribe_Values.Look(ref recoveryRequired, "recoveryRequired", false);
             Scribe_Values.Look(ref recoveryTicks, "recoveryTicks", 0);
             Scribe_Values.Look(ref lastRecoveryTick, "lastRecoveryTick", -1);

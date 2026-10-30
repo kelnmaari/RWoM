@@ -51,7 +51,8 @@ namespace TorannMagic.ClassProgression
         {
             if (!SpiritRebirthState.TryGet(pawn, out var state) || !state.HealthFormDirty
                 || !(SpiritRebirthFormPolicy.IsSpawnedEthereal(pawn) || state.HasValidStone(pawn)
-                    || state.HasValidHost(pawn) || SpiritRebirthRitualTransaction.IsPendingAccountingOwner(pawn))) return;
+                    || state.HasValidHost(pawn) || SpiritRebirthRitualTransaction.IsPendingAccountingOwner(pawn)
+                    || MapComponent_SpiritCollapse.IsPendingAccountingOwner(pawn))) return;
             int tick = Find.TickManager?.TicksGame ?? 0;
             if (tick < state.HealthFormRetryAt) return;
             try

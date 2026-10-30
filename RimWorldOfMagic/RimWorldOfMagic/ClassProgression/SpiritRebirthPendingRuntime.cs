@@ -11,7 +11,8 @@ namespace TorannMagic.ClassProgression
     {
         static bool Prefix(Pawn __instance)
         {
-            if (!SpiritRebirthRitualTransaction.IsPendingAccountingOwner(__instance)) return true;
+            if (!SpiritRebirthRitualTransaction.IsPendingAccountingOwner(__instance)
+                && !MapComponent_SpiritCollapse.IsPendingAccountingOwner(__instance)) return true;
             __instance.GetCompAbilityUserMagic()?.CompTick();
             __instance.GetCompAbilityUserMight()?.CompTick();
             return false;
@@ -22,6 +23,7 @@ namespace TorannMagic.ClassProgression
     internal static class SpiritRebirthPendingIntervalPatch
     {
         static bool Prefix(Pawn __instance)
-            => !SpiritRebirthRitualTransaction.IsPendingAccountingOwner(__instance);
+            => !SpiritRebirthRitualTransaction.IsPendingAccountingOwner(__instance)
+                && !MapComponent_SpiritCollapse.IsPendingAccountingOwner(__instance);
     }
 }
