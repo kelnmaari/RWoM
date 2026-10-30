@@ -6,7 +6,7 @@ namespace TorannMagic.ClassProgression
 {
     // Item presentation only; generation and implantation activation remain separate.
     // The container owns the original pawn, never a progression snapshot or clone.
-    public sealed class Thing_SoulStone : ThingWithComps, IThingHolder
+    public sealed class Thing_SoulStone : ThingWithComps, IThingHolder, IThingHolderTickable
     {
         private ThingOwner<Pawn> contents;
 
@@ -24,6 +24,12 @@ namespace TorannMagic.ClassProgression
             return inherited.NullOrEmpty() ? details : inherited + "\n" + details;
         }
         public ThingOwner GetDirectlyHeldThings() => contents;
+        public bool ShouldTickContents => false;
+        protected override void Tick()
+        {
+            base.Tick();
+            SpiritRebirthRuntime.TickHeld(this);
+        }
         public void GetChildHolders(List<IThingHolder> outChildren)
             => ThingOwnerUtility.AppendThingHoldersFromThings(outChildren, contents);
 

@@ -166,8 +166,15 @@ namespace TorannMagic
             TorannMagicDefOf.TM_Wayfarer.index
         };
 
-        public class ChainedMightAbility
+        public class ChainedMightAbility : IExposable
         {
+            public ChainedMightAbility() { }
+            public void ExposeData()
+            {
+                Scribe_Defs.Look(ref abilityDef, "ability");
+                Scribe_Values.Look(ref expirationTicks, "remaining", 0);
+                Scribe_Values.Look(ref expires, "expires", true);
+            }
             public ChainedMightAbility(TMAbilityDef _ability, int _expirationTicks, bool _expires)
             {
                 abilityDef = _ability;
@@ -179,6 +186,7 @@ namespace TorannMagic
             public bool expires = true;
         }
         public List<ChainedMightAbility> chainedAbilitiesList = new List<ChainedMightAbility>();
+        private ClassProgression.SpiritRuntimeClock spiritRuntimeClock = new ClassProgression.SpiritRuntimeClock();
 
         private MightData mightData = null;
         public MightData MightData
@@ -357,6 +365,7 @@ namespace TorannMagic
 
         public override void CompTick()
         {
+            if (ClassProgression.SpiritRebirthRuntime.TickMight(this, spiritRuntimeClock)) return;
             bool flag = base.Pawn != null;
             if (flag)
             {
@@ -4603,6 +4612,12 @@ namespace TorannMagic
 
         public override void PostExposeData()
         {
+            if (Scribe.mode != LoadSaveMode.Saving || ClassProgression.SpiritRebirthEnergy.Marked(Pawn))
+                Scribe_Deep.Look(ref spiritRuntimeClock, "TM_spiritMightRuntimeClock");
+            if (spiritRuntimeClock == null) spiritRuntimeClock = new ClassProgression.SpiritRuntimeClock();
+            if (Scribe.mode != LoadSaveMode.Saving || ClassProgression.SpiritRebirthEnergy.Marked(Pawn))
+                Scribe_Collections.Look(ref chainedAbilitiesList, "TM_spiritMightChainedAbilities", LookMode.Deep);
+            if (chainedAbilitiesList == null) chainedAbilitiesList = new List<ChainedMightAbility>();
             //base.PostExposeData();
             Scribe_Values.Look<bool>(ref this.mightPowersInitialized, "mightPowersInitialized", false, false);
             Scribe_Collections.Look<Thing>(ref this.combatItems, "combatItems", LookMode.Reference);

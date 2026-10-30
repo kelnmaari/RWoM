@@ -6,6 +6,7 @@
     <description>A crystal that can shelter a spirit. An occupied soul stone cannot be damaged or destroyed. After implantation, the spirit must recover for seven full days in a living host before leaving voluntarily.</description>
     <thingClass>TorannMagic.ClassProgression.Thing_SoulStone</thingClass>
     <category>Item</category>
+    <tickerType>Normal</tickerType>
     <altitudeLayer>Item</altitudeLayer>
     <selectable>true</selectable>
     <alwaysHaulable>true</alwaysHaulable>

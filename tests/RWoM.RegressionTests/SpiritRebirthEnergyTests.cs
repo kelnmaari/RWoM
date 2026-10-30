@@ -165,7 +165,7 @@ internal static class SpiritRebirthEnergyTests
         Check.Equal(true, state.RecoveryRequired, "forced collapse starts full recovery debt");
         Check.Equal(0, state.RecoveryTicks, "full seven days remain");
     }
-    static void Run(RuntimeFixture r, Action<SpiritRebirthRitualTransactionTests.Context, Need_Spirit> test)
+    internal static void Run(RuntimeFixture r, Action<SpiritRebirthRitualTransactionTests.Context, Need_Spirit> test)
     {
         using var language = new FleshStatTests.LanguageScope(r.Repository);
         LanguageDatabase.activeLanguage.keyedReplacements["TM_SpiritRebirthCastUnavailable"] = new LoadedLanguage.KeyedReplacement {

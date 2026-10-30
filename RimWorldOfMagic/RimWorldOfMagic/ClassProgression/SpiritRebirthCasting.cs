@@ -17,10 +17,16 @@ namespace TorannMagic.ClassProgression
 
         public static bool IsSpiritAbility(AbilityDef ability)
         {
-            if (ability == null || TorannMagicDefOf.TM_Possessor == null) return false;
+            return ability != null && NativeFamily().Contains(ability);
+        }
+
+        internal static HashSet<AbilityDef> NativeFamily()
+        {
+            var result = new HashSet<AbilityDef>();
+            if (TorannMagicDefOf.TM_Possessor == null) return result;
             var classes = DefDatabase<TM_CustomClassDef>.GetNamedSilentFail("TM_CustomClasses")?.customClasses;
             var matches = classes?.Where(c => c != null && c.classTrait == TorannMagicDefOf.TM_Possessor).ToList();
-            if (matches?.Count != 1 || !matches[0].isMage || matches[0].classMageAbilities == null) return false;
+            if (matches?.Count != 1 || !matches[0].isMage || matches[0].classMageAbilities == null) return result;
             // Native rank variants are explicit class entries. Follow only their
             // actual child definitions, with cycle protection; names grant nothing.
             var pending = new Stack<TMAbilityDef>(matches[0].classMageAbilities.Where(a => a != null));
@@ -29,11 +35,11 @@ namespace TorannMagic.ClassProgression
             {
                 var current = pending.Pop();
                 if (!seen.Add(current)) continue;
-                if (ReferenceEquals(current, ability)) return true;
+                result.Add(current);
                 foreach (var child in current.childAbilities ?? new List<TMAbilityDef>())
                     if (child != null) pending.Push(child);
             }
-            return false;
+            return result;
         }
     }
 }

@@ -216,6 +216,18 @@ namespace TorannMagic
 
         public override void CompPostTick(ref float severityAdjustment)
         {
+            var original = SpiritPawn;
+            if (ClassProgression.SpiritRebirthEnergy.Marked(original))
+            {
+                if (ClassProgression.SpiritRebirthState.TryGet(original, out var state)
+                    && state.HasValidHost(original) && ReferenceEquals(state.Host, Pawn))
+                {
+                    original.GetCompAbilityUserMagic()?.CompTick();
+                    original.GetCompAbilityUserMight()?.CompTick();
+                    state.TickRecovery(original, Pawn, Find.TickManager.TicksGame);
+                }
+                return;
+            }
             base.CompPostTick(ref severityAdjustment);
             bool flag = base.Pawn != null && SpiritPawn != null;
             if (flag)

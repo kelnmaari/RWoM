@@ -238,8 +238,15 @@ namespace TorannMagic
             TorannMagicDefOf.TM_Wanderer.index
         };
 
-        public class ChainedMagicAbility
+        public class ChainedMagicAbility : IExposable
         {
+            public ChainedMagicAbility() { }
+            public void ExposeData()
+            {
+                Scribe_Defs.Look(ref abilityDef, "ability");
+                Scribe_Values.Look(ref expirationTicks, "remaining", 0);
+                Scribe_Values.Look(ref expires, "expires", true);
+            }
             public ChainedMagicAbility(TMAbilityDef _ability, int _expirationTicks, bool _expires)
             {
                 abilityDef = _ability;
@@ -251,6 +258,7 @@ namespace TorannMagic
             public bool expires = true;
         }
         public List<ChainedMagicAbility> chainedAbilitiesList = new List<ChainedMagicAbility>();
+        private ClassProgression.SpiritRuntimeClock spiritRuntimeClock = new ClassProgression.SpiritRuntimeClock();
 
         private Effecter powerEffecter = null;
         private int powerModifier = 0;
@@ -698,6 +706,7 @@ namespace TorannMagic
 
         public override void CompTick()
         {
+            if (ClassProgression.SpiritRebirthRuntime.TickMagic(this, spiritRuntimeClock)) return;
 
             Pawn pawn = this.Pawn;
             if (pawn?.story == null) return;
@@ -3540,11 +3549,20 @@ namespace TorannMagic
         }     
 
         public float ActualManaCost(TMAbilityDef magicDef)
+            => ActualManaCost(magicDef, false);
+
+        // Read-only rank is used only for retained EnchantWeapon upkeep. All
+        // modifiers and the native final cost floor remain shared below.
+        private float ActualManaCost(TMAbilityDef magicDef, bool savedUpkeepRank)
         {
             float adjustedManaCost = magicDef.manaCost;
             if (magicDef.efficiencyReductionPercent != 0)
             {
-                if (magicDef == TorannMagicDefOf.TM_EnchantedAura)
+                if (savedUpkeepRank)
+                {
+                    adjustedManaCost *= 1f - (magicDef.efficiencyReductionPercent * ClassProgression.SpiritRebirthRuntime.SavedRank(ExistingMagicData, magicDef, "_eff"));
+                }
+                else if (magicDef == TorannMagicDefOf.TM_EnchantedAura)
                 {
                     adjustedManaCost *= 1f - (magicDef.efficiencyReductionPercent * this.MagicData.GetSkill_Efficiency(TorannMagicDefOf.TM_EnchantedBody).level);
                 }
@@ -6308,6 +6326,20 @@ namespace TorannMagic
         }
 
         public void ResolveEnchantments()
+            => ResolveEnchantments(true);
+
+        internal void ResolveOwnedMagicEconomy()
+        {
+            if (Pawn?.story?.traits == null || Pawn.health?.hediffSet == null || Pawn.apparel?.WornApparel == null
+                || Pawn.equipment == null || ExistingMagicData == null) return;
+            // Retain actual owners and links. This prunes only genuinely ended
+            // support, without granting commands or advancing former trials.
+            summonedMinions.RemoveAll(t => !(t is Pawn p) || p.Dead || p.Destroyed);
+            supportedUndead?.RemoveAll(t => !(t is Pawn p) || p.Dead || p.Destroyed);
+            ResolveEnchantments(false);
+        }
+
+        private void ResolveEnchantments(bool applyOriginalBody)
         {
             float _maxMP = 0;
             float _maxMPUpkeep = 0;
@@ -6442,7 +6474,7 @@ namespace TorannMagic
                         }
                     }
                 }
-                if (this.Pawn.equipment.Primary.def.defName == "TM_DefenderStaff")
+                if (applyOriginalBody && this.Pawn.equipment.Primary.def.defName == "TM_DefenderStaff")
                 {
                     if (this.item_StaffOfDefender == false)
                     {
@@ -6450,7 +6482,7 @@ namespace TorannMagic
                         this.item_StaffOfDefender = true;
                     }
                 }
-                else
+                else if (applyOriginalBody)
                 {
                     if (this.item_StaffOfDefender == true)
                     {
@@ -6464,8 +6496,8 @@ namespace TorannMagic
             //Determine active or sustained hediffs and abilities
             if(this.SoL != null)
             {
-                _maxMPUpkeep += (TorannMagicDefOf.TM_SpiritOfLight.upkeepEnergyCost * (1 - (TorannMagicDefOf.TM_SpiritOfLight.upkeepEfficiencyPercent * this.MagicData.MagicPowerSkill_SpiritOfLight.FirstOrDefault((MagicPowerSkill x) => x.label == "TM_SpiritOfLight_eff").level)));
-                _mpRegenRateUpkeep += (TorannMagicDefOf.TM_SpiritOfLight.upkeepRegenCost * (1 - (TorannMagicDefOf.TM_SpiritOfLight.upkeepEfficiencyPercent * this.MagicData.MagicPowerSkill_SpiritOfLight.FirstOrDefault((MagicPowerSkill x) => x.label == "TM_SpiritOfLight_eff").level)));
+                _maxMPUpkeep += (TorannMagicDefOf.TM_SpiritOfLight.upkeepEnergyCost * (1 - (TorannMagicDefOf.TM_SpiritOfLight.upkeepEfficiencyPercent * (applyOriginalBody ? this.MagicData.MagicPowerSkill_SpiritOfLight.FirstOrDefault((MagicPowerSkill x) => x.label == "TM_SpiritOfLight_eff").level : ClassProgression.SpiritRebirthRuntime.SavedRank(this.MagicData, "TM_SpiritOfLight_eff")))));
+                _mpRegenRateUpkeep += (TorannMagicDefOf.TM_SpiritOfLight.upkeepRegenCost * (1 - (TorannMagicDefOf.TM_SpiritOfLight.upkeepEfficiencyPercent * (applyOriginalBody ? this.MagicData.MagicPowerSkill_SpiritOfLight.FirstOrDefault((MagicPowerSkill x) => x.label == "TM_SpiritOfLight_eff").level : ClassProgression.SpiritRebirthRuntime.SavedRank(this.MagicData, "TM_SpiritOfLight_eff")))));
             }
             if (this.summonedLights.Count > 0)
             {
@@ -6487,47 +6519,47 @@ namespace TorannMagic
             }
             if (this.weaponEnchants.Count > 0)
             {
-                _maxMPUpkeep += (this.weaponEnchants.Count * ActualManaCost(TorannMagicDefOf.TM_EnchantWeapon));
+                _maxMPUpkeep += (this.weaponEnchants.Count * ActualManaCost(TorannMagicDefOf.TM_EnchantWeapon, !applyOriginalBody));
             }
             if (this.stoneskinPawns != null && this.stoneskinPawns.Count > 0)
             {
-                _maxMPUpkeep += (this.stoneskinPawns.Count * (TorannMagicDefOf.TM_Stoneskin.upkeepEnergyCost - (.02f * this.MagicData.GetSkill_Efficiency(TorannMagicDefOf.TM_Stoneskin).level)));
+                _maxMPUpkeep += (this.stoneskinPawns.Count * (TorannMagicDefOf.TM_Stoneskin.upkeepEnergyCost - (.02f * (applyOriginalBody ? this.MagicData.GetSkill_Efficiency(TorannMagicDefOf.TM_Stoneskin).level : ClassProgression.SpiritRebirthRuntime.SavedRank(this.MagicData, TorannMagicDefOf.TM_Stoneskin, "_eff")))));
             }
             if (this.summonedSentinels != null && this.summonedSentinels.Count > 0)
             {
-                MagicPowerSkill heartofstone = this.MagicData.MagicPowerSkill_Sentinel.FirstOrDefault((MagicPowerSkill x) => x.label == "TM_Sentinel_eff");
+                int heartofstone = applyOriginalBody ? this.MagicData.MagicPowerSkill_Sentinel.FirstOrDefault((MagicPowerSkill x) => x.label == "TM_Sentinel_eff").level : ClassProgression.SpiritRebirthRuntime.SavedRank(this.MagicData, "TM_Sentinel_eff");
 
-                if (heartofstone.level == 3)
+                if (heartofstone == 3)
                 {
                     _maxMPUpkeep += (.15f * this.summonedSentinels.Count);
                 }
                 else
                 {
-                    _maxMPUpkeep += ((.2f - (.02f * heartofstone.level)) * this.summonedSentinels.Count);
+                    _maxMPUpkeep += ((.2f - (.02f * heartofstone)) * this.summonedSentinels.Count);
                 }
             }
             if(this.BrandPawns != null && this.BrandPawns.Count > 0)
             {
-                float brandCost = this.BrandPawns.Count * (TorannMagicDefOf.TM_Branding.upkeepRegenCost * (1f - (TorannMagicDefOf.TM_Branding.upkeepEfficiencyPercent * this.MagicData.GetSkill_Efficiency(TorannMagicDefOf.TM_Branding).level)));
+                float brandCost = this.BrandPawns.Count * (TorannMagicDefOf.TM_Branding.upkeepRegenCost * (1f - (TorannMagicDefOf.TM_Branding.upkeepEfficiencyPercent * (applyOriginalBody ? this.MagicData.GetSkill_Efficiency(TorannMagicDefOf.TM_Branding).level : ClassProgression.SpiritRebirthRuntime.SavedRank(this.MagicData, TorannMagicDefOf.TM_Branding, "_eff")))));
                 if(sigilSurging)
                 {
-                    brandCost *= (5f * (1f - (.1f * this.MagicData.GetSkill_Efficiency(TorannMagicDefOf.TM_SigilSurge).level)));
+                    brandCost *= (5f * (1f - (.1f * (applyOriginalBody ? this.MagicData.GetSkill_Efficiency(TorannMagicDefOf.TM_SigilSurge).level : ClassProgression.SpiritRebirthRuntime.SavedRank(this.MagicData, TorannMagicDefOf.TM_SigilSurge, "_eff")))));
                 }
                 if(sigilDraining)
                 {
-                    brandCost *= (1.5f * (1f - (.2f * this.MagicData.GetSkill_Efficiency(TorannMagicDefOf.TM_SigilDrain).level)));
+                    brandCost *= (1.5f * (1f - (.2f * (applyOriginalBody ? this.MagicData.GetSkill_Efficiency(TorannMagicDefOf.TM_SigilDrain).level : ClassProgression.SpiritRebirthRuntime.SavedRank(this.MagicData, TorannMagicDefOf.TM_SigilDrain, "_eff")))));
                 }
                 _mpRegenRateUpkeep += brandCost; 
             }
             if(this.livingWall != null && livingWall.Spawned)
             {
-                _maxMPUpkeep += (TorannMagicDefOf.TM_LivingWall.upkeepEnergyCost * (1f - (TorannMagicDefOf.TM_LivingWall.upkeepEfficiencyPercent * this.MagicData.GetSkill_Efficiency(TorannMagicDefOf.TM_LivingWall).level)));
+                _maxMPUpkeep += (TorannMagicDefOf.TM_LivingWall.upkeepEnergyCost * (1f - (TorannMagicDefOf.TM_LivingWall.upkeepEfficiencyPercent * (applyOriginalBody ? this.MagicData.GetSkill_Efficiency(TorannMagicDefOf.TM_LivingWall).level : ClassProgression.SpiritRebirthRuntime.SavedRank(this.MagicData, TorannMagicDefOf.TM_LivingWall, "_eff")))));
             }
             //Bonded spirit animal
             if (this.bondedSpirit != null)
             {
-                _maxMPUpkeep += (TorannMagicDefOf.TM_GuardianSpirit.upkeepEnergyCost * (1f - (TorannMagicDefOf.TM_GuardianSpirit.upkeepEfficiencyPercent * this.MagicData.GetSkill_Efficiency(TorannMagicDefOf.TM_GuardianSpirit).level)));
-                _mpRegenRateUpkeep += (TorannMagicDefOf.TM_GuardianSpirit.upkeepRegenCost * (1f - (TorannMagicDefOf.TM_GuardianSpirit.upkeepEfficiencyPercent * this.MagicData.GetSkill_Efficiency(TorannMagicDefOf.TM_GuardianSpirit).level)));
+                _maxMPUpkeep += (TorannMagicDefOf.TM_GuardianSpirit.upkeepEnergyCost * (1f - (TorannMagicDefOf.TM_GuardianSpirit.upkeepEfficiencyPercent * (applyOriginalBody ? this.MagicData.GetSkill_Efficiency(TorannMagicDefOf.TM_GuardianSpirit).level : ClassProgression.SpiritRebirthRuntime.SavedRank(this.MagicData, TorannMagicDefOf.TM_GuardianSpirit, "_eff")))));
+                _mpRegenRateUpkeep += (TorannMagicDefOf.TM_GuardianSpirit.upkeepRegenCost * (1f - (TorannMagicDefOf.TM_GuardianSpirit.upkeepEfficiencyPercent * (applyOriginalBody ? this.MagicData.GetSkill_Efficiency(TorannMagicDefOf.TM_GuardianSpirit).level : ClassProgression.SpiritRebirthRuntime.SavedRank(this.MagicData, TorannMagicDefOf.TM_GuardianSpirit, "_eff")))));
                 if (this.bondedSpirit.Dead || this.bondedSpirit.Destroyed)
                 {
                     this.bondedSpirit = null;
@@ -6540,7 +6572,7 @@ namespace TorannMagic
                 {
                     HealthUtility.AdjustSeverity(this.bondedSpirit, TorannMagicDefOf.TM_SpiritBondHD, .5f);
                 }
-                if(TorannMagicDefOf.TM_SpiritCrowR == this.GuardianSpiritType)
+                if(applyOriginalBody && TorannMagicDefOf.TM_SpiritCrowR == this.GuardianSpiritType)
                 {
                     Hediff hd = this.Pawn.health.hediffSet.GetFirstHediffOfDef(TorannMagicDefOf.TM_CrowInsightHD);
                     if(hd != null && hd.Severity != (.5f + this.MagicData.GetSkill_Power(TorannMagicDefOf.TM_GuardianSpirit).level))
@@ -6563,7 +6595,7 @@ namespace TorannMagic
                         this.enchanterStones.Remove(this.enchanterStones[i]);
                     }
                 }
-                _maxMPUpkeep += (this.enchanterStones.Count * (TorannMagicDefOf.TM_EnchanterStone.upkeepEnergyCost * (1f - TorannMagicDefOf.TM_EnchanterStone.upkeepEfficiencyPercent * this.MagicData.MagicPowerSkill_EnchanterStone.FirstOrDefault((MagicPowerSkill x) => x.label == "TM_EnchanterStone_eff").level)));
+                _maxMPUpkeep += (this.enchanterStones.Count * (TorannMagicDefOf.TM_EnchanterStone.upkeepEnergyCost * (1f - TorannMagicDefOf.TM_EnchanterStone.upkeepEfficiencyPercent * (applyOriginalBody ? this.MagicData.MagicPowerSkill_EnchanterStone.FirstOrDefault((MagicPowerSkill x) => x.label == "TM_EnchanterStone_eff").level : ClassProgression.SpiritRebirthRuntime.SavedRank(this.MagicData, "TM_EnchanterStone_eff")))));
             }
             try
             {
@@ -6578,7 +6610,7 @@ namespace TorannMagic
             }
             if (ClassProgression.ClassIdentity.IsLich(this.Pawn))
             {
-                if (!ClassProgression.ClassIdentity.TryGetState(this.Pawn, out _)
+                if (applyOriginalBody && !ClassProgression.ClassIdentity.TryGetState(this.Pawn, out _)
                     && (this.spell_LichForm == true || (this.customClass != null && this.MagicData.ReturnMatchingMagicPower(TorannMagicDefOf.TM_LichForm).learned)))
                 {
                     this.RemovePawnAbility(TorannMagicDefOf.TM_LichForm);
@@ -6594,33 +6626,33 @@ namespace TorannMagic
             }
             if (this.recallSet)
             {
-                _maxMPUpkeep += TorannMagicDefOf.TM_Recall.upkeepEnergyCost * (1 - (TorannMagicDefOf.TM_Recall.upkeepEfficiencyPercent * this.MagicData.MagicPowerSkill_Recall.FirstOrDefault((MagicPowerSkill x) => x.label == "TM_Recall_eff").level));
-                _mpRegenRateUpkeep += TorannMagicDefOf.TM_Recall.upkeepRegenCost * (1 - (TorannMagicDefOf.TM_Recall.upkeepEfficiencyPercent * this.MagicData.MagicPowerSkill_Recall.FirstOrDefault((MagicPowerSkill x) => x.label == "TM_Recall_eff").level));
+                _maxMPUpkeep += TorannMagicDefOf.TM_Recall.upkeepEnergyCost * (1 - (TorannMagicDefOf.TM_Recall.upkeepEfficiencyPercent * (applyOriginalBody ? this.MagicData.MagicPowerSkill_Recall.FirstOrDefault((MagicPowerSkill x) => x.label == "TM_Recall_eff").level : ClassProgression.SpiritRebirthRuntime.SavedRank(this.MagicData, "TM_Recall_eff"))));
+                _mpRegenRateUpkeep += TorannMagicDefOf.TM_Recall.upkeepRegenCost * (1 - (TorannMagicDefOf.TM_Recall.upkeepEfficiencyPercent * (applyOriginalBody ? this.MagicData.MagicPowerSkill_Recall.FirstOrDefault((MagicPowerSkill x) => x.label == "TM_Recall_eff").level : ClassProgression.SpiritRebirthRuntime.SavedRank(this.MagicData, "TM_Recall_eff"))));
             }
             using (IEnumerator<Hediff> enumerator = this.Pawn.health.hediffSet.hediffs.GetEnumerator())
             {
                 while (enumerator.MoveNext())
                 {
                     Hediff rec = enumerator.Current;
-                    TMAbilityDef ability = this.MagicData.GetHediffAbility(rec);
+                    TMAbilityDef ability = applyOriginalBody ? this.MagicData.GetHediffAbility(rec) : ClassProgression.SpiritRebirthRuntime.SavedHediffAbility(this.MagicData, rec);
                     if (ability != null)
                     {
-                        MagicPowerSkill skill = this.MagicData.GetSkill_Efficiency(ability);
-                        int level = 0;
+                        MagicPowerSkill skill = applyOriginalBody ? this.MagicData.GetSkill_Efficiency(ability) : null;
+                        int level = applyOriginalBody ? 0 : ClassProgression.SpiritRebirthRuntime.SavedRank(this.MagicData, ability, "_eff");
                         if (skill != null)
                         {
                             level = skill.level;
                         }
                         if (ability == TorannMagicDefOf.TM_EnchantedAura || ability == TorannMagicDefOf.TM_EnchantedBody)
                         {
-                            level = this.MagicData.GetSkill_Efficiency(TorannMagicDefOf.TM_EnchantedBody).level;
+                            level = (applyOriginalBody ? this.MagicData.GetSkill_Efficiency(TorannMagicDefOf.TM_EnchantedBody).level : ClassProgression.SpiritRebirthRuntime.SavedRank(this.MagicData, TorannMagicDefOf.TM_EnchantedBody, "_eff"));
                         }
 
                         _maxMPUpkeep += (ability.upkeepEnergyCost * (1f - (ability.upkeepEfficiencyPercent * level)));
 
                         if (ability == TorannMagicDefOf.TM_EnchantedAura || ability == TorannMagicDefOf.TM_EnchantedBody)
                         {
-                            level = this.MagicData.GetSkill_Versatility(TorannMagicDefOf.TM_EnchantedBody).level;
+                            level = (applyOriginalBody ? this.MagicData.GetSkill_Versatility(TorannMagicDefOf.TM_EnchantedBody).level : ClassProgression.SpiritRebirthRuntime.SavedRank(this.MagicData, TorannMagicDefOf.TM_EnchantedBody, "_ver"));
                         }
                         _mpRegenRateUpkeep += (ability.upkeepRegenCost * (1f - (ability.upkeepEfficiencyPercent * level)));
                     }
@@ -6677,17 +6709,17 @@ namespace TorannMagic
             }
 
             //class and global modifiers
-            _arcaneDmg += (.01f * this.MagicData.MagicPowerSkill_WandererCraft.FirstOrDefault((MagicPowerSkill x) => x.label == "TM_WandererCraft_pwr").level);
-            _arcaneRes += (.02f * this.MagicData.MagicPowerSkill_WandererCraft.FirstOrDefault((MagicPowerSkill x) => x.label == "TM_WandererCraft_pwr").level);
-            _mpCost -= (.01f * this.MagicData.MagicPowerSkill_WandererCraft.FirstOrDefault((MagicPowerSkill x) => x.label == "TM_WandererCraft_eff").level);
-            _xpGain += (.02f * this.MagicData.MagicPowerSkill_WandererCraft.FirstOrDefault((MagicPowerSkill x) => x.label == "TM_WandererCraft_eff").level);
-            _coolDown -= (.01f * this.MagicData.MagicPowerSkill_WandererCraft.FirstOrDefault((MagicPowerSkill x) => x.label == "TM_WandererCraft_ver").level);
-            _mpRegenRate += (.01f * this.MagicData.MagicPowerSkill_WandererCraft.FirstOrDefault((MagicPowerSkill x) => x.label == "TM_WandererCraft_ver").level);
-            _maxMP += (.02f * this.MagicData.MagicPowerSkill_WandererCraft.FirstOrDefault((MagicPowerSkill x) => x.label == "TM_WandererCraft_ver").level);
+            _arcaneDmg += (.01f * (applyOriginalBody ? this.MagicData.MagicPowerSkill_WandererCraft.FirstOrDefault((MagicPowerSkill x) => x.label == "TM_WandererCraft_pwr").level : ClassProgression.SpiritRebirthRuntime.SavedRank(this.MagicData, "TM_WandererCraft_pwr")));
+            _arcaneRes += (.02f * (applyOriginalBody ? this.MagicData.MagicPowerSkill_WandererCraft.FirstOrDefault((MagicPowerSkill x) => x.label == "TM_WandererCraft_pwr").level : ClassProgression.SpiritRebirthRuntime.SavedRank(this.MagicData, "TM_WandererCraft_pwr")));
+            _mpCost -= (.01f * (applyOriginalBody ? this.MagicData.MagicPowerSkill_WandererCraft.FirstOrDefault((MagicPowerSkill x) => x.label == "TM_WandererCraft_eff").level : ClassProgression.SpiritRebirthRuntime.SavedRank(this.MagicData, "TM_WandererCraft_eff")));
+            _xpGain += (.02f * (applyOriginalBody ? this.MagicData.MagicPowerSkill_WandererCraft.FirstOrDefault((MagicPowerSkill x) => x.label == "TM_WandererCraft_eff").level : ClassProgression.SpiritRebirthRuntime.SavedRank(this.MagicData, "TM_WandererCraft_eff")));
+            _coolDown -= (.01f * (applyOriginalBody ? this.MagicData.MagicPowerSkill_WandererCraft.FirstOrDefault((MagicPowerSkill x) => x.label == "TM_WandererCraft_ver").level : ClassProgression.SpiritRebirthRuntime.SavedRank(this.MagicData, "TM_WandererCraft_ver")));
+            _mpRegenRate += (.01f * (applyOriginalBody ? this.MagicData.MagicPowerSkill_WandererCraft.FirstOrDefault((MagicPowerSkill x) => x.label == "TM_WandererCraft_ver").level : ClassProgression.SpiritRebirthRuntime.SavedRank(this.MagicData, "TM_WandererCraft_ver")));
+            _maxMP += (.02f * (applyOriginalBody ? this.MagicData.MagicPowerSkill_WandererCraft.FirstOrDefault((MagicPowerSkill x) => x.label == "TM_WandererCraft_ver").level : ClassProgression.SpiritRebirthRuntime.SavedRank(this.MagicData, "TM_WandererCraft_ver")));
 
-            _maxMP += (.04f * this.MagicData.MagicPowerSkill_global_spirit.FirstOrDefault((MagicPowerSkill x) => x.label == "TM_global_spirit_pwr").level);
-            _mpRegenRate += (.05f * this.MagicData.MagicPowerSkill_global_regen.FirstOrDefault((MagicPowerSkill x) => x.label == "TM_global_regen_pwr").level);
-            _mpCost -= (.025f * this.MagicData.MagicPowerSkill_global_eff.FirstOrDefault((MagicPowerSkill x) => x.label == "TM_global_eff_pwr").level);
+            _maxMP += (.04f * (applyOriginalBody ? this.MagicData.MagicPowerSkill_global_spirit.FirstOrDefault((MagicPowerSkill x) => x.label == "TM_global_spirit_pwr").level : ClassProgression.SpiritRebirthRuntime.SavedRank(this.MagicData, "TM_global_spirit_pwr")));
+            _mpRegenRate += (.05f * (applyOriginalBody ? this.MagicData.MagicPowerSkill_global_regen.FirstOrDefault((MagicPowerSkill x) => x.label == "TM_global_regen_pwr").level : ClassProgression.SpiritRebirthRuntime.SavedRank(this.MagicData, "TM_global_regen_pwr")));
+            _mpCost -= (.025f * (applyOriginalBody ? this.MagicData.MagicPowerSkill_global_eff.FirstOrDefault((MagicPowerSkill x) => x.label == "TM_global_eff_pwr").level : ClassProgression.SpiritRebirthRuntime.SavedRank(this.MagicData, "TM_global_eff_pwr")));
             _arcaneRes += ((1f - this.Pawn.GetStatValue(StatDefOf.PsychicSensitivity, false)) / 2f);
             _arcaneDmg += ((this.Pawn.GetStatValue(StatDefOf.PsychicSensitivity, false) - 1f) / 4f);
 
@@ -6700,7 +6732,7 @@ namespace TorannMagic
                 this.arcalleumCooldown = Mathf.Clamp(0f + _arcalleumCooldown, 0f, .5f);
             }
 
-            float val = (1f - (.03f * this.MagicData.MagicPowerSkill_Cantrips.FirstOrDefault((MagicPowerSkill x) => x.label == "TM_Cantrips_eff").level));
+            float val = (1f - (.03f * (applyOriginalBody ? this.MagicData.MagicPowerSkill_Cantrips.FirstOrDefault((MagicPowerSkill x) => x.label == "TM_Cantrips_eff").level : ClassProgression.SpiritRebirthRuntime.SavedRank(this.MagicData, "TM_Cantrips_eff"))));
             _maxMPUpkeep *= val;
             _mpRegenRateUpkeep *= val;
 
@@ -6717,7 +6749,7 @@ namespace TorannMagic
             this.arcaneRes = Mathf.Clamp(1 + _arcaneRes, 0.01f, 5f);
             this.arcaneDmg = 1 + _arcaneDmg;
 
-            if (this.IsMagicUser && !TM_Calc.IsCrossClass(this.Pawn, true))
+            if (applyOriginalBody && this.IsMagicUser && !TM_Calc.IsCrossClass(this.Pawn, true))
             {
                 if (this.maxMP != 1f && !this.Pawn.health.hediffSet.HasHediff(HediffDef.Named("TM_HediffEnchantment_maxEnergy")))
                 {
@@ -6816,6 +6848,12 @@ namespace TorannMagic
 
         public override void PostExposeData()
         {
+            if (Scribe.mode != LoadSaveMode.Saving || ClassProgression.SpiritRebirthEnergy.Marked(Pawn))
+                Scribe_Deep.Look(ref spiritRuntimeClock, "TM_spiritMagicRuntimeClock");
+            if (spiritRuntimeClock == null) spiritRuntimeClock = new ClassProgression.SpiritRuntimeClock();
+            if (Scribe.mode != LoadSaveMode.Saving || ClassProgression.SpiritRebirthEnergy.Marked(Pawn))
+                Scribe_Collections.Look(ref chainedAbilitiesList, "TM_spiritMagicChainedAbilities", LookMode.Deep);
+            if (chainedAbilitiesList == null) chainedAbilitiesList = new List<ChainedMagicAbility>();
             ExposeTechnomancerOverdrive();
             //base.PostExposeData();            
             Scribe_Values.Look<bool>(ref this.magicPowersInitialized, "magicPowersInitialized", false, false);

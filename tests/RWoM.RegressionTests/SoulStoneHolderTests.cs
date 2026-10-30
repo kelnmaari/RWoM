@@ -24,7 +24,7 @@ internal static class SoulStoneHolderTests
         yield return new("SoulStoneHolder.ExactNativeCaptureImplantAndRecovery", CaptureImplant);
         yield return new("SoulStoneHolder.RejectForeignUnmarkedOccupiedAndRetry", Rejections);
         yield return new("SoulStoneHolder.OccupiedDestroyStackAndSplitSafety", Safety);
-        yield return new("SoulStoneHolder.NativeStonePawnDeepScribe", Save);
+        yield return new("SoulStoneHolder.NativeStonePawnDeepScribe", r => Save(r));
         yield return new("SoulStoneHolder.FailedStateCommitRestoresExactOwner", Rollback);
     }
 
@@ -133,12 +133,13 @@ internal static class SoulStoneHolderTests
         Check.Equal(true, state.HasValidStone(f.Original), "nested stone custody valid");
     }
 
-    static void Save(RuntimeFixture r)
+    internal static void Save(RuntimeFixture r, bool runtime = false)
     {
         using var f = new SpiritRebirthStateTests.Fixture(r);
         var defs = DefDatabase<ThingDef>.AllDefsListForReading.ToArray();
         var capacities = DefDatabase<PawnCapacityDef>.AllDefsListForReading.ToArray();
         var needDefs = DefDatabase<NeedDef>.AllDefsListForReading.ToArray();
+        var hairDefs = DefDatabase<HairDef>.AllDefsListForReading.ToArray();
         var priorMana = TorannMagicDefOf.TM_Mana; var priorSpirit = TorannMagicDefOf.TM_SpiritND;
         var culture = System.Globalization.CultureInfo.CurrentCulture;
         using var patches = new FleshStatTests.ProductionPatches();
@@ -154,7 +155,19 @@ internal static class SoulStoneHolderTests
             pawn.def.race = new RaceProperties { body = new BodyDef { corePart = new BodyPartRecord { def = new BodyPartDef() } } };
             pawn.def.comps = new List<CompProperties> { new CompProperties { compClass = typeof(CompClassProgression) } };
             Set(pawn, "comps", new List<ThingComp> { f.Comp });
-            pawn.story = null; pawn.Name = null;
+            if (runtime)
+            {
+                pawn.def.comps.Add(new CompProperties { compClass = typeof(CompAbilityUserMagic) });
+                pawn.def.comps.Add(new CompProperties { compClass = typeof(CompAbilityUserMight) });
+                pawn.AllComps.Add(f.Magic); pawn.AllComps.Add(f.Might);
+            }
+            if (!runtime) pawn.story = null;
+            else
+            {
+                pawn.story.hairDef = new HairDef { defName = "SpiritRuntimeSavedHair" };
+                DefDatabase<HairDef>.Add(pawn.story.hairDef);
+            }
+            pawn.Name = null;
             pawn.ageTracker = new Pawn_AgeTracker(pawn);
             Set(pawn.ageTracker, "ageBiologicalTicksInt", 25L * 3600000L);
             pawn.def.race.lifeStageAges = [new LifeStageAge { minAge = 13, def = new LifeStageDef { developmentalStage = DevelopmentalStage.Adult } }];
@@ -171,6 +184,15 @@ internal static class SoulStoneHolderTests
             f.Comp.DelayNextTomeQuest(1234);
             var state = f.Begin(); f.Hold(f.Host, pawn); Invoke(state, "TryEnterHost", pawn, f.Host);
             var stone = Stone(); Check.Equal(true, Invoke(stone, "TryCapture", pawn, f.Host, false), "save capture");
+            if (runtime)
+            {
+                var ability = r.AddAbility("SpiritRuntimeSavedChain");
+                f.Magic.chainedAbilitiesList.Add(new CompAbilityUserMagic.ChainedMagicAbility(ability, 42, true));
+                f.Might.chainedAbilitiesList.Add(new CompAbilityUserMight.ChainedMightAbility(ability, 51, true));
+                Set(typeof(CompAbilityUserMagic).GetField("spiritRuntimeClock", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(f.Magic)!, "lastTick", 101);
+                Set(typeof(CompAbilityUserMight).GetField("spiritRuntimeClock", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(f.Might)!, "lastTick", 102);
+                Set(pawn.needs.TryGetNeed<Need_Mana>(), "lastSpiritIntervalTick", 99);
+            }
             if (capacities.Length == 0) DefDatabase<PawnCapacityDef>.Add(new PawnCapacityDef { defName = "SoulStoneFixtureCapacity" });
             DefDatabase<ThingDef>.Add(pawn.def); DefDatabase<ThingDef>.Add(stone.def);
             Set(Current.Game, "uniqueIDsManager", new UniqueIDsManager());
@@ -196,6 +218,18 @@ internal static class SoulStoneHolderTests
             Check.Equal(.27f, Check.NotNull(soul.needs.TryGetNeed(TorannMagicDefOf.TM_Mana), "loaded original Mana need").CurLevel, "saved upkeep mana survives load and refresh");
             Check.Equal(true, restored.RecoveryRequired, "recovery debt survives native save");
             Check.Equal(0, restored.RecoveryTicks, "stone never advances recovery");
+            if (runtime)
+            {
+                var magic = soul.GetComp<CompAbilityUserMagic>(); var might = soul.GetComp<CompAbilityUserMight>();
+                Check.Equal(42, magic.chainedAbilitiesList.Single().expirationTicks, "native original Magic chain timer survives");
+                Check.Equal(51, might.chainedAbilitiesList.Single().expirationTicks, "native original Might chain timer survives");
+                foreach (var owner in new object[] { magic, might })
+                {
+                    var clock = owner.GetType().GetField("spiritRuntimeClock", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(owner)!;
+                    Check.Equal(owner is CompAbilityUserMagic ? 101 : 102, (int)clock.GetType().GetField("lastTick", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(clock)!, "native independent comp clock receipt survives");
+                }
+                Check.Equal(99, (int)typeof(Need_Mana).GetField("lastSpiritIntervalTick", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(soul.needs.TryGetNeed<Need_Mana>())!, "native held need cadence survives");
+            }
             var comp = soul.GetComp<CompClassProgression>();
             Check.Equal(true, comp.State.Find("rwom.necromancer") != null, "class discipline survives on original comp");
             Check.Equal(f.Comp.TomeQuestAvailableAtTick, comp.TomeQuestAvailableAtTick, "progression investment remains owned by pawn");
@@ -208,6 +242,7 @@ internal static class SoulStoneHolderTests
             DefDatabase<PawnCapacityDef>.Clear(); foreach (var def in capacities) DefDatabase<PawnCapacityDef>.Add(def);
             TorannMagicDefOf.TM_Mana = priorMana; TorannMagicDefOf.TM_SpiritND = priorSpirit;
             DefDatabase<NeedDef>.Clear(); foreach (var def in needDefs) DefDatabase<NeedDef>.Add(def);
+            DefDatabase<HairDef>.Clear(); foreach (var def in hairDefs) DefDatabase<HairDef>.Add(def);
             System.Globalization.CultureInfo.CurrentCulture = culture;
         }
     }
