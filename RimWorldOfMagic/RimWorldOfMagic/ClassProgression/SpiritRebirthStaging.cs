@@ -38,6 +38,10 @@ namespace TorannMagic.ClassProgression
         internal Thing SourceAt(int index) => trips[index].source;
         internal IntVec3 CellAt(int index) => trips[index].cell;
         internal IntVec3 ReleaseCell => trips[trips.Count - 1].cell;
+        internal bool ReleaseContextValid(Pawn pawn, Job job)
+            => ReferenceEquals(pawn, creator) && ReferenceEquals(job, ownerJob) && pawn.CurJob == job
+                && job.targetA.Thing == circle && pawn.Position == circle.InteractionCell
+                && Reserved(circle, 1) && Reserved(circle.InteractionCell, -1) && Reserved(ReleaseCell, -1);
         internal bool WorkValid(Pawn pawn, Job job)
             => ValidActor(pawn, job) && pawn.Position == circle.InteractionCell && pawn.carryTracker.CarriedThing == null
                 && Reserved(circle, 1) && Reserved(circle.InteractionCell, -1)

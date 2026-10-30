@@ -19,7 +19,7 @@ internal static class SpiritRebirthRitualJobTests
     }
     public static IEnumerable<TestCase> Cases()
     {
-        foreach (string scenario in new[] { "NativeObservedWorkAndCompletion", "CancelledWorkSave", "InterruptedReleaseCleanup" })
+        foreach (string scenario in new[] { "NativeObservedWorkAndCompletion", "CancelledWorkSave", "InterruptedReleaseCleanup", "ReleaseCircleChanged", "ReleaseJobReplaced", "RevivalJobReplaced" })
         yield return new("SpiritRitualJob." + scenario, r => SpiritRebirthRitualTransactionTests.Run(r, c =>
         {
             Check.NotNull(Production("JobDriver_SpiritRebirth").GetProperty("WorkTicks", BindingFlags.Instance | BindingFlags.NonPublic), "saved observed work counter exists");
@@ -97,6 +97,26 @@ internal static class SpiritRebirthRitualJobTests
                 var problems = (List<string>)typeof(RuntimeLog).GetField("Problems", BindingFlags.Static | BindingFlags.NonPublic)!.GetValue(null)!;
                 Check.Equal(true, problems.Count > 0 && problems.All(p => p.Contains("injected ritual release")), "only explicit release failure diagnostic");
                 RuntimeLog.Clear(); return;
+            }
+            if (scenario == "ReleaseCircleChanged" || scenario == "ReleaseJobReplaced" || scenario == "RevivalJobReplaced")
+            {
+                transitionContext = c; transitionScenario = scenario; transitionReplacement = null;
+                revivalCalls = paymentUnits = transitionCalls = 0;
+                try
+                {
+                    using var revivalObserver = new Fault(typeof(ResurrectionUtility).GetMethod(nameof(ResurrectionUtility.TryResurrect))!, nameof(CountRevival));
+                    using var paymentObserver = new Fault(typeof(Thing).GetMethod(nameof(Thing.Destroy))!, nameof(CountPayment));
+                    using var callback = new Fault(scenario == "RevivalJobReplaced" ? typeof(ResurrectionUtility).GetMethod(nameof(ResurrectionUtility.TryResurrect))! : typeof(PawnComponentsUtility).GetMethod(nameof(PawnComponentsUtility.AddComponentsForSpawn))!, nameof(ChangeTransition), postfix: scenario == "RevivalJobReplaced");
+                    Tick(50000);
+                    Check.Equal(1, transitionCalls, "actual native boundary changed ritual context once");
+                    Check.Equal(1, revivalCalls, "actual original resurrected exactly once");
+                    Check.Equal(350, paymentUnits, "native payment destruction exactly 300 plus 50 once");
+                    Check.Equal(SpiritRebirthForm.Dormant, ClassIdentity.Component(c.Original).SpiritRebirth.Form, "changed ritual context cannot commit active form");
+                    Check.Same(c.Creator.inventory.innerContainer, c.Original.holdingOwner, "inactive original secured after outer native callback finishes");
+                    if (transitionReplacement != null) Check.Same(transitionReplacement, c.Creator.CurJob, "old ritual preserves replacement job");
+                    RuntimeLog.AssertClean(); return;
+                }
+                finally { transitionContext = null; transitionScenario = null; transitionReplacement = null; }
             }
             Tick(50000);
             Check.Equal(false, c.Original.Dead, "one observed tick after gap completes real resurrection");
@@ -311,6 +331,27 @@ internal static class SpiritRebirthRitualJobTests
         return (job, driver.GetType().GetProperty("Staging", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(driver)!);
     }
     static ThingOwner? refusedOwner;
+    static SpiritRebirthRitualTransactionTests.Context? transitionContext;
+    static string? transitionScenario;
+    static Job? transitionReplacement;
+    static int revivalCalls, paymentUnits, transitionCalls;
+    static void CountRevival(Pawn pawn) { if (ReferenceEquals(pawn, transitionContext?.Original)) revivalCalls++; }
+    static void CountPayment(Thing __instance)
+    {
+        if (__instance.def == transitionContext?.Magicyte.def || __instance.def == transitionContext?.Silver.def) paymentUnits += __instance.stackCount;
+    }
+    static void ChangeTransition(Pawn pawn)
+    {
+        var c = transitionContext;
+        if (c == null || !ReferenceEquals(pawn, c.Original)) return;
+        transitionCalls++;
+        if (transitionScenario == "ReleaseCircleChanged") c.Circle.MageList.Add(c.Creator);
+        else
+        {
+            transitionReplacement = JobMaker.MakeJob(JobDefOf.Wait_MaintainPosture);
+            c.Creator.jobs.StartJob(transitionReplacement, JobCondition.InterruptForced, canReturnCurJobToPool: true, addToJobsThisTick: false);
+        }
+    }
     static Pawn? failingSpawn;
     static void FailReleaseSpawn(Pawn pawn) { if (ReferenceEquals(pawn, failingSpawn)) throw new InvalidOperationException("injected ritual release"); }
     static bool RefuseCarry(ThingOwner __instance, ref bool __result)
@@ -321,11 +362,11 @@ internal static class SpiritRebirthRitualJobTests
     sealed class Fault : IDisposable
     {
         readonly object harmony; readonly string id = "rwom.ritual-haul-fault." + Guid.NewGuid();
-        public Fault(MethodBase? target = null, string callback = nameof(RefuseCarry))
+        public Fault(MethodBase? target = null, string callback = nameof(RefuseCarry), bool postfix = false)
         {
             var assembly = Assembly.Load("0Harmony"); harmony = Activator.CreateInstance(assembly.GetType("HarmonyLib.Harmony")!, id)!;
             var method = Activator.CreateInstance(assembly.GetType("HarmonyLib.HarmonyMethod")!, typeof(SpiritRebirthRitualJobTests).GetMethod(callback, BindingFlags.NonPublic | BindingFlags.Static)!)!;
-            harmony.GetType().GetMethod("Patch")!.Invoke(harmony, [target ?? typeof(ThingOwner<Thing>).GetMethod("TryAdd", [typeof(Thing), typeof(bool)])!, method, null, null, null]);
+            harmony.GetType().GetMethod("Patch")!.Invoke(harmony, [target ?? typeof(ThingOwner<Thing>).GetMethod("TryAdd", [typeof(Thing), typeof(bool)])!, postfix ? null : method, postfix ? method : null, null, null]);
         }
         public void Dispose() => harmony.GetType().GetMethod("UnpatchAll")!.Invoke(harmony, [id]);
     }

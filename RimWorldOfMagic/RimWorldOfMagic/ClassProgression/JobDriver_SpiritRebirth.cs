@@ -12,6 +12,7 @@ namespace TorannMagic.ClassProgression
         private bool completionStarted;
         internal SpiritRebirthStaging Staging => staging;
         internal int WorkTicks => workTicks;
+        private bool OwnsCurrentJob => pawn.CurJob == job && ReferenceEquals(pawn.jobs.curDriver, this);
 
         public override bool TryMakePreToilReservations(bool errorOnFailed)
         {
@@ -75,16 +76,30 @@ namespace TorannMagic.ClassProgression
         {
             var original = staging?.Original;
             var receipt = ClassIdentity.Component(original)?.SpiritRitual;
-            bool released = receipt != null && receipt.Paid && receipt.Converted
-                && receipt.TryRelease(pawn, pawn.Map, staging.ReleaseCell) == SpiritReleaseResult.Released
-                && SpiritRebirthFormPolicy.IsSpawnedEthereal(original);
+            if (!OwnsCurrentJob) { SecureReceipt(receipt, original); return; }
+            // The ritual's own corpse/material destruction is expected here.
+            // Only the paid receipt and remaining release context may authorize
+            // activation, including after reentrant native callbacks.
+            bool ContextValid() => OwnsCurrentJob && receipt != null
+                && ReferenceEquals(ClassIdentity.Component(original)?.SpiritRitual, receipt)
+                && receipt.CanOrderPaidRecovery(pawn, original, staging.Circle)
+                && staging.ReleaseContextValid(pawn, job);
+            bool released = ContextValid()
+                && receipt.TryReleaseWithGuard(pawn, pawn.Map, staging.ReleaseCell, ContextValid) == SpiritReleaseResult.Released
+                && receipt.RecoveryCompleted(pawn);
+            if (!OwnsCurrentJob) { SecureReceipt(receipt, original); return; }
             EndJobWith(released ? JobCondition.Succeeded : JobCondition.Incompletable);
         }
 
         private void SecurePendingOriginal()
         {
             var receipt = ClassIdentity.Component(staging?.Original)?.SpiritRitual;
-            if (receipt != null && receipt.Attempted && !SpiritRebirthFormPolicy.IsSpawnedEthereal(staging.Original))
+            SecureReceipt(receipt, staging?.Original);
+        }
+
+        private void SecureReceipt(SpiritRebirthRitualTransaction receipt, Pawn original)
+        {
+            if (receipt != null && receipt.Attempted && !SpiritRebirthFormPolicy.IsSpawnedEthereal(original))
                 receipt.TryRetainReleaseForCleanup(pawn);
         }
 
