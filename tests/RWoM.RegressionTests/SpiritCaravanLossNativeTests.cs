@@ -13,7 +13,11 @@ internal static class SpiritCaravanLossNativeTests
 {
     public static IEnumerable<TestCase> Cases()
     {
-        yield return new("SpiritCaravanLoss.NativeDiscardWithoutWorldRegistration", r => SpiritRebirthRitualTransactionTests.Run(r, c =>
+        yield return new("SpiritCaravanLoss.NativeDiscardWithoutWorldRegistration", r => Run(r));
+    }
+    internal static void Run(RuntimeFixture r, Action<SpiritRebirthRitualTransactionTests.Context, Thing_SoulStone>? dispose = null,
+        bool expectCompleted = true)
+        => SpiritRebirthRitualTransactionTests.Run(r, c =>
         {
             typeof(SpellItemEffectTests).GetMethod("HeadlessDefOf", BindingFlags.Static | BindingFlags.NonPublic)!.Invoke(null, [typeof(PawnRelationDefOf)]);
             Check.Equal("ConvertedHeld", c.Execute(), "actual original revived and pending");
@@ -37,9 +41,14 @@ internal static class SpiritCaravanLossNativeTests
             Check.Equal(false, Find.WorldPawns.Contains(original), "original is not a world pawn");
             passCalls = 0;
             using var observer = new PassObserver();
-            var discard = typeof(WorldPawns).GetMethod("DiscardPawn", BindingFlags.Instance | BindingFlags.NonPublic)!;
-            try { discard.Invoke(Find.WorldPawns, [original, true]); }
-            catch (TargetInvocationException e) { System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(e.InnerException!).Throw(); }
+            if (dispose != null) dispose(c, stone);
+            else
+            {
+                var discard = typeof(WorldPawns).GetMethod("DiscardPawn", BindingFlags.Instance | BindingFlags.NonPublic)!;
+                try { discard.Invoke(Find.WorldPawns, [original, true]); }
+                catch (TargetInvocationException e) { System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(e.InnerException!).Throw(); }
+            }
+            if (!expectCompleted) return;
             Check.Equal(true, original.Destroyed && original.Discarded, "actual native destroy and discard complete");
             Check.Equal(false, Find.WorldPawns.IsBeingDiscarded(original), "native discard scope cleared");
             Check.Equal(false, Find.WorldPawns.Contains(original), "no persisted world-pawn original");
@@ -66,8 +75,7 @@ internal static class SpiritCaravanLossNativeTests
                 c.Original.def.destroyable = oldDestroyable;
                 Find.World.worldObjects = oldWorldObjects;
             }
-        }));
-    }
+        });
 
     static int passCalls;
     static HediffComp NewUndead() => (HediffComp)Activator.CreateInstance(typeof(SpiritRebirthState).Assembly.GetType("TorannMagic.HediffComp_Undead")!)!;
