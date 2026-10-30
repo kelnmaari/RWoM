@@ -17,12 +17,15 @@ internal static class SpiritRebirthStateTests
         yield return new("SpiritRebirthState.ExactNativeHostCustody", Custody);
         yield return new("SpiritRebirthState.NativeScribeReferencesAndLegacyNull", Save);
         yield return new("SpiritRebirthState.UnsupportedStateNeverAuthorizesHost", Invalid);
+        yield return new("SpiritRebirthState.StoneRecoveryLivingTicksAndDeathReset", Recovery);
+        yield return new("SpiritRebirthState.RecoveryScribeAndFoundationMigration", RecoverySave);
+        yield return new("SpiritRebirthState.MalformedRecoverySaveCannotUnlock", MalformedRecoverySave);
     }
 
-    static bool Invoke(object target, string name, params object[] args)
+    internal static bool Invoke(object target, string name, params object[] args)
         => (bool)target.GetType().GetMethod(name, BindingFlags.Instance | BindingFlags.NonPublic)!.Invoke(target, args)!;
 
-    sealed class Fixture : IDisposable
+    internal sealed class Fixture : IDisposable
     {
         readonly HediffDef oldPossession = TorannMagicDefOf.TM_SpiritPossessionHD;
         readonly Game previousGame = Current.Game;
@@ -41,6 +44,7 @@ internal static class SpiritRebirthStateTests
             Set(Current.Game, "maps", new List<Map> { map });
             var original = PawnWithComps(true, true);
             Original = original.pawn; Magic = original.magic; Might = original.might;
+            Original.def.stackLimit = 1;
             Host = PawnWithComps(true, true).pawn; Other = PawnWithComps(false, false).pawn;
             Original.thingIDNumber = 67101; Host.thingIDNumber = 67102; Other.thingIDNumber = 67103;
             Comp = new CompClassProgression { parent = Original }; Original.AllComps.Add(Comp);
@@ -171,6 +175,110 @@ internal static class SpiritRebirthStateTests
             Check.Same(magic, f.Magic.MagicData, "state save never copies magic data"); Check.Same(might, f.Might.MightData, "state save never copies might data");
             var xml = XDocument.Load(Path.Combine(r.WorkingDirectory, "spirit-state-" + possessed + ".xml"));
             Check.Equal(false, xml.Descendants("magicData").Any() || xml.Descendants("mightData").Any(), "state serialization owns no class snapshot");
+        }
+    }
+
+    static SpiritRebirthState Recovering(Fixture f)
+    {
+        var state = f.Begin(); var possession = f.Hold(f.Host, f.Original);
+        Check.Equal(true, Invoke(state, "TryEnterHost", f.Original, f.Host), "ordinary ethereal possession");
+        Check.Equal(false, state.RecoveryRequired, "ordinary possession has no stone recovery debt");
+        Check.Equal(true, state.CanVoluntarilyLeaveHost(f.Original), "ordinary possession can leave");
+        var stone = new Thing_SoulStone();
+        Check.Equal(true, Invoke(stone, "TryCapture", f.Original, f.Host, false), "native host transfers actual spirit to stone");
+        Check.Equal(true, state.HasValidStone(f.Original), "stone custody is reciprocal");
+        Check.Equal(false, Invoke(state, "TickRecovery", f.Original, f.Host, 50), "stone never recovers");
+        Check.Equal(true, Invoke(stone, "TryImplant", f.Original, possession), "actual spirit reimplants");
+        Check.Equal(true, state.RecoveryRequired, "stone assigns full week debt");
+        return state;
+    }
+
+    static void Recovery(RuntimeFixture r)
+    {
+        using var f = new Fixture(r); var state = Recovering(f);
+        Check.Equal(false, state.CanVoluntarilyLeaveHost(f.Original), "recovery blocks voluntary departure");
+        var originalHolder = f.Original.holdingOwner; originalHolder.Remove(f.Original);
+        Set(f.Original, "mapIndexOrState", (sbyte)0);
+        Check.Equal(false, Invoke(state, "TryLeaveHost", f.Original, f.Host), "placing spirit cannot bypass recovery release gate");
+        Set(f.Original, "mapIndexOrState", (sbyte)-1); originalHolder.TryAdd(f.Original, false);
+        Invoke(state, "TickRecovery", f.Original, f.Host, 10);
+        Invoke(state, "TickRecovery", f.Original, f.Host, 11);
+        Check.Equal(1, state.RecoveryTicks, "partial progress exists before depletion");
+        var depleted = new Thing_SoulStone();
+        Check.Equal(true, Invoke(depleted, "TryCapture", f.Original, f.Host, false), "forced depletion can safely collapse during recovery lock");
+        Check.Equal(0, state.RecoveryTicks, "forced depletion starts full week again");
+        var possession = f.Host.health.hediffSet.GetFirstHediffOfDef(TorannMagicDefOf.TM_SpiritPossessionHD).TryGetComp<HediffComp_SpiritPossession>();
+        Check.Equal(true, Invoke(depleted, "TryImplant", f.Original, possession), "forced collapse retains original for implantation");
+        Check.Equal(false, state.CanVoluntarilyLeaveHost(f.Original), "forced collapse never removes voluntary departure lock");
+        Check.Equal(false, Invoke(state, "TickRecovery", f.Original, f.Host, 100), "first tick establishes baseline");
+        Check.Equal(true, Invoke(state, "TickRecovery", f.Original, f.Host, 101), "actual next living tick recovers");
+        Check.Equal(false, Invoke(state, "TickRecovery", f.Original, f.Host, 101), "duplicate tick does not recover");
+        Check.Equal(false, Invoke(state, "TickRecovery", f.Original, f.Host, 9000), "offline gap grants nothing");
+        Check.Equal(1, state.RecoveryTicks, "only observed adjacent tick credited");
+        Check.Equal(false, Invoke(state, "TickRecovery", f.Original, f.Other, 9001), "foreign host cannot advance");
+        Check.Equal(false, Invoke(state, "TickRecovery", f.Original, f.Host, 9002), "invalid observation breaks continuity");
+        Set(f.Host.health, "healthState", PawnHealthState.Dead);
+        Check.Equal(false, Invoke(state, "TickRecovery", f.Original, f.Host, 9003), "dead host cannot recover");
+        var stone = new Thing_SoulStone();
+        Check.Equal(false, Invoke(stone, "TryCapture", f.Original, f.Host, false), "dead host rejected on voluntary path");
+        Check.Equal(false, Invoke(stone, "TryCapture", f.Original, f.Other, true), "wrong death source rejected");
+        Check.Equal(true, Invoke(stone, "TryCapture", f.Original, f.Host, true), "death bypasses lock preserving native spirit");
+        Check.Equal(0, state.RecoveryTicks, "host death resets accumulated progress");
+        var next = f.Hold(f.Other, f.Host); next.GetDirectlyHeldThings().Remove(f.Host);
+        Check.Equal(true, Invoke(stone, "TryImplant", f.Original, next), "same soul implants in next host");
+        Invoke(state, "TickRecovery", f.Original, f.Other, 10000);
+        var tick = typeof(SpiritRebirthState).GetMethod("TickRecovery", BindingFlags.Instance | BindingFlags.NonPublic)!;
+        for (int i = 1; i < SpiritRebirthState.RecoveryDurationTicks; i++) tick.Invoke(state, [f.Original, f.Other, 10000 + i]);
+        Check.Equal(false, state.CanVoluntarilyLeaveHost(f.Original), "one tick short remains locked");
+        Invoke(state, "TickRecovery", f.Original, f.Other, 10000 + SpiritRebirthState.RecoveryDurationTicks);
+        Check.Equal(true, state.CanVoluntarilyLeaveHost(f.Original), "full seven days unlocks departure");
+        Invoke(state, "TickRecovery", f.Original, f.Other, 10001 + SpiritRebirthState.RecoveryDurationTicks);
+        Check.Equal(SpiritRebirthState.RecoveryDurationTicks, state.RecoveryTicks, "recovery saturates");
+        next.GetDirectlyHeldThings().Remove(f.Original); Set(f.Original, "mapIndexOrState", (sbyte)0);
+        Check.Equal(true, Invoke(state, "TryLeaveHost", f.Original, f.Other), "actual placed spirit can depart after week");
+    }
+
+    static void RecoverySave(RuntimeFixture r)
+    {
+        using var f = new Fixture(r); var state = Recovering(f);
+        Invoke(state, "TickRecovery", f.Original, f.Host, 100); Invoke(state, "TickRecovery", f.Original, f.Host, 101);
+        var loaded = RoundTrip(r, f, "spirit-recovery");
+        f.Original.AllComps.Remove(f.Comp); f.Original.AllComps.Add(loaded.comp);
+        state = loaded.comp.SpiritRebirth;
+        Check.Equal(1, state.RecoveryTicks, "save retains partial progress");
+        Check.Equal(true, state.RecoveryRequired, "save retains recovery debt");
+        Check.Equal(false, Invoke(state, "TickRecovery", f.Original, f.Host, 101), "saved same tick cannot credit twice");
+        Check.Equal(true, Invoke(state, "TickRecovery", f.Original, f.Host, 102), "reload preserves adjacent baseline");
+        Check.Equal(false, Invoke(state, "TickRecovery", f.Original, f.Host, 1000000), "load jump grants no offline credit");
+        Check.Equal(2, state.RecoveryTicks, "load never hard resets progress");
+        var migrated = RoundTrip(r, f, "spirit-foundation-version", xml =>
+        {
+            var marker = xml.Descendants("TM_spiritRebirth").Single(); marker.Element("version")!.Value = "1";
+            marker.Element("recoveryRequired")?.Remove(); marker.Element("recoveryTicks")?.Remove(); marker.Element("lastRecoveryTick")?.Remove();
+        });
+        Check.Equal(SpiritRebirthState.CurrentVersion, migrated.comp.SpiritRebirth.Version, "foundation version migrates");
+        Check.Equal(false, migrated.comp.SpiritRebirth.RecoveryRequired, "foundation never acquires stone debt");
+        Check.Equal(0, migrated.comp.SpiritRebirth.RecoveryTicks, "foundation has no fabricated recovery progress");
+    }
+
+    static void MalformedRecoverySave(RuntimeFixture r)
+    {
+        using var f = new Fixture(r); Recovering(f);
+        foreach (int malformed in new[] { -1, SpiritRebirthState.RecoveryDurationTicks + 1 })
+        {
+            var loaded = RoundTrip(r, f, "spirit-recovery-malformed-" + malformed, xml =>
+            {
+                var marker = xml.Descendants("TM_spiritRebirth").Single();
+                marker.SetElementValue("recoveryTicks", malformed);
+                marker.SetElementValue("lastRecoveryTick", -5);
+            });
+            var current = f.Original.AllComps.OfType<CompClassProgression>().Single();
+            f.Original.AllComps.Remove(current); f.Original.AllComps.Add(loaded.comp);
+            var state = loaded.comp.SpiritRebirth;
+            Check.Equal(0, state.RecoveryTicks, "malformed progress grants no recovered time");
+            Check.Equal(false, state.CanVoluntarilyLeaveHost(f.Original), "malformed progress cannot unlock release");
+            Check.Equal(false, Invoke(state, "TickRecovery", f.Original, f.Host, 50), "malformed baseline restarts observation");
+            Check.Equal(true, Invoke(state, "TickRecovery", f.Original, f.Host, 51), "repaired recovery can make actual progress");
         }
     }
 
