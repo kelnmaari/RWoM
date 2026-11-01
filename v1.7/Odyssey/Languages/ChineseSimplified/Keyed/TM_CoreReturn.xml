@@ -23,6 +23,9 @@
   <TM_CoreReturnCaravan>召回整个商队</TM_CoreReturnCaravan>
   <TM_CoreReturnCaravanDesc>召回所有成员、动物和俘虏，以及全部货物。每名成员消耗 {0} 魔法燃料。</TM_CoreReturnCaravanDesc>
   <TM_CoreReturnChanged>成员名单已变化，请重新检查召回。</TM_CoreReturnChanged>
+  <TM_CoreReturnBlockDowned>当前无法标记：倒地中。</TM_CoreReturnBlockDowned>
+  <TM_CoreReturnBlockMental>当前无法标记：精神崩溃。</TM_CoreReturnBlockMental>
+  <TM_CoreReturnBlockCapacity>当前无法标记：无法移动。</TM_CoreReturnBlockCapacity>
   <TM_CoreReturn_InvalidSelection>所选成员中有人已不满足此次召回条件。</TM_CoreReturn_InvalidSelection>
   <TM_CoreReturn_AlreadyNear>所选成员已经在核心附近。</TM_CoreReturn_AlreadyNear>
   <TM_CoreReturn_NoLanding>核心附近没有足够的安全空地。</TM_CoreReturn_NoLanding>

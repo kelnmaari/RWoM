@@ -23,6 +23,9 @@ Magocombustible disponible: {2}</TM_CoreReturnStatus>
   <TM_CoreReturnCaravan>Devolver toda la caravana</TM_CoreReturnCaravan>
   <TM_CoreReturnCaravanDesc>Devuelve a todos los miembros, animales y prisioneros con su carga. Coste: {0} de magocombustible por miembro.</TM_CoreReturnCaravanDesc>
   <TM_CoreReturnChanged>La selección ha cambiado. Revisa el retorno de nuevo.</TM_CoreReturnChanged>
+  <TM_CoreReturnBlockDowned>No se puede marcar ahora: incapacitado.</TM_CoreReturnBlockDowned>
+  <TM_CoreReturnBlockMental>No se puede marcar ahora: brote mental.</TM_CoreReturnBlockMental>
+  <TM_CoreReturnBlockCapacity>No se puede marcar ahora: no puede moverse.</TM_CoreReturnBlockCapacity>
   <TM_CoreReturn_InvalidSelection>Un peón seleccionado ya no puede realizar este retorno.</TM_CoreReturn_InvalidSelection>
   <TM_CoreReturn_AlreadyNear>Los peones seleccionados ya están cerca del núcleo.</TM_CoreReturn_AlreadyNear>
   <TM_CoreReturn_NoLanding>No hay suficientes casillas libres y seguras cerca del núcleo.</TM_CoreReturn_NoLanding>

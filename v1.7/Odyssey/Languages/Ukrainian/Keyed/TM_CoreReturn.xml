@@ -23,6 +23,9 @@
   <TM_CoreReturnCaravan>Повернути весь караван</TM_CoreReturnCaravan>
   <TM_CoreReturnCaravanDesc>Повернути всіх учасників, тварин і полонених з усім вантажем. Вартість: {0} магопалива за учасника.</TM_CoreReturnCaravanDesc>
   <TM_CoreReturnChanged>Склад змінився. Перевірте повернення знову.</TM_CoreReturnChanged>
+  <TM_CoreReturnBlockDowned>Зараз не можна позначити: у нокдауні.</TM_CoreReturnBlockDowned>
+  <TM_CoreReturnBlockMental>Зараз не можна позначити: психічний зрив.</TM_CoreReturnBlockMental>
+  <TM_CoreReturnBlockCapacity>Зараз не можна позначити: не може рухатися.</TM_CoreReturnBlockCapacity>
   <TM_CoreReturn_InvalidSelection>Один із вибраних пішаків більше не придатний для цього повернення.</TM_CoreReturn_InvalidSelection>
   <TM_CoreReturn_AlreadyNear>Вибрані пішаки вже перебувають поруч із ядром.</TM_CoreReturn_AlreadyNear>
   <TM_CoreReturn_NoLanding>Біля ядра недостатньо вільних безпечних клітин.</TM_CoreReturn_NoLanding>

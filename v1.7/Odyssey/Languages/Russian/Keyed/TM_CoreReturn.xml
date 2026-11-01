@@ -23,6 +23,9 @@
   <TM_CoreReturnCaravan>Вернуть весь караван</TM_CoreReturnCaravan>
   <TM_CoreReturnCaravanDesc>Вернуть всех участников, животных и пленников со всем грузом. Стоимость: {0} манатоплива за участника.</TM_CoreReturnCaravanDesc>
   <TM_CoreReturnChanged>Состав изменился. Проверьте возврат заново.</TM_CoreReturnChanged>
+  <TM_CoreReturnBlockDowned>Сейчас нельзя пометить: в нокдауне.</TM_CoreReturnBlockDowned>
+  <TM_CoreReturnBlockMental>Сейчас нельзя пометить: психический срыв.</TM_CoreReturnBlockMental>
+  <TM_CoreReturnBlockCapacity>Сейчас нельзя пометить: не может двигаться.</TM_CoreReturnBlockCapacity>
   <TM_CoreReturn_InvalidSelection>Одна из выбранных пешек больше не подходит для этого возврата.</TM_CoreReturn_InvalidSelection>
   <TM_CoreReturn_AlreadyNear>Выбранные пешки уже находятся рядом с ядром.</TM_CoreReturn_AlreadyNear>
   <TM_CoreReturn_NoLanding>Возле ядра недостаточно свободных безопасных клеток.</TM_CoreReturn_NoLanding>

@@ -86,8 +86,20 @@ namespace TorannMagic.Odyssey
         }
         public bool CanMark(Pawn pawn, bool requirePosition = false) => Operational && pawn != null && pawn.Spawned && pawn.Map == parent.Map
             && PlayerCustody(pawn) && pawn.IsColonistPlayerControlled && !pawn.Dead && !pawn.Downed && !pawn.InMentalState
-            && pawn.Awake() && pawn.health.capacities.CapableOf(PawnCapacityDefOf.Moving)
+            && pawn.health.capacities.CapableOf(PawnCapacityDefOf.Moving)
             && (!requirePosition || pawn.Position.AdjacentTo8WayOrInside(parent));
+
+        // Player-facing reason a colonist cannot be marked right now, or null.
+        // Sleeping is deliberately not a blocker: the ordered mark job wakes the
+        // pawn (a night-time "no candidates" dead end was a player report).
+        public string MarkBlockReason(Pawn pawn)
+        {
+            if (!Operational) return "TM_CoreReturnUnavailable".Translate().ToString();
+            if (pawn.Downed) return "TM_CoreReturnBlockDowned".Translate().ToString();
+            if (pawn.InMentalState) return "TM_CoreReturnBlockMental".Translate().ToString();
+            if (!pawn.health.capacities.CapableOf(PawnCapacityDefOf.Moving)) return "TM_CoreReturnBlockCapacity".Translate().ToString();
+            return null;
+        }
         public bool Bind(Pawn pawn)
         {
             if (!CanMark(pawn, true) || FindMark(pawn) != null) return false;
@@ -107,24 +119,29 @@ namespace TorannMagic.Odyssey
         {
             if (!Operational) return;
             var options = new List<FloatMenuOption>();
-            foreach (Pawn candidate in parent.Map.mapPawns.FreeColonistsSpawned.Where(p => CanMark(p)))
+            foreach (Pawn candidate in parent.Map.mapPawns.FreeColonistsSpawned)
             {
                 Pawn pawn = candidate;
                 var old = FindMark(pawn);
                 if (old?.Core == parent) continue;
                 Action order = () =>
                 {
-                    if (!CanMark(pawn)) return;
+                    // Sleep is not a blocker; anything still blocking shows as a reason.
+                    if (FindMark(pawn) != null || MarkBlockReason(pawn) != null) return;
                     // Rebinding is explicit and only removes the old mark upon arrival.
                     var job = JobMaker.MakeJob(DefDatabase<JobDef>.GetNamed("TM_ReceiveCoreReturnMark"), parent);
                     job.targetB = old?.Core;
                     pawn.jobs.TryTakeOrderedJob(job, JobTag.Misc);
                 };
-                options.Add(new FloatMenuOption(pawn.LabelShortCap, () =>
-                {
-                    if (old == null) order();
-                    else Find.WindowStack.Add(Dialog_MessageBox.CreateConfirmation("TM_CoreReturnRebindConfirm".Translate(pawn.LabelShortCap), order));
-                }));
+                string blocked = CanMark(pawn) ? null : MarkBlockReason(pawn);
+                if (blocked != null)
+                    options.Add(new FloatMenuOption(pawn.LabelShortCap + " — " + blocked, null));
+                else
+                    options.Add(new FloatMenuOption(pawn.LabelShortCap, () =>
+                    {
+                        if (old == null) order();
+                        else Find.WindowStack.Add(Dialog_MessageBox.CreateConfirmation("TM_CoreReturnRebindConfirm".Translate(pawn.LabelShortCap), order));
+                    }));
             }
             if (options.Count == 0) options.Add(new FloatMenuOption("TM_CoreReturnNoCandidates".Translate(), null));
             Find.WindowStack.Add(new FloatMenu(options));

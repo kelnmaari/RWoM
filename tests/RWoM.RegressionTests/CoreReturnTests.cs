@@ -25,6 +25,23 @@ internal static partial class TeleportSpiritTests
         yield return new("CoreReturn.ConfirmationCaravanRosterStale", f=>CoreReturnWorld(f,w=>CoreReturnCaravan(w,true,true)));
         yield return new("CoreReturn.MaintenanceFailureBoundedRetry", f=>CoreReturnWorld(f,CoreReturnRetry));
         yield return new("CoreReturn.GizmosEnumerateWithoutThrowing", f=>CoreReturnWorld(f,CoreReturnGizmos));
+        yield return new("CoreReturn.SecondColonistMarkableAfterFirstCycle", f=>CoreReturnWorld(f,CoreReturnSecondBind));
+    }
+
+    // Player report: after the first bind+return cycle, "Пометить" claims no
+    // suitable colonists exist. A second unbound colonist must remain markable.
+    static void CoreReturnSecondBind(WorldState w)
+    {
+        using var def=CoreReturnDef();using var health=CoreReturnHealthBoundary();
+        var core=CoreReturnReady(w,100); // binds w.Caster and walks them away
+        var second=w.Pawn("CoreReturnSecond",new IntVec3(12,0,12));
+        using var movement=CoreReturnMovementBoundary(); portalBoundarySpawns=portalBoundaryDespawns=0;
+        Check.Equal(true,CoreReturnUtility.TryReturn(core,[w.Caster],out var why),"first cycle return "+why);
+        Check.Equal(true,core.CanMark(second),"CanMark accepts the unbound colonist");
+        var reason=(string)typeof(CompCoreReturn).GetMethod("MarkBlockReason",Flags)!.Invoke(core,[second])!;
+        Check.Null(reason,"an awake moving colonist has no mark block reason");
+        var mark=CompCoreReturn.FindMark(w.Caster);
+        Check.Equal(true,mark!=null,"the returned pawn keeps its recall mark by design");
     }
 
     static void CoreReturnWorld(RuntimeFixture f, Action<WorldState> body)

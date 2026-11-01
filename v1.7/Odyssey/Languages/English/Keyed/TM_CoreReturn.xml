@@ -23,6 +23,9 @@ Available magofuel: {2}</TM_CoreReturnStatus>
   <TM_CoreReturnCaravan>Return entire caravan</TM_CoreReturnCaravan>
   <TM_CoreReturnCaravanDesc>Return all caravan members, animals, prisoners and their cargo. Cost: {0} magofuel per member.</TM_CoreReturnCaravanDesc>
   <TM_CoreReturnChanged>The selection changed. Review the return again.</TM_CoreReturnChanged>
+  <TM_CoreReturnBlockDowned>Cannot be marked now: downed.</TM_CoreReturnBlockDowned>
+  <TM_CoreReturnBlockMental>Cannot be marked now: mental break.</TM_CoreReturnBlockMental>
+  <TM_CoreReturnBlockCapacity>Cannot be marked now: cannot move.</TM_CoreReturnBlockCapacity>
   <TM_CoreReturn_InvalidSelection>A selected pawn is no longer eligible for this return.</TM_CoreReturn_InvalidSelection>
   <TM_CoreReturn_AlreadyNear>The selected pawns are already near the core.</TM_CoreReturn_AlreadyNear>
   <TM_CoreReturn_NoLanding>Not enough safe, free landing cells near the core.</TM_CoreReturn_NoLanding>
