@@ -2446,4 +2446,9 @@ DR: [5, 9, 13, 17, 20]%</TM_Golemancy_pwr_desc>
   <TM_SmokeCloud_pwr_desc>Увеличивает размер Облака дыма.</TM_SmokeCloud_pwr_desc>
   <TM_SmokeCloud_eff_desc>Уменьшает затраты маны на Облако дыма.</TM_SmokeCloud_eff_desc>
   <TM_SmokeCloud_ver_desc>Продлевает длительность Облака дыма.</TM_SmokeCloud_ver_desc>
+  <TM_SynthToggleLabel>Автосинтез: мана + химтопливо</TM_SynthToggleLabel>
+  <TM_SynthToggleDesc>Медленно превращает запасённую ману и химтопливо в манатопливо в этом баке (~50 в день). Пауза, пока бак не достигнет цели или не хватает входов.</TM_SynthToggleDesc>
+  <TM_SynthLoad>Загрузить химтопливо ({0})</TM_SynthLoad>
+  <TM_SynthLoadDesc>Забрать химтопливо со стаков возле резервуара в приёмный бункер.</TM_SynthLoadDesc>
+  <TM_SynthInspect>Бункер химтоплива: {0} — синтез 50 манатоплива в день</TM_SynthInspect>
 </LanguageData>

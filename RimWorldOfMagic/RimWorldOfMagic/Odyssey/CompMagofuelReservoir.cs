@@ -1,3 +1,4 @@
+﻿using System;
 using System;
 using System.Collections.Generic;
 using RimWorld;
@@ -36,6 +37,12 @@ namespace TorannMagic.Odyssey
         private bool transferring;
         private float personalReserve = .2f;
         private float fuelReserve;
+        private float chemfuelHopper;
+        private bool synthesisOn = true;
+        private const float SynthManaPerFuel = 10f;
+        private const float SynthChemfuelPerFuel = 1f;
+        private const float SynthHopperCapacity = 100f;
+        private float synthesisTicks;
         private float FuelReserveCapacity => parent?.GetComp<CompRefuelable>() is CompRefuelable fuel
             && PositiveFinite(fuel.Props.fuelCapacity) ? (float)Math.Floor(fuel.Props.fuelCapacity) : 0f;
         public float FuelReserve
@@ -50,6 +57,8 @@ namespace TorannMagic.Odyssey
         }
         public CompProperties_MagofuelReservoir Props => (CompProperties_MagofuelReservoir)props;
         public float StoredMana => storedMana;
+        public float ChemfuelHopper => chemfuelHopper;
+        public bool SynthesisOn => synthesisOn;
         public float FreeCapacity => Math.Max(0f, Props.manaCapacity - storedMana);
         private bool Usable => parent != null && !parent.Destroyed && !transferring &&
             PositiveFinite(Props.manaCapacity) && PositiveFinite(Props.maxTransfer);
@@ -61,6 +70,8 @@ namespace TorannMagic.Odyssey
             Scribe_Values.Look(ref storedMana, "TM_reservoirMana", 0f);
             Scribe_Values.Look(ref personalReserve, "TM_reservoirPersonalReserve", .2f);
             Scribe_Values.Look(ref fuelReserve, "TM_reservoirFuelReserve", 0f);
+            Scribe_Values.Look(ref chemfuelHopper, "TM_synthChemfuelHopper", 0f);
+            Scribe_Values.Look(ref synthesisOn, "TM_synthOn", true);
             // Retain a valid fixed quantity if a later balance patch temporarily reduces capacity.
             if (Scribe.mode == LoadSaveMode.PostLoadInit && (fuelReserve < 0f || float.IsNaN(fuelReserve) || float.IsInfinity(fuelReserve))) fuelReserve = 0f;
             if (Scribe.mode == LoadSaveMode.PostLoadInit) PersonalReserve = personalReserve;
@@ -98,10 +109,73 @@ namespace TorannMagic.Odyssey
             return 1f;
         }
 
+        // Auto-synthesis (magofuel reservoir only): stored mana plus hauled chemfuel
+        // slowly becomes magofuel in the same tank — 50 units per day — pausing while
+        // inputs are missing or the tank reached its configured target.
+        public override void CompTickInterval(int delta)
+        {
+            base.CompTickInterval(delta);
+            if (!synthesisOn || !MagofuelReserve.IsStorage(this)) return;
+            var fuel = parent?.GetComp<CompRefuelable>();
+            if (fuel == null) return;
+            synthesisTicks += delta;
+            while (synthesisTicks >= 1200f)
+            {
+                synthesisTicks -= 1200f;
+                if (!TrySynthesizeOne(fuel))
+                {
+                    // Paused: keep the remainder so synthesis resumes the tick after
+                    // the missing chemfuel or mana arrives.
+                    synthesisTicks = 1200f;
+                    return;
+                }
+            }
+        }
+
+        private bool TrySynthesizeOne(CompRefuelable fuel)
+        {
+            if (chemfuelHopper < SynthChemfuelPerFuel || storedMana < SynthManaPerFuel) return false;
+            if (fuel.Fuel >= fuel.TargetFuelLevel) return false;
+            chemfuelHopper -= SynthChemfuelPerFuel;
+            storedMana -= SynthManaPerFuel;
+            fuel.Refuel(1f);
+            parent.GetComp<CompCrystalGlow>()?.NotifyTransfer(1f, Find.TickManager.TicksGame);
+            return true;
+        }
+
+        public void LoadNearbyChemfuel()
+        {
+            Map map = parent?.Map;
+            if (map == null) return;
+            int remaining = (int)(SynthHopperCapacity - chemfuelHopper);
+            foreach (IntVec3 cell in GenRadial.RadialCellsAround(parent.Position, 4f, true))
+            {
+                if (remaining <= 0) break;
+                if (!cell.InBounds(map)) continue;
+                Thing stack = null;
+                foreach (var candidate in map.thingGrid.ThingsListAt(cell))
+                    if (candidate != null && candidate.def == ThingDefOf.Chemfuel) { stack = candidate; break; }
+                if (stack == null) continue;
+                int take = Math.Min(remaining, stack.stackCount);
+                LoadChemfuel(stack, take);
+                remaining -= take;
+            }
+        }
+
+        public void LoadChemfuel(Thing chemfuelStack, int count)
+        {
+            if (chemfuelStack == null || chemfuelStack.def != ThingDefOf.Chemfuel) return;
+            int taken = Math.Min(count, Math.Min(chemfuelStack.stackCount, (int)(SynthHopperCapacity - chemfuelHopper)));
+            if (taken <= 0) return;
+            chemfuelStack.SplitOff(taken).Destroy(DestroyMode.Vanish);
+            chemfuelHopper += taken;
+        }
+
         public override string CompInspectStringExtra() =>
             "TM_ReservoirCharge".Translate(storedMana.ToString("0.##"), Props.manaCapacity.ToString("0.##")) + "\n" +
             "TM_ReservoirReserve".Translate(PersonalReserve.ToString("P0")) +
-            (MagofuelReserve.IsStorage(this) ? "\n" + "TM_ReservoirFuelReserveInspect".Translate(FuelReserve.ToString("0"), MagofuelReserve.Available(parent.GetComp<CompRefuelable>()).ToString("0.##")).ToString() : "");
+            (MagofuelReserve.IsStorage(this) ? "\n" + "TM_ReservoirFuelReserveInspect".Translate(FuelReserve.ToString("0"), MagofuelReserve.Available(parent.GetComp<CompRefuelable>()).ToString("0.##")).ToString() : "") +
+            (MagofuelReserve.IsStorage(this) && synthesisOn ? "\n" + "TM_SynthInspect".Translate(chemfuelHopper.ToString("0")).ToString() : "");
 
         public override IEnumerable<Gizmo> CompGetGizmosExtra()
         {
@@ -147,6 +221,27 @@ namespace TorannMagic.Odyssey
                     Find.WindowStack.Add(new FloatMenu(options));
                 }
             };
+            if (MagofuelReserve.IsStorage(this))
+            {
+                var synth = new Command_Toggle
+                {
+                    defaultLabel = "TM_SynthToggleLabel".Translate(),
+                    defaultDesc = "TM_SynthToggleDesc".Translate(),
+                    icon = ContentFinder<Texture2D>.Get("Items/Magofuel"),
+                    isActive = () => synthesisOn,
+                    toggleAction = () => synthesisOn = !synthesisOn
+                };
+                yield return synth;
+                var load = new Command_Action
+                {
+                    defaultLabel = "TM_SynthLoad".Translate(chemfuelHopper.ToString("0")),
+                    defaultDesc = "TM_SynthLoadDesc".Translate(),
+                    icon = ContentFinder<Texture2D>.Get("UI/Icons/Chemfuel"),
+                    action = () => LoadNearbyChemfuel()
+                };
+                if (chemfuelHopper >= SynthHopperCapacity) load.Disable();
+                yield return load;
+            }
         }
 
         public override IEnumerable<FloatMenuOption> CompFloatMenuOptions(Pawn selPawn)

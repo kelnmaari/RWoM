@@ -2569,4 +2569,9 @@ Level 3: all 4 effects</TM_CombatDrugs_pwr_desc>
   <TM_SmokeCloud_pwr_desc>Increases Smoke Cloud size.</TM_SmokeCloud_pwr_desc>
   <TM_SmokeCloud_eff_desc>Reduces the mana cost of Smoke Cloud.</TM_SmokeCloud_eff_desc>
   <TM_SmokeCloud_ver_desc>Extends Smoke Cloud duration.</TM_SmokeCloud_ver_desc>
+  <TM_SynthToggleLabel>Auto-synthesis: mana + chemfuel</TM_SynthToggleLabel>
+  <TM_SynthToggleDesc>Slowly converts stored mana and chemfuel into magofuel in this tank (~50 per day). Pauses while the tank is at its target or inputs are missing.</TM_SynthToggleDesc>
+  <TM_SynthLoad>Load chemfuel ({0})</TM_SynthLoad>
+  <TM_SynthLoadDesc>Take chemfuel from stacks near the synthesizer into its fuel hopper.</TM_SynthLoadDesc>
+  <TM_SynthInspect>Chemfuel hopper: {0} — synthesizing 50 magofuel/day</TM_SynthInspect>
 </LanguageData>
