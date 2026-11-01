@@ -777,6 +777,13 @@ namespace TorannMagic.AutoCast
                 return;
             }
             Pawn caster = casterComp.Pawn;
+            // The monk's Meditate only fires when it has actual utility (healing,
+            // affliction purge, break-risk relief, or chi/rest building while idle).
+            if (abilitydef != null && TM_Calc.BaseAbilityDefName(abilitydef.defName) == "TM_Meditate"
+                && !TM_Calc.MonkMeditateWorthAutocast(caster))
+            {
+                return;
+            }
             LocalTargetInfo jobTarget = caster;
             if (!TM_Calc.AutocastTargetAcceptable(caster, abilitydef, jobTarget)) return;
 

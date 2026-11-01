@@ -966,6 +966,28 @@ namespace TorannMagic
                 .Sum(injury => injury.Severity) > minInjurySeverity;
         }
 
+        // Autocast utility gate for the monk's Meditate (player report: the autocast
+        // re-proc'd its activation every cooldown even mid-task). The cast heals
+        // wounds, purges afflictions and addictions, lifts break risk, and only
+        // otherwise builds chi and trickles rest/joy — so it fires when any of that
+        // utility exists, and for a healthy rested pawn only when idle with chi to
+        // gain. A working pawn is never interrupted for a chi trickle.
+        public static bool MonkMeditateWorthAutocast(Pawn pawn)
+        {
+            if (pawn?.health?.hediffSet == null) return false;
+            if (IsPawnInjured(pawn, 0)) return true;
+            if ((GetPawnAfflictions(pawn)?.Count ?? 0) > 0) return true;
+            if ((GetPawnAddictions(pawn)?.Count ?? 0) > 0) return true;
+            if (BreakRiskAlertUtility.PawnsAtRiskMinor.Contains(pawn)
+                || BreakRiskAlertUtility.PawnsAtRiskMajor.Contains(pawn)
+                || BreakRiskAlertUtility.PawnsAtRiskExtreme.Contains(pawn)) return true;
+            Hediff chi = pawn.health.hediffSet.GetFirstHediffOfDef(TorannMagicDefOf.TM_ChiHD);
+            if (chi != null && chi.Severity >= 70f) return false;   // chi already high
+            float rest = pawn.needs?.rest?.CurLevelPercentage ?? 1f;
+            if (rest < 0.5f) return true;                           // tired: the rest trickle helps
+            return pawn.CurJob?.workGiverDef == null;               // idle: building chi is fine; don't interrupt work
+        }
+
         public static List<Hediff> GetPawnAfflictions(Pawn targetPawn)
         {
             return targetPawn.health.hediffSet.hediffs
