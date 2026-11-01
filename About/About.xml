@@ -91,7 +91,8 @@ Unofficial continuation of TorannD's "A RimWorld of Magic" for RimWorld 1.7. All
 
 [i]Load order: Harmony → this mod; the MP fork goes before it. Requires [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3312959701]JecsLite - A RimWorld of Magic[/url]; do NOT enable the original JecsTools alongside.[/i]
 
-[b]CAUTION! This port and its integrations were made with AI assistance — I'm not a C# developer and can't judge how well the AI handled it. If you don't use AI mods, please pass this one by.[/b] I fixed this mod for myself and decided to share it. If you have a problem, create a Discussion here — the code is on [url=https://github.com/kelnmaari/RWoM]GitHub[/url].
+[b]Regarding the use of AI in modding:
+I am a full-time developer and IT engineer. My primary programming languages ​​are Golang, Node.js, and Python. I incorporate AI into both my daily work and my personal life. Beyond AI, I rely on my own intellect to structure workflows for coding and to address broader architectural challenges. I do not use AI in a "YOLO" (reckless/unthinking) fashion. But if you are not comfortable using mods created or developed with the help of AI, then please pass by..[/b] I fixed this mod for myself and decided to share it. If you have a problem, create a Discussion here — the code is on [url=https://github.com/kelnmaari/RWoM]GitHub[/url].
 
 [b]This mod contains AI-generated assets. If you are able to help create proper ones, please reach out to me via private message.[/b]
 </description>
