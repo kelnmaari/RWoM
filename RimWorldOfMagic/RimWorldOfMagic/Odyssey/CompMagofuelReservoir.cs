@@ -171,6 +171,11 @@ namespace TorannMagic.Odyssey
             chemfuelHopper += taken;
         }
 
+        public void AddChemfuelToHopper(int count)
+        {
+            chemfuelHopper = Math.Min(chemfuelHopper + count, SynthHopperCapacity);
+        }
+
         public override string CompInspectStringExtra() =>
             "TM_ReservoirCharge".Translate(storedMana.ToString("0.##"), Props.manaCapacity.ToString("0.##")) + "\n" +
             "TM_ReservoirReserve".Translate(PersonalReserve.ToString("P0")) +
