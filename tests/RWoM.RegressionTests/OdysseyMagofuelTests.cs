@@ -32,7 +32,7 @@ internal static class OdysseyMagofuelTests
         Check.Equal(100, amounts["Chemfuel"], "chemfuel payment");
         Check.Equal(50, amounts["RawMagicyte"], "magicyte payment");
         Check.Equal(100, (int)recipe.Element("products")!.Element("TM_Magofuel")!, "batch yield");
-        Check.Equal("Building_BiofuelRefinery", recipe.Element("recipeUsers")!.Elements().Single().Value, "crafted at the vanilla biofuel refinery");
+        Check.Equal("BiofuelRefinery", recipe.Element("recipeUsers")!.Elements().Single().Value, "crafted at the vanilla biofuel refinery");
         Check.Equal("TM_MagofuelRefining", recipe.Element("researchPrerequisite")!.Value, "research gates recipe");
         var requirements = defs["TM_MagofuelRefining"].Element("prerequisites")!.Elements().Select(x => x.Value).ToHashSet();
         Check.Equal(true, requirements.SetEquals(["BiofuelRefining", "BasicGravtech"]), "vanilla fuel chain required, no arcane forge");
@@ -53,7 +53,7 @@ internal static class OdysseyMagofuelTests
         var known = sources.SelectMany(dir => Directory.GetFiles(dir, "*.xml", SearchOption.AllDirectories))
             .SelectMany(path => XDocument.Load(path).Root!.Elements())
             .Concat(defs.Values).Where(x => x.Element("defName") != null).ToList();
-        foreach (var id in amounts.Keys.Append("TableArcaneForge"))
+        foreach (var id in amounts.Keys.Append("TableArcaneForge").Append("BiofuelRefinery"))
             Check.Equal(true, known.Any(x => x.Name.LocalName == "ThingDef" && (string?)x.Element("defName") == id), "real resource/station reference " + id);
         foreach (var id in requirements)
             Check.Equal(true, known.Any(x => x.Name.LocalName == "ResearchProjectDef" && (string?)x.Element("defName") == id), "real research reference " + id);
@@ -122,7 +122,7 @@ internal static class OdysseyMagofuelTests
             things.Add(def); return def;
         }
         var chem = Resource("Chemfuel"); var magic = Resource("RawMagicyte");
-        var fuel = Resource("TM_Magofuel"); var refinery = Resource("Building_BiofuelRefinery");
+        var fuel = Resource("TM_Magofuel"); var refinery = Resource("BiofuelRefinery");
         stats.Add(new StatDef { defName = "WorkSpeedGlobal" });
         skills.Add(new SkillDef { defName = "Intellectual" });
         effects.Add(new EffecterDef { defName = "Smelt" });

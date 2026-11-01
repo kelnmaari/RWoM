@@ -55,7 +55,7 @@
     <researchPrerequisite>TM_MagofuelRefining</researchPrerequisite>
     <!-- Crafted at the vanilla biofuel refinery (VGE-style: ordinary fuel
          infrastructure, no arcane forge or mage labor required). -->
-    <recipeUsers><li>Building_BiofuelRefinery</li></recipeUsers>
+    <recipeUsers><li>BiofuelRefinery</li></recipeUsers>
     <ingredients>
       <li><filter><thingDefs><li>Chemfuel</li></thingDefs></filter><count>100</count></li>
       <li><filter><thingDefs><li>RawMagicyte</li></thingDefs></filter><count>50</count></li>
