@@ -20,6 +20,7 @@ internal static class MonkMeditateTests
         yield return new("MonkMeditate.HighChiSkips", HighChi);
         yield return new("MonkMeditate.TiredBuildsRest", Tired);
         yield return new("MonkMeditate.InjuryAlwaysWorthIt", Injured);
+        yield return new("MonkMeditate.NoChiHediffSkipsUntilGrant", NoChi);
     }
 
     static Pawn Pawn(bool working, float rest = 1f)
@@ -63,12 +64,14 @@ internal static class MonkMeditateTests
     static void HealthyIdle(RuntimeFixture _)
     {
         var pawn = Pawn(working: false);
+        SetChi(pawn, 10f);
         Check.Equal(true, Worth(pawn), "an idle healthy monk may build chi");
     }
 
     static void WorkingTrickle(RuntimeFixture _)
     {
         var pawn = Pawn(working: true);
+        SetChi(pawn, 10f);
         Check.Equal(false, Worth(pawn), "a working pawn is never interrupted for a chi trickle");
     }
 
@@ -82,7 +85,16 @@ internal static class MonkMeditateTests
     static void Tired(RuntimeFixture _)
     {
         var pawn = Pawn(working: true, rest: .2f);
+        SetChi(pawn, 10f);
         Check.Equal(true, Worth(pawn), "a tired working monk still benefits from the rest trickle");
+    }
+
+    static void NoChi(RuntimeFixture _)
+    {
+        // Freshly created monk: the chi hediff is granted by the might comp a tick
+        // later; until then the autocast must not start a job it cannot track.
+        var pawn = Pawn(working: false);
+        Check.Equal(false, Worth(pawn), "a monk without the chi hediff yet skips meditate");
     }
 
     static void Injured(RuntimeFixture _)

@@ -982,7 +982,10 @@ namespace TorannMagic
                 || BreakRiskAlertUtility.PawnsAtRiskMajor.Contains(pawn)
                 || BreakRiskAlertUtility.PawnsAtRiskExtreme.Contains(pawn)) return true;
             Hediff chi = pawn.health.hediffSet.GetFirstHediffOfDef(TorannMagicDefOf.TM_ChiHD);
-            if (chi != null && chi.Severity >= 70f) return false;   // chi already high
+            // No chi hediff yet (just gained the class, grant tick pending): the
+            // meditate job cannot track chi and would error — skip until it exists.
+            if (chi == null) return false;
+            if (chi.Severity >= 70f) return false;   // chi already high
             float rest = pawn.needs?.rest?.CurLevelPercentage ?? 1f;
             if (rest < 0.5f) return true;                           // tired: the rest trickle helps
             return pawn.CurJob?.workGiverDef == null;               // idle: building chi is fine; don't interrupt work

@@ -52,8 +52,10 @@ namespace TorannMagic
                     }
                     else
                     {
-                        Log.Warning("No Chi Hediff or Might Comp found.");
-                        this.EndJobWith(JobCondition.Errored);
+                        // Expected right after the class grant: the chi hediff is
+                        // applied by the might comp a tick later. End quietly —
+                        // the next autocast evaluation will succeed.
+                        this.EndJobWith(JobCondition.Incompletable);
                     }
                     if(this.age > this.durationTicks)
                     {
