@@ -236,7 +236,7 @@ namespace TorannMagic.Odyssey
                 {
                     defaultLabel = "TM_SynthLoad".Translate(chemfuelHopper.ToString("0")),
                     defaultDesc = "TM_SynthLoadDesc".Translate(),
-                    icon = ContentFinder<Texture2D>.Get("UI/Icons/Chemfuel"),
+                    icon = ContentFinder<Texture2D>.Get("UI/transfermana"),
                     action = () => LoadNearbyChemfuel()
                 };
                 if (chemfuelHopper >= SynthHopperCapacity) load.Disable();
