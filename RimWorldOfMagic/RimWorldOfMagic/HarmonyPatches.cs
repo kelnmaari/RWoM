@@ -6249,16 +6249,21 @@ namespace TorannMagic
         {
             private static bool Prefix(SkillRecord __instance, Pawn ___pawn)
             {
-                if (___pawn != null)
+                // Robots, androids and other story-less races crash the trait lookup
+                // below (workshop report: Fluffy Breakdowns maintenance XP); magic
+                // simply ignores them and lets vanilla learning proceed.
+                if (___pawn == null || ___pawn.story == null || ___pawn.story.traits == null ||
+                    !___pawn.RaceProps.Humanlike)
                 {
-                    if (___pawn.story.traits.HasTrait(TorannMagicDefOf.Undead))
-                    {
-                        return false;
-                    }
-                    if(___pawn is TMPawnGolem)
-                    {
-                        return false;
-                    }
+                    return true;
+                }
+                if (___pawn.story.traits.HasTrait(TorannMagicDefOf.Undead))
+                {
+                    return false;
+                }
+                if(___pawn is TMPawnGolem)
+                {
+                    return false;
                 }
                 return true;
             }
