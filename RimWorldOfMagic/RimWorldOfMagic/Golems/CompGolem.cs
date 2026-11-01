@@ -564,6 +564,16 @@ namespace TorannMagic.Golems
 
         public override void CompTick()
         {
+            // A gravship flight destroys the old ship map, and a rest place bound
+            // to it cannot survive the trip (player report: the assigned rest spot
+            // reset after landing). Re-point the rest place to the golem's current
+            // spot; an assignment on a live map — e.g. the home base — is kept.
+            if (this.dormantMap != null && !Find.Maps.Contains(this.dormantMap))
+            {
+                this.dormantMap = Pawn.Map;
+                this.dormantPosition = Pawn.Position;
+                this.dormantRotation = Pawn.Rotation;
+            }
             if (this.age > 0)
             {
                 if (!this.initialized && InnerWorkstation != null)
