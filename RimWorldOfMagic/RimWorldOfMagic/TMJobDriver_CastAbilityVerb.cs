@@ -207,7 +207,18 @@ namespace TorannMagic
                 {
                     if(this.pawn.Downed) EndJobWith(JobCondition.InterruptForced);
                     if (combatToil.actor.jobs.curJob.verbToUse == null) this.EndJobWith(JobCondition.Errored);
-
+#if RW17
+                    // A target destroyed or despawned mid-warmup leaves the vanilla
+                    // warmup stance aiming at nothing (Stance_Warmup.AimDir NRE spam)
+                    // and a cast job that never completes. End both immediately.
+                    LocalTargetInfo warmupTarget = combatToil.actor.jobs.curJob.GetTarget(TargetIndex.A);
+                    if (castStarted && warmupTarget.HasThing && (warmupTarget.Thing.Destroyed || !warmupTarget.Thing.Spawned))
+                    {
+                        this.pawn.stances?.SetStance(new Stance_Mobile());
+                        this.EndJobWith(JobCondition.Incompletable);
+                        return;
+                    }
+#endif
                     if (Find.TickManager.TicksGame % 12 == 0)
                     {
                         if (verb.Ability.Def == TorannMagicDefOf.TM_Artifact_TraitThief || verb.Ability.Def == TorannMagicDefOf.TM_Artifact_TraitInfuse)
@@ -220,7 +231,7 @@ namespace TorannMagic
                             TM_MoteMaker.ThrowCastingMote(pawn.DrawPos, pawn.Map, Rand.Range(1.2f, 2f));
                         }
                     }
-                    
+
                     this.duration--;
                     if (!wildCheck && this.duration <= 6)
                     {
@@ -232,6 +243,16 @@ namespace TorannMagic
                             EndJobWith(JobCondition.InterruptForced);
                         }
                     }
+#if RW17
+                    // Watchdog: a cast still running 30 in-game seconds past its
+                    // intended duration is stuck (verb jammed, target unreachable).
+                    // Free the pawn instead of freezing it in the casting stance.
+                    if (castStarted && this.duration <= -1800)
+                    {
+                        this.pawn.stances?.SetStance(new Stance_Mobile());
+                        this.EndJobWith(JobCondition.Incompletable);
+                    }
+#endif
                 };
                 combatToil.AddFinishAction(delegate
                 {
@@ -371,6 +392,16 @@ namespace TorannMagic
                             {
 
                                 if (toil.actor.jobs.curJob.verbToUse == null) this.EndJobWith(JobCondition.Errored);
+#if RW17
+                                // Same mid-warmup target guard as the pawn-target branch:
+                                // dead focus means AimDir NRE spam and a never-ending job.
+                                if (castStarted && target.HasThing && (target.Thing.Destroyed || !target.Thing.Spawned))
+                                {
+                                    this.pawn.stances?.SetStance(new Stance_Mobile());
+                                    this.EndJobWith(JobCondition.Incompletable);
+                                    return;
+                                }
+#endif
                                 if (Find.TickManager.TicksGame % 12 == 0)
                                 {
                                     TM_MoteMaker.ThrowCastingMote(pawn.DrawPos, pawn.Map, Rand.Range(1.2f, 2f));
@@ -380,7 +411,7 @@ namespace TorannMagic
                                 {
                                     wildCheck = true;
                                     if (this.pawn.story != null && this.pawn.story.traits != null && this.pawn.story.traits.HasTrait(TorannMagicDefOf.ChaosMage) && Rand.Chance(.1f))
-                                    {                                        
+                                    {
                                         bool completeJob = TM_Action.DoWildSurge(this.pawn, this.pawn.GetCompAbilityUserMagic(), (MagicAbility)verb.Ability, (TMAbilityDef)verb.Ability.Def, TargetA);
                                         if (!completeJob)
                                         {
@@ -389,6 +420,15 @@ namespace TorannMagic
                                         }
                                     }
                                 }
+#if RW17
+                                // Watchdog for the stuck-cast case, matching the
+                                // pawn-target branch above.
+                                if (castStarted && this.duration <= -1800)
+                                {
+                                    this.pawn.stances?.SetStance(new Stance_Mobile());
+                                    this.EndJobWith(JobCondition.Incompletable);
+                                }
+#endif
                             };
                             toil.AddFinishAction(delegate
                             {                                
