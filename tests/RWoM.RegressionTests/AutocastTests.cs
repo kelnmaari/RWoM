@@ -102,6 +102,34 @@ internal static class AutocastTests
         yield return new("Autocast.SharedMightPathRejectsWrongMechaniteTarget", SharedMightRejectsFlu);
         yield return new("Autocast.StandaloneAndLeveledPowersKeepSavedOwners", FullCollections);
         yield return new("Autocast.HerbalClarityAndBlissKeepXmlConditions", HerbalConditions);
+        yield return new("Autocast.CommanderAurasStayManualToggles", CommanderAurasManual);
+    }
+
+    // The commander auras are toggles: casting the active aura dispels it (player
+    // report — a drafted commander's aura switched itself off every time its icon
+    // cooldown expired, because the toggle verb enables autocast and the generic
+    // loop recast the toggle). They must stay manual-only like the other
+    // MaintainedNoAutocast powers, with no autocast affordance and no candidate.
+    private static void CommanderAurasManual(RuntimeFixture fixture)
+    {
+        var might = EmptyMight();
+        var magic = EmptyMagic();
+        foreach (string family in new[] { "TM_CommanderAura", "TM_ProvisionerAura", "TM_TaskMasterAura" })
+            foreach (string suffix in new[] { "", "_I", "_II", "_III" })
+            {
+                var def = fixture.AddAbility(family + suffix);
+                var policy = TM_AutocastDefaults.For(def, true);
+                Check.Equal(AutocastType.Null, policy.type, family + suffix + " stays a manual toggle");
+                Check.Equal(true, TM_AutocastDefaults.NeverAutocast(def), family + suffix + " never autocasts");
+                Check.Same(null, MagicToggle(magic, def), family + suffix + " offers no AC affordance");
+                Check.Same(null, MightToggle(might, def), family + suffix + " offers no might AC affordance");
+                var mp = new MightPower { TMabilityDefs = [def], learned = true, autocast = true };
+                might.mightPowerG.Add(mp);
+                var gp = new MagicPower { TMabilityDefs = [def], learned = true, autocast = true };
+                magic.magicPowerIF.Add(gp);
+            }
+        Check.Equal(0, MightCandidates(might).Count(), "toggled-on commander auras are never might autocast candidates");
+        Check.Equal(0, MagicCandidates(magic).Count(), "toggled-on commander auras are never magic autocast candidates");
     }
 
     private static void DefaultPolicy(RuntimeFixture fixture, string name, bool blink)

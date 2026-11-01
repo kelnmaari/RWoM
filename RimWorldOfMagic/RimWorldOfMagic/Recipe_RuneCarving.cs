@@ -103,7 +103,10 @@ namespace TorannMagic
 			if (comp.IsMagicUser)
 			{
 				bool canRuneCarve = false;
-				if ((ClassProgression.ClassIdentity.TryGetState(surgeon, out _) || comp.customClass != null) && comp.MagicData.MagicPowersGolemancer.Any(x => x.abilityDef == TorannMagicDefOf.TM_RuneCarving && x.learned))
+				// IsGolemancer adds the classic TM_Golemancer trait arm: an old-save pawn
+				// holding only the legacy trait (no enrollment, no custom class) must keep
+				// the rune-carving ability the HarmonyPatches capability check grants it.
+				if ((ClassProgression.ClassIdentity.IsGolemancer(surgeon) || ClassProgression.ClassIdentity.TryGetState(surgeon, out _) || comp.customClass != null) && comp.MagicData.MagicPowersGolemancer.Any(x => x.abilityDef == TorannMagicDefOf.TM_RuneCarving && x.learned))
 				{
 					canRuneCarve = true;
 				}

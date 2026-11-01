@@ -203,6 +203,10 @@ namespace TorannMagic.ClassProgression
 
         public override void MapComponentTick()
         {
+            // Beta progression kill switch: keep ExposeData running so pending custody
+            // from an old feature-on save stays loadable (recoverable by re-enabling),
+            // but never tick stale records while the feature is disabled.
+            if (!ClassProgressionFeature.Enabled) return;
             if (records.Count == 0) return;
             for (int i = 0; i < records.Count; i++)
             {

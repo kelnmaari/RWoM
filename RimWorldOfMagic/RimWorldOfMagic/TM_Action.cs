@@ -3032,7 +3032,7 @@ namespace TorannMagic
                     {
                         magicPower = comp.MagicData.MagicPowersA.FirstOrDefault<MagicPower>((MagicPower x) => x.abilityDef == tmAbilityDef);
 
-                        if (Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
+                        if (magicPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
                             magicPower.AutoCast = !magicPower.AutoCast;
                             return new GizmoResult(GizmoState.Mouseover, null);                            
@@ -3042,7 +3042,7 @@ namespace TorannMagic
                     {
                         magicPower = comp.MagicData.MagicPowersIF.FirstOrDefault<MagicPower>((MagicPower x) => x.abilityDef == tmAbilityDef);
 
-                        if (Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
+                        if (magicPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
                             magicPower.AutoCast = !magicPower.AutoCast;
                             return new GizmoResult(GizmoState.Mouseover, null);                            
@@ -3052,7 +3052,7 @@ namespace TorannMagic
                     {
                         magicPower = comp.MagicData.MagicPowersHoF.FirstOrDefault<MagicPower>((MagicPower x) => x.abilityDef == tmAbilityDef);
 
-                        if (Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
+                        if (magicPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
                             magicPower.AutoCast = !magicPower.AutoCast;
                             return new GizmoResult(GizmoState.Mouseover, null);
@@ -3063,7 +3063,7 @@ namespace TorannMagic
                     {
                         magicPower = comp.MagicData.MagicPowersSB.FirstOrDefault<MagicPower>((MagicPower x) => x.abilityDef == tmAbilityDef);
 
-                        if (Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
+                        if (magicPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
                             magicPower.AutoCast = !magicPower.AutoCast;
                             return new GizmoResult(GizmoState.Mouseover, null);
@@ -3074,7 +3074,7 @@ namespace TorannMagic
                     {
                         magicPower = comp.MagicData.MagicPowersHoF.FirstOrDefault<MagicPower>((MagicPower x) => x.abilityDef == tmAbilityDef);
 
-                        if (Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
+                        if (magicPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
                             magicPower.AutoCast = !magicPower.AutoCast;
                             return new GizmoResult(GizmoState.Mouseover, null);
@@ -3085,7 +3085,7 @@ namespace TorannMagic
                     {
                         magicPower = comp.MagicData.MagicPowersA.FirstOrDefault<MagicPower>((MagicPower x) => x.abilityDef == tmAbilityDef);
 
-                        if (Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
+                        if (magicPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
                             magicPower.AutoCast = !magicPower.AutoCast;
                             return new GizmoResult(GizmoState.Mouseover, null);
@@ -3128,7 +3128,7 @@ namespace TorannMagic
                     {
                         magicPower = comp.MagicData.MagicPowersD.FirstOrDefault<MagicPower>((MagicPower x) => x.abilityDef == TorannMagicDefOf.TM_Poison);
 
-                        if (Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
+                        if (magicPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
                             magicPower.AutoCast = !magicPower.AutoCast;
                             return new GizmoResult(GizmoState.Mouseover, null);
@@ -3139,7 +3139,7 @@ namespace TorannMagic
                     {
                         magicPower = comp.MagicData.MagicPowersD.FirstOrDefault<MagicPower>((MagicPower x) => x.abilityDef == TorannMagicDefOf.TM_Regenerate);
 
-                        if (Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
+                        if (magicPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
                             magicPower.AutoCast = !magicPower.AutoCast;
                             return new GizmoResult(GizmoState.Mouseover, null);
@@ -3150,7 +3150,7 @@ namespace TorannMagic
                     {
                         magicPower = comp.MagicData.MagicPowersD.FirstOrDefault<MagicPower>((MagicPower x) => x.abilityDef == TorannMagicDefOf.TM_CureDisease);
 
-                        if (Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
+                        if (magicPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
                             magicPower.AutoCast = !magicPower.AutoCast;
                             return new GizmoResult(GizmoState.Mouseover, null);
@@ -3161,7 +3161,7 @@ namespace TorannMagic
                     {
                         magicPower = comp.MagicData.MagicPowersP.FirstOrDefault<MagicPower>((MagicPower x) => x.abilityDef == TorannMagicDefOf.TM_Heal);
 
-                        if (Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
+                        if (magicPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
                             magicPower.AutoCast = !magicPower.AutoCast;
                             return new GizmoResult(GizmoState.Mouseover, null);
@@ -3172,7 +3172,7 @@ namespace TorannMagic
                     {
                         magicPower = comp.MagicData.MagicPowersP.FirstOrDefault<MagicPower>((MagicPower x) => x.abilityDef == tmAbilityDef);
 
-                        if (Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
+                        if (magicPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
                             magicPower.AutoCast = !magicPower.AutoCast;
                             return new GizmoResult(GizmoState.Mouseover, null);
@@ -3183,7 +3183,7 @@ namespace TorannMagic
                     {
                         magicPower = comp.MagicData.MagicPowersPR.FirstOrDefault<MagicPower>((MagicPower x) => x.abilityDef == TorannMagicDefOf.TM_AdvancedHeal);
 
-                        if (Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
+                        if (magicPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
                             magicPower.AutoCast = !magicPower.AutoCast;
                             return new GizmoResult(GizmoState.Mouseover, null);
@@ -3194,7 +3194,7 @@ namespace TorannMagic
                     {
                         magicPower = comp.MagicData.MagicPowersStandalone.FirstOrDefault<MagicPower>((MagicPower x) => x.abilityDef == TorannMagicDefOf.TM_TransferMana);
 
-                        if (Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
+                        if (magicPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
                             magicPower.AutoCast = !magicPower.AutoCast;
                             return new GizmoResult(GizmoState.Mouseover, null);
@@ -3205,7 +3205,7 @@ namespace TorannMagic
                     {
                         magicPower = comp.MagicData.MagicPowersStandalone.FirstOrDefault<MagicPower>((MagicPower x) => x.abilityDef == TorannMagicDefOf.TM_SiphonMana);
 
-                        if (Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
+                        if (magicPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
                             magicPower.AutoCast = !magicPower.AutoCast;
                             return new GizmoResult(GizmoState.Mouseover, null);
@@ -3216,7 +3216,7 @@ namespace TorannMagic
                     {
                         magicPower = comp.MagicData.MagicPowersStandalone.FirstOrDefault<MagicPower>((MagicPower x) => x.abilityDef == TorannMagicDefOf.TM_CauterizeWound);
 
-                        if (Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
+                        if (magicPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
                             magicPower.AutoCast = !magicPower.AutoCast;
                             return new GizmoResult(GizmoState.Mouseover, null);
@@ -3227,7 +3227,7 @@ namespace TorannMagic
                     {
                         magicPower = comp.MagicData.MagicPowersStandalone.FirstOrDefault<MagicPower>((MagicPower x) => x.abilityDef == TorannMagicDefOf.TM_SpellMending);
 
-                        if (Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
+                        if (magicPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
                             magicPower.AutoCast = !magicPower.AutoCast;
                             return new GizmoResult(GizmoState.Mouseover, null);
@@ -3238,7 +3238,7 @@ namespace TorannMagic
                     {
                         magicPower = comp.MagicData.MagicPowersStandalone.FirstOrDefault<MagicPower>((MagicPower x) => x.abilityDef == TorannMagicDefOf.TM_TeachMagic);
 
-                        if (Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
+                        if (magicPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
                             magicPower.AutoCast = !magicPower.AutoCast;
                             return new GizmoResult(GizmoState.Mouseover, null);
@@ -3256,7 +3256,7 @@ namespace TorannMagic
                             magicPower = comp.MagicData.MagicPowersSD.FirstOrDefault<MagicPower>((MagicPower x) => x.abilityDef == tmAbilityDef);
                         }
 
-                        if (Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
+                        if (magicPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
                             magicPower.AutoCast = !magicPower.AutoCast;
                             return new GizmoResult(GizmoState.Mouseover, null);
@@ -3267,7 +3267,7 @@ namespace TorannMagic
                     {
                         magicPower = comp.MagicData.MagicPowersPR.FirstOrDefault<MagicPower>((MagicPower x) => x.abilityDef == TorannMagicDefOf.TM_Purify);
 
-                        if (Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
+                        if (magicPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
                             magicPower.AutoCast = !magicPower.AutoCast;
                             return new GizmoResult(GizmoState.Mouseover, null);
@@ -3278,7 +3278,7 @@ namespace TorannMagic
                     {
                         magicPower = comp.MagicData.MagicPowersS.FirstOrDefault<MagicPower>((MagicPower x) => x.abilityDef == TorannMagicDefOf.TM_SummonMinion);
 
-                        if (Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
+                        if (magicPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
                             magicPower.AutoCast = !magicPower.AutoCast;
                             return new GizmoResult(GizmoState.Mouseover, null);
@@ -3289,7 +3289,7 @@ namespace TorannMagic
                     {
                         magicPower = comp.MagicData.MagicPowersStandalone.FirstOrDefault<MagicPower>((MagicPower x) => x.abilityDef == TorannMagicDefOf.TM_MechaniteReprogramming);
 
-                        if (Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
+                        if (magicPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
                             magicPower.AutoCast = !magicPower.AutoCast;
                             return new GizmoResult(GizmoState.Mouseover, null);
@@ -3300,7 +3300,7 @@ namespace TorannMagic
                     {
                         magicPower = comp.MagicData.MagicPowersStandalone.FirstOrDefault<MagicPower>((MagicPower x) => x.abilityDef == TorannMagicDefOf.TM_DirtDevil);
 
-                        if (Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
+                        if (magicPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
                             magicPower.AutoCast = !magicPower.AutoCast;
                             return new GizmoResult(GizmoState.Mouseover, null);
@@ -3311,7 +3311,7 @@ namespace TorannMagic
                     {
                         magicPower = comp.MagicData.MagicPowersStandalone.FirstOrDefault<MagicPower>((MagicPower x) => x.abilityDef == TorannMagicDefOf.TM_ArcaneBolt);
 
-                        if (Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
+                        if (magicPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
                             magicPower.AutoCast = !magicPower.AutoCast;
                             return new GizmoResult(GizmoState.Mouseover, null);
@@ -3322,7 +3322,7 @@ namespace TorannMagic
                     {
                         magicPower = comp.MagicData.MagicPowersStandalone.FirstOrDefault<MagicPower>((MagicPower x) => x.abilityDef == TorannMagicDefOf.TM_TimeMark);
 
-                        if (Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
+                        if (magicPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
                             magicPower.AutoCast = !magicPower.AutoCast;
                             return new GizmoResult(GizmoState.Mouseover, null);
@@ -3333,7 +3333,7 @@ namespace TorannMagic
                     {
                         magicPower = comp.MagicData.MagicPowersE.FirstOrDefault<MagicPower>((MagicPower x) => x.abilityDef == TorannMagicDefOf.TM_Transmutate);
 
-                        if (Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
+                        if (magicPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
                             magicPower.AutoCast = !magicPower.AutoCast;
                             return new GizmoResult(GizmoState.Mouseover, null);
@@ -3344,7 +3344,7 @@ namespace TorannMagic
                     {
                         magicPower = comp.MagicData.MagicPowersD.FirstOrDefault<MagicPower>((MagicPower x) => x.abilityDef == TorannMagicDefOf.TM_RegrowLimb);
 
-                        if (Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
+                        if (magicPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
                             magicPower.AutoCast = !magicPower.AutoCast;
                             return new GizmoResult(GizmoState.Mouseover, null);
@@ -3359,7 +3359,7 @@ namespace TorannMagic
                     if (genericPower != null)
                     {
                         magicPower = genericPower;
-                        if (Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
+                        if (magicPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
                             magicPower.AutoCast = !magicPower.AutoCast;
                             return new GizmoResult(GizmoState.Mouseover, null);
@@ -3373,7 +3373,7 @@ namespace TorannMagic
                     if (genericPower != null)
                     {
                         mightPower = genericPower;
-                        if (Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
+                        if (mightPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
                             mightPower.AutoCast = !mightPower.AutoCast;
                             return new GizmoResult(GizmoState.Mouseover, null);
@@ -3383,7 +3383,7 @@ namespace TorannMagic
                     {
                         mightPower = mightComp.MightData.MightPowersG.FirstOrDefault<MightPower>((MightPower x) => x.abilityDef == tmAbilityDef);
 
-                        if (Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
+                        if (mightPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
                             mightPower.AutoCast = !mightPower.AutoCast;
                             return new GizmoResult(GizmoState.Mouseover, null);
@@ -3394,7 +3394,7 @@ namespace TorannMagic
                     {
                         mightPower = mightComp.MightData.MightPowersB.FirstOrDefault<MightPower>((MightPower x) => x.abilityDef == TorannMagicDefOf.TM_BladeSpin);
 
-                        if (Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
+                        if (mightPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
                             mightPower.AutoCast = !mightPower.AutoCast;
                             return new GizmoResult(GizmoState.Mouseover, null);
@@ -3405,7 +3405,7 @@ namespace TorannMagic
                     {
                         mightPower = mightComp.MightData.MightPowersB.FirstOrDefault<MightPower>((MightPower x) => x.abilityDef == tmAbilityDef);
 
-                        if (Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
+                        if (mightPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
                             mightPower.AutoCast = !mightPower.AutoCast;
                             return new GizmoResult(GizmoState.Mouseover, null);
@@ -3416,7 +3416,7 @@ namespace TorannMagic
                     {
                         mightPower = mightComp.MightData.MightPowersR.FirstOrDefault<MightPower>((MightPower x) => x.abilityDef == tmAbilityDef);
 
-                        if (Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
+                        if (mightPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
                             mightPower.AutoCast = !mightPower.AutoCast;
                             return new GizmoResult(GizmoState.Mouseover, null);
@@ -3427,7 +3427,7 @@ namespace TorannMagic
                     {
                         mightPower = mightComp.MightData.MightPowersS.FirstOrDefault<MightPower>((MightPower x) => x.abilityDef == tmAbilityDef);
 
-                        if (Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
+                        if (mightPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
                             mightPower.AutoCast = !mightPower.AutoCast;
                             return new GizmoResult(GizmoState.Mouseover, null);
@@ -3438,7 +3438,7 @@ namespace TorannMagic
                     {
                         mightPower = mightComp.MightData.MightPowersDK.FirstOrDefault<MightPower>((MightPower x) => x.abilityDef == tmAbilityDef);
 
-                        if (Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
+                        if (mightPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
                             mightPower.AutoCast = !mightPower.AutoCast;
                             return new GizmoResult(GizmoState.Mouseover, null);
@@ -3449,7 +3449,7 @@ namespace TorannMagic
                     {
                         mightPower = mightComp.MightData.MightPowersS.FirstOrDefault<MightPower>((MightPower x) => x.abilityDef == TorannMagicDefOf.TM_Headshot);
 
-                        if (Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
+                        if (mightPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
                             mightPower.AutoCast = !mightPower.AutoCast;
                             return new GizmoResult(GizmoState.Mouseover, null);
@@ -3460,7 +3460,7 @@ namespace TorannMagic
                     {
                         mightPower = mightComp.MightData.MightPowersS.FirstOrDefault<MightPower>((MightPower x) => x.abilityDef == TorannMagicDefOf.TM_AntiArmor);
 
-                        if (Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
+                        if (mightPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
                             mightPower.AutoCast = !mightPower.AutoCast;
                             return new GizmoResult(GizmoState.Mouseover, null);
@@ -3471,7 +3471,7 @@ namespace TorannMagic
                     {
                         mightPower = mightComp.MightData.MightPowersStandalone.FirstOrDefault<MightPower>((MightPower x) => x.abilityDef == TorannMagicDefOf.TM_ThrowingKnife);
 
-                        if (Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
+                        if (mightPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
                             mightPower.AutoCast = !mightPower.AutoCast;
                             return new GizmoResult(GizmoState.Mouseover, null);
@@ -3482,7 +3482,7 @@ namespace TorannMagic
                     {
                         mightPower = mightComp.MightData.MightPowersStandalone.FirstOrDefault<MightPower>((MightPower x) => x.abilityDef == TorannMagicDefOf.TM_PommelStrike);
 
-                        if (Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
+                        if (mightPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
                             mightPower.AutoCast = !mightPower.AutoCast;
                             return new GizmoResult(GizmoState.Mouseover, null);
@@ -3493,7 +3493,7 @@ namespace TorannMagic
                     {
                         mightPower = mightComp.MightData.MightPowersStandalone.FirstOrDefault<MightPower>((MightPower x) => x.abilityDef == TorannMagicDefOf.TM_TempestStrike);
 
-                        if (Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
+                        if (mightPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
                             mightPower.AutoCast = !mightPower.AutoCast;
                             return new GizmoResult(GizmoState.Mouseover, null);
@@ -3504,7 +3504,7 @@ namespace TorannMagic
                     {
                         mightPower = mightComp.MightData.MightPowersM.FirstOrDefault<MightPower>((MightPower x) => x.abilityDef == TorannMagicDefOf.TM_TigerStrike);
 
-                        if (Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
+                        if (mightPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
                             mightPower.AutoCast = !mightPower.AutoCast;
                             return new GizmoResult(GizmoState.Mouseover, null);
@@ -3515,7 +3515,7 @@ namespace TorannMagic
                     {
                         mightPower = mightComp.MightData.MightPowersM.FirstOrDefault<MightPower>((MightPower x) => x.abilityDef == TorannMagicDefOf.TM_ThunderStrike);
 
-                        if (Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
+                        if (mightPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
                             mightPower.AutoCast = !mightPower.AutoCast;
                             return new GizmoResult(GizmoState.Mouseover, null);
@@ -3538,7 +3538,7 @@ namespace TorannMagic
                     {
                         mightPower = mightComp.MightData.MightPowersSS.FirstOrDefault<MightPower>((MightPower x) => x.abilityDef == TorannMagicDefOf.TM_PistolWhip);
 
-                        if (Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
+                        if (mightPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
                             mightPower.AutoCast = !mightPower.AutoCast;
                             return new GizmoResult(GizmoState.Mouseover, null);
@@ -3549,7 +3549,7 @@ namespace TorannMagic
                     {
                         mightPower = mightComp.MightData.MightPowersSS.FirstOrDefault<MightPower>((MightPower x) => x.abilityDef == TorannMagicDefOf.TM_SuppressingFire);
 
-                        if (Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
+                        if (mightPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
                             mightPower.AutoCast = !mightPower.AutoCast;
                             return new GizmoResult(GizmoState.Mouseover, null);
@@ -3560,7 +3560,7 @@ namespace TorannMagic
                     {
                         mightPower = mightComp.MightData.MightPowersSS.FirstOrDefault<MightPower>((MightPower x) => x.abilityDef == TorannMagicDefOf.TM_Buckshot);
 
-                        if (Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
+                        if (mightPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
                             mightPower.AutoCast = !mightPower.AutoCast;
                             return new GizmoResult(GizmoState.Mouseover, null);
@@ -3571,7 +3571,7 @@ namespace TorannMagic
                     {
                         mightPower = mightComp.MightData.MightPowersSS.FirstOrDefault<MightPower>((MightPower x) => x.abilityDef == TorannMagicDefOf.TM_FirstAid);
 
-                        if (Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
+                        if (mightPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
                             mightPower.AutoCast = !mightPower.AutoCast;
                             return new GizmoResult(GizmoState.Mouseover, null);
@@ -3582,7 +3582,7 @@ namespace TorannMagic
                     {
                         mightPower = mightComp.MightData.MightPowersM.FirstOrDefault<MightPower>((MightPower x) => x.abilityDef == TorannMagicDefOf.TM_Meditate);
 
-                        if (Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
+                        if (mightPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
                             mightPower.AutoCast = !mightPower.AutoCast;
                             return new GizmoResult(GizmoState.Mouseover, null);
@@ -3596,7 +3596,7 @@ namespace TorannMagic
                     if (com.pawnAbility.Def == TorannMagicDefOf.TM_Elixir)
                     {
                         mightPower = mightComp.MightData.MightPowersApothecary.FirstOrDefault<MightPower>((MightPower x) => x.abilityDef == TorannMagicDefOf.TM_Elixir);
-                        if (Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
+                        if (mightPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
                             mightPower.AutoCast = !mightPower.AutoCast;
                             return new GizmoResult(GizmoState.Mouseover, null);
@@ -3607,7 +3607,7 @@ namespace TorannMagic
                     {
                         mightPower = mightComp.MightData.MightPowersStandalone.FirstOrDefault<MightPower>((MightPower x) => x.abilityDef == TorannMagicDefOf.TM_TeachMight);
 
-                        if (Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
+                        if (mightPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
                             mightPower.AutoCast = !mightPower.AutoCast;
                             return new GizmoResult(GizmoState.Mouseover, null);

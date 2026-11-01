@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?>
+﻿<?xml version="1.0" encoding="utf-8" ?>
 <LanguageData>
 
 <!-- Notification messages  -->
@@ -178,6 +178,8 @@
 
 <TM_ClassWarning>**Cambia la configuración de las clases solo al empezar un nuevo juego**</TM_ClassWarning>
 <TM_RequiresRestart>**Cualquier cambio requiere un reinicio de juego**</TM_RequiresRestart>
+<TM_NewProgressionBeta>Nueva progresión de clase (beta)</TM_NewProgressionBeta>
+  <TM_NewProgressionBetaDesc>Activa el nuevo sistema experimental de progresión de clase. Solo se lee al iniciar el juego: cambiar esta opción requiere reiniciar. Cuando está desactivada, el mod usa el sistema de clases clásico.</TM_NewProgressionBetaDesc>
 <TM_ClassOptions>Clases Habilitadas</TM_ClassOptions>
 <TM_EnabledMages>Magos</TM_EnabledMages>
 <TM_EnabledFighters>Luchadores</TM_EnabledFighters>
@@ -1327,4 +1329,14 @@ Cantidad base: 0%</TM_LifeSteal_ver_desc>
   <TM_GrimoireDesc>Abre el Grimorio de este personaje: niveles de clase, recursos y habilidades.</TM_GrimoireDesc>
   <TM_GrimoireIsekaiHint>La integración nativa de Isekai Leveling, de Jelly Creative, otorga bonificaciones al maná y aguante máximos, su regeneración, las recargas de habilidades y los costes de recursos.</TM_GrimoireIsekaiHint>
   <TM_Grimoire>Grimorio</TM_Grimoire>
+
+  <!-- Grimoire classic-mode strings. -->
+  <TM_GrimoireClassicRequirements>Reglas clásicas: los hechizos se aprenden con puntos de clase en el Grimorio; algunos hechizos también requieren leer su pergamino o libro.</TM_GrimoireClassicRequirements>
+  <TM_GrimoireClassicRules>Reglas clásicas</TM_GrimoireClassicRules>
+  <TM_GrimoireLearningItems>Objetos de aprendizaje necesarios:</TM_GrimoireLearningItems>
+  <TM_GrimoireNoLearningItems>No se necesitan objetos de aprendizaje.</TM_GrimoireNoLearningItems>
+  <TM_GrimoireLearned>Aprendido</TM_GrimoireLearned>
+  <TM_GrimoireRankMax>Rango máx.</TM_GrimoireRankMax>
+  <TM_GrimoireRank>Rango</TM_GrimoireRank>
+  <TM_GrimoireScrollUnspecified>Pergamino sin especificar</TM_GrimoireScrollUnspecified>
 </LanguageData>

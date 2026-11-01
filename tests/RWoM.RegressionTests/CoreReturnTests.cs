@@ -24,6 +24,7 @@ internal static partial class TeleportSpiritTests
         yield return new("CoreReturn.ApproachCompletionAndRevalidation", f=>CoreReturnWorld(f,CoreReturnApproach));
         yield return new("CoreReturn.ConfirmationCaravanRosterStale", f=>CoreReturnWorld(f,w=>CoreReturnCaravan(w,true,true)));
         yield return new("CoreReturn.MaintenanceFailureBoundedRetry", f=>CoreReturnWorld(f,CoreReturnRetry));
+        yield return new("CoreReturn.GizmosEnumerateWithoutThrowing", f=>CoreReturnWorld(f,CoreReturnGizmos));
     }
 
     static void CoreReturnWorld(RuntimeFixture f, Action<WorldState> body)
@@ -279,6 +280,21 @@ internal static partial class TeleportSpiritTests
         Check.Equal(true,core.IsBound(w.Caster),"friendly downed pawn remains recallable");Check.Equal(false,core.CanMark(w.Caster),"downed pawn cannot start approach");
     }
     static bool CoreReturnLabel(ref string __result) {__result="return core";return false;}
+    static bool CoreReturnSkipTexture(string itemPath, bool reportFailure, ref UnityEngine.Texture2D __result) {__result=null;return false;}
+    static void CoreReturnGizmos(WorldState w)
+    {
+        using var def=CoreReturnDef();using var health=CoreReturnHealthBoundary();using var textures=new Patches();
+        textures.Prefix(typeof(ContentFinder<UnityEngine.Texture2D>).GetMethod("Get",new[]{typeof(string),typeof(bool)})!,nameof(CoreReturnSkipTexture));
+        var core=CoreReturnCore(w);Check.Equal(true,core.Bind(w.Caster),"mark bound before selection");
+        var mark=CompCoreReturn.FindMark(w.Caster)!;
+        // RimWorld 1.7: the vanilla Hediff.GetGizmos base returns null — the old
+        // foreach over it threw NullReferenceException for every selected pawn and
+        // vanilla's gizmo-grid guard wiped ALL of the pawn's commands (draft included).
+        var gizmos=mark.GetGizmos().ToList();
+        Check.Equal(2,gizmos.Count,"recall and unbind commands offered for a bound colonist");
+        Set(w.Caster,"factionInt",new Faction {def=new FactionDef()});
+        Check.Equal(0,mark.GetGizmos().ToList().Count,"foreign pawn receives no core commands");
+    }
     static Action? coreReturnConfirmation;
     static bool CoreReturnWindowStack(ref WindowStack __result) {__result=new WindowStack();return false;}
     static bool CoreReturnCaptureDialog(Window window) {coreReturnConfirmation=((Dialog_MessageBox)window).buttonAAction;return false;}

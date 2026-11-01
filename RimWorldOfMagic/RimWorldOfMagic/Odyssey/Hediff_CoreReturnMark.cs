@@ -22,8 +22,11 @@ namespace TorannMagic.Odyssey
         public override void PostRemoved() { Comp?.Unregister(pawn); base.PostRemoved(); }
         public override IEnumerable<Gizmo> GetGizmos()
         {
-            foreach (Gizmo gizmo in base.GetGizmos()) yield return gizmo;
-            if (pawn.Faction != Faction.OfPlayer || pawn.Dead) yield break;
+            // RimWorld 1.7: the vanilla base implementation returns null, so iterating
+            // it threw NullReferenceException for every selected marked pawn — vanilla's
+            // gizmo-grid guard then wiped ALL of the pawn's buttons, including drafting.
+            foreach (Gizmo gizmo in base.GetGizmos() ?? Enumerable.Empty<Gizmo>()) yield return gizmo;
+            if (pawn?.Faction != Faction.OfPlayer || pawn.Dead) yield break;
             var recall = new Command_Action
             {
                 defaultLabel = "TM_CoreReturnSingle".Translate(), defaultDesc = "TM_CoreReturnSingleDesc".Translate(10),

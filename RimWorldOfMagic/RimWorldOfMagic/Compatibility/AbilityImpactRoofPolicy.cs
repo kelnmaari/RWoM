@@ -16,12 +16,17 @@ namespace TorannMagic.Compatibility
         {
             // Local fields, rituals and summons (all spell levels share these classes).
             typeof(Projectile_RaiseUndead), typeof(Projectile_FogOfTorment), typeof(Projectile_HealingCircle),
-            typeof(Projectile_Teleport), typeof(Projectile_IgniteBlood), 
+            typeof(Projectile_Teleport), typeof(Projectile_IgniteBlood),
              typeof(Projectile_AccelerateTime), typeof(Projectile_GraveBlade),
             typeof(Projectile_Attraction), typeof(Projectile_Repulsion), typeof(Projectile_PsychicShock),
             typeof(Projectile_Encase), typeof(Projectile_LightningCloud),
             typeof(Projectile_DistortSpirit), typeof(Projectile_SummonSpiritAnimals), typeof(Projectile_PsionicBlast),
             typeof(Projectile_Explosion), typeof(Projectile_SummonPoppi),
+            // Summoned minions spawn locally at the target cell; the mana is already
+            // paid at cast time, so a roof interception that destroys the carrier
+            // silently ate the payment and produced no minions (player report).
+            typeof(Projectile_SummonMinion), typeof(Projectile_SummonExplosive), typeof(Projectile_SummonPylon),
+            typeof(Projectile_SummonDemon), typeof(Projectile_SummonElemental), typeof(Projectile_SpiritPossession),
             // Local utility effects and infrastructure magic.
             typeof(Projectile_Sunlight), typeof(Projectile_DryGround), typeof(Projectile_WetGround),
             typeof(Projectile_SmokeCloud), typeof(Projectile_Extinguish), typeof(Projectile_EMP),

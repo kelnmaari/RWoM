@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Verse;
@@ -54,8 +54,12 @@ namespace TorannMagic
         {
             float width = rect.width - 20f;
             string description = ClassDescription() ?? "";
-            string mode = (ClassProgression.ClassIdentity.TryGetState(pawn, out _)
-                ? "TM_ProgressionSharedLearning" : "TM_GrimoireClassicRules").Translate();
+            // The progression-era mode line belongs to the beta progression only;
+            // with the feature disabled the classic grimoire renders without it.
+            string mode = ClassProgression.ClassProgressionFeature.Enabled
+                ? (ClassProgression.ClassIdentity.TryGetState(pawn, out _)
+                    ? "TM_ProgressionSharedLearning" : "TM_GrimoireClassicRules").Translate()
+                : "";
             Text.Font = GameFont.Small;
             string title = pawn.LabelShortCap + "\n" + ClassLabel();
             float titleHeight = Text.CalcHeight(title, width) + 12f;
@@ -130,9 +134,14 @@ namespace TorannMagic
         private void DrawDetailsColumn(Rect rect)
         {
             float width = rect.width - 20f;
-            var requirements = RequiredLearningItems();
-            string text = InitiationRequirements() + "\n\n" + "TM_GrimoireLearningItems".Translate();
-            if (requirements.Count == 0) text += "\n" + "TM_GrimoireNoLearningItems".Translate();
+            // The requirements/learning-items column is part of the beta progression
+            // grimoire; with the feature disabled the classic grimoire renders only
+            // the resource bars (user request: do not draw this text at all).
+            var requirements = ClassProgression.ClassProgressionFeature.Enabled ? RequiredLearningItems() : new List<TMAbilityDef>();
+            string text = ClassProgression.ClassProgressionFeature.Enabled
+                ? InitiationRequirements() + "\n\n" + "TM_GrimoireLearningItems".Translate()
+                : "";
+            if (ClassProgression.ClassProgressionFeature.Enabled && requirements.Count == 0) text += "\n" + "TM_GrimoireNoLearningItems".Translate();
             foreach (var ability in requirements)
                 text += "\n\n" + ability.LabelCap + "\n" + (ability.learnItem != null
                     ? ability.learnItem.LabelCap.ToString() : "TM_GrimoireScrollUnspecified".Translate().ToString());

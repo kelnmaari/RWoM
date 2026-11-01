@@ -96,6 +96,9 @@ namespace TorannMagic.ClassProgression
         static float Slow(Pawn target) => target.health.hediffSet.hediffs.Where(h => h.def == TorannMagicDefOf.TM_GravitySlowHD).Sum(h => h.Severity);
         public static EffectSnapshot BeforeEffect(Projectile_AbilityBase projectile, Pawn target, bool repulsion)
         {
+            // ConditionalWeakTable throws on a null key; a missing projectile simply
+            // cannot be an owned trial source.
+            if (projectile == null) return null;
             if (!sources.TryGetValue(projectile, out var tag) || tag.profile != (repulsion ? "rwom.warlock" : "rwom.succubus") || projectile.Caster?.thingIDNumber != tag.casterId
                 || projectile.def?.defName != Projectile(tag.profile) || projectile.localAbilityDef != tag.ability || !Hostile(projectile.Caster, target)) return null;
             var path = Owned(projectile.Caster, tag.profile, true, tag.ability);

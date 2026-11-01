@@ -63,7 +63,8 @@ internal static partial class AbilityProjectileTests
             "Projectile_Teleport","Projectile_IgniteBlood","Projectile_AccelerateTime","Projectile_GraveBlade",
             "Projectile_Attraction","Projectile_Repulsion","Projectile_PsychicShock","Projectile_Encase","Projectile_LightningCloud",
             "Projectile_DistortSpirit","Projectile_SummonSpiritAnimals","Projectile_PsionicBlast","Projectile_Sunlight","Projectile_DryGround","Projectile_WetGround",
-            "Projectile_SmokeCloud","Projectile_Extinguish","Projectile_EMP","Projectile_FertileLands","Projectile_Explosion","Projectile_SummonPoppi","Projectile_Sabotage"}.Concat(BlockedRoofClasses))
+            "Projectile_SmokeCloud","Projectile_Extinguish","Projectile_EMP","Projectile_FertileLands","Projectile_Explosion","Projectile_SummonPoppi","Projectile_Sabotage",
+            "Projectile_SummonMinion","Projectile_SummonExplosive","Projectile_SummonPylon","Projectile_SummonDemon","Projectile_SummonElemental","Projectile_SpiritPossession"}.Concat(BlockedRoofClasses))
         foreach(string roof in name is "Projectile_RaiseUndead" or "Projectile_FogOfTorment" or "Projectile_HealingCircle"
             ? new[] {"None","Constructed","ThinRock","ThickRock"} : new[] {"ThickRock"})
         {

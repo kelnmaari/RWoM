@@ -1,4 +1,4 @@
-using HarmonyLib;
+﻿using HarmonyLib;
 using RimWorld;
 using AbilityUser;
 using RimWorld.Planet;
@@ -37,6 +37,11 @@ namespace TorannMagic
         public TorannMagicMod(ModContentPack content) : base(content)
         {
             var harmonyInstance = new Harmony("rimworld.torann.tmagic");
+
+            // The beta class progression kill switch must be known before any patch
+            // application: with the feature disabled the ClassProgression patch set
+            // is skipped entirely and the mod behaves like the classic system.
+            ClassProgression.ClassProgressionFeature.SnapshotFromSettings(this);
 
             // RimWorld 1.7 port note: on 1.6 the [HarmonyPatch] attribute classes below were
             // applied automatically by HugsLib's assembly scan; HugsLib is not available for 1.7,
@@ -299,8 +304,21 @@ namespace TorannMagic
                 return;
             }
             int applied = 0;
+            int skipped = 0;
             foreach (Type patchClass in patchClasses)
             {
+                // The beta progression ships its own patch set (trials, passives, spirit
+                // rebirth policy). With the feature disabled those patches must not be
+                // applied at all — the only exception is the chronomancer prediction
+                // scribe, which serializes ownership tokens for the CLASSIC prediction
+                // mechanic and is state-independent.
+                if (!ClassProgression.ClassProgressionFeature.Enabled
+                    && patchClass.Namespace == "TorannMagic.ClassProgression"
+                    && patchClass != typeof(ClassProgression.ChronomancerPredictionScribePatch))
+                {
+                    skipped++;
+                    continue;
+                }
                 try
                 {
                     harmonyInstance.CreateClassProcessor(patchClass).Patch();
@@ -313,7 +331,8 @@ namespace TorannMagic
             }
             if (Prefs.DevMode)
             {
-                Compatibility.TM_Log.Message("Harmony", $"[TM] Harmony: applied {applied}/{patchClasses.Count} attribute patch classes.");
+                Compatibility.TM_Log.Message("Harmony", $"[TM] Harmony: applied {applied}/{patchClasses.Count} attribute patch classes."
+                    + (skipped > 0 ? $" {skipped} beta progression patches skipped (feature disabled)." : ""));
             }
         }
 
@@ -4060,9 +4079,13 @@ namespace TorannMagic
         {
             if (!__result) return;
             Pawn p = __instance.parent;
+            // Only these RWoM units resist stagger (demons, hollow golems, and pawns
+            // under Burning Fury / Move Out / Enrage). The inverted condition used to
+            // clear the staggered state for everyone else, so no pawn in the game
+            // ever staggered (workshop report: "as if everyone had Unstoppable").
             if (p.def == TorannMagicDefOf.TM_DemonR
                || p.def == TorannMagicDefOf.TM_HollowGolem
-               || !p.health.hediffSet.hediffs.Any(hd =>
+               || p.health.hediffSet.hediffs.Any(hd =>
                    hd.def == TorannMagicDefOf.TM_BurningFuryHD
                    || hd.def == TorannMagicDefOf.TM_MoveOutHD
                    || hd.def == TorannMagicDefOf.TM_EnrageHD
@@ -4254,6 +4277,22 @@ namespace TorannMagic
 
         public static void Pawn_Gizmo_TogglePatch(ref IEnumerable<Gizmo> __result, ref Pawn __instance)
         {
+            // This postfix runs last in a long chain of third-party GetGizmos patchers;
+            // a throw here aborts the whole chain and vanilla's gizmo-grid guard wipes
+            // every button of the selected pawn (player report: the grimoire widget
+            // disappears). Contain our own failures instead of breaking the grid.
+            try
+            {
+                Pawn_Gizmo_TogglePatchBody(ref __result, ref __instance);
+            }
+            catch (Exception ex)
+            {
+                Compatibility.TM_Log.Error("Gizmos", "[TM] grimoire gizmo postfix failed: " + ex);
+            }
+        }
+
+        private static void Pawn_Gizmo_TogglePatchBody(ref IEnumerable<Gizmo> __result, ref Pawn __instance)
+        {
             if (__instance == null) return;
             if (__result == null) return;
             if (__instance.Faction != Faction.OfPlayer) return;
@@ -4300,7 +4339,7 @@ namespace TorannMagic
                     bool canBecomeClassless = false;
                     if (ModOptions.Settings.Instance.Wanderer && __instance.story.traits.HasTrait(TorannMagicDefOf.TM_Gifted) && __instance.ageTracker.AgeBiologicalYears >= 4)
                     {
-                        Command_Action itemWanderer = (Command_Action)compMagic.GetGizmoCommands("wanderer");
+                        Command_Action itemWanderer = compMagic == null ? null : (Command_Action)compMagic.GetGizmoCommands("wanderer");
                         if (itemWanderer != null)
                         {
                             canBecomeClassless = true;
@@ -4310,7 +4349,7 @@ namespace TorannMagic
 
                     if (ModOptions.Settings.Instance.Wayfarer && __instance.story.traits.HasTrait(TorannMagicDefOf.PhysicalProdigy) && __instance.ageTracker.AgeBiologicalYears >= 4)
                     {
-                        Command_Action itemWayfarer = (Command_Action)compMight.GetGizmoCommands("wayfarer");
+                        Command_Action itemWayfarer = compMight == null ? null : (Command_Action)compMight.GetGizmoCommands("wayfarer");
                         if (itemWayfarer != null)
                         {
                             canBecomeClassless = true;
@@ -4323,7 +4362,7 @@ namespace TorannMagic
                         HediffComp_SymbiosisCaster hdc = __instance.health.hediffSet.GetFirstHediffOfDef(TorannMagicDefOf.TM_OutOfBodyHD).TryGetComp<HediffComp_SymbiosisCaster>();
                         if (hdc != null && hdc.symbiosisHost != null && hdc.symbiosisHost.Map == __instance.Map && (hdc.symbiosisHost.Position - __instance.Position).LengthHorizontal <= 2f)
                         {
-                            Command_Action itemSymbiosis = (Command_Action)compMagic.GetGizmoCommands("symbiosis");
+                            Command_Action itemSymbiosis = compMagic == null ? null : (Command_Action)compMagic.GetGizmoCommands("symbiosis");
                             if (itemSymbiosis != null)
                             {
                                 gizmoList.Add(itemSymbiosis);
@@ -4348,7 +4387,10 @@ namespace TorannMagic
                         {
                             return;
                         }
-                        if (!compMagic.IsMagicUser && !compMight.IsMightUser && itemComp == null && !canBecomeClassless)
+                        // Either comp can be absent on its own (post class removal or a
+                        // partially initialized pawn); dereferencing the missing one here
+                        // threw NullReferenceException and broke the pawn's gizmo grid.
+                        if ((compMagic == null || !compMagic.IsMagicUser) && (compMight == null || !compMight.IsMightUser) && itemComp == null && !canBecomeClassless)
                         {
                             return;
                         }
@@ -4368,7 +4410,7 @@ namespace TorannMagic
                         }
 
                     }
-                    if (__instance.story.traits.HasTrait(TorannMagicDefOf.Gladiator) || TM_ClassUtility.ClassHasAbility(TorannMagicDefOf.TM_Cleave, null, compMight))
+                    if (compMight != null && (__instance.story.traits.HasTrait(TorannMagicDefOf.Gladiator) || TM_ClassUtility.ClassHasAbility(TorannMagicDefOf.TM_Cleave, null, compMight)))
                     {
                         Command_Toggle ct = (Command_Toggle)compMight.GetGizmoCommands("cleave");
                         if (ct != null)
@@ -4376,7 +4418,7 @@ namespace TorannMagic
                             gizmoList.Add(ct);
                         }
                     }
-                    if (__instance.story.traits.HasTrait(TorannMagicDefOf.TM_SuperSoldier) || TM_ClassUtility.ClassHasAbility(TorannMagicDefOf.TM_CQC, null, compMight))
+                    if (compMight != null && (__instance.story.traits.HasTrait(TorannMagicDefOf.TM_SuperSoldier) || TM_ClassUtility.ClassHasAbility(TorannMagicDefOf.TM_CQC, null, compMight)))
                     {
                         Command_Toggle ct = (Command_Toggle)compMight.GetGizmoCommands("cqc");
                         if (ct != null)
@@ -4384,7 +4426,7 @@ namespace TorannMagic
                             gizmoList.Add(ct);
                         }
                     }
-                    if (__instance.story.traits.HasTrait(TorannMagicDefOf.TM_Psionic) || TM_ClassUtility.ClassHasHediff(TorannMagicDefOf.TM_PsionicHD, compMagic, compMight))
+                    if (compMight != null && (__instance.story.traits.HasTrait(TorannMagicDefOf.TM_Psionic) || TM_ClassUtility.ClassHasHediff(TorannMagicDefOf.TM_PsionicHD, compMagic, compMight)))
                     {
                         Command_Toggle ct = (Command_Toggle)compMight.GetGizmoCommands("psiAugmentation");
                         if (ct != null)
@@ -4397,7 +4439,7 @@ namespace TorannMagic
                             gizmoList.Add(ct);
                         }
                     }
-                    if (((__instance.story.traits.HasTrait(TorannMagicDefOf.Technomancer) || ClassProgression.ClassIdentity.IsTechnomancer(__instance)) || __instance.story.traits.HasTrait(TorannMagicDefOf.ChaosMage) || TM_ClassUtility.ClassHasAbility(TorannMagicDefOf.TM_TechnoBit, compMagic, compMight)) && compMagic.HasTechnoBit)
+                    if (((__instance.story.traits.HasTrait(TorannMagicDefOf.Technomancer) || ClassProgression.ClassIdentity.IsTechnomancer(__instance)) || __instance.story.traits.HasTrait(TorannMagicDefOf.ChaosMage) || TM_ClassUtility.ClassHasAbility(TorannMagicDefOf.TM_TechnoBit, compMagic, compMight)) && compMagic != null && compMagic.HasTechnoBit)
                     {
                         Command_Toggle ct = (Command_Toggle)compMagic.GetGizmoCommands("technoBit");
                         if (ct != null)
@@ -4411,7 +4453,7 @@ namespace TorannMagic
                         }
                     }
 
-                    if (((__instance.story.traits.HasTrait(TorannMagicDefOf.Technomancer) || ClassProgression.ClassIdentity.IsTechnomancer(__instance)) || __instance.story.traits.HasTrait(TorannMagicDefOf.ChaosMage) || TM_ClassUtility.ClassHasAbility(TorannMagicDefOf.TM_TechnoWeapon, compMagic, compMight)) && compMagic.HasTechnoWeapon)
+                    if (((__instance.story.traits.HasTrait(TorannMagicDefOf.Technomancer) || ClassProgression.ClassIdentity.IsTechnomancer(__instance)) || __instance.story.traits.HasTrait(TorannMagicDefOf.ChaosMage) || TM_ClassUtility.ClassHasAbility(TorannMagicDefOf.TM_TechnoWeapon, compMagic, compMight)) && compMagic != null && compMagic.HasTechnoWeapon)
                     {
                         Command_Toggle ct = (Command_Toggle)compMagic.GetGizmoCommands("elementalShot");
                         if (ct != null)

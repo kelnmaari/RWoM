@@ -36,7 +36,7 @@ namespace TorannMagic.TMDefs
             "TM_TechnoBit", "TM_ChargeBattery", "TM_NanoStimulant", "TM_ChaosTradition", "TM_AMP",
             "TM_Prediction", "TM_BardTraining", "TM_BowTraining", "TM_BladeArt", "TM_BladeFocus",
             "TM_FightersFocus", "TM_Fortitude", "TM_ThickSkin", "TM_CQC", "TM_BurningFury",
-            "TM_CommanderAura", "TM_HoldTheLine", "TM_StayAlert", "TM_Sprint", "TM_MindOverBody",
+            "TM_HoldTheLine", "TM_StayAlert", "TM_Sprint", "TM_MindOverBody",
             "TM_PsionicAugmentation", "TM_Shroud", "TM_SniperFocus", "TM_Legion", "TM_TigerStrike",
             "TM_VeilOfShadows", "TM_SpiritOfLight", "TM_TimeMark", "TM_Totems", "TM_Whirlwind",
             "TM_SeismicSlash", "TM_TempestStrike", "TM_SigilSurge", "TM_ValiantCharge", "TM_PhaseStrike",
@@ -76,7 +76,7 @@ namespace TorannMagic.TMDefs
             "TM_TeachMagic", "TM_TeachMight", "TM_WandererCraft", "TM_WayfarerCraft", "TM_Soothe",
             "TM_SootheAnimal", "TM_TransferMana", "TM_ChronostaticField", "TM_Mimic", "TM_Possess",
             "TM_Disguise", "TM_Transpose", "TM_MoveOut", "TM_StrongBack", "TM_FieldTraining",
-            "TM_RangerTraining", "TM_ShadowSlayer", "TM_ProvisionerAura", "TM_TaskMasterAura",
+            "TM_RangerTraining", "TM_ShadowSlayer",
             "TM_Meditate", "TM_BriarPatch", "TM_FoldReality", "TM_AnimalFriend", "TM_BestowMight",
             "TM_Inspire", "TM_Dominate"
         };
@@ -91,13 +91,17 @@ namespace TorannMagic.TMDefs
 
         // Maintained/toggle powers: casting an active one dispels it, so a pawn
         // autocasting them would switch its own buffs off mid-fight (player report:
-        // Enchanted Body, Arcanist's Shadow). Per the autocast policy these stay
-        // manual only — autocast belongs on instant abilities without an off state.
-        // Never autocast them even if a legacy XML config appears.
+        // Enchanted Body, Arcanist's Shadow, and the commander auras which flipped
+        // themselves off as soon as their icon cooldown expired — the toggle verb
+        // enables autocast, the generic loop recast the toggle and dispelled the
+        // aura). Per the autocast policy these stay manual only — autocast belongs
+        // on instant abilities without an off state. Never autocast them even if a
+        // legacy XML config appears.
         private static readonly HashSet<string> MaintainedNoAutocast = new HashSet<string>
         {
             "TM_AnimalFriend", "TM_Shadow", "TM_RayofHope", "TM_Soothe", "TM_P_RayofHope",
             "TM_BattleHymn", "TM_BladeFocus", "TM_Blur", "TM_BurningFury", "TM_ChaosTradition",
+            "TM_CommanderAura", "TM_ProvisionerAura", "TM_TaskMasterAura",
             "TM_EnchantedAura", "TM_EnchantedBody", "TM_Entertain", "TM_FightersFocus",
             "TM_GearRepair", "TM_HeatShield", "TM_HeavyBlow", "TM_InnerHealing", "TM_Invisibility",
             "TM_MageLight", "TM_ManaShield", "TM_Prediction", "TM_ReverseTime", "TM_SniperFocus",

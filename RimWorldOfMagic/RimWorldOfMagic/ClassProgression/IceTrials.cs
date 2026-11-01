@@ -173,7 +173,9 @@ namespace TorannMagic.ClassProgression
     [HarmonyPatch(typeof(DamageWorker), "ExplosionDamageThing")]
     public static class IceExplosionDamagePatch
     {
-        public static void Prefix(Explosion explosion, Thing t, out IceTrials.DamageScope __state) => __state = IceTrials.EnterExplosion(explosion, t);
+        // ConditionalWeakTable throws on a null key; a missing explosion is simply
+        // never a tagged cast, so enter nothing instead of throwing from the prefix.
+        public static void Prefix(Explosion explosion, Thing t, out IceTrials.DamageScope __state) => __state = explosion == null ? null : IceTrials.EnterExplosion(explosion, t);
         public static Exception Finalizer(Exception __exception, IceTrials.DamageScope __state) { IceTrials.ExitExplosion(__state); return __exception; }
     }
     [HarmonyPatch(typeof(Thing), nameof(Thing.TakeDamage))]

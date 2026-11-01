@@ -193,8 +193,11 @@ namespace TorannMagic.ClassProgression
     public static class LightningExplosionDamagePatch
     {
         public struct Scope { public LightningTrials.DamageScope lightning; public BloodMageTrials.DamageScope blood; }
+        // ConditionalWeakTable throws on a null key; a missing explosion is simply
+        // never a tagged cast, so enter nothing instead of throwing from the prefix.
         public static void Prefix(Explosion explosion, Thing t, out Scope __state)
-            => __state = new Scope { lightning = LightningTrials.EnterExplosion(explosion, t), blood = BloodMageTrials.EnterExplosion(explosion, t) };
+            => __state = explosion == null ? default
+                : new Scope { lightning = LightningTrials.EnterExplosion(explosion, t), blood = BloodMageTrials.EnterExplosion(explosion, t) };
         public static Exception Finalizer(Exception __exception, Scope __state) { LightningTrials.ExitExplosion(__state.lightning); BloodMageTrials.ExitExplosion(__state.blood); return __exception; }
     }
     [HarmonyPatch(typeof(Thing), nameof(Thing.TakeDamage))]

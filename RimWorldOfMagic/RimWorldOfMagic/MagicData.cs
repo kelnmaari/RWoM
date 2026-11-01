@@ -434,6 +434,12 @@ namespace TorannMagic
         public List<MagicPowerSkill> magicPowerSkill_Prediction;
         public List<MagicPowerSkill> magicPowerSkill_AlterFate;
         public List<MagicPowerSkill> magicPowerSkill_AccelerateTime;
+        public List<MagicPowerSkill> magicPowerSkill_ArcaneBolt;
+        public List<MagicPowerSkill> magicPowerSkill_MageLight;
+        public List<MagicPowerSkill> magicPowerSkill_Extinguish;
+        public List<MagicPowerSkill> magicPowerSkill_Heater;
+        public List<MagicPowerSkill> magicPowerSkill_Cooler;
+        public List<MagicPowerSkill> magicPowerSkill_SmokeCloud;
         public List<MagicPowerSkill> magicPowerSkill_ReverseTime;
         public List<MagicPowerSkill> magicPowerSkill_ChronostaticField;
         public List<MagicPowerSkill> magicPowerSkill_Recall;       
@@ -3001,6 +3007,108 @@ namespace TorannMagic
                 return this.magicPowerSkill_AlterFate;
             }
         }
+        public List<MagicPowerSkill> MagicPowerSkill_ArcaneBolt
+        {
+            get
+            {
+                bool flag = this.magicPowerSkill_ArcaneBolt == null;
+                if (flag)
+                {
+                    this.magicPowerSkill_ArcaneBolt = new List<MagicPowerSkill>
+                    {
+                        new MagicPowerSkill("TM_ArcaneBolt_pwr", "TM_ArcaneBolt_pwr_desc"),
+                        new MagicPowerSkill("TM_ArcaneBolt_eff", "TM_ArcaneBolt_eff_desc"),
+                        new MagicPowerSkill("TM_ArcaneBolt_ver", "TM_ArcaneBolt_ver_desc")
+                    };
+                }
+                return this.magicPowerSkill_ArcaneBolt;
+            }
+        }
+        public List<MagicPowerSkill> MagicPowerSkill_MageLight
+        {
+            get
+            {
+                bool flag = this.magicPowerSkill_MageLight == null;
+                if (flag)
+                {
+                    this.magicPowerSkill_MageLight = new List<MagicPowerSkill>
+                    {
+                        new MagicPowerSkill("TM_MageLight_pwr", "TM_MageLight_pwr_desc"),
+                        new MagicPowerSkill("TM_MageLight_eff", "TM_MageLight_eff_desc"),
+                        new MagicPowerSkill("TM_MageLight_ver", "TM_MageLight_ver_desc")
+                    };
+                }
+                return this.magicPowerSkill_MageLight;
+            }
+        }
+        public List<MagicPowerSkill> MagicPowerSkill_Extinguish
+        {
+            get
+            {
+                bool flag = this.magicPowerSkill_Extinguish == null;
+                if (flag)
+                {
+                    this.magicPowerSkill_Extinguish = new List<MagicPowerSkill>
+                    {
+                        new MagicPowerSkill("TM_Extinguish_pwr", "TM_Extinguish_pwr_desc"),
+                        new MagicPowerSkill("TM_Extinguish_eff", "TM_Extinguish_eff_desc"),
+                        new MagicPowerSkill("TM_Extinguish_ver", "TM_Extinguish_ver_desc")
+                    };
+                }
+                return this.magicPowerSkill_Extinguish;
+            }
+        }
+        public List<MagicPowerSkill> MagicPowerSkill_Heater
+        {
+            get
+            {
+                bool flag = this.magicPowerSkill_Heater == null;
+                if (flag)
+                {
+                    this.magicPowerSkill_Heater = new List<MagicPowerSkill>
+                    {
+                        new MagicPowerSkill("TM_Heater_pwr", "TM_Heater_pwr_desc"),
+                        new MagicPowerSkill("TM_Heater_eff", "TM_Heater_eff_desc"),
+                        new MagicPowerSkill("TM_Heater_ver", "TM_Heater_ver_desc")
+                    };
+                }
+                return this.magicPowerSkill_Heater;
+            }
+        }
+        public List<MagicPowerSkill> MagicPowerSkill_Cooler
+        {
+            get
+            {
+                bool flag = this.magicPowerSkill_Cooler == null;
+                if (flag)
+                {
+                    this.magicPowerSkill_Cooler = new List<MagicPowerSkill>
+                    {
+                        new MagicPowerSkill("TM_Cooler_pwr", "TM_Cooler_pwr_desc"),
+                        new MagicPowerSkill("TM_Cooler_eff", "TM_Cooler_eff_desc"),
+                        new MagicPowerSkill("TM_Cooler_ver", "TM_Cooler_ver_desc")
+                    };
+                }
+                return this.magicPowerSkill_Cooler;
+            }
+        }
+        public List<MagicPowerSkill> MagicPowerSkill_SmokeCloud
+        {
+            get
+            {
+                bool flag = this.magicPowerSkill_SmokeCloud == null;
+                if (flag)
+                {
+                    this.magicPowerSkill_SmokeCloud = new List<MagicPowerSkill>
+                    {
+                        new MagicPowerSkill("TM_SmokeCloud_pwr", "TM_SmokeCloud_pwr_desc"),
+                        new MagicPowerSkill("TM_SmokeCloud_eff", "TM_SmokeCloud_eff_desc"),
+                        new MagicPowerSkill("TM_SmokeCloud_ver", "TM_SmokeCloud_ver_desc")
+                    };
+                }
+                return this.magicPowerSkill_SmokeCloud;
+            }
+        }
         public List<MagicPowerSkill> MagicPowerSkill_AccelerateTime
         {
             get
@@ -3969,6 +4077,10 @@ namespace TorannMagic
                     allMagicPowersWithSkillsList.AddRange(this.MagicPowersBrightmage);
                     allMagicPowersWithSkillsList.AddRange(this.MagicPowersShaman);
                     allMagicPowersWithSkillsList.AddRange(this.MagicPowersGolemancer);
+                    // Standalone (scroll/book/novice) powers are full citizens: they are
+                    // learned, cast and upgraded through the same Grimoire and autocast
+                    // systems, so they belong in the aggregate consumers iterate.
+                    allMagicPowersWithSkillsList.AddRange(this.MagicPowersStandalone);
                 }
                 return allMagicPowersWithSkillsList;
             }
@@ -4011,6 +4123,12 @@ namespace TorannMagic
                     allMagicPowerSkillsList = new List<MagicPowerSkill>();
                     allMagicPowerSkillsList.Clear();
                     allMagicPowerSkillsList.AddRange(this.MagicPowerSkill_AccelerateTime);
+                    allMagicPowerSkillsList.AddRange(this.MagicPowerSkill_ArcaneBolt);
+                    allMagicPowerSkillsList.AddRange(this.MagicPowerSkill_MageLight);
+                    allMagicPowerSkillsList.AddRange(this.MagicPowerSkill_Extinguish);
+                    allMagicPowerSkillsList.AddRange(this.MagicPowerSkill_Heater);
+                    allMagicPowerSkillsList.AddRange(this.MagicPowerSkill_Cooler);
+                    allMagicPowerSkillsList.AddRange(this.MagicPowerSkill_SmokeCloud);
                     allMagicPowerSkillsList.AddRange(this.MagicPowerSkill_AdvancedHeal);
                     allMagicPowerSkillsList.AddRange(this.MagicPowerSkill_AlterFate);
                     allMagicPowerSkillsList.AddRange(this.MagicPowerSkill_AMP);
@@ -4326,6 +4444,12 @@ namespace TorannMagic
             Scribe_Collections.Look<MagicPowerSkill>(ref this.magicPowerSkill_Prediction, "magicPowerSkill_Prediction", LookMode.Deep, new object[0]);
             Scribe_Collections.Look<MagicPowerSkill>(ref this.magicPowerSkill_AlterFate, "magicPowerSkill_AlterFate", LookMode.Deep, new object[0]);
             Scribe_Collections.Look<MagicPowerSkill>(ref this.magicPowerSkill_AccelerateTime, "magicPowerSkill_AccelerateTime", LookMode.Deep, new object[0]);
+            Scribe_Collections.Look<MagicPowerSkill>(ref this.magicPowerSkill_ArcaneBolt, "magicPowerSkill_ArcaneBolt", LookMode.Deep, new object[0]);
+            Scribe_Collections.Look<MagicPowerSkill>(ref this.magicPowerSkill_MageLight, "magicPowerSkill_MageLight", LookMode.Deep, new object[0]);
+            Scribe_Collections.Look<MagicPowerSkill>(ref this.magicPowerSkill_Extinguish, "magicPowerSkill_Extinguish", LookMode.Deep, new object[0]);
+            Scribe_Collections.Look<MagicPowerSkill>(ref this.magicPowerSkill_Heater, "magicPowerSkill_Heater", LookMode.Deep, new object[0]);
+            Scribe_Collections.Look<MagicPowerSkill>(ref this.magicPowerSkill_Cooler, "magicPowerSkill_Cooler", LookMode.Deep, new object[0]);
+            Scribe_Collections.Look<MagicPowerSkill>(ref this.magicPowerSkill_SmokeCloud, "magicPowerSkill_SmokeCloud", LookMode.Deep, new object[0]);
             Scribe_Collections.Look<MagicPowerSkill>(ref this.magicPowerSkill_ReverseTime, "magicPowerSkill_ReverseTime", LookMode.Deep, new object[0]);
             Scribe_Collections.Look<MagicPowerSkill>(ref this.magicPowerSkill_ChronostaticField, "magicPowerSkill_ChronostaticField", LookMode.Deep, new object[0]);
             Scribe_Collections.Look<MagicPowerSkill>(ref this.magicPowerSkill_Recall, "magicPowerSkill_Recall", LookMode.Deep, new object[0]);

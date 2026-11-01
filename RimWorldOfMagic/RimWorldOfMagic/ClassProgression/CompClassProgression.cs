@@ -147,11 +147,16 @@ namespace TorannMagic.ClassProgression
     {
         static ClassProgressionBootstrap()
         {
+            // Beta progression kill switch: without the comp no pawn can hold
+            // progression state, and every ClassIdentity predicate falls back to the
+            // classic trait checks.
+            if (!ClassProgressionFeature.Enabled) return;
             foreach (var def in DefDatabase<ThingDef>.AllDefsListForReading) EnsureComp(def);
         }
 
         public static void EnsureComp(ThingDef def)
         {
+            if (!ClassProgressionFeature.Enabled) return;
             if (def?.race == null || !def.race.Humanlike) return;
             if (def.comps == null) def.comps = new List<CompProperties>();
             if (!def.comps.Any(p => p?.compClass == typeof(CompClassProgression)))

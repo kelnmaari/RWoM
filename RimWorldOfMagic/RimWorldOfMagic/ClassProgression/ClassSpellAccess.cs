@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Verse;
 
@@ -28,6 +28,18 @@ namespace TorannMagic.ClassProgression
                 var powers = TM_ClassGroups.ResolveMagicList(data, profile.magicPowerList);
                 if (powers != null) foreach (var power in powers) if (!result.Contains(power)) result.Add(power);
             }
+            // Novice spell picks and every learned power (scrolls, standalones) always
+            // render, so they can be upgraded in the Grimoire before a discipline —
+            // or without one — is chosen.
+            if (state.NoviceSpells != null)
+                foreach (string id in state.NoviceSpells)
+                {
+                    var noviceAbility = DefDatabase<TMAbilityDef>.GetNamedSilentFail(id);
+                    var noviceOwner = noviceAbility == null ? null : data.AllMagicPowers.FirstOrDefault(p => p.TMabilityDefs != null && p.TMabilityDefs.Contains(noviceAbility));
+                    if (noviceOwner != null && !result.Contains(noviceOwner)) result.Add(noviceOwner);
+                }
+            foreach (var owner in data.AllMagicPowers)
+                if (owner != null && owner.learned && owner.abilityDef is TMAbilityDef && !result.Contains(owner)) result.Add(owner);
             return result;
         }
 

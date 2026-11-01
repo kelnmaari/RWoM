@@ -130,7 +130,9 @@ namespace TorannMagic.ClassProgression
     public static class FireclawExplosionDamagePatch
     {
         public static void Prefix(Explosion explosion, Thing t, out FireclawTrial.DamageScope __state)
-            => __state = FireclawTrial.EnterExplosion(explosion, t);
+            // ConditionalWeakTable throws on a null key; a missing explosion is simply
+            // never a tagged cast, so enter nothing instead of throwing from the prefix.
+            => __state = explosion == null ? null : FireclawTrial.EnterExplosion(explosion, t);
         public static Exception Finalizer(Exception __exception, FireclawTrial.DamageScope __state)
         { FireclawTrial.ExitExplosion(__state); return __exception; }
     }

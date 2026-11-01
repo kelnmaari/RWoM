@@ -40,6 +40,10 @@ namespace TorannMagic.ClassProgression
 
         public static bool TryGetState(Pawn pawn, out ClassProgressionState state)
         {
+            // Beta progression kill switch: even a pawn that somehow carries progression
+            // state (edge cases around old feature-on saves) must resolve as classic
+            // while the feature is disabled.
+            if (!ClassProgressionFeature.Enabled) { state = null; return false; }
             state = Component(pawn)?.State;
             return state != null && state.Version == ClassProgressionState.CurrentVersion
                 && state.Vocation != Vocation.None && (state.Vocation & ~Vocation.WarriorMage) == 0;

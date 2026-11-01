@@ -1,4 +1,4 @@
-<Defs>
+﻿<Defs>
   <ThingDef ParentName="GravshipComponentBase">
     <defName>TM_MagicalGravEngine</defName>
     <label>magical grav engine</label>
@@ -11,6 +11,10 @@
       <graphicClass>Graphic_Single</graphicClass>
       <texPath>Buildings/MagicalGravEngine</texPath>
       <drawSize>(3.3,3.3)</drawSize>
+      <!-- The engine art has a single valid view; keep the sprite unrotated while
+           the building itself still rotates so the interaction cell follows
+           placement rotation (4 approach spots). -->
+      <drawRotated>false</drawRotated>
     </graphicData>
     <statBases>
       <MaxHitPoints>800</MaxHitPoints>

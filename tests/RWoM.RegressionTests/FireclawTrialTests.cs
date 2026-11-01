@@ -19,6 +19,7 @@ internal static class FireclawTrialTests
         yield return new("FireclawTrial.NativeExplosionAndWitnessScribe", Save);
         yield return new("FireclawTrial.BoundedWitnesses", Bounded);
         yield return new("FireclawTrial.NativeWorkerAndProjectileStampHooks", Native);
+        yield return new("FireclawTrial.NullExplosionPrefixesEnterNothing", NullExplosionPrefixes);
     }
 
     sealed class Fixture : IDisposable
@@ -252,5 +253,24 @@ internal static class FireclawTrialTests
         int stamp = instructions.FindIndex(i => Equals(Operand(i), typeof(FireclawTrial).GetMethod(nameof(FireclawTrial.Stamp))));
         int start = instructions.FindIndex(i => Operand(i) is MethodInfo m && m.DeclaringType == typeof(Explosion) && m.Name == "StartExplosion");
         Check.Equal(true, stamp >= 0 && start > stamp, "actual Fireclaw projectile stamps explosion before native start");
+    }
+
+    static void NullExplosionPrefixes(RuntimeFixture f)
+    {
+        using var w = new Fixture(f);
+        // ConditionalWeakTable throws on a null key: a null explosion reaching the
+        // patched DamageWorker.ExplosionDamageThing prefixes used to abort the whole
+        // explosion cell with "Explosion could not affect cell ..." errors.
+        FireclawExplosionDamagePatch.Prefix(null, w.First, out var fire);
+        Check.Same(null, fire, "fire trial enters nothing for a null explosion");
+        IceExplosionDamagePatch.Prefix(null, w.First, out var ice);
+        Check.Same(null, ice, "ice trial enters nothing for a null explosion");
+        LightningExplosionDamagePatch.Prefix(null, w.First, out var bolt);
+        Check.Same(null, bolt.lightning, "lightning trial enters nothing for a null explosion");
+        Check.Same(null, bolt.blood, "blood trial enters nothing for a null explosion");
+        // Finalizers unwind without a state and rethrow nothing when nothing failed.
+        Check.Same(null, FireclawExplosionDamagePatch.Finalizer(null, null), "fire finalizer rethrows nothing");
+        Check.Same(null, IceExplosionDamagePatch.Finalizer(null, null), "ice finalizer rethrows nothing");
+        Check.Same(null, LightningExplosionDamagePatch.Finalizer(null, default), "lightning finalizer rethrows nothing");
     }
 }

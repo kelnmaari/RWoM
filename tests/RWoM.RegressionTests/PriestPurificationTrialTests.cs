@@ -1,4 +1,4 @@
-using System.Reflection;
+﻿using System.Reflection;
 using System.Runtime.CompilerServices;
 using AbilityUser;
 using RimWorld;
@@ -16,7 +16,126 @@ internal static class PriestPurificationTrialTests
         yield return new("PriestPurificationTrial.CompleteScarOnlyAndIdempotent", Completion);
         yield return new("PriestPurificationTrial.OwnedAdeptSpellOnly", Eligibility);
         yield return new("PriestPurificationTrial.NativeHookAttaches", Hook);
+        yield return new("Purify.HealsPermanentInjuriesButNotNaturalWounds", HealsPermanentInjuries);
     }
+
+    // Player report: Purify removed toxic buildup but did nothing to scars or a lost
+    // arm. Vanilla GetInjuredParts only yields bleeding parts, so the old loop never
+    // saw permanent injuries. The spell must heal permanent injuries (scars) per its
+    // description and leave fresh naturally-healing wounds to normal medicine.
+    static void HealsPermanentInjuries(RuntimeFixture f)
+    {
+        using var w = new Fixture(f);
+        var savedSettings = TorannMagic.ModOptions.Settings.Instance;
+        TorannMagic.ModOptions.Settings.Instance = new TorannMagic.ModOptions.Settings();
+        var savedCategories = DefDatabase<HediffCategoryList>.AllDefsListForReading.ToArray();
+        DefDatabase<HediffCategoryList>.Clear();
+        DefDatabase<HediffCategoryList>.Add(new HediffCategoryList
+        {
+            defName = "TM_Category_Hediffs",
+            ailments = new List<TorannMagic.TMDefs.TM_CategoryHediff>(),
+            addictions = new List<TorannMagic.TMDefs.TM_CategoryHediff>(),
+            diseases = new List<TorannMagic.TMDefs.TM_CategoryHediff>(),
+            mechanites = new List<TorannMagic.TMDefs.TM_CategoryHediff>()
+        });
+        w.Magic.MagicData.MagicPowerSkill_Purify[0].level = 3;  // 2 + 2x3 heal per use covers severity 8 in one cast
+        w.Magic.MagicData.MagicPowerSkill_Purify[2].level = 10; // budget 1 + 0.4x10 = 5 injuries per cast
+        // TM_Calc.GetSkillPowerLevel resolves through IsMagicUser, which requires the
+        // mana need to be present on the caster; the need ctor reads adult age.
+        Set(w.Caster.def.race, "lifeStageAges", new List<LifeStageAge> { new LifeStageAge { minAge = 0f, def = new LifeStageDef { defName = "PurifyCasterStage", healthScaleFactor = 1f, bodySizeFactor = 1f, developmentalStage = DevelopmentalStage.Adult } } });
+        w.Caster.ageTracker = new Pawn_AgeTracker(w.Caster);
+        Set(w.Caster.ageTracker, "cachedLifeStageIndex", 0);
+        var mana = new Need_Mana(w.Caster);
+        var allNeeds = (List<Need>)typeof(Pawn_NeedsTracker).GetField("needs", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(w.Caster.needs)!;
+        allNeeds.Add(mana);
+
+        // Injury healing refreshes the hediff set cache, which needs a body model
+        // plus an initialized capacities cache (CoreReturnWorld pattern).
+        RuntimeLog.EnsureHeadlessDefOfInitialized(typeof(BodyPartTagDefOf));
+        RuntimeLog.EnsureHeadlessDefOfInitialized(typeof(PawnCapacityDefOf));
+        var savedCapacities = DefDatabase<PawnCapacityDef>.AllDefsListForReading.ToArray();
+        var moving = new PawnCapacityDef { defName = "PurifyMoving", minForCapable = .1f };
+        var consciousness = new PawnCapacityDef { defName = "PurifyConsciousness", minForCapable = .1f };
+        DefDatabase<PawnCapacityDef>.Clear(); DefDatabase<PawnCapacityDef>.Add(moving); DefDatabase<PawnCapacityDef>.Add(consciousness);
+        try
+        {
+            PawnCapacityDefOf.Moving = moving; PawnCapacityDefOf.Consciousness = consciousness;
+            w.Target.def.race.body = new BodyDef { corePart = new BodyPartRecord { def = new BodyPartDef { defName = "PurificationCore" } } };
+            Set(w.Target.def.race, "fleshType", new RimWorld.FleshTypeDef { defName = "PurifyFlesh" });
+            Set(w.Target.def.race, "lifeStageAges", new List<LifeStageAge> { new LifeStageAge { minAge = 0f, def = new LifeStageDef { defName = "PurifyStage", healthScaleFactor = 1f, bodySizeFactor = 1f, developmentalStage = DevelopmentalStage.Adult } } });
+            w.Target.ageTracker = new Pawn_AgeTracker(w.Target);
+            Set(w.Target.ageTracker, "cachedLifeStageIndex", 0);
+            var capacityField = typeof(PawnCapacitiesHandler).GetField("cachedCapacityLevels", BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)!;
+            var cache = Activator.CreateInstance(capacityField.FieldType)!;
+            foreach (var cap in new[] { PawnCapacityDefOf.Moving, PawnCapacityDefOf.Consciousness })
+            {
+                var entry = capacityField.FieldType.GetProperty("Item", [typeof(PawnCapacityDef)])!.GetValue(cache, [cap])!;
+                Set(entry, "status", Enum.Parse(entry.GetType().GetField("status")!.FieldType, "Cached"));
+                Set(entry, "value", 1f);
+            }
+            capacityField.SetValue(w.Target.health.capacities, cache);
+
+            // Regeneration motes probe the map bounds and mote budget.
+            var map = Find.Maps[0];
+            map.info = new MapInfo { Size = new IntVec3(20, 1, 20) };
+            map.cellIndices = new CellIndices(map);
+            map.moteCounter = new MoteCounter();
+
+            // A realistic located permanent scar plus a partless fresh wound.
+            var armPart = new BodyPartRecord { def = new BodyPartDef { defName = "PurificationArm" } };
+            var scar = new Hediff_Injury { pawn = w.Target, def = new HediffDef { defName = "PurificationScar", injuryProps = new InjuryProps() } };
+            scar.comps = [new HediffComp_GetsPermanent { parent = scar, props = new HediffCompProperties_GetsPermanent() }];
+            Set(scar.comps[0], "isPermanentInt", true);
+            Set(scar, "part", armPart);
+            w.Target.health.hediffSet.hediffs.Add(scar);
+            Set(scar, "severityInt", 8f);
+
+            var fresh = new Hediff_Injury { pawn = w.Target, def = new HediffDef { defName = "PurificationFreshCut", injuryProps = new InjuryProps() } };
+            w.Target.health.hediffSet.hediffs.Add(fresh);
+            Set(fresh, "severityInt", 5f);
+
+            var verb = new Verb_Purify { Ability = w.Ability, verbProps = TorannMagicDefOf.TM_Purify.MainVerb };
+            Set(verb, "caster", w.Caster);
+            Set(verb, "currentTarget", new LocalTargetInfo(w.Target));
+            var cast = typeof(Verb_Purify).GetMethod("TryCastShot", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.DeclaredOnly)!;
+            // Heal recalculates capacities and downed state; only hediff removal is
+            // under test, so skip the physiological recalculation like CoreReturn does.
+            var assembly = Assembly.Load("0Harmony");
+            var id = "rwom.regression.purifyheal." + Guid.NewGuid();
+            var harmony = Activator.CreateInstance(assembly.GetType("HarmonyLib.Harmony")!, id)!;
+            var hook = Activator.CreateInstance(assembly.GetType("HarmonyLib.HarmonyMethod")!, typeof(PriestPurificationTrialTests).GetMethod(nameof(SkipStateChange), BindingFlags.NonPublic | BindingFlags.Static))!;
+            harmony.GetType().GetMethod("Patch")!.Invoke(harmony, [typeof(Pawn_HealthTracker).GetMethod(nameof(Pawn_HealthTracker.CheckForStateChange), BindingFlags.Public | BindingFlags.Instance)!, hook, null, null, null]);
+            try
+            {
+                Check.Equal(true, (bool)cast.Invoke(verb, null)!, "native cast succeeds on the injured target");
+                Check.Equal(0f, w.Scar.Severity, "fixture permanent scar healed to zero by the cast");
+                Check.Equal(0f, scar.Severity, "located permanent scar healed to zero by the cast");
+                Check.Equal(5f, fresh.Severity, "fresh naturally-healing wound is untouched");
+            }
+            finally
+            {
+                harmony.GetType().GetMethod("UnpatchAll")!.Invoke(harmony, [id]);
+            }
+        }
+        finally
+        {
+            TorannMagic.ModOptions.Settings.Instance = savedSettings;
+            TorannMagic.TM_Data.ResetCaches();
+            DefDatabase<HediffCategoryList>.Clear();
+            foreach (var def in savedCategories) DefDatabase<HediffCategoryList>.Add(def);
+            // Restore the pre-test capacity set. When it was empty (no earlier test
+            // initialized capacities yet), keep the registered defs in place: an
+            // emptied database makes every later DefMap constructor throw
+            // "without defs being initialized" (ManaSiphon cluster in the full run).
+            if (savedCapacities.Length > 0)
+            {
+                DefDatabase<PawnCapacityDef>.Clear();
+                foreach (var def in savedCapacities) DefDatabase<PawnCapacityDef>.Add(def);
+            }
+        }
+    }
+
+    static bool SkipStateChange(DamageInfo? dinfo, Hediff hediff) => false;
 
     sealed class Fixture : IDisposable
     {
