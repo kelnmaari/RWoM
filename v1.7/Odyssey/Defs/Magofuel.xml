@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Defs>
   <!-- Dedicated fuel resource; consumers are defined separately. -->
   <ThingDef ParentName="ResourceBase">
@@ -38,25 +38,28 @@
     <researchViewY>5</researchViewY>
   </ResearchProjectDef>
 
+  <!-- Player-facing balance: raw magicyte is a limited map resource also spent on
+       books, spells and gear. Batch doubled and magicyte cost reduced to 0.5 per
+       magofuel (was 4) so fuel production no longer competes with crafting. -->
   <RecipeDef>
     <defName>TM_RefineMagofuel</defName>
-    <label>refine magofuel x50</label>
-    <description>Infuse 50 chemfuel with 200 magicyte to make 50 magofuel. Requires an arcane forge and its normal magical work and mana expenditure.</description>
+    <label>refine magofuel x100</label>
+    <description>Infuse 100 chemfuel with 50 magicyte to make 100 magofuel. Requires an arcane forge and its normal magical work and mana expenditure.</description>
     <jobString>refining magofuel.</jobString>
     <workSpeedStat>WorkSpeedGlobal</workSpeedStat>
     <effectWorking>Smelt</effectWorking>
     <soundWorking>Recipe_Machining</soundWorking>
-    <workAmount>6000</workAmount>
+    <workAmount>12000</workAmount>
     <workSkill>Intellectual</workSkill>
     <skillRequirements><Intellectual>4</Intellectual></skillRequirements>
     <researchPrerequisite>TM_MagofuelRefining</researchPrerequisite>
     <recipeUsers><li>TableArcaneForge</li></recipeUsers>
     <ingredients>
-      <li><filter><thingDefs><li>Chemfuel</li></thingDefs></filter><count>50</count></li>
-      <li><filter><thingDefs><li>RawMagicyte</li></thingDefs></filter><count>200</count></li>
+      <li><filter><thingDefs><li>Chemfuel</li></thingDefs></filter><count>100</count></li>
+      <li><filter><thingDefs><li>RawMagicyte</li></thingDefs></filter><count>50</count></li>
     </ingredients>
     <fixedIngredientFilter><thingDefs><li>Chemfuel</li><li>RawMagicyte</li></thingDefs></fixedIngredientFilter>
-    <products><TM_Magofuel>50</TM_Magofuel></products>
+    <products><TM_Magofuel>100</TM_Magofuel></products>
   </RecipeDef>
 </Defs>
 

@@ -1,4 +1,4 @@
-using System.Xml;
+﻿using System.Xml;
 using System.Xml.Linq;
 using RimWorld;
 using Verse;
@@ -29,9 +29,9 @@ internal static class OdysseyMagofuelTests
         var recipe = defs["TM_RefineMagofuel"];
         var amounts = recipe.Element("ingredients")!.Elements("li").ToDictionary(x => x.Element("filter")!.Element("thingDefs")!.Element("li")!.Value, x => (int)x.Element("count")!);
         Check.Equal(2, amounts.Count, "exactly two physical inputs");
-        Check.Equal(50, amounts["Chemfuel"], "chemfuel payment");
-        Check.Equal(200, amounts["RawMagicyte"], "magicyte payment");
-        Check.Equal(50, (int)recipe.Element("products")!.Element("TM_Magofuel")!, "batch yield");
+        Check.Equal(100, amounts["Chemfuel"], "chemfuel payment");
+        Check.Equal(50, amounts["RawMagicyte"], "magicyte payment");
+        Check.Equal(100, (int)recipe.Element("products")!.Element("TM_Magofuel")!, "batch yield");
         Check.Equal("TableArcaneForge", recipe.Element("recipeUsers")!.Elements().Single().Value, "only existing magical forge");
         Check.Equal("TM_MagofuelRefining", recipe.Element("researchPrerequisite")!.Value, "research gates recipe");
         var requirements = defs["TM_MagofuelRefining"].Element("prerequisites")!.Elements().Select(x => x.Value).ToHashSet();
@@ -70,10 +70,10 @@ internal static class OdysseyMagofuelTests
         {
             var document = new XmlDocument(); document.Load(Path.Combine(f.Repository, "v1.7/Odyssey/Defs/Magofuel.xml"));
             var recipe = DirectXmlToObject.ObjectFromXml<RecipeDef>(document.SelectSingleNode("Defs/RecipeDef")!, false);
-            Check.Equal(6000f, recipe.workAmount, "native parser accepts work amount");
+            Check.Equal(12000f, recipe.workAmount, "native parser accepts work amount");
             Check.Equal(2, recipe.ingredients.Count, "native ingredient records");
-            Check.Equal(50f, recipe.ingredients[0].GetBaseCount(), "native chemfuel count");
-            Check.Equal(200f, recipe.ingredients[1].GetBaseCount(), "native magicyte count");
+            Check.Equal(100f, recipe.ingredients[0].GetBaseCount(), "native chemfuel count");
+            Check.Equal(50f, recipe.ingredients[1].GetBaseCount(), "native magicyte count");
             var research = DirectXmlToObject.ObjectFromXml<ResearchProjectDef>(document.SelectSingleNode("Defs/ResearchProjectDef")!, false);
             Check.Equal(2000f, research.baseCost, "native research cost");
         }
@@ -147,13 +147,13 @@ internal static class OdysseyMagofuelTests
             Check.Equal(false, recipe.ingredients[0].filter.Allows(magic), "magicyte cannot replace chemfuel");
             Check.Equal(true, recipe.ingredients[1].filter.Allows(magic), "magicyte accepted by second ingredient");
             Check.Equal(false, recipe.fixedIngredientFilter.Allows(fuel), "output cannot feed its own recipe");
-            var a = ThingMaker.MakeThing(chem); a.stackCount = 50;
-            var b = ThingMaker.MakeThing(magic); b.stackCount = 200;
+            var a = ThingMaker.MakeThing(chem); a.stackCount = 100;
+            var b = ThingMaker.MakeThing(magic); b.stackCount = 50;
             var worker = new Pawn();
             var products = GenRecipe.MakeRecipeProducts(recipe, worker, [a,b], null!, null!).ToList();
             Check.Equal(1, products.Count, "one real output stack");
             Check.Same(fuel, products[0].def, "native maker uses magofuel definition");
-            Check.Equal(50, products[0].stackCount, "native yield exactly fifty");
+            Check.Equal(100, products[0].stackCount, "native yield exactly hundred");
             recipe.Worker.ConsumeIngredient(a, recipe, null!);
             recipe.Worker.ConsumeIngredient(b, recipe, null!);
             Check.Equal(true, a.Destroyed && b.Destroyed, "native recipe consumes both inputs");
