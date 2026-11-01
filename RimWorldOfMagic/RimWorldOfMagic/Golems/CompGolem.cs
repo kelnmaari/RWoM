@@ -592,10 +592,14 @@ namespace TorannMagic.Golems
                             UpdateGolemancerStatus();
                         }
 
-                        if ((this.ShouldDespawnNow && !Pawn.IsBurning()) || Energy.CurLevel <= .1f)
+                        if (this.ShouldDespawnNow && !Pawn.IsBurning())
                         {
                             DeSpawnGolem();
                             this.shouldDespawn = false;
+                        }
+                        else if (Energy.CurLevel <= .1f && !Pawn.IsBurning())
+                        {
+                            ShutdownGolemLowPower();
                         }
                     }
                 }                
@@ -741,6 +745,42 @@ namespace TorannMagic.Golems
             this.effecter?.Cleanup();
         }
 
+        // A golem that ran out of energy must walk to its rest spot before shutting
+        // down; collapsing wherever it stands crushes any storage or furniture
+        // underfoot (workshop report). Only a home that can never be reached falls
+        // back to an on-the-spot shutdown, which places the dormant golem on a
+        // clear cell instead of wiping the one it stands on.
+        private void ShutdownGolemLowPower()
+        {
+            if (this.despawnNow)
+            {
+                return;
+            }
+            Map map = Pawn.Map;
+            if (map == null || !this.dormantPosition.IsValid || this.dormantMap != map
+                || !this.dormantPosition.Walkable(map) || !this.dormantPosition.Standable(map))
+            {
+                this.despawnNow = true;
+                return;
+            }
+            this.shouldDespawn = true;
+            Job cur = Pawn.CurJob;
+            if (cur != null && (cur.def == TorannMagicDefOf.JobDriver_GolemDespawn
+                || (cur.def == JobDefOf.Goto && cur.targetA.Cell == this.dormantPosition)))
+            {
+                return;
+            }
+            if (Pawn.Drafted || !Pawn.CanReach(this.dormantPosition, PathEndMode.ClosestTouch, Danger.Deadly))
+            {
+                // Player orders win, and the despawn job giver retries on its own
+                // once a path to the rest spot opens.
+                return;
+            }
+            Job job = JobMaker.MakeJob(TorannMagicDefOf.JobDriver_GolemDespawn, this.dormantPosition);
+            job.locomotionUrgency = LocomotionUrgency.Sprint;
+            Pawn.jobs.StartJob(job, JobCondition.InterruptForced);
+        }
+
         public void DeSpawnGolem()
         {
             for(int i =0; i < 4; i++)
@@ -748,7 +788,7 @@ namespace TorannMagic.Golems
                 Vector3 rndPos = dormantPosition.ToVector3Shifted();
                 rndPos.x += Rand.Range(-1f, 1f);
                 rndPos.z += Rand.Range(-1f, 1f);
-                FleckMaker.ThrowSmoke(rndPos, Pawn.Map, Rand.Range(.6f, 1.2f));                
+                FleckMaker.ThrowSmoke(rndPos, Pawn.Map, Rand.Range(.6f, 1.2f));
             }
             if (ModOptions.Settings.Instance.golemScreenShake)
             {
@@ -759,6 +799,14 @@ namespace TorannMagic.Golems
             if((dormantPosition - despawnPos).LengthHorizontal <= 1.4f)
             {
                 despawnPos = dormantPosition;
+            }
+            else
+            {
+                IntVec3 clear = SafeCollapseCell();
+                if (clear.IsValid)
+                {
+                    despawnPos = clear;
+                }
             }
             if (InnerWorkstation != null)
             {
@@ -784,7 +832,7 @@ namespace TorannMagic.Golems
                     }
                     spawnedThing = ThingMaker.MakeThing(def, stuff) as Building_TMGolemBase;
                     spawnedThing.SetFaction(Pawn.Faction);
-                    GenSpawn.Spawn(spawnedThing, Pawn.Position, this.Pawn.Map, dormantRotation, WipeMode.Vanish, false);                    
+                    GenSpawn.Spawn(spawnedThing, despawnPos, this.Pawn.Map, dormantRotation, WipeMode.Vanish, false);
                 }
             }
             if (Find.Selector.SingleSelectedThing == this.parent)
@@ -798,6 +846,34 @@ namespace TorannMagic.Golems
             this.initialized = false;
             this.parent.DeSpawn(DestroyMode.Vanish);
             PawnGolem.PostGolemDeActivate();
+        }
+
+        // Emergency shutdown away from the rest spot: pick a cell where placing the
+        // dormant golem will not destroy whatever furniture or storage is underfoot.
+        private IntVec3 SafeCollapseCell()
+        {
+            Map map = Pawn.Map;
+            if(map == null)
+            {
+                return IntVec3.Invalid;
+            }
+            if (CollapseCellClear(Pawn.Position, map))
+            {
+                return Pawn.Position;
+            }
+            foreach (IntVec3 cell in GenAdj.CellsAdjacent8Way(Pawn))
+            {
+                if (CollapseCellClear(cell, map))
+                {
+                    return cell;
+                }
+            }
+            return IntVec3.Invalid;
+        }
+
+        private static bool CollapseCellClear(IntVec3 cell, Map map)
+        {
+            return cell.InBounds(map) && cell.Standable(map) && cell.GetEdifice(map) == null;
         }
 
         public override void PostDestroy(DestroyMode mode, Map previousMap)
