@@ -69,12 +69,12 @@ namespace TorannMagic
 
             float viewWidth = inRect.width - 20f;
 
-            // the whole header (title, pawn name, class description) scrolls with
-            // the content — a fixed header left a tiny viewport on small screens
+            // the whole header (title, portrait, pawn name, class description) scrolls
+            // with the content — a fixed header left a tiny viewport on small screens
             string classDesc = ClassDescription();
             if (ClassProgression.ClassIdentity.TryGetState(pawn, out _)) classDesc += "\n\n" + InitiationRequirements();
             Text.Font = GameFont.Tiny;
-            float headerH = 50f + 12f;
+            float headerH = 34f + 96f + 12f;
             if (!classDesc.NullOrEmpty())
             {
                 headerH += Text.CalcHeight(classDesc, viewWidth) + 8f;
@@ -90,12 +90,16 @@ namespace TorannMagic
                 Label(new Rect(0f, y, viewWidth, 32f), "Grimoire", TextAnchor.MiddleLeft,
                     TorannMagic.Utils.TMIsekaiUI.HeaderGold);
                 Text.Font = GameFont.Small;
-                float nameW = Text.CalcSize(pawn.LabelShortCap).x + 8f;
-                Label(new Rect(0f, y + 30f, nameW, 18f),
+                RenderTexture portrait = PortraitsCache.Get(pawn, new Vector2(72f, 96f), Rot4.South);
+                Rect portraitRect = new Rect(0f, y + 34f, 72f, 96f);
+                TorannMagic.Utils.TMIsekaiUI.Panel(portraitRect);
+                GUI.DrawTexture(portraitRect, portrait, ScaleMode.ScaleToFit);
+                float nameX = 80f;
+                Label(new Rect(nameX, y + 40f, viewWidth - nameX, 18f),
                     pawn.LabelShortCap, TextAnchor.MiddleLeft, Color.white);
-                Label(new Rect(nameW, y + 30f, viewWidth - nameW, 18f),
+                Label(new Rect(nameX, y + 60f, viewWidth - nameX, 18f),
                     "— " + ClassLabel(), TextAnchor.MiddleLeft, TorannMagic.Utils.TMIsekaiUI.LabelGold);
-                y += 50f;
+                y += 34f + 96f + 12f;
 
                 if (!classDesc.NullOrEmpty())
                 {

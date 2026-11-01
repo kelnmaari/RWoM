@@ -67,16 +67,26 @@ namespace TorannMagic
             float descriptionHeight = Text.CalcHeight(description, width) + 16f;
             float modeHeight = Text.CalcHeight(mode, width) + 16f;
             int owners = (magic != null && magic.IsMagicUser ? 1 : 0) + (might != null && might.IsMightUser ? 1 : 0);
+            // Community idea #46: the pawn's full-height portrait sits at the very
+            // top of the class column, between the window title and the name card.
+            float portraitHeight = Mathf.Clamp(width * 1.35f, 130f, 280f);
             Rect view = new Rect(0f, 0f, width, Mathf.Max(rect.height,
-                34f + titleHeight + descriptionHeight + modeHeight + owners * ClassProgressHeight + InitiationControlsHeight()));
+                34f + portraitHeight + 12f + titleHeight + descriptionHeight + modeHeight
+                + owners * ClassProgressHeight + InitiationControlsHeight()));
             Widgets.BeginScrollView(rect, ref classScroll, view);
             try
             {
                 Text.Font = GameFont.Medium;
                 Label(new Rect(0f, 0f, width, 30f), "Grimoire", TextAnchor.UpperLeft, Utils.TMIsekaiUI.HeaderGold);
+                float y = 34f;
+                RenderTexture portrait = RimWorld.PortraitsCache.Get(pawn, new Vector2(width, portraitHeight), Rot4.South);
+                Rect portraitRect = new Rect(0f, y, width, portraitHeight);
+                Utils.TMIsekaiUI.Panel(portraitRect);
+                GUI.DrawTexture(portraitRect, portrait, ScaleMode.ScaleToFit);
+                y += portraitHeight + 12f;
                 Text.Font = GameFont.Small;
-                Label(new Rect(0f, 34f, width, titleHeight), title, TextAnchor.UpperLeft, Utils.TMIsekaiUI.LabelGold);
-                float y = 34f + titleHeight;
+                Label(new Rect(0f, y, width, titleHeight), title, TextAnchor.UpperLeft, Utils.TMIsekaiUI.LabelGold);
+                y += titleHeight;
                 if (magic != null && magic.IsMagicUser) y = DrawClassProgress(view, y, true);
                 if (might != null && might.IsMightUser) y = DrawClassProgress(view, y, false);
                 Text.Font = GameFont.Tiny;
