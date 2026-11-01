@@ -102,6 +102,36 @@ namespace TorannMagic.Odyssey
                 group.Contains(Nearest(e, nodes))).OrderBy(e => e.parent.thingIDNumber).ToList();
         }
 
+        // The virtual pool's members: every live tank-holding endpoint in the
+        // endpoint's connected group, nearest first with stable ID tie-breaks. An
+        // endpoint without a beacon sees only itself — local tanks stay local.
+        public List<CompManaNetworkEndpoint> PoolTanks(CompManaNetworkEndpoint endpoint)
+        {
+            var result = new List<CompManaNetworkEndpoint>();
+            if (!Live(endpoint) || !endpoints.Contains(endpoint))
+            {
+                result.Add(endpoint);
+                return result;
+            }
+            var nodes = LiveBeacons();
+            var attached = Nearest(endpoint, nodes);
+            if (attached == null)
+            {
+                result.Add(endpoint);
+                return result;
+            }
+            var group = Components(nodes).First(c => c.Contains(attached));
+            var rect = endpoint.parent.OccupiedRect();
+            result.AddRange(endpoints.Where(e => e != endpoint && Live(e) && e.parent.Faction == endpoint.parent.Faction &&
+                    (e.parent.def.defName == "TM_MagofuelReservoir" || e.parent is Building_MagicalGravEngine) &&
+                    e.parent.GetComp<CompMagofuelReservoir>()?.GetType() == typeof(CompMagofuelReservoir) &&
+                    group.Contains(Nearest(e, nodes)))
+                .OrderBy(e => ManaNetworkOverlay.DistanceSquared(rect, e.parent.Position))
+                .ThenBy(e => e.parent.thingIDNumber));
+            result.Insert(0, endpoint);
+            return result;
+        }
+
         // Recall draws only from registered live sending tanks on the core's ordinary network.
         public List<CompRefuelable> CoreReturnFuelSources(CompManaNetworkEndpoint core)
         {

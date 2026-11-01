@@ -2574,4 +2574,5 @@ Level 3: all 4 effects</TM_CombatDrugs_pwr_desc>
   <TM_SynthLoad>Load chemfuel ({0})</TM_SynthLoad>
   <TM_SynthLoadDesc>Take chemfuel from stacks near the synthesizer into its fuel hopper.</TM_SynthLoadDesc>
   <TM_SynthInspect>Chemfuel hopper: {0} — synthesizing 50 magofuel/day</TM_SynthInspect>
+  <TM_PoolInspect>Beacon network pool: mana {0}/{1}, magofuel {2}/{3} ({4} tanks)</TM_PoolInspect>
 </LanguageData>

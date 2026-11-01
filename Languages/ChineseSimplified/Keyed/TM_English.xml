@@ -753,4 +753,5 @@
   <TM_SynthLoad>装载化学燃料 ({0})</TM_SynthLoad>
   <TM_SynthLoadDesc>从储液罐附近的堆栈中获取化学燃料装入料斗。</TM_SynthLoadDesc>
   <TM_SynthInspect>化学燃料料斗：{0} — 每天合成50个魔燃料</TM_SynthInspect>
+  <TM_PoolInspect>信标网络池：法力 {0}/{1}，魔燃料 {2}/{3}（{4} 个储罐）</TM_PoolInspect>
 </LanguageData>

@@ -1346,4 +1346,5 @@ Cantidad base: 0%</TM_LifeSteal_ver_desc>
   <TM_SynthLoad>Cargar chemfuel ({0})</TM_SynthLoad>
   <TM_SynthLoadDesc>Toma chemfuel de pilas cerca del depósito hacia el embudo.</TM_SynthLoadDesc>
   <TM_SynthInspect>Embudo de chemfuel: {0} — sintetizando 50 magofuel/día</TM_SynthInspect>
+  <TM_PoolInspect>Red de balizas: maná {0}/{1}, magofuel {2}/{3} ({4} tanques)</TM_PoolInspect>
 </LanguageData>

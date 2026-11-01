@@ -2451,4 +2451,5 @@ DR: [5, 9, 13, 17, 20]%</TM_Golemancy_pwr_desc>
   <TM_SynthLoad>Загрузить химтопливо ({0})</TM_SynthLoad>
   <TM_SynthLoadDesc>Забрать химтопливо со стаков возле резервуара в приёмный бункер.</TM_SynthLoadDesc>
   <TM_SynthInspect>Бункер химтоплива: {0} — синтез 50 манатоплива в день</TM_SynthInspect>
+  <TM_PoolInspect>Пул сети маяков: мана {0}/{1}, манатопливо {2}/{3} ({4} бака)</TM_PoolInspect>
 </LanguageData>

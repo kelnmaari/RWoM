@@ -62,6 +62,7 @@ namespace TorannMagic.Odyssey
         public float FreeCapacity => Math.Max(0f, Props.manaCapacity - storedMana);
         private bool Usable => parent != null && !parent.Destroyed && !transferring &&
             PositiveFinite(Props.manaCapacity) && PositiveFinite(Props.maxTransfer);
+        internal bool UsableInternal => Usable;
         internal static bool PositiveFinite(float value) => value > 0f && !float.IsNaN(value) && !float.IsInfinity(value);
 
         public override void PostExposeData()
@@ -134,7 +135,11 @@ namespace TorannMagic.Odyssey
 
         private bool TrySynthesizeOne(CompRefuelable fuel)
         {
-            if (chemfuelHopper < SynthChemfuelPerFuel || storedMana < SynthManaPerFuel) return false;
+            if (chemfuelHopper < SynthChemfuelPerFuel) return false;
+            // Synthesis feeds from the shared pool when the local mana is short.
+            if (storedMana < SynthManaPerFuel)
+                MagofuelPool.DrawMana(this, SynthManaPerFuel - storedMana);
+            if (storedMana < SynthManaPerFuel) return false;
             if (fuel.Fuel >= fuel.TargetFuelLevel) return false;
             chemfuelHopper -= SynthChemfuelPerFuel;
             storedMana -= SynthManaPerFuel;
@@ -180,7 +185,8 @@ namespace TorannMagic.Odyssey
             "TM_ReservoirCharge".Translate(storedMana.ToString("0.##"), Props.manaCapacity.ToString("0.##")) + "\n" +
             "TM_ReservoirReserve".Translate(PersonalReserve.ToString("P0")) +
             (MagofuelReserve.IsStorage(this) ? "\n" + "TM_ReservoirFuelReserveInspect".Translate(FuelReserve.ToString("0"), MagofuelReserve.Available(parent.GetComp<CompRefuelable>()).ToString("0.##")).ToString() : "") +
-            (MagofuelReserve.IsStorage(this) && synthesisOn ? "\n" + "TM_SynthInspect".Translate(chemfuelHopper.ToString("0")).ToString() : "");
+            (MagofuelReserve.IsStorage(this) && synthesisOn ? "\n" + "TM_SynthInspect".Translate(chemfuelHopper.ToString("0")).ToString() : "") +
+            (MagofuelPool.InspectLine(parent) is string pool ? "\n" + pool : "");
 
         public override IEnumerable<Gizmo> CompGetGizmosExtra()
         {
@@ -323,10 +329,15 @@ namespace TorannMagic.Odyssey
         }
 
         // Returns the exact paid amount. Callers must apply only that amount, never the request.
+        // A short local tank tops up from its beacon network's shared pool first, so
+        // consumers draw from any network tank while off-network tanks stay local.
         public float WithdrawMana(float requestedMana)
         {
             if (!Usable || !PositiveFinite(requestedMana)) return 0f;
-            float amount = Math.Min(Math.Min(requestedMana, Props.maxTransfer), storedMana);
+            float wanted = Math.Min(requestedMana, Props.maxTransfer);
+            if (storedMana < wanted)
+                MagofuelPool.DrawMana(this, wanted - storedMana);
+            float amount = Math.Min(wanted, storedMana);
             if (!(storedMana - amount < storedMana)) return 0f;
             storedMana -= amount;
             return amount;

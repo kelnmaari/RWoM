@@ -2223,4 +2223,5 @@ DR: [5, 9, 13, 17, 20]%</TM_Golemancy_pwr_desc>
   <TM_SynthLoad>Завантажити хімічне паливо ({0})</TM_SynthLoad>
   <TM_SynthLoadDesc>Забрати хімічне паливо зі стаків біля резервуара в прийомний бункер.</TM_SynthLoadDesc>
   <TM_SynthInspect>Бункер хімічного палива: {0} — синтез 50 манапалива на день</TM_SynthInspect>
+  <TM_PoolInspect>Пул мережі маяків: мана {0}/{1}, манапаливо {2}/{3} ({4} баки)</TM_PoolInspect>
 </LanguageData>

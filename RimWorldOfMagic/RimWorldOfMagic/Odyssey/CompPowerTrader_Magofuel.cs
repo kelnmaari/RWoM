@@ -87,6 +87,10 @@ namespace TorannMagic.Odyssey
             var originalFaction = parent.Faction;
             var originalPosition = parent.Position;
             double needed = (double)Props.fuelPerDay * ticks / 60000d;
+            // A dry tank tops up from the beacon network's shared magofuel pool;
+            // off-network engines only ever burn their own storage.
+            if (fuel.Fuel < 1f && paidFuel < needed)
+                MagofuelPool.DrawFuel(parent, (float)Math.Ceiling(needed - paidFuel));
             // Transfer ownership of whole fuel units to the paid burn balance before
             // publishing electricity. Never prepay beyond what this interval needs.
             while (paidFuel < needed && fuel.Fuel >= 1f)
@@ -127,9 +131,10 @@ namespace TorannMagic.Odyssey
         public override string CompInspectStringExtra()
         {
             double remaining = (parent.GetComp<CompRefuelable>()?.Fuel ?? 0) + paidFuel;
+            string pool = MagofuelPool.InspectLine(parent);
             return base.CompInspectStringExtra() + "\n" + "TM_MagofuelGeneratorStatus".Translate(
                 PowerOutput.ToString("0"), Props.fuelPerDay.ToString("0.##"), paidFuel.ToString("0.####"),
-                (remaining / Props.fuelPerDay).ToString("0.##"));
+                (remaining / Props.fuelPerDay).ToString("0.##")) + (pool == null ? "" : "\n" + pool);
         }
     }
 }
