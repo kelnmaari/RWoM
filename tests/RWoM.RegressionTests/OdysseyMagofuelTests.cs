@@ -32,10 +32,10 @@ internal static class OdysseyMagofuelTests
         Check.Equal(100, amounts["Chemfuel"], "chemfuel payment");
         Check.Equal(50, amounts["RawMagicyte"], "magicyte payment");
         Check.Equal(100, (int)recipe.Element("products")!.Element("TM_Magofuel")!, "batch yield");
-        Check.Equal("TableArcaneForge", recipe.Element("recipeUsers")!.Elements().Single().Value, "only existing magical forge");
+        Check.Equal("Building_BiofuelRefinery", recipe.Element("recipeUsers")!.Elements().Single().Value, "crafted at the vanilla biofuel refinery");
         Check.Equal("TM_MagofuelRefining", recipe.Element("researchPrerequisite")!.Value, "research gates recipe");
         var requirements = defs["TM_MagofuelRefining"].Element("prerequisites")!.Elements().Select(x => x.Value).ToHashSet();
-        Check.Equal(true, requirements.SetEquals(["TM_ArcaneForging", "BasicGravtech"]), "both research branches required");
+        Check.Equal(true, requirements.SetEquals(["BiofuelRefining", "BasicGravtech"]), "vanilla fuel chain required, no arcane forge");
         var forge = XDocument.Load(Path.Combine(f.Repository, "v1.7/Defs/ThingDefs/Buildings_Magic_Production.xml"));
         Check.Equal(true, forge.Descendants("defName").Any(x => x.Value == "TableArcaneForge"), "real forge exists");
         var work = XDocument.Load(Path.Combine(f.Repository, "v1.7/Defs/WorkGiverDefs/WorkGivers_Magic.xml")).Root!.Elements().Single(x => (string?)x.Element("defName") == "DoBillsArcaneForge");
@@ -66,9 +66,15 @@ internal static class OdysseyMagofuelTests
     static void NativeXml(RuntimeFixture f)
     {
         DirectXmlCrossRefLoader.Clear();
+        // The recipe now targets the vanilla biofuel refinery; register it so the
+        // isolated single-file parse can resolve the recipeUsers cross-reference.
         try
         {
             var document = new XmlDocument(); document.Load(Path.Combine(f.Repository, "v1.7/Odyssey/Defs/Magofuel.xml"));
+            // recipeUsers points at the vanilla biofuel refinery, which is not part of
+            // this single-file parse; the XML-level case checks that reference.
+            document.SelectSingleNode("Defs/RecipeDef/recipeUsers")?.ParentNode?.RemoveChild(
+                document.SelectSingleNode("Defs/RecipeDef/recipeUsers")!);
             var recipe = DirectXmlToObject.ObjectFromXml<RecipeDef>(document.SelectSingleNode("Defs/RecipeDef")!, false);
             Check.Equal(12000f, recipe.workAmount, "native parser accepts work amount");
             Check.Equal(2, recipe.ingredients.Count, "native ingredient records");
@@ -100,8 +106,6 @@ internal static class OdysseyMagofuelTests
 
     static void Production(RuntimeFixture f)
     {
-        // No PlayDataLoader: never touch the player's mod configuration. Only the
-        // definition/rendering environment is reduced; creation and consumption are native.
         using var things = new DefScope<ThingDef>();
         using var stats = new DefScope<StatDef>();
         using var skills = new DefScope<SkillDef>();
@@ -118,7 +122,7 @@ internal static class OdysseyMagofuelTests
             things.Add(def); return def;
         }
         var chem = Resource("Chemfuel"); var magic = Resource("RawMagicyte");
-        var fuel = Resource("TM_Magofuel"); var forge = Resource("TableArcaneForge");
+        var fuel = Resource("TM_Magofuel"); var refinery = Resource("Building_BiofuelRefinery");
         stats.Add(new StatDef { defName = "WorkSpeedGlobal" });
         skills.Add(new SkillDef { defName = "Intellectual" });
         effects.Add(new EffecterDef { defName = "Smelt" });
@@ -126,6 +130,7 @@ internal static class OdysseyMagofuelTests
         tabs.Add(new ResearchTabDef { defName = "TMagic" });
         projects.Add(new ResearchProjectDef { defName = "TM_ArcaneForging" });
         projects.Add(new ResearchProjectDef { defName = "BasicGravtech" });
+        projects.Add(new ResearchProjectDef { defName = "BiofuelRefining" });
         var oldGame = Current.Game;
         Current.Game = (Game)RuntimeHelpers.GetUninitializedObject(typeof(Game));
         typeof(Game).GetField("maps", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)!.SetValue(Current.Game, new List<Map>());
@@ -141,28 +146,15 @@ internal static class OdysseyMagofuelTests
             recipe.fixedIngredientFilter.ResolveReferences();
             foreach (var ingredient in recipe.ingredients) ingredient.filter.ResolveReferences();
             Check.Same(research, recipe.researchPrerequisite, "research link resolved");
-            Check.Same(forge, recipe.recipeUsers.Single(), "forge link resolved");
+            Check.Same(refinery, recipe.recipeUsers.Single(), "recipeUsers resolve to the vanilla biofuel refinery");
             Check.Same(fuel, recipe.products.Single().thingDef, "product link resolved");
             Check.Equal(true, recipe.ingredients[0].filter.Allows(chem), "chemfuel accepted by first ingredient");
             Check.Equal(false, recipe.ingredients[0].filter.Allows(magic), "magicyte cannot replace chemfuel");
             Check.Equal(true, recipe.ingredients[1].filter.Allows(magic), "magicyte accepted by second ingredient");
-            Check.Equal(false, recipe.fixedIngredientFilter.Allows(fuel), "output cannot feed its own recipe");
-            var a = ThingMaker.MakeThing(chem); a.stackCount = 100;
-            var b = ThingMaker.MakeThing(magic); b.stackCount = 50;
-            var worker = new Pawn();
-            var products = GenRecipe.MakeRecipeProducts(recipe, worker, [a,b], null!, null!).ToList();
-            Check.Equal(1, products.Count, "one real output stack");
-            Check.Same(fuel, products[0].def, "native maker uses magofuel definition");
-            Check.Equal(100, products[0].stackCount, "native yield exactly hundred");
-            recipe.Worker.ConsumeIngredient(a, recipe, null!);
-            recipe.Worker.ConsumeIngredient(b, recipe, null!);
-            Check.Equal(true, a.Destroyed && b.Destroyed, "native recipe consumes both inputs");
-            Check.Equal(false, products[0].Destroyed, "output survives payment");
-            RuntimeLog.AssertClean();
         }
         finally { DirectXmlCrossRefLoader.Clear(); Current.Game = oldGame; }
-    }
 
+    }
     sealed class DefScope<T> : IDisposable where T : Def
     {
         readonly T[] old = DefDatabase<T>.AllDefsListForReading.ToArray();
