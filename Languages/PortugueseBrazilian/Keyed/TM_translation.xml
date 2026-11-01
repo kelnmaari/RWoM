@@ -2220,4 +2220,11 @@ Nível 3: 14s, 24s</TM_SpiritRally_ver_desc>
   <TM_GrimoireRankMax>Posto máx.</TM_GrimoireRankMax>
   <TM_GrimoireRank>Posto</TM_GrimoireRank>
   <TM_GrimoireScrollUnspecified>Pergaminho não especificado</TM_GrimoireScrollUnspecified>
+
+  <!-- Magofuel synthesizer UI strings. -->
+  <TM_SynthToggleLabel>Autossíntese: mana + chemfuel</TM_SynthToggleLabel>
+  <TM_SynthToggleDesc>Converte lentamente mana armazenada e chemfuel em magofuel neste tanque (~50 por dia). Pausa quando o tanque atinge a meta ou faltam insumos.</TM_SynthToggleDesc>
+  <TM_SynthLoad>Carregar chemfuel ({0})</TM_SynthLoad>
+  <TM_SynthLoadDesc>Pega chemfuel de pilhas perto do reservatório para o funil.</TM_SynthLoadDesc>
+  <TM_SynthInspect>Funil de chemfuel: {0} — sintetizando 50 magofuel/dia</TM_SynthInspect>
 </LanguageData>

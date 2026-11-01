@@ -1339,4 +1339,11 @@ Cantidad base: 0%</TM_LifeSteal_ver_desc>
   <TM_GrimoireRankMax>Rango máx.</TM_GrimoireRankMax>
   <TM_GrimoireRank>Rango</TM_GrimoireRank>
   <TM_GrimoireScrollUnspecified>Pergamino sin especificar</TM_GrimoireScrollUnspecified>
+
+  <!-- Magofuel synthesizer UI strings. -->
+  <TM_SynthToggleLabel>Autosíntesis: maná + chemfuel</TM_SynthToggleLabel>
+  <TM_SynthToggleDesc>Convierte lentamente maná almacenado y chemfuel en magofuel en este tanque (~50 por día). Pausa cuando el tanque alcanza su meta o faltan insumos.</TM_SynthToggleDesc>
+  <TM_SynthLoad>Cargar chemfuel ({0})</TM_SynthLoad>
+  <TM_SynthLoadDesc>Toma chemfuel de pilas cerca del depósito hacia el embudo.</TM_SynthLoadDesc>
+  <TM_SynthInspect>Embudo de chemfuel: {0} — sintetizando 50 magofuel/día</TM_SynthInspect>
 </LanguageData>

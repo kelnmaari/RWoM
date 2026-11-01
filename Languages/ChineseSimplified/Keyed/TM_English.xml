@@ -746,4 +746,11 @@
   <TM_GrimoireRankMax>最高等级</TM_GrimoireRankMax>
   <TM_GrimoireRank>等级</TM_GrimoireRank>
   <TM_GrimoireScrollUnspecified>未指定卷轴</TM_GrimoireScrollUnspecified>
+
+  <!-- Magofuel synthesizer UI strings. -->
+  <TM_SynthToggleLabel>自动合成：魔力 + 化学燃料</TM_SynthToggleLabel>
+  <TM_SynthToggleDesc>缓慢地将储存的魔力和化学燃料转化为魔燃料（约每天50个）。当油罐达到目标或缺少原料时暂停。</TM_SynthToggleDesc>
+  <TM_SynthLoad>装载化学燃料 ({0})</TM_SynthLoad>
+  <TM_SynthLoadDesc>从储液罐附近的堆栈中获取化学燃料装入料斗。</TM_SynthLoadDesc>
+  <TM_SynthInspect>化学燃料料斗：{0} — 每天合成50个魔燃料</TM_SynthInspect>
 </LanguageData>

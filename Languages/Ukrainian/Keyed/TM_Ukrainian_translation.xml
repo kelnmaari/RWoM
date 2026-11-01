@@ -2216,4 +2216,11 @@ DR: [5, 9, 13, 17, 20]%</TM_Golemancy_pwr_desc>
   <TM_GrimoireRankMax>Макс. ранг</TM_GrimoireRankMax>
   <TM_GrimoireRank>Ранг</TM_GrimoireRank>
   <TM_GrimoireScrollUnspecified>Сувій не вказано</TM_GrimoireScrollUnspecified>
+
+  <!-- Magofuel synthesizer UI strings. -->
+  <TM_SynthToggleLabel>Автосинтез: мана + хімічне паливо</TM_SynthToggleLabel>
+  <TM_SynthToggleDesc>Повільно перетворює накопичену ману та хімічне паливо на манапаливо в цьому баку (~50 на день). Пауза, поки бак не досягне цілі або не вистачає входів.</TM_SynthToggleDesc>
+  <TM_SynthLoad>Завантажити хімічне паливо ({0})</TM_SynthLoad>
+  <TM_SynthLoadDesc>Забрати хімічне паливо зі стаків біля резервуара в прийомний бункер.</TM_SynthLoadDesc>
+  <TM_SynthInspect>Бункер хімічного палива: {0} — синтез 50 манапалива на день</TM_SynthInspect>
 </LanguageData>
