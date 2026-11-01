@@ -1,4 +1,5 @@
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using RimWorld;
 using TorannMagic;
 using Verse;
@@ -24,9 +25,9 @@ internal static class SkillRecordPatchTests
 
     static Pawn Pawn(bool humanlike, bool withStory, bool withTraits, Trait? trait = null)
     {
-        var def = (ThingDef)Runtime.CompilerServices.RuntimeHelpers.GetUninitializedObject(typeof(ThingDef));
+        var def = (ThingDef)RuntimeHelpers.GetUninitializedObject(typeof(ThingDef));
         def.defName = "SkillRecordPatchPawn"; def.category = ThingCategory.Pawn;
-        def.race = new RaceProperties { humanlike = humanlike };
+        def.race = new RaceProperties { intelligence = humanlike ? Intelligence.Humanlike : Intelligence.ToolUser };
         var pawn = new Pawn { def = def };
         pawn.health = new Pawn_HealthTracker(pawn);
         if (withStory)

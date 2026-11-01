@@ -82,11 +82,16 @@ namespace TorannMagic.TMDefs
         };
 
         // Destructive location spells have no safe automatic target policy. Summon
-        // requires a designated thing, not a generic self target. Saved AC settings
-        // cannot override this admission rule.
+        // requires a designated thing, not a generic self target. Brands are
+        // semi-permanent upkeep links between two specific pawns — autocasting one
+        // onto a random passerby (prisoner, ally, colonist) drains the caster's
+        // mana and misplaces a permanent effect, so they are cast on purpose only.
+        // Saved AC settings cannot override this admission rule.
         private static readonly HashSet<string> NoAutocast = new HashSet<string>
         {
-            "TM_Summon", "TM_Meteor", "TM_OrbitalStrike"
+            "TM_Summon", "TM_Meteor", "TM_OrbitalStrike",
+            "TM_Branding", "TM_SiphonBrand", "TM_FitnessBrand", "TM_EmotionBrand",
+            "TM_VitalityBrand", "TM_ProtectionBrand", "TM_AwarenessBrand", "TM_DispelBranding"
         };
 
         // Maintained/toggle powers: casting an active one dispels it, so a pawn

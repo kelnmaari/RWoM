@@ -103,6 +103,29 @@ internal static class AutocastTests
         yield return new("Autocast.StandaloneAndLeveledPowersKeepSavedOwners", FullCollections);
         yield return new("Autocast.HerbalClarityAndBlissKeepXmlConditions", HerbalConditions);
         yield return new("Autocast.CommanderAurasStayManualToggles", CommanderAurasManual);
+        yield return new("Autocast.BrandsStayTargetedManualCasts", BrandsManual);
+    }
+
+    // Brands are semi-permanent upkeep links between two chosen pawns; autocasting
+    // one onto whoever walks past (prisoners, allies, colonists — player report)
+    // drains the caster and misplaces a permanent effect. They must stay targeted
+    // manual casts with no autocast affordance and no candidate.
+    private static void BrandsManual(RuntimeFixture fixture)
+    {
+        var might = EmptyMight();
+        var magic = EmptyMagic();
+        foreach (string family in new[] { "TM_Branding", "TM_SiphonBrand", "TM_FitnessBrand", "TM_EmotionBrand",
+                 "TM_VitalityBrand", "TM_ProtectionBrand", "TM_AwarenessBrand", "TM_DispelBranding" })
+        {
+            var def = fixture.AddAbility(family);
+            var policy = TM_AutocastDefaults.For(def, false);
+            Check.Equal(AutocastType.Null, policy.type, family + " stays a targeted manual cast");
+            Check.Equal(true, TM_AutocastDefaults.IsManualOnly(def), family + " is manual only");
+            Check.Same(null, MagicToggle(magic, def), family + " offers no AC affordance");
+            var mp = new MagicPower { TMabilityDefs = [def], learned = true, autocast = true };
+            magic.magicPowerIF.Add(mp);
+        }
+        Check.Equal(0, MagicCandidates(magic).Count(), "toggled-on brands are never autocast candidates");
     }
 
     // The commander auras are toggles: casting the active aura dispels it (player

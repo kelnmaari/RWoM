@@ -7,7 +7,6 @@
     <defName>TM_LoadSynthChemfuel</defName>
     <driverClass>TorannMagic.Odyssey.JobDriver_LoadSynthChemfuel</driverClass>
     <reportString>loading chemfuel into magofuel reservoir.</reportString>
-    <carryThingReportString>carrying chemfuel to magofuel reservoir.</carryThingReportString>
   </JobDef>
   <WorkGiverDef>
     <defName>TM_LoadSynthChemfuel</defName>
