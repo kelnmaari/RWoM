@@ -27,7 +27,7 @@ namespace TorannMagic.Compatibility
         {
             return pawn != null && pawn.Spawned && !pawn.Destroyed && pawn.Faction?.IsPlayer == true
                 && Find.Selector?.NumSelected == 1 && Find.Selector.SingleSelectedThing == pawn
-                && Possession(pawn) != null;
+                && Possession(pawn) != null && !ClassProgression.SpiritHostLoss.IsMarkedHost(pawn);
         }
 
         public static void LeaveBody(Pawn pawn)

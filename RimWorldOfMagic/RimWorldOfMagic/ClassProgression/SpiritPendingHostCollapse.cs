@@ -10,7 +10,7 @@ namespace TorannMagic.ClassProgression
         internal Pawn Original;
         internal Thing_SoulStone Stone;
         internal IntVec3 Anchor;
-        internal bool WarningIssued;
+        internal bool WarningIssued, Forced;
         private int version = 1;
         public SpiritPendingHostCollapse(MapComponent_SpiritCollapse keeper) { Keeper = keeper; }
         internal bool Registered => version == 1 && Id > 0 && Keeper.Registered && Keeper.ContainsRecord(this);
@@ -20,6 +20,7 @@ namespace TorannMagic.ClassProgression
             Scribe_Values.Look(ref version, "version", 1);
             Scribe_Values.Look(ref Id, "id"); Scribe_Values.Look(ref SourceHostId, "sourceHostId");
             Scribe_Values.Look(ref Anchor, "anchor"); Scribe_Values.Look(ref RetryAt, "retryAt");
+            Scribe_Values.Look(ref Forced, "forcedRemoval");
             Scribe_Values.Look(ref WarningIssued, "warningIssued");
             Scribe_References.Look(ref Original, "original"); Scribe_References.Look(ref Stone, "stone");
         }

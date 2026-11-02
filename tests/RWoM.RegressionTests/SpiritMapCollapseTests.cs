@@ -14,6 +14,66 @@ internal static class SpiritMapCollapseTests
     internal static Type Production(string name) => Check.NotNull(typeof(SpiritRebirthState).Assembly.GetType("TorannMagic.ClassProgression." + name), "map collapse " + name + " exists");
     public static IEnumerable<TestCase> Cases()
     {
+        foreach (var route in new[] { "SetDead", "CancelKill", "RemoveHediff", "RemovePossession", "Destroy", "Kill", "RefusedRemoval" })
+            yield return new("SpiritHostLoss.Native." + route, r => SpiritRebirthRitualTransactionTests.Run(r, c =>
+            {
+                using var fixture = new Fixture(r, c);
+                using var hooks = new FleshStatTests.ProductionPatches();
+                foreach (var patch in new[] { Production("SpiritHostSetDeadPatch"), Production("SpiritHostRemoveHediffPatch"),
+                    Production("SpiritHostDestroyPatch"), typeof(TorannMagicMod.KillPossessed_Patch) })
+                    hooks.Add(patch);
+                var host = c.Creator;
+                var state = ClassIdentity.Component(c.Original).SpiritRebirth;
+                if (route == "CancelKill")
+                {
+                    using var veto = new Patch(typeof(Pawn).GetMethod(nameof(Pawn.Kill))!, nameof(CancelNative));
+                    TM_Action.RemovePossession(host, host.Position, false, true);
+                    host.Kill(null);
+                    Check.Equal(false, host.Dead, "cancelled native kill");
+                    Check.Equal(true, state.HasValidHost(c.Original), "cancelled kill keeps exact original in host");
+                    Check.Equal(87, state.RecoveryTicks, "cancelled kill keeps recovery");
+                    return;
+                }
+                host.def.destroyable = true;
+                if (route == "RefusedRemoval")
+                {
+                    c.Map.components.Remove(fixture.Keeper);
+                    host.health.RemoveHediff(fixture.Possession.parent);
+                    host.Destroy();
+                    Check.Equal(true, host.Spawned && state.HasValidHost(c.Original), "source survives both refused destructive operations");
+                    return;
+                }
+                host.def.comps ??= [];
+                host.def.category = ThingCategory.Pawn;
+                host.def.size = new IntVec2(1,1);
+                host.def.thingClass = typeof(Pawn); host.def.drawerType = DrawerType.RealtimeOnly;
+                c.Map.events = new MapEvents(c.Map);
+                c.Map.thingGrid.Register(host); c.Map.listerThings.Add(host);
+                c.Map.attackTargetsCache.Notify_ThingSpawned(host);
+                Find.World.ideoManager = new IdeoManager();
+                Current.Game.components ??= [];
+                Current.Game.components.Add(new GameComponent_Bossgroup(Current.Game));
+                Set(Find.TickManager, "gameStartAbsTick", 1);
+                host.meleeVerbs = new Pawn_MeleeVerbs(host);
+                // Tales, battle-log rendering and colony thoughts need a running game.
+                using var stories = new Patch(typeof(Pawn).GetMethod("DoKillSideEffects", BindingFlags.Instance | BindingFlags.NonPublic)!, nameof(CancelNative));
+                using var thoughts = new Patch(typeof(Pawn).GetMethod("DropBeforeDying", BindingFlags.Instance | BindingFlags.NonPublic)!, nameof(CancelNative));
+                using var unrelatedHealth = new Patch(typeof(Pawn_HealthTracker).GetMethod("CheckForStateChange")!, nameof(CancelNative));
+                if (route == "SetDead") host.health.SetDead();
+                if (route == "Kill") { host.Kill(null); RuntimeLog.AssertClean(); }
+                if (route == "RemoveHediff") host.health.RemoveHediff(fixture.Possession.parent);
+                if (route == "RemovePossession") TM_Action.RemovePossession(host, host.Position, true);
+                if (route == "Destroy") host.Destroy();
+                Check.Equal(true, state.HasValidStone(c.Original), "native " + route + " secures exact original");
+                var stone = state.Stone;
+                if (route == "Kill" || route == "SetDead") Check.Equal(true, host.Dead, "native death committed");
+                if (route == "Destroy") Check.Equal(true, host.Destroyed, "native destruction completed");
+                if (route == "RemovePossession") TM_Action.RemovePossession(host, host.Position, true);
+                Check.Equal(0, state.RecoveryTicks, "full week resets on commit");
+                Check.Equal(true, fixture.Possession.SpiritPawn == null, "former holder released original");
+                MapComponentUtility.MapComponentTick(c.Map);
+                Check.Same(stone, state.Stone, "no second stone on retry");
+            }));
         yield return new("SpiritMapCollapse.NativePlacementFalseAfterSuccess", r => SpiritRebirthRitualTransactionTests.Run(r, c =>
         {
             using var f = new Fixture(r, c); c.Creator.health.SetDead();
@@ -240,6 +300,7 @@ internal static class SpiritMapCollapseTests
         }
         public void Dispose() { ui.Dispose(); TorannMagicDefOf.TM_SpiritPossessionHD = oldPossession; DefDatabase<ThingDef>.Clear(); foreach (var def in defs) DefDatabase<ThingDef>.Add(def); release.Dispose(); }
     }
+    static bool CancelNative() => false;
     sealed class Patch : IDisposable
     {
         readonly object harmony; readonly string id = "rwom.map-collapse-fault." + Guid.NewGuid();

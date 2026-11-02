@@ -37,7 +37,8 @@ namespace TorannMagic.ClassProgression
         {
             if (pendingDeathMap != null || pendingDeathId != 0 || receipt == null || !receipt.Registered
                 || !ReferenceEquals(receipt.Original, pawn) || receipt.SourceHostId != deadHost?.thingIDNumber
-                || !ReferenceEquals(receipt.Keeper.map, deadHost.Map) || !CanEnterStone(pawn, deadHost, true)) return false;
+                || !ReferenceEquals(receipt.Keeper.map, deadHost.Map) || (!receipt.Forced && !deadHost.Dead)
+                || !CanEnterStone(pawn, deadHost, deadHost.Dead)) return false;
             // Authorization alone never clears the still-owning source graph.
             pendingDeathMap = receipt.Keeper.map; pendingDeathId = receipt.Id;
             return true;

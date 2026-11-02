@@ -4,8 +4,7 @@ using Verse;
 
 namespace TorannMagic.ClassProgression
 {
-    // Internal map-local custody infrastructure. No death hooks or map-removal
-    // rescue policy are enabled by this component.
+    // Owns the original while a host loss on this map is being settled.
     public sealed class MapComponent_SpiritCollapse : MapComponent, IThingHolder, IThingHolderTickable
     {
         private ThingOwner<Thing> contents;
@@ -57,6 +56,9 @@ namespace TorannMagic.ClassProgression
         }
 
         internal bool TryBeginHostDeath(Pawn original, Pawn deadHost)
+            => deadHost?.Dead == true && TryBeginHostLoss(original, deadHost, false);
+
+        internal bool TryBeginHostLoss(Pawn original, Pawn deadHost, bool forced)
         {
             if (!Registered || original == null || deadHost == null || !SpiritRebirthState.TryGet(original, out var state)) return false;
             var existing = Find(original);
@@ -67,7 +69,7 @@ namespace TorannMagic.ClassProgression
                 return Retained(existing);
             }
             if (!SpiritRebirthStaging.MapOwns(deadHost, map) || !deadHost.Position.InBounds(map)
-                || !state.CanEnterStone(original, deadHost, true) || !busy.Add(original)) return false;
+                || (!forced && !deadHost.Dead) || !state.CanEnterStone(original, deadHost, deadHost.Dead) || !busy.Add(original)) return false;
             SpiritPendingHostCollapse receipt = null;
             try
             {
@@ -79,7 +81,7 @@ namespace TorannMagic.ClassProgression
                 catch { if (!DirectlyOwns(stone)) throw; }
                 if (!DirectlyOwns(stone)) return false;
                 receipt = new SpiritPendingHostCollapse(this) { Id = nextId++, Original = original, Stone = stone,
-                    SourceHostId = deadHost.thingIDNumber, Anchor = deadHost.Position };
+                    SourceHostId = deadHost.thingIDNumber, Anchor = deadHost.Position, Forced = forced };
                 records.Add(receipt);
                 if (!state.BeginPendingMapDeath(original, deadHost, receipt) && !state.MatchesPendingMapDeath(original, map, receipt.Id))
                 {
@@ -163,9 +165,9 @@ namespace TorannMagic.ClassProgression
             var pawn = receipt.Original; var source = pawn.holdingOwner;
             var possession = source?.Owner as HediffComp_SpiritPossession;
             var host = possession?.parent?.pawn;
-            if (host == null || !host.Dead || host.thingIDNumber != receipt.SourceHostId
+            if (host == null || (!receipt.Forced && !host.Dead) || host.thingIDNumber != receipt.SourceHostId
                 || !ReferenceEquals(possession.SpiritPawn, pawn) || !source.Contains(pawn)
-                || !SpiritRebirthState.TryGet(pawn, out var state) || !state.CanEnterStone(pawn, host, true)) return;
+                || !SpiritRebirthState.TryGet(pawn, out var state) || !state.CanEnterStone(pawn, host, host.Dead)) return;
             try { source.Remove(pawn); contents.TryAdd(pawn, false); }
             finally
             {

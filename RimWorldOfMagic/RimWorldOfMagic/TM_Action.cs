@@ -1115,9 +1115,21 @@ namespace TorannMagic
 
         public static void RemovePossession(Pawn p, IntVec3 loc, bool destroySpirit = false, bool hostKilled = false)
         {            
+            if (ClassProgression.SpiritHostLoss.IsMarkedHost(p))
+            {
+                // The Kill prefix is only a notification of intent. Wait for native death.
+                if (!hostKilled && p.Spawned && ClassProgression.SpiritHostLoss.Secure(p, true))
+                {
+                    var empty = p.health.hediffSet.GetFirstHediffOfDef(TorannMagicDefOf.TM_SpiritPossessionHD);
+                    if (empty?.TryGetComp<HediffComp_SpiritPossession>()?.SpiritPawn == null && empty != null)
+                        p.health.RemoveHediff(empty);
+                }
+                return;
+            }
             Hediff hd = p.health.hediffSet.GetFirstHediffOfDef(TorannMagicDefOf.TM_SpiritPossessionHD);
-            HediffComp_SpiritPossession hdc_sp = hd.TryGetComp<HediffComp_SpiritPossession>() as HediffComp_SpiritPossession;
-            Pawn spirit = hdc_sp.SpiritPawn;
+            var hdc_sp = hd?.TryGetComp<HediffComp_SpiritPossession>();
+            Pawn spirit = hdc_sp?.SpiritPawn;
+            if (spirit == null) return;
             CompAbilityUserMagic pComp = p.GetCompAbilityUserMagic();
             Map spawnMap = p.Map;
             if (p.Map == null && p.Corpse != null)
