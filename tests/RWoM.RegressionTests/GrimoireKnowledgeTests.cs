@@ -1,4 +1,4 @@
-using System.Reflection;
+﻿using System.Reflection;
 using System.Runtime.CompilerServices;
 using RimWorld;
 using TorannMagic;
@@ -17,6 +17,62 @@ internal static class GrimoireKnowledgeTests
         yield return new("GrimoireKnowledge.DisplayNamePrettifies", DisplayNamePrettifies);
         yield return new("GrimoireKnowledge.SleepingFiltersByResolvability", SleepingFiltersByResolvability);
         yield return new("GrimoireKnowledge.SleepingNullSafe", SleepingNullSafe);
+        yield return new("GrimoireKnowledge.SyncMirrorsWrites", SyncMirrorsWrites);
+    }
+
+    // Ф4 step 4 stage 2: grimoire writes (learn/level-up/skill rank) mirror
+    // into the knowledge store so it stays a complete mirror after the
+    // one-shot import. Role comes from the skill label suffix.
+    private static void SyncMirrorsWrites(RuntimeFixture _)
+    {
+        if (Current.Game == null)
+        {
+            Current.Game = (Game)RuntimeHelpers.GetUninitializedObject(typeof(Game));
+        }
+        // An existing shell from an earlier suite may lack the managers the
+        // Pawn ctor needs — patch them in individually.
+        if (Current.Game.tickManager == null)
+            typeof(Game).GetField("tickManager", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)!.SetValue(Current.Game, new TickManager());
+        if (Current.Game.uniqueIDsManager == null)
+            typeof(Game).GetField("uniqueIDsManager", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)!.SetValue(Current.Game, new UniqueIDsManager());
+        var pawnDef = (ThingDef)RuntimeHelpers.GetUninitializedObject(typeof(ThingDef));
+        pawnDef.defName = "Regression_GrimSync";
+        pawnDef.race = new RaceProperties { intelligence = Intelligence.Humanlike };
+        var pawn = new Pawn { def = pawnDef };
+        for (Type type = pawn.GetType(); type != null; type = type.BaseType)
+        {
+            var compsField = type.GetField("comps", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
+            if (compsField == null) continue;
+            compsField.SetValue(pawn, new List<ThingComp>());
+            break;
+        }
+        pawn.AllComps.Add(new AbilityKnowledgeComp { parent = pawn });
+        var knowledge = pawn.TryGetComp<AbilityKnowledgeComp>();
+
+        var def = (TMAbilityDef)RuntimeHelpers.GetUninitializedObject(typeof(TMAbilityDef));
+        def.defName = "TM_GrimSyncA";
+        def.label = "TM_GrimSyncA";
+
+        GrimoireKnowledge.SyncEntry(pawn, def, 2, true);
+        var entry = knowledge.Find(SpellIds.Of(def));
+        Check.NotNull(entry, "sync creates the entry");
+        Check.Equal(true, entry.learned, "learned mirrored");
+        Check.Equal(2, entry.tier, "tier mirrored");
+
+        GrimoireKnowledge.SyncRank(pawn, def, "TM_grimsynca_pwr", 3);
+        GrimoireKnowledge.SyncRank(pawn, def, "TM_grimsynca_eff", 1);
+        GrimoireKnowledge.SyncRank(pawn, def, "TM_grimsynca_ver", 2);
+        Check.Equal(3, knowledge.GetSkillRank(SpellIds.Of(def), 0), "pwr rank mirrored");
+        Check.Equal(1, knowledge.GetSkillRank(SpellIds.Of(def), 1), "eff rank mirrored");
+        Check.Equal(2, knowledge.GetSkillRank(SpellIds.Of(def), 2), "ver rank mirrored");
+
+        // Global stat skills are not per-spell knowledge — a non-suffix label is a no-op.
+        GrimoireKnowledge.SyncRank(pawn, def, "TM_global_regen", 5);
+        Check.Equal(3, knowledge.GetSkillRank(SpellIds.Of(def), 0), "unknown label suffix is a no-op");
+
+        GrimoireKnowledge.SyncEntry(pawn, null, 0, true);
+        GrimoireKnowledge.SyncRank(pawn, def, "TM_grimsynca_pwr", 4);
+        Check.Equal(4, knowledge.GetSkillRank(SpellIds.Of(def), 0), "null-def sync is a no-op for ranks");
     }
 
     // RED 1: convention ids read as spell names; unknown shapes come back sane.

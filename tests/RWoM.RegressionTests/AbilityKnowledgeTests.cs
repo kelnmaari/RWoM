@@ -1,3 +1,6 @@
+﻿using System.Linq;
+using System.Reflection;
+using System.Runtime.CompilerServices;
 using RimWorld;
 using TorannMagic;
 using Verse;
@@ -14,6 +17,108 @@ internal static class AbilityKnowledgeTests
         yield return new("AbilityKnowledge.MissingSpellReturnsZero", MissingSpell);
         yield return new("AbilityKnowledge.RemoveSpell", RemoveSpell);
         yield return new("AbilityKnowledge.SaveLoadRoundTrip", SaveLoad);
+        yield return new("AbilityKnowledge.SchemaV2Reconciles", SchemaV2Reconciles);
+    }
+
+    // Ф4 step 4 stage 2: v1 saves drifted from legacy (toggles and ranks moved
+    // after the one-shot import, before dual-write existed). Bumping the schema
+    // triggers a one-shot reconcile on the next tick: flags AND ranks are
+    // re-read from legacy, then the version stamps current.
+    private static void SchemaV2Reconciles(RuntimeFixture f)
+    {
+        if (Current.Game == null)
+        {
+            Current.Game = (Game)RuntimeHelpers.GetUninitializedObject(typeof(Game));
+        }
+        // An existing shell from an earlier suite may lack the managers the
+        // Pawn ctor needs — patch them in individually.
+        if (Current.Game.tickManager == null)
+            typeof(Game).GetField("tickManager", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)!.SetValue(Current.Game, new TickManager());
+        if (Current.Game.uniqueIDsManager == null)
+            typeof(Game).GetField("uniqueIDsManager", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)!.SetValue(Current.Game, new UniqueIDsManager());
+        var pawnDef = (ThingDef)RuntimeHelpers.GetUninitializedObject(typeof(ThingDef));
+        pawnDef.defName = "Regression_Reconcile";
+        pawnDef.race = new RaceProperties { intelligence = Intelligence.Humanlike };
+        var pawn = new Pawn { def = pawnDef };
+        for (Type type = pawn.GetType(); type != null; type = type.BaseType)
+        {
+            var compsField = type.GetField("comps", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
+            if (compsField == null) continue;
+            compsField.SetValue(pawn, new List<ThingComp>());
+            break;
+        }
+
+        var def = (TMAbilityDef)RuntimeHelpers.GetUninitializedObject(typeof(TMAbilityDef));
+        def.defName = "TM_ReconcileA";
+        def.label = "TM_ReconcileA";
+
+        var magic = new CompAbilityUserMagic { parent = pawn };
+        // Blank the class-list backings first (their lazy getters build from
+        // DefOfs that are null headless — the EmptyMagic pattern), then plant
+        // the standalone list with the power under test.
+        var data = new MagicData();
+        foreach (var field in typeof(MagicData).GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
+            if (field.FieldType == typeof(List<MagicPower>) && !field.Name.Contains("Custom"))
+                field.SetValue(data, new List<MagicPower>());
+        // The MagicPowersP getter pads a short list with a DefOf-built paladin
+        // buff (NRE headless) — fill 6 blanks like EmptyMagic does.
+        var pList = (List<MagicPower>)typeof(MagicData).GetField("magicPowerP", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)!
+            .GetValue(data);
+        pList.AddRange(Enumerable.Range(0, 6).Select(_ => new MagicPower { TMabilityDefs = [] }));
+        var power = new MagicPower(new List<AbilityUser.AbilityDef> { def }) { learned = true, autocast = true, level = 2 };
+        typeof(MagicData).GetField("magicPowerStandalone", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)!
+            .SetValue(data, new List<MagicPower> { power });
+        typeof(CompAbilityUserMagic).GetField("magicData", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)!
+            .SetValue(magic, data);
+        pawn.AllComps.Add(magic);
+
+        var knowledge = new AbilityKnowledgeComp { parent = pawn };
+        pawn.AllComps.Add(knowledge);
+        // Simulate the imported-and-drifted v1 state: import already ran, the
+        // store holds stale values.
+        typeof(AbilityKnowledgeComp).GetField("legacyImported", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)!
+            .SetValue(knowledge, true);
+        var stale = knowledge.GetOrCreate(TorannMagic.SpellIds.Of(def), 0);
+        stale.learned = true;
+        stale.autocast = false; // legacy says true — drifted
+        stale.pwr = 0; // legacy skill says 2 — never imported at v1
+        typeof(AbilityKnowledgeComp).GetField("schemaVersion", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)!
+            .SetValue(knowledge, 1);
+
+        // Round-trip through the real Scribe (PostLoadInit arms the reconcile).
+        string path = Path.Combine(f.WorkingDirectory, "reconcile-v1.xml");
+        var wrap = new KnowledgeWrap { Comp = knowledge };
+        try
+        {
+            Scribe.saver.InitSaving(path, "regression");
+            Scribe_Deep.Look(ref wrap, "wrap");
+            Scribe.saver.FinalizeSaving();
+        }
+        finally { Scribe.ForceStop(); }
+        KnowledgeWrap loaded = null!;
+        try
+        {
+            Scribe.loader.InitLoading(path);
+            Scribe_Deep.Look(ref loaded, "wrap");
+            Scribe.loader.FinalizeLoading();
+        }
+        finally { Scribe.ForceStop(); }
+        Check.NotNull(loaded?.Comp, "comp survives the round-trip");
+        // The game's comp loader restores `parent`; a bare Scribe wrap does not.
+        loaded.Comp.parent = pawn;
+
+        loaded.Comp.CompTick(); // reconcile runs here
+        Check.Equal(2, loaded.Comp.SchemaVersion, "schema stamped current");
+        var entry = loaded.Comp.Find(TorannMagic.SpellIds.Of(def));
+        Check.NotNull(entry, "reconciled entry present");
+        Check.Equal(true, entry.autocast, "drifted autocast re-read from legacy");
+        Check.Equal(2, entry.tier, "tier re-read from legacy level");
+        Check.Equal(0, loaded.Comp.GetSkillRank(TorannMagic.SpellIds.Of(def), 0), "rank defaults to 0 while legacy has no skill list");
+
+        // The reconcile is one-shot per load: a second tick does not re-import.
+        entry.autocast = false;
+        loaded.Comp.CompTick();
+        Check.Equal(false, loaded.Comp.Find(TorannMagic.SpellIds.Of(def)).autocast, "post-reconcile edits are preserved");
     }
 
     static AbilityKnowledgeComp Comp() => new() { parent = new ThingWithComps() };

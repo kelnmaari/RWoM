@@ -50,5 +50,37 @@ namespace TorannMagic
             }
             return sleeping;
         }
+
+        // Ф4 step 4 stage 2: grimoire writes (learn / level-up) mirror into the
+        // knowledge store so it stays a complete mirror after the one-shot
+        // import — the same dual-write contract as the autocast toggles.
+        public static void SyncEntry(Pawn pawn, Verse.Def def, int tier, bool learned)
+        {
+            AbilityKnowledgeComp knowledge = pawn?.TryGetComp<AbilityKnowledgeComp>();
+            if (knowledge == null || def == null) return;
+            SpellKnowledge entry = knowledge.GetOrCreate(SpellIds.Of(def), tier);
+            entry.tier = tier;
+            entry.learned = learned;
+        }
+
+        // Skill-rank mirror; the role comes from the legacy label suffix
+        // (TM_X_pwr/eff/ver). Global stat skills have no suffix and are skipped.
+        public static void SyncRank(Pawn pawn, Verse.Def def, string skillLabel, int rank)
+        {
+            int role = RoleOf(skillLabel);
+            if (def == null || role < 0) return;
+            AbilityKnowledgeComp knowledge = pawn?.TryGetComp<AbilityKnowledgeComp>();
+            if (knowledge == null) return;
+            knowledge.SetSkillRank(SpellIds.Of(def), role, rank);
+        }
+
+        public static int RoleOf(string skillLabel)
+        {
+            if (skillLabel == null) return -1;
+            if (skillLabel.EndsWith("_pwr")) return 0;
+            if (skillLabel.EndsWith("_eff")) return 1;
+            if (skillLabel.EndsWith("_ver")) return 2;
+            return -1;
+        }
     }
 }

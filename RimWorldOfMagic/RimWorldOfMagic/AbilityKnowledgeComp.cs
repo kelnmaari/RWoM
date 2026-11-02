@@ -10,9 +10,13 @@ namespace TorannMagic
     // Consumers access through TryGet/TrySet — no direct def or label derefs.
     public class AbilityKnowledgeComp : ThingComp, IExposable
     {
-        public const int CurrentSchemaVersion = 1;
-        private int schemaVersion;
+        // v2: v1 stores drifted from legacy (toggles moved after the one-shot
+        // import, before dual-write existed, and ranks were never imported).
+        // A v1 load arms a one-shot reconcile on the next tick.
+        public const int CurrentSchemaVersion = 2;
+        private int schemaVersion = CurrentSchemaVersion;
         private bool legacyImported;
+        private bool pendingReconcile;
         private List<SpellKnowledge> spells = new List<SpellKnowledge>();
 
         public IReadOnlyList<SpellKnowledge> Spells => spells.AsReadOnly();
@@ -58,6 +62,11 @@ namespace TorannMagic
         {
             if (legacyImported) return;
             legacyImported = true;
+            ImportNow();
+        }
+
+        private void ImportNow()
+        {
             var pawn = parent as Pawn;
             if (pawn == null) return;
 
@@ -69,8 +78,13 @@ namespace TorannMagic
                     if (power?.abilityDef == null) continue;
                     var spellId = SpellIds.Of(power.abilityDef);
                     var entry = GetOrCreate(spellId, power.level);
+                    entry.tier = power.level;
                     entry.learned = power.learned;
                     entry.autocast = power.autocast;
+                    var ability = power.abilityDef as TMAbilityDef;
+                    entry.pwr = magicComp.MagicData.GetSkill_Power(ability)?.level ?? entry.pwr;
+                    entry.eff = magicComp.MagicData.GetSkill_Efficiency(ability)?.level ?? entry.eff;
+                    entry.ver = magicComp.MagicData.GetSkill_Versatility(ability)?.level ?? entry.ver;
                 }
             }
 
@@ -82,8 +96,13 @@ namespace TorannMagic
                     if (power?.abilityDef == null) continue;
                     var spellId = SpellIds.Of(power.abilityDef);
                     var entry = GetOrCreate(spellId, power.level);
+                    entry.tier = power.level;
                     entry.learned = power.learned;
                     entry.autocast = power.autocast;
+                    var ability = power.abilityDef as TMAbilityDef;
+                    entry.pwr = mightComp.MightData.GetSkill_Power(ability)?.level ?? entry.pwr;
+                    entry.eff = mightComp.MightData.GetSkill_Efficiency(ability)?.level ?? entry.eff;
+                    entry.ver = mightComp.MightData.GetSkill_Versatility(ability)?.level ?? entry.ver;
                 }
             }
         }
@@ -96,6 +115,9 @@ namespace TorannMagic
             if (Scribe.mode == LoadSaveMode.PostLoadInit)
             {
                 spells?.RemoveAll(s => s == null || string.IsNullOrEmpty(s.spellId));
+                // Comps are not fully loaded during PostLoadInit — defer the
+                // re-import to the first tick.
+                if (schemaVersion < CurrentSchemaVersion) pendingReconcile = true;
                 schemaVersion = CurrentSchemaVersion;
             }
         }
@@ -105,6 +127,12 @@ namespace TorannMagic
             // One-shot legacy import: runs on the first CompTick after spawn,
             // when all other comps have loaded their data.
             ImportLegacy();
+            // Schema migration: re-read drifted flags and ranks from legacy once.
+            if (pendingReconcile)
+            {
+                pendingReconcile = false;
+                ImportNow();
+            }
             // Ф5 spike: keep the vanilla tracker in sync with the knowledge
             // store (bridge pilot family) on the autocast cadence.
             if (parent is Pawn pawn && pawn.IsHashIntervalTick(180))

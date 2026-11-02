@@ -250,6 +250,7 @@ namespace TorannMagic
                 {
                     skill.level++;
                     magic.MagicData.MagicAbilityPoints -= skill.costToLevel;
+                    GrimoireKnowledge.SyncRank(pawn, ability, skill.label, skill.level);
                 }
                 else if (power.learned && skill.level >= skill.levelMax)
                 {
@@ -280,6 +281,7 @@ namespace TorannMagic
                 if (Widgets.ButtonText(rect, "TM_Learn".Translate() + " (" + power.learnCost + ")", true, false, true))
                 {
                     power.learned = true;
+                    GrimoireKnowledge.SyncEntry(pawn, power.abilityDef, power.level, true);
                     TMAbilityDef ability = (TMAbilityDef)power.abilityDef;
                     if (!(power.abilityDef.defName == "TM_TechnoBit") && ability.shouldInitialize)
                     {
@@ -325,6 +327,7 @@ namespace TorannMagic
             {
                 magic.LevelUpPower(power);
                 magic.MagicData.MagicAbilityPoints -= power.costToLevel;
+                GrimoireKnowledge.SyncEntry(pawn, power.abilityDef, power.level, power.learned);
             }
         }
 
@@ -432,6 +435,7 @@ namespace TorannMagic
                 {
                     skill.level++;
                     might.MightData.MightAbilityPoints -= skill.costToLevel;
+                    GrimoireKnowledge.SyncRank(pawn, ability, skill.label, skill.level);
                 }
                 else if (power.learned && skill.level >= skill.levelMax)
                 {
@@ -456,6 +460,7 @@ namespace TorannMagic
                 if (Widgets.ButtonText(rect, "TM_Learn".Translate() + " (" + power.learnCost + ")", true, false, true))
                 {
                     power.learned = true;
+                    GrimoireKnowledge.SyncEntry(pawn, power.abilityDef, power.level, true);
                     might.AddPawnAbility((TMAbilityDef)power.abilityDef);
                     might.MightData.MightAbilityPoints -= power.learnCost;
                 }
@@ -481,6 +486,7 @@ namespace TorannMagic
             {
                 might.LevelUpPower(power);
                 might.MightData.MightAbilityPoints -= power.costToLevel;
+                GrimoireKnowledge.SyncEntry(pawn, power.abilityDef, power.level, power.learned);
             }
         }
 
