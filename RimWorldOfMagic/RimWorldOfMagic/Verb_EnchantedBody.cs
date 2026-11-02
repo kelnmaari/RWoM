@@ -1,4 +1,4 @@
-﻿using RimWorld;
+using RimWorld;
 using System;
 using Verse;
 using AbilityUser;
@@ -29,14 +29,14 @@ namespace TorannMagic
             {
                 if(pawn.health.hediffSet.HasHediff(TorannMagicDefOf.TM_EnchantedAuraHD))
                 {
-                    comp.MagicData.MagicPowersStandalone.FirstOrDefault<MagicPower>((MagicPower x) => x.abilityDef == TorannMagicDefOf.TM_EnchantedAura).AutoCast = false;
+                    AutoCast.AutocastPolicy.SetAutocast(comp, comp.MagicData.MagicPowersStandalone.FirstOrDefault<MagicPower>((MagicPower x) => x.abilityDef == TorannMagicDefOf.TM_EnchantedAura), false);
                     pawn.health.RemoveHediff(pawn.health.hediffSet.GetFirstHediffOfDef(TorannMagicDefOf.TM_EnchantedAuraHD, false));
                     FleckMaker.ThrowHeatGlow(pawn.Position, pawn.Map, 1f);
                 }
 
                 if(pawn.health.hediffSet.HasHediff(TorannMagicDefOf.TM_EnchantedBodyHD))
                 {
-                    comp.MagicData.MagicPowersE.FirstOrDefault<MagicPower>((MagicPower x) => x.abilityDef == TorannMagicDefOf.TM_EnchantedBody).AutoCast = false;
+                    AutoCast.AutocastPolicy.SetAutocast(comp, comp.MagicData.MagicPowersE.FirstOrDefault<MagicPower>((MagicPower x) => x.abilityDef == TorannMagicDefOf.TM_EnchantedBody), false);
                     pawn.health.RemoveHediff(pawn.health.hediffSet.GetFirstHediffOfDef(TorannMagicDefOf.TM_EnchantedBodyHD, false));
                     FleckMaker.ThrowHeatGlow(pawn.Position, pawn.Map, 1f);
                 }
@@ -44,7 +44,7 @@ namespace TorannMagic
                 {
                     if (comp.maxMP >= TorannMagicDefOf.TM_EnchantedBody.upkeepEnergyCost)
                     {
-                        comp.MagicData.MagicPowersE.FirstOrDefault<MagicPower>((MagicPower x) => x.abilityDef == TorannMagicDefOf.TM_EnchantedBody).AutoCast = true;
+                        AutoCast.AutocastPolicy.SetAutocast(comp, comp.MagicData.MagicPowersE.FirstOrDefault<MagicPower>((MagicPower x) => x.abilityDef == TorannMagicDefOf.TM_EnchantedBody), true);
                         HealthUtility.AdjustSeverity(pawn, TorannMagicDefOf.TM_EnchantedBodyHD, .5f + pwrVal);
                         for (int i = 0; i < 3; i++)
                         {

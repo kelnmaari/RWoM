@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using RimWorld;
@@ -37,7 +37,7 @@ namespace TorannMagic
                 {
                     Hediff hediff = pawn.health.hediffSet.GetFirstHediffOfDef(TorannMagicDefOf.TM_PredictionHD);
                     pawn.health.RemoveHediff(hediff);                    
-                    magicPower.AutoCast = false;
+                    AutoCast.AutocastPolicy.SetAutocast(comp, magicPower, false);
                 }
                 else
                 {
@@ -45,7 +45,7 @@ namespace TorannMagic
                     HealthUtility.AdjustSeverity(pawn, TorannMagicDefOf.TM_PredictionHD, .5f + pwrVal);
                     ClassProgression.ChronomancerTrials.CompletePrediction(trial);
                     //TM_MoteMaker.ThrowNoteMote(pawn.DrawPos, pawn.Map, .8f);
-                    magicPower.AutoCast = true;
+                    AutoCast.AutocastPolicy.SetAutocast(comp, magicPower, true);
                 }
             }
             return true;

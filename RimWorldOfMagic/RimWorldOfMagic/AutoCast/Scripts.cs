@@ -146,6 +146,48 @@ namespace TorannMagic.AutoCast
             return entry == null ? legacyLearned : entry.learned;
         }
 
+        // Ф4 step 6: autocast toggles dual-write. The knowledge store is the
+        // gate's source of truth, so the player toggle must update it — the
+        // mirror copies what the throttled legacy property actually accepted.
+        public static void ToggleAutocast(CompAbilityUserMagic comp, MagicPower power)
+        {
+            if (power == null) return;
+            power.AutoCast = !power.autocast;
+            SyncAutocast(comp?.Pawn, power);
+        }
+
+        public static void ToggleAutocast(CompAbilityUserMight comp, MightPower power)
+        {
+            if (power == null) return;
+            power.AutoCast = !power.autocast;
+            SyncAutocast(comp?.Pawn, power);
+        }
+
+        // Direct assignment for the sustained-buff mutual exclusions: a verb
+        // switching another spell's autocast on/off also mirrors the store.
+        public static void SetAutocast(CompAbilityUserMagic comp, MagicPower power, bool value)
+        {
+            if (power == null) return;
+            power.AutoCast = value;
+            SyncAutocast(comp?.Pawn, power);
+        }
+
+        private static void SyncAutocast(Pawn pawn, MagicPower power)
+        {
+            if (power?.abilityDef == null) return;
+            TorannMagic.AbilityKnowledgeComp knowledge = pawn?.TryGetComp<TorannMagic.AbilityKnowledgeComp>();
+            if (knowledge == null) return;
+            knowledge.GetOrCreate(TorannMagic.SpellIds.Of(power.abilityDef), power.level).autocast = power.autocast;
+        }
+
+        private static void SyncAutocast(Pawn pawn, MightPower power)
+        {
+            if (power?.abilityDef == null) return;
+            TorannMagic.AbilityKnowledgeComp knowledge = pawn?.TryGetComp<TorannMagic.AbilityKnowledgeComp>();
+            if (knowledge == null) return;
+            knowledge.GetOrCreate(TorannMagic.SpellIds.Of(power.abilityDef), power.level).autocast = power.autocast;
+        }
+
         public static bool EnabledForAutocast(MagicPower power, TorannMagic.AbilityKnowledgeComp knowledge)
             => KnowledgeAllows(power?.abilityDef, power?.learned ?? false, power?.autocast ?? false, knowledge);
 

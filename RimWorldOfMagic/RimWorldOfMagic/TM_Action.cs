@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using Verse;
 using System.Collections.Generic;
 using System.Linq;
@@ -3024,7 +3024,7 @@ namespace TorannMagic
 
                         if (magicPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect)) //__result.State == GizmoState.Mouseover)
                         {
-                            magicPower.AutoCast = !magicPower.AutoCast;
+                            AutoCast.AutocastPolicy.ToggleAutocast(comp, magicPower);
                             return new GizmoResult(GizmoState.Mouseover, null);
                         }
                     }
@@ -3034,7 +3034,7 @@ namespace TorannMagic
 
                         if (magicPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
-                            magicPower.AutoCast = !magicPower.AutoCast;
+                            AutoCast.AutocastPolicy.ToggleAutocast(comp, magicPower);
                             return new GizmoResult(GizmoState.Mouseover, null);                            
                         }
                     }
@@ -3044,7 +3044,7 @@ namespace TorannMagic
 
                         if (magicPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
-                            magicPower.AutoCast = !magicPower.AutoCast;
+                            AutoCast.AutocastPolicy.ToggleAutocast(comp, magicPower);
                             return new GizmoResult(GizmoState.Mouseover, null);                            
                         }
                     }
@@ -3054,7 +3054,7 @@ namespace TorannMagic
 
                         if (magicPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
-                            magicPower.AutoCast = !magicPower.AutoCast;
+                            AutoCast.AutocastPolicy.ToggleAutocast(comp, magicPower);
                             return new GizmoResult(GizmoState.Mouseover, null);
                             
                         }
@@ -3065,7 +3065,7 @@ namespace TorannMagic
 
                         if (magicPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
-                            magicPower.AutoCast = !magicPower.AutoCast;
+                            AutoCast.AutocastPolicy.ToggleAutocast(comp, magicPower);
                             return new GizmoResult(GizmoState.Mouseover, null);
                             
                         }
@@ -3076,7 +3076,7 @@ namespace TorannMagic
 
                         if (magicPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
-                            magicPower.AutoCast = !magicPower.AutoCast;
+                            AutoCast.AutocastPolicy.ToggleAutocast(comp, magicPower);
                             return new GizmoResult(GizmoState.Mouseover, null);
                             
                         }
@@ -3087,7 +3087,7 @@ namespace TorannMagic
 
                         if (magicPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
-                            magicPower.AutoCast = !magicPower.AutoCast;
+                            AutoCast.AutocastPolicy.ToggleAutocast(comp, magicPower);
                             return new GizmoResult(GizmoState.Mouseover, null);
                             
                         }
@@ -3130,7 +3130,7 @@ namespace TorannMagic
 
                         if (magicPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
-                            magicPower.AutoCast = !magicPower.AutoCast;
+                            AutoCast.AutocastPolicy.ToggleAutocast(comp, magicPower);
                             return new GizmoResult(GizmoState.Mouseover, null);
                             
                         }
@@ -3141,7 +3141,7 @@ namespace TorannMagic
 
                         if (magicPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
-                            magicPower.AutoCast = !magicPower.AutoCast;
+                            AutoCast.AutocastPolicy.ToggleAutocast(comp, magicPower);
                             return new GizmoResult(GizmoState.Mouseover, null);
                             
                         }
@@ -3152,7 +3152,7 @@ namespace TorannMagic
 
                         if (magicPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
-                            magicPower.AutoCast = !magicPower.AutoCast;
+                            AutoCast.AutocastPolicy.ToggleAutocast(comp, magicPower);
                             return new GizmoResult(GizmoState.Mouseover, null);
                             
                         }
@@ -3163,7 +3163,7 @@ namespace TorannMagic
 
                         if (magicPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
-                            magicPower.AutoCast = !magicPower.AutoCast;
+                            AutoCast.AutocastPolicy.ToggleAutocast(comp, magicPower);
                             return new GizmoResult(GizmoState.Mouseover, null);
                             
                         }
@@ -3174,7 +3174,7 @@ namespace TorannMagic
 
                         if (magicPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
-                            magicPower.AutoCast = !magicPower.AutoCast;
+                            AutoCast.AutocastPolicy.ToggleAutocast(comp, magicPower);
                             return new GizmoResult(GizmoState.Mouseover, null);
                             
                         }
@@ -3185,7 +3185,7 @@ namespace TorannMagic
 
                         if (magicPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
-                            magicPower.AutoCast = !magicPower.AutoCast;
+                            AutoCast.AutocastPolicy.ToggleAutocast(comp, magicPower);
                             return new GizmoResult(GizmoState.Mouseover, null);
                             
                         }
@@ -3196,7 +3196,7 @@ namespace TorannMagic
 
                         if (magicPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
-                            magicPower.AutoCast = !magicPower.AutoCast;
+                            AutoCast.AutocastPolicy.ToggleAutocast(comp, magicPower);
                             return new GizmoResult(GizmoState.Mouseover, null);
                             
                         }
@@ -3207,7 +3207,7 @@ namespace TorannMagic
 
                         if (magicPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
-                            magicPower.AutoCast = !magicPower.AutoCast;
+                            AutoCast.AutocastPolicy.ToggleAutocast(comp, magicPower);
                             return new GizmoResult(GizmoState.Mouseover, null);
                             
                         }
@@ -3218,7 +3218,7 @@ namespace TorannMagic
 
                         if (magicPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
-                            magicPower.AutoCast = !magicPower.AutoCast;
+                            AutoCast.AutocastPolicy.ToggleAutocast(comp, magicPower);
                             return new GizmoResult(GizmoState.Mouseover, null);
                             
                         }
@@ -3229,7 +3229,7 @@ namespace TorannMagic
 
                         if (magicPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
-                            magicPower.AutoCast = !magicPower.AutoCast;
+                            AutoCast.AutocastPolicy.ToggleAutocast(comp, magicPower);
                             return new GizmoResult(GizmoState.Mouseover, null);
                             
                         }
@@ -3240,7 +3240,7 @@ namespace TorannMagic
 
                         if (magicPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
-                            magicPower.AutoCast = !magicPower.AutoCast;
+                            AutoCast.AutocastPolicy.ToggleAutocast(comp, magicPower);
                             return new GizmoResult(GizmoState.Mouseover, null);
                             
                         }
@@ -3258,7 +3258,7 @@ namespace TorannMagic
 
                         if (magicPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
-                            magicPower.AutoCast = !magicPower.AutoCast;
+                            AutoCast.AutocastPolicy.ToggleAutocast(comp, magicPower);
                             return new GizmoResult(GizmoState.Mouseover, null);
                             
                         }
@@ -3269,7 +3269,7 @@ namespace TorannMagic
 
                         if (magicPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
-                            magicPower.AutoCast = !magicPower.AutoCast;
+                            AutoCast.AutocastPolicy.ToggleAutocast(comp, magicPower);
                             return new GizmoResult(GizmoState.Mouseover, null);
                             
                         }
@@ -3280,7 +3280,7 @@ namespace TorannMagic
 
                         if (magicPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
-                            magicPower.AutoCast = !magicPower.AutoCast;
+                            AutoCast.AutocastPolicy.ToggleAutocast(comp, magicPower);
                             return new GizmoResult(GizmoState.Mouseover, null);
                             
                         }
@@ -3291,7 +3291,7 @@ namespace TorannMagic
 
                         if (magicPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
-                            magicPower.AutoCast = !magicPower.AutoCast;
+                            AutoCast.AutocastPolicy.ToggleAutocast(comp, magicPower);
                             return new GizmoResult(GizmoState.Mouseover, null);
                             
                         }
@@ -3302,7 +3302,7 @@ namespace TorannMagic
 
                         if (magicPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
-                            magicPower.AutoCast = !magicPower.AutoCast;
+                            AutoCast.AutocastPolicy.ToggleAutocast(comp, magicPower);
                             return new GizmoResult(GizmoState.Mouseover, null);
                             
                         }
@@ -3313,7 +3313,7 @@ namespace TorannMagic
 
                         if (magicPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
-                            magicPower.AutoCast = !magicPower.AutoCast;
+                            AutoCast.AutocastPolicy.ToggleAutocast(comp, magicPower);
                             return new GizmoResult(GizmoState.Mouseover, null);
                             
                         }
@@ -3324,7 +3324,7 @@ namespace TorannMagic
 
                         if (magicPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
-                            magicPower.AutoCast = !magicPower.AutoCast;
+                            AutoCast.AutocastPolicy.ToggleAutocast(comp, magicPower);
                             return new GizmoResult(GizmoState.Mouseover, null);
                             
                         }
@@ -3335,7 +3335,7 @@ namespace TorannMagic
 
                         if (magicPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
-                            magicPower.AutoCast = !magicPower.AutoCast;
+                            AutoCast.AutocastPolicy.ToggleAutocast(comp, magicPower);
                             return new GizmoResult(GizmoState.Mouseover, null);
                             
                         }
@@ -3346,7 +3346,7 @@ namespace TorannMagic
 
                         if (magicPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
-                            magicPower.AutoCast = !magicPower.AutoCast;
+                            AutoCast.AutocastPolicy.ToggleAutocast(comp, magicPower);
                             return new GizmoResult(GizmoState.Mouseover, null);
                             
                         }
@@ -3361,7 +3361,7 @@ namespace TorannMagic
                         magicPower = genericPower;
                         if (magicPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
-                            magicPower.AutoCast = !magicPower.AutoCast;
+                            AutoCast.AutocastPolicy.ToggleAutocast(comp, magicPower);
                             return new GizmoResult(GizmoState.Mouseover, null);
                         }
                     }
@@ -3375,7 +3375,7 @@ namespace TorannMagic
                         mightPower = genericPower;
                         if (mightPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
-                            mightPower.AutoCast = !mightPower.AutoCast;
+                            AutoCast.AutocastPolicy.ToggleAutocast(mightComp, mightPower);
                             return new GizmoResult(GizmoState.Mouseover, null);
                         }
                     }
@@ -3385,7 +3385,7 @@ namespace TorannMagic
 
                         if (mightPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
-                            mightPower.AutoCast = !mightPower.AutoCast;
+                            AutoCast.AutocastPolicy.ToggleAutocast(mightComp, mightPower);
                             return new GizmoResult(GizmoState.Mouseover, null);
                             
                         }
@@ -3396,7 +3396,7 @@ namespace TorannMagic
 
                         if (mightPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
-                            mightPower.AutoCast = !mightPower.AutoCast;
+                            AutoCast.AutocastPolicy.ToggleAutocast(mightComp, mightPower);
                             return new GizmoResult(GizmoState.Mouseover, null);
                             
                         }
@@ -3407,7 +3407,7 @@ namespace TorannMagic
 
                         if (mightPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
-                            mightPower.AutoCast = !mightPower.AutoCast;
+                            AutoCast.AutocastPolicy.ToggleAutocast(mightComp, mightPower);
                             return new GizmoResult(GizmoState.Mouseover, null);
                             
                         }
@@ -3418,7 +3418,7 @@ namespace TorannMagic
 
                         if (mightPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
-                            mightPower.AutoCast = !mightPower.AutoCast;
+                            AutoCast.AutocastPolicy.ToggleAutocast(mightComp, mightPower);
                             return new GizmoResult(GizmoState.Mouseover, null);
                             
                         }
@@ -3429,7 +3429,7 @@ namespace TorannMagic
 
                         if (mightPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
-                            mightPower.AutoCast = !mightPower.AutoCast;
+                            AutoCast.AutocastPolicy.ToggleAutocast(mightComp, mightPower);
                             return new GizmoResult(GizmoState.Mouseover, null);
                             
                         }
@@ -3440,7 +3440,7 @@ namespace TorannMagic
 
                         if (mightPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
-                            mightPower.AutoCast = !mightPower.AutoCast;
+                            AutoCast.AutocastPolicy.ToggleAutocast(mightComp, mightPower);
                             return new GizmoResult(GizmoState.Mouseover, null);
                             
                         }
@@ -3451,7 +3451,7 @@ namespace TorannMagic
 
                         if (mightPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
-                            mightPower.AutoCast = !mightPower.AutoCast;
+                            AutoCast.AutocastPolicy.ToggleAutocast(mightComp, mightPower);
                             return new GizmoResult(GizmoState.Mouseover, null);
                             
                         }
@@ -3462,7 +3462,7 @@ namespace TorannMagic
 
                         if (mightPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
-                            mightPower.AutoCast = !mightPower.AutoCast;
+                            AutoCast.AutocastPolicy.ToggleAutocast(mightComp, mightPower);
                             return new GizmoResult(GizmoState.Mouseover, null);
                             
                         }
@@ -3473,7 +3473,7 @@ namespace TorannMagic
 
                         if (mightPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
-                            mightPower.AutoCast = !mightPower.AutoCast;
+                            AutoCast.AutocastPolicy.ToggleAutocast(mightComp, mightPower);
                             return new GizmoResult(GizmoState.Mouseover, null);
                             
                         }
@@ -3484,7 +3484,7 @@ namespace TorannMagic
 
                         if (mightPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
-                            mightPower.AutoCast = !mightPower.AutoCast;
+                            AutoCast.AutocastPolicy.ToggleAutocast(mightComp, mightPower);
                             return new GizmoResult(GizmoState.Mouseover, null);
                             
                         }
@@ -3495,7 +3495,7 @@ namespace TorannMagic
 
                         if (mightPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
-                            mightPower.AutoCast = !mightPower.AutoCast;
+                            AutoCast.AutocastPolicy.ToggleAutocast(mightComp, mightPower);
                             return new GizmoResult(GizmoState.Mouseover, null);
                             
                         }
@@ -3506,7 +3506,7 @@ namespace TorannMagic
 
                         if (mightPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
-                            mightPower.AutoCast = !mightPower.AutoCast;
+                            AutoCast.AutocastPolicy.ToggleAutocast(mightComp, mightPower);
                             return new GizmoResult(GizmoState.Mouseover, null);
                             
                         }
@@ -3517,7 +3517,7 @@ namespace TorannMagic
 
                         if (mightPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
-                            mightPower.AutoCast = !mightPower.AutoCast;
+                            AutoCast.AutocastPolicy.ToggleAutocast(mightComp, mightPower);
                             return new GizmoResult(GizmoState.Mouseover, null);
                             
                         }
@@ -3540,7 +3540,7 @@ namespace TorannMagic
 
                         if (mightPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
-                            mightPower.AutoCast = !mightPower.AutoCast;
+                            AutoCast.AutocastPolicy.ToggleAutocast(mightComp, mightPower);
                             return new GizmoResult(GizmoState.Mouseover, null);
                             
                         }
@@ -3551,7 +3551,7 @@ namespace TorannMagic
 
                         if (mightPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
-                            mightPower.AutoCast = !mightPower.AutoCast;
+                            AutoCast.AutocastPolicy.ToggleAutocast(mightComp, mightPower);
                             return new GizmoResult(GizmoState.Mouseover, null);
                             
                         }
@@ -3562,7 +3562,7 @@ namespace TorannMagic
 
                         if (mightPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
-                            mightPower.AutoCast = !mightPower.AutoCast;
+                            AutoCast.AutocastPolicy.ToggleAutocast(mightComp, mightPower);
                             return new GizmoResult(GizmoState.Mouseover, null);
                             
                         }
@@ -3573,7 +3573,7 @@ namespace TorannMagic
 
                         if (mightPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
-                            mightPower.AutoCast = !mightPower.AutoCast;
+                            AutoCast.AutocastPolicy.ToggleAutocast(mightComp, mightPower);
                             return new GizmoResult(GizmoState.Mouseover, null);
                             
                         }
@@ -3584,7 +3584,7 @@ namespace TorannMagic
 
                         if (mightPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
-                            mightPower.AutoCast = !mightPower.AutoCast;
+                            AutoCast.AutocastPolicy.ToggleAutocast(mightComp, mightPower);
                             return new GizmoResult(GizmoState.Mouseover, null);
                             
                         }
@@ -3598,7 +3598,7 @@ namespace TorannMagic
                         mightPower = mightComp.MightData.MightPowersApothecary.FirstOrDefault<MightPower>((MightPower x) => x.abilityDef == TorannMagicDefOf.TM_Elixir);
                         if (mightPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
-                            mightPower.AutoCast = !mightPower.AutoCast;
+                            AutoCast.AutocastPolicy.ToggleAutocast(mightComp, mightPower);
                             return new GizmoResult(GizmoState.Mouseover, null);
 
                         }
@@ -3609,7 +3609,7 @@ namespace TorannMagic
 
                         if (mightPower != null && Input.GetMouseButtonDown(1) && Mouse.IsOver(rect))
                         {
-                            mightPower.AutoCast = !mightPower.AutoCast;
+                            AutoCast.AutocastPolicy.ToggleAutocast(mightComp, mightPower);
                             return new GizmoResult(GizmoState.Mouseover, null);
                             
                         }

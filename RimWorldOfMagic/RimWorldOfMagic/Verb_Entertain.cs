@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using RimWorld;
@@ -34,7 +34,7 @@ namespace TorannMagic
                         }
                     }
                     
-                    magicPower.AutoCast = false;
+                    AutoCast.AutocastPolicy.SetAutocast(comp, magicPower, false);
                 }
                 else
                 {
@@ -42,7 +42,7 @@ namespace TorannMagic
                     {
                         HealthUtility.AdjustSeverity(pawn, HediffDef.Named("TM_EntertainingHD"), .95f);
                         TM_MoteMaker.ThrowNoteMote(pawn.DrawPos, pawn.Map, .8f);
-                        magicPower.AutoCast = true;
+                        AutoCast.AutocastPolicy.SetAutocast(comp, magicPower, true);
                     }
                     else
                     {
