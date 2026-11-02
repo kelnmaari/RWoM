@@ -12,6 +12,7 @@ namespace TorannMagic
     {
         public const int CurrentSchemaVersion = 1;
         private int schemaVersion;
+        private bool legacyImported;
         private List<SpellKnowledge> spells = new List<SpellKnowledge>();
 
         public IReadOnlyList<SpellKnowledge> Spells => spells.AsReadOnly();
@@ -51,15 +52,59 @@ namespace TorannMagic
             else if (role == 2) s.ver = value;
         }
 
+        // One-shot import from legacy MagicData/MightData lists. Runs on the first
+        // CompTick after spawn — by that time all comps are loaded and initialized.
+        public void ImportLegacy()
+        {
+            if (legacyImported) return;
+            legacyImported = true;
+            var pawn = parent as Pawn;
+            if (pawn == null) return;
+
+            var magicComp = pawn.TryGetComp<CompAbilityUserMagic>();
+            if (magicComp?.MagicData != null)
+            {
+                foreach (var power in magicComp.MagicData.AllMagicPowers)
+                {
+                    if (power?.abilityDef == null) continue;
+                    var spellId = "rwom." + power.abilityDef.defName.ToLower();
+                    var entry = GetOrCreate(spellId, power.level);
+                    entry.learned = power.learned;
+                    entry.autocast = power.autocast;
+                }
+            }
+
+            var mightComp = pawn.TryGetComp<CompAbilityUserMight>();
+            if (mightComp?.MightData != null)
+            {
+                foreach (var power in mightComp.MightData.AllMightPowers)
+                {
+                    if (power?.abilityDef == null) continue;
+                    var spellId = "rwom." + power.abilityDef.defName.ToLower();
+                    var entry = GetOrCreate(spellId, power.level);
+                    entry.learned = power.learned;
+                    entry.autocast = power.autocast;
+                }
+            }
+        }
+
         public void ExposeData()
         {
             Scribe_Values.Look(ref schemaVersion, "schemaVersion", CurrentSchemaVersion);
+            Scribe_Values.Look(ref legacyImported, "legacyImported", false);
             Scribe_Collections.Look(ref spells, "spells", LookMode.Deep);
             if (Scribe.mode == LoadSaveMode.PostLoadInit)
             {
                 spells?.RemoveAll(s => s == null || string.IsNullOrEmpty(s.spellId));
-                schemaVersion = CurrentSchemaVersion; // migrations go here when version bumps
+                schemaVersion = CurrentSchemaVersion;
             }
+        }
+
+        public override void CompTick()
+        {
+            // One-shot legacy import: runs on the first CompTick after spawn,
+            // when all other comps have loaded their data.
+            ImportLegacy();
         }
     }
 }
