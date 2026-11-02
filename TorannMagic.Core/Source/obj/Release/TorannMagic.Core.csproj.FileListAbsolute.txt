@@ -1,0 +1,9 @@
+D:\golang\RWoM\RWoM\TorannMagic.Core\Source\obj\Release\TorannMagic.Core.GeneratedMSBuildEditorConfig.editorconfig
+D:\golang\RWoM\RWoM\TorannMagic.Core\Source\obj\Release\TorannMagic.Core.AssemblyInfoInputs.cache
+D:\golang\RWoM\RWoM\TorannMagic.Core\Source\obj\Release\TorannMagic.Core.AssemblyInfo.cs
+D:\golang\RWoM\RWoM\TorannMagic.Core\Source\obj\Release\TorannMagic.Core.csproj.CoreCompileInputs.cache
+D:\golang\RWoM\RWoM\TorannMagic.Core\Source\obj\Release\TorannMagic.Core.csproj.AssemblyReference.cache
+D:\golang\RWoM\RWoM\TorannMagic.Core\Assemblies\TorannMagic.Core.dll
+D:\golang\RWoM\RWoM\TorannMagic.Core\Source\obj\Release\TorannMagic.Core.dll
+D:\golang\RWoM\RWoM\TorannMagic.Core\Source\obj\Release\refint\TorannMagic.Core.dll
+D:\golang\RWoM\RWoM\TorannMagic.Core\Source\obj\Release\ref\TorannMagic.Core.dll

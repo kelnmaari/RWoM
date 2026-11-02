@@ -1,8 +1,7 @@
-<?xml version="1.0" encoding="utf-8" ?>
-
+<?xml version="1.0" encoding="utf-8"?>
 <Defs>
 
- <!-- shroud -->
+ 
  
  <TorannMagic.TMAbilityDef ParentName="BaseMightAbility">
     <defName>TM_Shroud</defName>
@@ -43,9 +42,16 @@ All of these functions are enhanced as hate levels grow and must have a sufficie
 		  <canTargetLocations>false</canTargetLocations>
 		</targetParams>
     </MainVerb>
-  </TorannMagic.TMAbilityDef>
+  <modExtensions>
+<li Class="TorannMagic.Core.SpellIdentityExtension">
+<spellId>rwom.tm_shroud</spellId>
+<domain>Magic</domain>
+<tier>0</tier>
+</li>
+</modExtensions>
+</TorannMagic.TMAbilityDef>
    
-     <!-- wave of fear -->
+     
   
   <ThingDef ParentName="BaseBullet" Class="AbilityUser.ProjectileDef_Ability">
    <defName>Projectile_WaveOfFear</defName>
@@ -61,7 +67,14 @@ All of these functions are enhanced as hate levels grow and must have a sufficie
 		<damageAmountBase>0</damageAmountBase>
 		<speed>999</speed>
    </projectile>
- </ThingDef>
+ <modExtensions>
+<li Class="TorannMagic.Core.SpellIdentityExtension">
+<spellId>rwom.projectile_waveoffear</spellId>
+<domain>Magic</domain>
+<tier>0</tier>
+</li>
+</modExtensions>
+</ThingDef>
  
  <TorannMagic.TMAbilityDef ParentName="BaseMightAbility">
     <defName>TM_WaveOfFear</defName>
@@ -86,7 +99,7 @@ Hate is not required to use this ability, but it's effective range is greatly in
         <warmupTime>0.5</warmupTime>
         <SecondsToRecharge>120</SecondsToRecharge>
         <range>0</range>
-        <soundCast></soundCast>
+        <soundCast />
         <muzzleFlashScale>20</muzzleFlashScale>
         <isPrimary>false</isPrimary>
    	    <AbilityTargetCategory>TargetSelf</AbilityTargetCategory>
@@ -97,9 +110,16 @@ Hate is not required to use this ability, but it's effective range is greatly in
 		  <canTargetLocations>false</canTargetLocations>
 		</targetParams>
     </MainVerb>
-  </TorannMagic.TMAbilityDef>
+  <modExtensions>
+<li Class="TorannMagic.Core.SpellIdentityExtension">
+<spellId>rwom.tm_waveoffear</spellId>
+<domain>Magic</domain>
+<tier>0</tier>
+</li>
+</modExtensions>
+</TorannMagic.TMAbilityDef>
   
-  <!-- Spite  -->	
+  	
 	
 	<ThingDef ParentName="BaseBullet" Class="AbilityUser.ProjectileDef_Ability">
 		<thingClass>TorannMagic.Projectile_Spite</thingClass>
@@ -115,7 +135,14 @@ Hate is not required to use this ability, but it's effective range is greatly in
             <damageAmountBase>12</damageAmountBase>
             <speed>50</speed>
         </projectile>
-    </ThingDef>	
+    <modExtensions>
+<li Class="TorannMagic.Core.SpellIdentityExtension">
+<spellId>rwom.projectile_spite</spellId>
+<domain>Magic</domain>
+<tier>0</tier>
+</li>
+</modExtensions>
+</ThingDef>	
 	
     <TorannMagic.TMAbilityDef ParentName="BaseMightAbility">
         <defName>TM_Spite</defName>
@@ -155,7 +182,14 @@ Range: 21</description>
                 <canTargetLocations>false</canTargetLocations>
             </targetParams>
         </MainVerb>
-    </TorannMagic.TMAbilityDef>
+    <modExtensions>
+<li Class="TorannMagic.Core.SpellIdentityExtension">
+<spellId>rwom.tm_spite</spellId>
+<domain>Magic</domain>
+<tier>0</tier>
+</li>
+</modExtensions>
+</TorannMagic.TMAbilityDef>
 	
     <TorannMagic.TMAbilityDef ParentName="BaseMightAbility">
         <defName>TM_Spite_I</defName>
@@ -196,7 +230,14 @@ Range: 24</description>
                 <canTargetLocations>false</canTargetLocations>
             </targetParams>
         </MainVerb>
-    </TorannMagic.TMAbilityDef>
+    <modExtensions>
+<li Class="TorannMagic.Core.SpellIdentityExtension">
+<spellId>rwom.tm_spite_i</spellId>
+<domain>Magic</domain>
+<tier>1</tier>
+</li>
+</modExtensions>
+</TorannMagic.TMAbilityDef>
 	
 	<TorannMagic.TMAbilityDef ParentName="BaseMightAbility">
         <defName>TM_Spite_II</defName>
@@ -237,7 +278,14 @@ Range: 27</description>
                 <canTargetLocations>false</canTargetLocations>
             </targetParams>
         </MainVerb>
-    </TorannMagic.TMAbilityDef>
+    <modExtensions>
+<li Class="TorannMagic.Core.SpellIdentityExtension">
+<spellId>rwom.tm_spite_ii</spellId>
+<domain>Magic</domain>
+<tier>2</tier>
+</li>
+</modExtensions>
+</TorannMagic.TMAbilityDef>
 	
 	<TorannMagic.TMAbilityDef ParentName="BaseMightAbility">
         <defName>TM_Spite_III</defName>
@@ -278,9 +326,16 @@ Range: 30</description>
                 <canTargetLocations>false</canTargetLocations>
             </targetParams>
         </MainVerb>
-    </TorannMagic.TMAbilityDef>
+    <modExtensions>
+<li Class="TorannMagic.Core.SpellIdentityExtension">
+<spellId>rwom.tm_spite_iii</spellId>
+<domain>Magic</domain>
+<tier>3</tier>
+</li>
+</modExtensions>
+</TorannMagic.TMAbilityDef>
 	
-	 <!-- life steal -->
+	 
  
  <TorannMagic.TMAbilityDef ParentName="BaseMightAbility">
     <defName>TM_LifeSteal</defName>
@@ -314,10 +369,17 @@ Range: 30</description>
 		  <canTargetLocations>false</canTargetLocations>
 		</targetParams>
     </MainVerb>
-  </TorannMagic.TMAbilityDef>
+  <modExtensions>
+<li Class="TorannMagic.Core.SpellIdentityExtension">
+<spellId>rwom.tm_lifesteal</spellId>
+<domain>Magic</domain>
+<tier>0</tier>
+</li>
+</modExtensions>
+</TorannMagic.TMAbilityDef>
   
   
-	<!-- grave blade -->
+	
 	<ThingDef ParentName="BaseBullet" Class="AbilityUser.ProjectileDef_Ability">
         <thingClass>TorannMagic.Projectile_GraveBlade</thingClass>
 		<defName>Projectile_GraveBlade</defName>
@@ -335,7 +397,14 @@ Range: 30</description>
 			<postExplosionSpawnChance>1</postExplosionSpawnChance>
             <speed>999</speed>
         </projectile>
-    </ThingDef>
+    <modExtensions>
+<li Class="TorannMagic.Core.SpellIdentityExtension">
+<spellId>rwom.projectile_graveblade</spellId>
+<domain>Magic</domain>
+<tier>0</tier>
+</li>
+</modExtensions>
+</ThingDef>
 	
 	<ThingDef ParentName="BaseBullet" Class="AbilityUser.ProjectileDef_Ability">
         <thingClass>TorannMagic.Projectile_GraveBlade</thingClass>
@@ -354,7 +423,14 @@ Range: 30</description>
 			<postExplosionSpawnChance>1</postExplosionSpawnChance>
             <speed>999</speed>
         </projectile>
-    </ThingDef>
+    <modExtensions>
+<li Class="TorannMagic.Core.SpellIdentityExtension">
+<spellId>rwom.projectile_graveblade_i</spellId>
+<domain>Magic</domain>
+<tier>1</tier>
+</li>
+</modExtensions>
+</ThingDef>
 	
 	<ThingDef ParentName="BaseBullet" Class="AbilityUser.ProjectileDef_Ability">
         <thingClass>TorannMagic.Projectile_GraveBlade</thingClass>
@@ -373,7 +449,14 @@ Range: 30</description>
 			<postExplosionSpawnChance>1</postExplosionSpawnChance>
             <speed>999</speed>
         </projectile>
-    </ThingDef>
+    <modExtensions>
+<li Class="TorannMagic.Core.SpellIdentityExtension">
+<spellId>rwom.projectile_graveblade_ii</spellId>
+<domain>Magic</domain>
+<tier>2</tier>
+</li>
+</modExtensions>
+</ThingDef>
 	
     <ThingDef ParentName="BaseBullet" Class="AbilityUser.ProjectileDef_Ability">
         <thingClass>TorannMagic.Projectile_GraveBlade</thingClass>
@@ -392,7 +475,14 @@ Range: 30</description>
 			<postExplosionSpawnChance>1</postExplosionSpawnChance>
             <speed>999</speed>
         </projectile>
-    </ThingDef>
+    <modExtensions>
+<li Class="TorannMagic.Core.SpellIdentityExtension">
+<spellId>rwom.projectile_graveblade_iii</spellId>
+<domain>Magic</domain>
+<tier>3</tier>
+</li>
+</modExtensions>
+</ThingDef>
 
 	<TorannMagic.TMAbilityDef ParentName="BaseMightAbility">
         <defName>TM_GraveBlade</defName>
@@ -428,7 +518,14 @@ Radius: 3.0</description>
             <muzzleFlashScale>20</muzzleFlashScale>
             <isPrimary>false</isPrimary>
         </MainVerb>
-    </TorannMagic.TMAbilityDef>
+    <modExtensions>
+<li Class="TorannMagic.Core.SpellIdentityExtension">
+<spellId>rwom.tm_graveblade</spellId>
+<domain>Magic</domain>
+<tier>0</tier>
+</li>
+</modExtensions>
+</TorannMagic.TMAbilityDef>
 	
 	<TorannMagic.TMAbilityDef ParentName="BaseMightAbility">
         <defName>TM_GraveBlade_I</defName>
@@ -464,7 +561,14 @@ Radius: 3.4</description>
             <muzzleFlashScale>20</muzzleFlashScale>
             <isPrimary>false</isPrimary>
         </MainVerb>
-    </TorannMagic.TMAbilityDef>
+    <modExtensions>
+<li Class="TorannMagic.Core.SpellIdentityExtension">
+<spellId>rwom.tm_graveblade_i</spellId>
+<domain>Magic</domain>
+<tier>1</tier>
+</li>
+</modExtensions>
+</TorannMagic.TMAbilityDef>
 	
 	<TorannMagic.TMAbilityDef ParentName="BaseMightAbility">
         <defName>TM_GraveBlade_II</defName>
@@ -500,7 +604,14 @@ Radius: 3.8</description>
             <muzzleFlashScale>20</muzzleFlashScale>
             <isPrimary>false</isPrimary>
         </MainVerb>
-    </TorannMagic.TMAbilityDef>
+    <modExtensions>
+<li Class="TorannMagic.Core.SpellIdentityExtension">
+<spellId>rwom.tm_graveblade_ii</spellId>
+<domain>Magic</domain>
+<tier>2</tier>
+</li>
+</modExtensions>
+</TorannMagic.TMAbilityDef>
 	
 	<TorannMagic.TMAbilityDef ParentName="BaseMightAbility">
         <defName>TM_GraveBlade_III</defName>
@@ -536,6 +647,13 @@ Radius: 4.2</description>
             <muzzleFlashScale>20</muzzleFlashScale>
             <isPrimary>false</isPrimary>
         </MainVerb>
-    </TorannMagic.TMAbilityDef>
+    <modExtensions>
+<li Class="TorannMagic.Core.SpellIdentityExtension">
+<spellId>rwom.tm_graveblade_iii</spellId>
+<domain>Magic</domain>
+<tier>3</tier>
+</li>
+</modExtensions>
+</TorannMagic.TMAbilityDef>
 
 </Defs>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ModMetaData>
+  <name>RWoM Core (Ability Framework)</name>
+  <author>HUGINN</author>
+  <packageId>huginn.rwom.core</packageId>
+  <supportedVersions>
+    <li>1.7</li>
+  </supportedVersions>
+  <modDependencies>
+    <li>
+      <packageId>brrainz.harmony</packageId>
+      <displayName>Harmony</displayName>
+      <steamWorkshopUrl>steam://url/CommunityFilePage/2009463077</steamWorkshopUrl>
+    </li>
+  </modDependencies>
+  <loadAfter>
+    <li>brrainz.harmony</li>
+  </loadAfter>
+  <loadBefore>
+    <li>Torann.ARimworldOfMagic</li>
+  </loadBefore>
+  <description>Core ability framework for A RimWorld of Magic (Continued). Provides stable spell identity, the ability resolver registry and the knowledge storage layer. Required by A RimWorld of Magic (Continued).</description>
+</ModMetaData>

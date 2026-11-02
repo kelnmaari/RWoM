@@ -1,29 +1,15 @@
-<?xml version="1.0" encoding="utf-8" ?>
-
+<?xml version="1.0" encoding="utf-8"?>
 <Defs>
 
-  <!-- ========================Vanilla Abstracts ======================= -->
-<!--   <ThingDef Name="BaseBullet" Abstract="True">
-    <category>Projectile</category>
-    <tickerType>Normal</tickerType>
-    <altitudeLayer>Projectile</altitudeLayer>
-    <thingClass>Bullet</thingClass>
-    <label>bullet</label>
-    <useHitPoints>False</useHitPoints>
-    <neverMultiSelect>True</neverMultiSelect>
-    <graphicData>
-      <shaderType>Transparent</shaderType>
-    </graphicData>
-  </ThingDef> -->
-
-
-  <!-- ========================BaseDef================================== -->
-
-<!--   <AbilityUser.AbilityDef Name="BaseAbility" Abstract="True">
-    <uiIconPath>UI/Glow_Corrupt</uiIconPath>
-  </AbilityUser.AbilityDef> -->
   
-    <!-- leap as a flying object -->
+
+
+
+  
+
+
+  
+    
 	
 	  <ThingDef Name="TM_FlyingObjectBase" Abstract="True">
 		<tickerType>Normal</tickerType>
@@ -51,7 +37,14 @@
 			<damageAmountBase>6</damageAmountBase>
 			<speed>250</speed>
 	   </projectile>
-	</ThingDef>
+	<modExtensions>
+<li Class="TorannMagic.Core.SpellIdentityExtension">
+<spellId>rwom.flyingobject_spinning</spellId>
+<domain>Magic</domain>
+<tier>0</tier>
+</li>
+</modExtensions>
+</ThingDef>
 	
 	<ThingDef ParentName="TM_FlyingObjectBase" Name="FlyingObject_SpinningBone">
 	   <defName>FlyingObject_SpinningBone</defName>
@@ -67,7 +60,14 @@
 			<damageAmountBase>6</damageAmountBase>
 			<speed>250</speed>
 	   </projectile>
-	</ThingDef>
+	<modExtensions>
+<li Class="TorannMagic.Core.SpellIdentityExtension">
+<spellId>rwom.flyingobject_spinningbone</spellId>
+<domain>Magic</domain>
+<tier>0</tier>
+</li>
+</modExtensions>
+</ThingDef>
 	
 	<ThingDef ParentName="TM_FlyingObjectBase" Name="FlyingObject_Advanced">
 	   <defName>FlyingObject_Advanced</defName>
@@ -83,7 +83,14 @@
 			<damageAmountBase>0</damageAmountBase>
 			<speed>30</speed>
 	   </projectile>
-	</ThingDef>
+	<modExtensions>
+<li Class="TorannMagic.Core.SpellIdentityExtension">
+<spellId>rwom.flyingobject_advanced</spellId>
+<domain>Magic</domain>
+<tier>0</tier>
+</li>
+</modExtensions>
+</ThingDef>
 	
   <ThingDef ParentName="BaseBullet" Class="AbilityUser.ProjectileDef_Ability">
    <defName>Projectile_Default</defName>
@@ -99,7 +106,14 @@
 		<damageAmountBase>0</damageAmountBase>
 		<speed>999</speed>
    </projectile>
- </ThingDef>
+ <modExtensions>
+<li Class="TorannMagic.Core.SpellIdentityExtension">
+<spellId>rwom.projectile_default</spellId>
+<domain>Magic</domain>
+<tier>0</tier>
+</li>
+</modExtensions>
+</ThingDef>
  
  <TorannMagic.TMAbilityDef ParentName="BaseMagicAbility">
         <defName>TM_CompVerb</defName>
@@ -133,7 +147,14 @@
                 <canTargetLocations>true</canTargetLocations>
             </targetParams>
         </MainVerb>
-    </TorannMagic.TMAbilityDef>
+    <modExtensions>
+<li Class="TorannMagic.Core.SpellIdentityExtension">
+<spellId>rwom.tm_compverb</spellId>
+<domain>Magic</domain>
+<tier>0</tier>
+</li>
+</modExtensions>
+</TorannMagic.TMAbilityDef>
 
 
   <AbilityUser.AbilityDef Name="BaseMagicAbility" Abstract="True">
