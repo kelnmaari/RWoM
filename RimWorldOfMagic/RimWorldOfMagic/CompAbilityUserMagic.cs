@@ -4265,10 +4265,10 @@ namespace TorannMagic
                                     if (magicPower != null && AutoCast.AutocastPolicy.EnabledForAutocast(magicPower, knowledge) && !this.Pawn.CurJob.playerForced && workPriorities)
                                     {
                                         Area tArea = TM_Calc.GetSeedOfRegrowthArea(this.Pawn.Map, false);
-                                        if (tArea != null)
+                                        if (TM_Calc.TryPickAutocastAreaCell(tArea, out var targetCell))
                                         {
                                             ability = this.AbilityData.Powers.FirstOrDefault((PawnAbility x) => x.Def == TorannMagicDefOf.TM_RegrowLimb);
-                                            AutoCast.OnTarget_Spell.TryExecute(this, TorannMagicDefOf.TM_RegrowLimb, ability, magicPower, tArea.ActiveCells.RandomElement(), 40, out castSuccess);
+                                            AutoCast.OnTarget_Spell.TryExecute(this, TorannMagicDefOf.TM_RegrowLimb, ability, magicPower, targetCell, 40, out castSuccess);
                                             if (castSuccess) goto AutoCastExit;
                                         }
                                     }
@@ -4428,10 +4428,10 @@ namespace TorannMagic
                         if (magicPower != null && AutoCast.AutocastPolicy.EnabledForAutocast(magicPower, knowledge) && !this.Pawn.CurJob.playerForced && workPriorities)
                         {
                             Area tArea = TM_Calc.GetTransmutateArea(this.Pawn.Map, false);
-                            if (tArea != null)
+                            if (TM_Calc.TryPickAutocastAreaCell(tArea, out var targetCell))
                             {
                                 bool _out;
-                                Thing transmuteThing = TM_Calc.GetTransmutableThingFromCell(tArea.ActiveCells.RandomElement(), this.Pawn, out _out, out _out, out _out, out _out, out _out);
+                                Thing transmuteThing = TM_Calc.GetTransmutableThingFromCell(targetCell, this.Pawn, out _out, out _out, out _out, out _out, out _out);
                                 if (transmuteThing != null)
                                 {
                                     PawnAbility ability = this.AbilityData.Powers.FirstOrDefault((PawnAbility x) => x.Def == TorannMagicDefOf.TM_Transmutate);

@@ -2210,6 +2210,14 @@ namespace TorannMagic
             return spriteArea;
         }
 
+        public static bool TryPickAutocastAreaCell(Area area, out IntVec3 cell)
+        {
+            if (area?.InnerGrid != null && area.TrueCount > 0 && area.ActiveCells.TryRandomElement(out cell))
+                return true;
+            cell = IntVec3.Invalid;
+            return false;
+        }
+
         public static Area GetTransmutateArea(Map map = null, bool makeNewArea = true)
         {
             Area transmutateArea = null;

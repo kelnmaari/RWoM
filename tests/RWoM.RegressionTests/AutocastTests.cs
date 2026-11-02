@@ -60,8 +60,25 @@ internal static class AutocastTests
         DefDatabase<HediffDef>.Add(new HediffDef { defName = "TM_SyrriumSenseHD" });
     }
 
+    private static void AreaSelection(RuntimeFixture fixture)
+    {
+        var area = new Area_Allowed();
+        var grid = new BoolGrid(4, 4);
+        typeof(Area).GetField("innerGrid", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(area, grid);
+        var origin = new IntVec3(0, 0, 0);
+        Check.Equal(false, TM_Calc.TryPickAutocastAreaCell(null, out _), "missing area skips cast");
+        Check.Equal(false, TM_Calc.TryPickAutocastAreaCell(area, out var empty), "empty area skips cast");
+        Check.Equal(IntVec3.Invalid, empty, "empty zone must never target map origin");
+        grid[origin] = true;
+        Check.Equal(true, TM_Calc.TryPickAutocastAreaCell(area, out var picked), "painted origin is valid");
+        Check.Equal(origin, picked, "selects a designated cell");
+        grid[origin] = false;
+        Check.Equal(false, TM_Calc.TryPickAutocastAreaCell(area, out empty), "erased zone skips cast");
+    }
+
     public static IEnumerable<TestCase> Cases()
     {
+        yield return new("Autocast.AreaSelection", AreaSelection);
         foreach (string family in new[] { "TM_Meteor", "TM_OrbitalStrike", "TM_Blink" })
             foreach (string suffix in new[] { "", "_I", "_II", "_III" })
             {
