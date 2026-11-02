@@ -3,4 +3,5 @@ RimWorldOfMagic/RimWorldOfMagic/obj/
 RimWorldOfMagic/RimWorldOfMagic/bin/
 *.user
 docs/superpowers/
-docs/
+docs/TorannMagic.Core/Source/obj/
+TorannMagic.Core/Source/bin/
