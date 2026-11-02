@@ -21,6 +21,74 @@ internal static class VanillaBridgeTests
         yield return new("VanillaBridge.TrackerGainAndLookup", TrackerGainAndLookup);
         yield return new("VanillaBridge.SleepingDefDegrades", SleepingDefDegrades);
         yield return new("VanillaBridge.SyncGrantsFromKnowledge", SyncGrantsFromKnowledge);
+        yield return new("VanillaBridge.SyncRespectsAllowList", SyncRespectsAllowList);
+        yield return new("VanillaBridge.GeneratedBridgesAreWellFormed", GeneratedBridgesAreWellFormed);
+    }
+
+    // RED 6: bridges outside the rollout allow-list stay dormant even when the
+    // knowledge store has a learned entry and the bridge def exists.
+    private static void SyncRespectsAllowList(RuntimeFixture f)
+    {
+        EnsureCoreLoaded(f);
+        CoreBridge.RegisterSpell(Original("TM_Firebolt"));
+        var bridge = BridgeDef("TM_Bridge_Firebolt", "rwom.tm_firebolt");
+        DefDatabase<RimWorld.AbilityDef>.Clear();
+        DefDatabase<RimWorld.AbilityDef>.Add(bridge);
+        try
+        {
+            var pawn = BridgePawn();
+            pawn.abilities = new Pawn_AbilityTracker(pawn);
+            var knowledge = new AbilityKnowledgeComp { parent = pawn };
+            pawn.AllComps.Add(knowledge);
+            var entry = knowledge.GetOrCreate("rwom.tm_firebolt", 0);
+            entry.learned = true;
+
+            VanillaBridgeSync.Sync(pawn);
+            Check.Equal(true, pawn.abilities.GetAbility(bridge) == null,
+                "a family outside the allow-list is not granted (dormant bridge)");
+        }
+        finally
+        {
+            DefDatabase<RimWorld.AbilityDef>.Clear();
+        }
+    }
+
+    // RED 7: every generated bridge def XML is well formed, carries a spellId
+    // and a verb class, and the defName follows the sync convention.
+    private static void GeneratedBridgesAreWellFormed(RuntimeFixture f)
+    {
+        string dir = Path.Combine(f.Repository, "v1.7", "Defs", "AbilityDefs", "Bridge");
+        Check.Equal(true, Directory.Exists(dir), "bridge output directory exists");
+        var files = Directory.GetFiles(dir, "*.xml");
+        Check.Equal(true, files.Length > 10, "generated bridge files present");
+
+        var seen = new HashSet<string>();
+        int defs = 0;
+        foreach (string file in files)
+        {
+            var doc = System.Xml.Linq.XDocument.Load(file);
+            foreach (var el in doc.Root.Elements("AbilityDef"))
+            {
+                Check.Equal("TorannMagic.TMBridgeAbilityDef", (string)el.Attribute("Class"),
+                    "bridge class on " + file);
+                if (el.Attribute("Abstract") != null) continue; // the shared base uses Name=
+                string defName = (string)el.Element("defName");
+                Check.Equal(true, !string.IsNullOrEmpty(defName) && seen.Add(defName),
+                    "unique non-empty defName " + defName);
+                if (el.Attribute("Abstract") != null) continue; // the shared base
+                Check.NotNull(el.Element("spellId"), "spellId on " + defName);
+                var verbProps = el.Element("verbProperties");
+                Check.NotNull(verbProps, "verbProperties on " + defName);
+                // Subclasses of VerbProperties_Ability carry family config — the copy
+                // preserves the original's Class as-is.
+                Check.Equal(true, !string.IsNullOrEmpty((string)verbProps.Attribute("Class")),
+                    "verb properties class on " + defName);
+                Check.NotNull(verbProps.Element("verbClass"), "verb class on " + defName);
+                Check.Equal(true, defName.StartsWith("TM_Bridge_"), "defName convention on " + defName);
+                defs++;
+            }
+        }
+        Check.Equal(true, defs > 400, "generated bridge def count covers the ability tree: " + defs);
     }
 
     // RED 5: the sync grants the bridge ability for a learned knowledge entry,

@@ -1,46 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Defs>
 
-  <!-- Ф5 spike: vanilla Ability bridge for the Heal family pilot.
-       The bridge def is a data-only shim: the spell content (verb class,
-       projectile, costs, autocast config) stays in the original
-       TorannMagic.TMAbilityDef, resolved through the stable spellId via the
-       core registry. The vanilla tracker/gizmos see the bridge; execution
-       routes through the transient companion PawnAbility of the original. -->
+  <!-- Ф5: shared abstract base for generated vanilla-bridge ability defs
+       (scripts/generate-ability-bridges.py). The bridge defs are data-only
+       shims: the spell content stays in the original TorannMagic.TMAbilityDef,
+       resolved through the stable spellId via the core registry. Bridges are
+       dormant until their family is enabled in VanillaBridgeSync. -->
 
   <AbilityDef Class="TorannMagic.TMBridgeAbilityDef" Name="TMBridgeAbilityBase" Abstract="true">
     <abilityClass>TorannMagic.TMBridgeAbility</abilityClass>
     <description>Bridge placeholder — the description is taken from the original spell def at runtime.</description>
-  </AbilityDef>
-
-  <AbilityDef Class="TorannMagic.TMBridgeAbilityDef" ParentName="TMBridgeAbilityBase">
-    <defName>TM_Bridge_Heal</defName>
-    <label>Heal</label>
-    <spellId>rwom.tm_heal</spellId>
-    <verbProperties Class="AbilityUser.VerbProperties_Ability">
-      <verbClass>TorannMagic.Verb_Heal</verbClass>
-      <abilityDef>TM_Heal</abilityDef>
-      <hasStandardCommand>true</hasStandardCommand>
-      <isViolent>false</isViolent>
-      <defaultProjectile>TM_Paladin_Heal</defaultProjectile>
-      <warmupTime>0.3</warmupTime>
-      <SecondsToRecharge>15.0</SecondsToRecharge>
-      <range>12</range>
-      <soundCast>Message_PositiveEvent</soundCast>
-      <muzzleFlashScale>30</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
-      <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
-      <tooltipShowExtraDamages>false</tooltipShowExtraDamages>
-      <tooltipShowHediffsToApply>false</tooltipShowHediffsToApply>
-      <tooltipShowMentalStatesToApply>false</tooltipShowMentalStatesToApply>
-      <AbilityTargetCategory>TargetThing</AbilityTargetCategory>
-      <targetParams>
-        <canTargetPawns>true</canTargetPawns>
-        <canTargetBuildings>false</canTargetBuildings>
-        <canTargetSelf>true</canTargetSelf>
-        <canTargetLocations>false</canTargetLocations>
-      </targetParams>
-    </verbProperties>
   </AbilityDef>
 
 </Defs>
