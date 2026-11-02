@@ -14,6 +14,8 @@ glitterworld medicine - 51.2 medical supplies
 
 The Field Medic can train to convert his equipment back into common medicine</description>
     <spellId>rwom.tm_medicalsupply</spellId>
+    <iconPath>UI/bloodgift</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_MedicalSupply</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -45,6 +47,8 @@ The Field Medic can train to convert his equipment back into common medicine</de
 
 The Field Medic gains increased base movement speed, tending speed and tending quality as well as reduced pain for a 30 seconds.</description>
     <spellId>rwom.tm_emergency</spellId>
+    <iconPath>UI/Emergency</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_SB</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -82,6 +86,8 @@ The Field Medic gains increased base movement speed, tending speed and tending q
     <label>Medigel</label>
     <description>Applies a healing gel to the wounds of a target that speeds recovery and fights infection. Wounds will be healed slowly over time. Medigel slightly reduces the pain of wounds.</description>
     <spellId>rwom.tm_medigel</spellId>
+    <iconPath>UI/Medigel</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_SB</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -121,6 +127,8 @@ The Field Medic gains increased base movement speed, tending speed and tending q
 The Field Medic throws a syringe of improvised combat drugs to an ally.
 The effects are always positive but may vary.</description>
     <spellId>rwom.tm_combatdrugs</spellId>
+    <iconPath>UI/bloodgift</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="TorannMagic.Verb_ApplyRandomHediffFromList_Properties">
       <verbClass>TorannMagic.Verb_ApplyRandomHediffFromList</verbClass>
       <hediffDefs>

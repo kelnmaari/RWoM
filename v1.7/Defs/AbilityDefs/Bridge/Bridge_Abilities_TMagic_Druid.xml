@@ -5,6 +5,8 @@
     <label>Poison</label>
     <description>Fast acting toxin that works its way into the targets bloodstream. The more a target moves, the more lethal the poison becomes. Poison is ineffective against mechanoids.</description>
     <spellId>rwom.tm_poison</spellId>
+    <iconPath>UI/poison</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_SB</verbClass>
       <tooltipShowProjectileDamage>true</tooltipShowProjectileDamage>
@@ -42,6 +44,8 @@ Recharge: 80s
 Max Targets: 4
 AoE Size: 7</description>
     <spellId>rwom.tm_sootheanimal</spellId>
+    <iconPath>UI/beguile_animal</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_SootheAnimal</verbClass>
       <tooltipShowProjectileDamage>true</tooltipShowProjectileDamage>
@@ -89,6 +93,8 @@ Recharge: 75s
 Max Targets: 6
 AoE Size: 8</description>
     <spellId>rwom.tm_sootheanimal_i</spellId>
+    <iconPath>UI/beguile_animal</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_SootheAnimal</verbClass>
       <tooltipShowProjectileDamage>true</tooltipShowProjectileDamage>
@@ -136,6 +142,8 @@ Recharge: 68s
 Max Targets: 7
 AoE Size: 9</description>
     <spellId>rwom.tm_sootheanimal_ii</spellId>
+    <iconPath>UI/beguile_animal</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_SootheAnimal</verbClass>
       <tooltipShowProjectileDamage>true</tooltipShowProjectileDamage>
@@ -183,6 +191,8 @@ Recharge: 60s
 Max Targets: 7
 AoE Size: 10</description>
     <spellId>rwom.tm_sootheanimal_iii</spellId>
+    <iconPath>UI/beguile_animal</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_SootheAnimal</verbClass>
       <tooltipShowProjectileDamage>true</tooltipShowProjectileDamage>
@@ -225,6 +235,8 @@ AoE Size: 10</description>
     <label>Regenerate</label>
     <description>Regeneration acts as a natural curative over time and will restore even grievous wounds with continued application. Base regeneration restores 4 health to 1 wound every 5 seconds. Only cures physical injuries and will not restore or heal destroyed body parts.</description>
     <spellId>rwom.tm_regenerate</spellId>
+    <iconPath>UI/Regen</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_Regenerate</verbClass>
       <tooltipShowProjectileDamage>true</tooltipShowProjectileDamage>
@@ -258,6 +270,8 @@ AoE Size: 10</description>
     <label>Cure Disease</label>
     <description>Potential to cure most diseases and infections.</description>
     <spellId>rwom.tm_curedisease</spellId>
+    <iconPath>UI/curedisease</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_CureDisease</verbClass>
       <tooltipShowProjectileDamage>true</tooltipShowProjectileDamage>
@@ -290,6 +304,8 @@ AoE Size: 10</description>
     <label>Regrowth</label>
     <description>Creates the Seed of Life required to regrow body parts. Regrowth surgeries will only appear as an option when all components of regrowth are within resource zones: 1x Seed of Life , mana potions, and medicine, then select the body part to regrow in the patient's surgery tab.  Ensure this druid (or another with this spell) performs the surgery and the druid has 90 mana or more at the time the surgery is performed.</description>
     <spellId>rwom.tm_regrowlimb</spellId>
+    <iconPath>UI/regrowlimb</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_RegrowLimb</verbClass>
       <tooltipShowProjectileDamage>true</tooltipShowProjectileDamage>

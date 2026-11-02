@@ -7,6 +7,8 @@
 		
 Use of Conviction will destroy the orb.</description>
     <spellId>rwom.tm_artifact_conviction</spellId>
+    <iconPath>UI/orb_conviction</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Enchantment.Verb_OrbTraitor</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -39,6 +41,8 @@ Use of Conviction will destroy the orb.</description>
     <label>Winter's Fury</label>
     <description>Covers the map in rolling waves of dark, angry clouds carrying winters' biting scorn.</description>
     <spellId>rwom.tm_weapon_wintersfury</spellId>
+    <iconPath>UI/wintersfury</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Enchantment.Verb_WeaponWintersFury</verbClass>
       <hasStandardCommand>true</hasStandardCommand>

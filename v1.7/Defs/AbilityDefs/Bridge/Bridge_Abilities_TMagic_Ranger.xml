@@ -18,6 +18,8 @@ Tame and train animal +10%, butchering speed +15%, smelting and construction spe
 Ranger: Speed +0.3c/s, Aiming Delay -40%, Immunity Gain +35%, Comf. Temperature +-25C., Toxic Sensitivity -25%
 Tame and train animal +12%, butchering speed +20%, smelting and construction speed -20%</description>
     <spellId>rwom.tm_rangertraining</spellId>
+    <iconPath>UI/rangertraining</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_RangerTraining</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -53,6 +55,8 @@ Level 1: Hearing and Sight +40%, +40% bow damage
 Level 2: Hearing and Sight +60%, Breathing +15%, +60% bow damage
 Level 3: Hearing and Sight +80%, Breathing +25%, Blood filtration +10%, +80% bow damage</description>
     <spellId>rwom.tm_bowtraining</spellId>
+    <iconPath>UI/bowtraining</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_BowTraining</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -85,6 +89,8 @@ Level 3: Hearing and Sight +80%, Breathing +25%, Blood filtration +10%, +80% bow
 
 Enemies caught in the poison will take 1-8 poison damage every 0.66 seconds. Poison damage also applies a slowing effect. Traps will never be triggered by animals.</description>
     <spellId>rwom.tm_poisontrap</spellId>
+    <iconPath>UI/trap</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_PoisonTrap</verbClass>
       <hasStandardCommand>true</hasStandardCommand>
@@ -118,6 +124,8 @@ Rangers are only able to form a single bond and maintaining the bond reduces the
 The increase in physical capability applies to the animal kin only, in return, the bonded animal will assist the ranger in whatever capacity the animal is capable.
 A bond can be removed by using this ability on a bonded creature.</description>
     <spellId>rwom.tm_animalfriend</spellId>
+    <iconPath>UI/animalfriend</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_AnimalFriend</verbClass>
       <hasStandardCommand>true</hasStandardCommand>
@@ -147,6 +155,8 @@ A bond can be removed by using this ability on a bonded creature.</description>
     <description>Fire a volley of 5 arrows at a target.
 Range: 32</description>
     <spellId>rwom.tm_arrowstorm</spellId>
+    <iconPath>UI/arrowstorm</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_RangerShot</verbClass>
       <hasStandardCommand>true</hasStandardCommand>
@@ -176,6 +186,8 @@ Range: 32</description>
     <description>Fire a volley of 6 arrows at a target.
 Range: 34</description>
     <spellId>rwom.tm_arrowstorm_i</spellId>
+    <iconPath>UI/arrowstorm</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_RangerShot</verbClass>
       <hasStandardCommand>true</hasStandardCommand>
@@ -205,6 +217,8 @@ Range: 34</description>
     <description>Fire a rapid volley of 7 arrows at a target.
 Range: 36</description>
     <spellId>rwom.tm_arrowstorm_ii</spellId>
+    <iconPath>UI/arrowstorm</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_RangerShot</verbClass>
       <hasStandardCommand>true</hasStandardCommand>
@@ -234,6 +248,8 @@ Range: 36</description>
     <description>Fire a rapid volley of 8 arrows at a target.
 Range: 38</description>
     <spellId>rwom.tm_arrowstorm_iii</spellId>
+    <iconPath>UI/arrowstorm</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_RangerShot</verbClass>
       <hasStandardCommand>true</hasStandardCommand>

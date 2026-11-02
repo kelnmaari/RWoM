@@ -9,6 +9,8 @@ Both the golem and golemancer gain a boost to their capabilities when paired. A 
 
 Golems may be crafted from their respective workbenches after the appropriate research is complete. Check the research tab for each golem type and their corresponding workbench.</description>
     <spellId>rwom.tm_golemancy</spellId>
+    <iconPath>UI/golemancy</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_SB</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -45,6 +47,8 @@ Rune carving requires additional material resources in a marked stockpile: 225 m
 
 To apply runes, select the pawn you wish to inscribe and create the rune carving surgery under their health options. All components must be available before the surgery option will appear.</description>
     <spellId>rwom.tm_runecarving</spellId>
+    <iconPath>UI/runecarving</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_SB</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -76,6 +80,8 @@ To apply runes, select the pawn you wish to inscribe and create the rune carving
     <label>Branding</label>
     <description>Branding is used to create a temporary, magical mark on a pawn that creates a link between the caster and the branded. Multiple brands may be placed on a single pawn as long as each brand is a different type. A caster may create as many brands as they wish, but each brand subtracts from the energy regeneration of the caster. Brands will become dormant if the caster runs out of mana. Brands are a unique type of spell, and each brand must be learned separately. Skill in branding affects all types of brands.</description>
     <spellId>rwom.tm_branding</spellId>
+    <iconPath>UI/branding</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_SB</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -109,6 +115,8 @@ To apply runes, select the pawn you wish to inscribe and create the rune carving
 		
 Brands are a semi-permanent form of magic typically created using some form of marking or engraving, much like a magical tattoo, that creates a link between two pawns. Brands require a constant flow of mana to maintain, however, the brand becomes dormant if the caster is unable to sustain the spell. The brand is removed if the caster dies or chooses to dispel the brand.</description>
     <spellId>rwom.tm_siphonbrand</spellId>
+    <iconPath>UI/siphonbrand</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_BrandSiphon</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -143,6 +151,8 @@ Brands are a semi-permanent form of magic typically created using some form of m
 		
 Brands are a semi-permanent form of magic typically created using some form of marking or engraving, much like a magical tattoo, that creates a link between two pawns. Brands require a constant flow of mana to maintain, however, the brand becomes dormant if the caster is unable to sustain the spell. The brand is removed if the caster dies or chooses to dispel the brand.</description>
     <spellId>rwom.tm_fitnessbrand</spellId>
+    <iconPath>UI/fitnessbrand</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_BrandFitness</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -177,6 +187,8 @@ Brands are a semi-permanent form of magic typically created using some form of m
 		
 Brands are a semi-permanent form of magic typically created using some form of marking or engraving, much like a magical tattoo, that creates a link between two pawns. Brands require a constant flow of mana to maintain, however, the brand becomes dormant if the caster is unable to sustain the spell. The brand is removed if the caster dies or chooses to dispel the brand.</description>
     <spellId>rwom.tm_emotionbrand</spellId>
+    <iconPath>UI/emotionbrand</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_BrandEmotion</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -211,6 +223,8 @@ Brands are a semi-permanent form of magic typically created using some form of m
 		
 Brands are a semi-permanent form of magic typically created using some form of marking or engraving, much like a magical tattoo, that creates a link between two pawns. Brands require a constant flow of mana to maintain, however, the brand becomes dormant if the caster is unable to sustain the spell. The brand is removed if the caster dies or chooses to dispel the brand.</description>
     <spellId>rwom.tm_vitalitybrand</spellId>
+    <iconPath>UI/vitalitybrand</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_BrandVitality</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -245,6 +259,8 @@ Brands are a semi-permanent form of magic typically created using some form of m
 		
 Brands are a semi-permanent form of magic typically created using some form of marking or engraving, much like a magical tattoo, that creates a link between two pawns. Brands require a constant flow of mana to maintain, however, the brand becomes dormant if the caster is unable to sustain the spell. The brand is removed if the caster dies or chooses to dispel the brand.</description>
     <spellId>rwom.tm_protectionbrand</spellId>
+    <iconPath>UI/protectionbrand</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_BrandProtection</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -279,6 +295,8 @@ Brands are a semi-permanent form of magic typically created using some form of m
 		
 Brands are a semi-permanent form of magic typically created using some form of marking or engraving, much like a magical tattoo, that creates a link between two pawns. Brands require a constant flow of mana to maintain, however, the brand becomes dormant if the caster is unable to sustain the spell. The brand is removed if the caster dies or chooses to dispel the brand.</description>
     <spellId>rwom.tm_awarenessbrand</spellId>
+    <iconPath>UI/awarenessbrand</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_BrandAwareness</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -311,6 +329,8 @@ Brands are a semi-permanent form of magic typically created using some form of m
     <label>Dispel Brands</label>
     <description>Dispels all active brands.</description>
     <spellId>rwom.tm_dispelbranding</spellId>
+    <iconPath>UI/dispelbranding</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_DispelBranding</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -343,6 +363,8 @@ Brands are a semi-permanent form of magic typically created using some form of m
     <label>Sigil Surge</label>
     <description>Activating this ability causes all brands to become super-charged. This ability causes moderate pain to the Golemancer and triples the energy drain of each brand. Use the ability again to stop surging.</description>
     <spellId>rwom.tm_sigilsurge</spellId>
+    <iconPath>UI/sigilsurge</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_SigilSurge</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -375,6 +397,8 @@ Brands are a semi-permanent form of magic typically created using some form of m
     <label>Sigil Drain</label>
     <description>Activating this ability causes all brands to invert their effects, granting bonuses to the caster instead of the branded. This ability causes moderate pain to the branded and bonuses to the caster for each brand they control. Use this ability again to stop draining.</description>
     <spellId>rwom.tm_sigildrain</spellId>
+    <iconPath>UI/sigildrain</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_SigilDrain</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -407,6 +431,8 @@ Brands are a semi-permanent form of magic typically created using some form of m
     <label>Living Wall</label>
     <description>Enchants a wall with purpose allowing it to become semi-intelligent. The living wall will strike out at enemies within reach and will repair itself when damaged. The animated creature within the wall may travel to any adjacent section of wall and treats an entire connected section of wall as an extension of itself. A living wall will attempt to move to the closest wall segment of the closest enemy. The living wall cannot move between disconnected wall segments and may only move to another segment that is cardinal adjacent. A caster can only maintain a single living wall, regardless of the size of the wall it occupies. Multiple living wall's may occupy a single wall.</description>
     <spellId>rwom.tm_livingwall</spellId>
+    <iconPath>UI/livingwall</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_LivingWall</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -439,6 +465,8 @@ Brands are a semi-permanent form of magic typically created using some form of m
     <label>Dispel Living Wall</label>
     <description>Dispels the living wall.</description>
     <spellId>rwom.tm_dispellivingwall</spellId>
+    <iconPath>UI/dispellivingwall</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_DispelLivingWall</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>

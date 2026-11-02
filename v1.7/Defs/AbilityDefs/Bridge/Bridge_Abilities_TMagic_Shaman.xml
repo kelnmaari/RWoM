@@ -5,6 +5,8 @@
     <label>Totems</label>
     <description>Totems are a form of magic that anchors an elemental spirit to the physical world allowing it to influence objects near the totem. This ability increases control over all types of totems.</description>
     <spellId>rwom.tm_totems</spellId>
+    <iconPath>UI/totem_icon</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_SB</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -37,6 +39,8 @@
     <label>Totem: Lightning</label>
     <description>Creates a lightning totem at the target location. Lasts 1 game hr and discharges electrical bolts at enemies within 40m every 2-3 seconds.</description>
     <spellId>rwom.tm_summontotemlightning</spellId>
+    <iconPath>UI/totem_lightning_icon</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_SummonTotemLightning</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -68,6 +72,8 @@
     <label>Totem: Earth</label>
     <description>Creates an earth totem at the target location. Lasts 1 game hour and causes tremors every 3-4 seconds that stagger all pawns within 5 cells.</description>
     <spellId>rwom.tm_summontotemearth</spellId>
+    <iconPath>UI/totem_earth_icon</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_SummonTotemEarth</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -99,6 +105,8 @@
     <label>Totem: Healing</label>
     <description>Creates a healing totem at the target location. Lasts 1 game hour and periodically heals nearby pawns.</description>
     <spellId>rwom.tm_summontotemhealing</spellId>
+    <iconPath>UI/totem_heal_icon</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_SummonTotemHealing</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -130,6 +138,8 @@
     <label>Chain Lightning</label>
     <description>A powerful bolt of lightning that forks after striking its first target.</description>
     <spellId>rwom.tm_chainlightning</spellId>
+    <iconPath>UI/chain_lightning</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>AbilityUser.Verb_UseAbility</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -165,6 +175,8 @@
 
 An enraged pawn gains increased movement and manipulation, increased pain resistance, cannot be staggered, and increases melee damage by the percent equal to the severity of enrage (20-50% damage bonus).</description>
     <spellId>rwom.tm_enrage</spellId>
+    <iconPath>UI/enrage</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_Enrage</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -202,6 +214,8 @@ Radius: 3
 Range: 36
 Cast time: 1s</description>
     <spellId>rwom.tm_hex</spellId>
+    <iconPath>UI/hex</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_Hex</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -247,6 +261,8 @@ Radius: 3
 Range: 40
 Cast time: .8s</description>
     <spellId>rwom.tm_hex_i</spellId>
+    <iconPath>UI/hex</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_Hex</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -292,6 +308,8 @@ Radius: 4
 Range: 43
 Cast time: .7s</description>
     <spellId>rwom.tm_hex_ii</spellId>
+    <iconPath>UI/hex</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_Hex</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -337,6 +355,8 @@ Radius: 4
 Range: 45
 Cast time: .6s</description>
     <spellId>rwom.tm_hex_iii</spellId>
+    <iconPath>UI/hex</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_Hex</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -377,6 +397,8 @@ Cast time: .6s</description>
     <label>Pain (Hex)</label>
     <description>All hexed pawns suffer extreme pain.</description>
     <spellId>rwom.tm_hex_pain</spellId>
+    <iconPath>UI/hex_pain</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_Hex_Pain</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -409,6 +431,8 @@ Cast time: .6s</description>
     <label>Critical Fail (Hex)</label>
     <description>Places a short lived curse on all hexed targets that causes extremely bad luck.</description>
     <spellId>rwom.tm_hex_criticalfail</spellId>
+    <iconPath>UI/hex_criticalfail</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_Hex_CriticalFail</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -441,6 +465,8 @@ Cast time: .6s</description>
     <label>Mental Assault (Hex)</label>
     <description>Causes all hexed targets to experience a dramatic and, potentially, overwhelming surge of emotions.</description>
     <spellId>rwom.tm_hex_mentalassault</spellId>
+    <iconPath>UI/hex_mentalassault</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_Hex_MentalAssault</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -477,6 +503,8 @@ Range: 50
 Cast time: 3s
 Cooldown: 120s</description>
     <spellId>rwom.tm_spiritwolves</spellId>
+    <iconPath>UI/spiritwolf</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_SummonSpiritWolves</verbClass>
       <tooltipShowProjectileDamage>true</tooltipShowProjectileDamage>
@@ -514,6 +542,8 @@ Range: 55
 Cast time: 2.7s
 Cooldown: 110s</description>
     <spellId>rwom.tm_spiritwolves_i</spellId>
+    <iconPath>UI/spiritwolf</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_SummonSpiritWolves</verbClass>
       <tooltipShowProjectileDamage>true</tooltipShowProjectileDamage>
@@ -551,6 +581,8 @@ Range: 60
 Cast time: 2.5s
 Cooldown: 100s</description>
     <spellId>rwom.tm_spiritwolves_ii</spellId>
+    <iconPath>UI/spiritwolf</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_SummonSpiritWolves</verbClass>
       <tooltipShowProjectileDamage>true</tooltipShowProjectileDamage>
@@ -588,6 +620,8 @@ Range: 65
 Cast time: 2.4s
 Cooldown: 90s</description>
     <spellId>rwom.tm_spiritwolves_iii</spellId>
+    <iconPath>UI/spiritwolf</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_SummonSpiritWolves</verbClass>
       <tooltipShowProjectileDamage>true</tooltipShowProjectileDamage>
@@ -629,6 +663,8 @@ Spirit Crow - represents magic and insight; will place a hex on enemies and enha
 		
 Once determined, a guardian spirit type remains the same, however, this can be forcibly changed using a scroll of spirit binding.</description>
     <spellId>rwom.tm_guardianspirit</spellId>
+    <iconPath>UI/spiritanimals</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_SummonGuardianSpirit</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -662,6 +698,8 @@ Once determined, a guardian spirit type remains the same, however, this can be f
     <label>Dismiss Guardian Spirit</label>
     <description>Releases the guardian spirit to return to the spirit realm.</description>
     <spellId>rwom.tm_dismissguardianspirit</spellId>
+    <iconPath>UI/dismiss_spiritanimals</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_DismissGuardianSpirit</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>

@@ -11,6 +11,8 @@ Blademaster: Speed +0.2c/s, MBT -5%, Hit chance +6%, Dodge +10%, Shooting Acc. -
 Bladedancer: Speed +0.3c/s, MBT -8%, Hit chance +10%, Dodge +15%, Shooting Acc. -28%, Global Workspeed -6%, Pain threshold +5%
 Legendary Bladedancer: Speed +0.4c/s, MBT -10%, Hit chance +15%, Dodge +20%, Shooting Acc. -30%, Global Workspeed -5%, Pain threshold +10%</description>
     <spellId>rwom.tm_bladefocus</spellId>
+    <iconPath>UI/bladeart</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_BladeFocus</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -46,6 +48,8 @@ Level 1: Moving +15%, Manipulation +15%
 Level 2: Moving +20%, Manipulation +20%, Breathing +10%
 Level 3: Moving +25%, Manipulation +25%, Breathing +15%, Blood pumping +10%, Blood filtration +10%</description>
     <spellId>rwom.tm_bladeart</spellId>
+    <iconPath>UI/bodytraining</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_BladeArt</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -76,6 +80,8 @@ Level 3: Moving +25%, Manipulation +25%, Breathing +15%, Blood pumping +10%, Blo
     <label>Blade Spin</label>
     <description>The blademaster seems to blur for a split second, striking all nearby targets in a flurry of steel.</description>
     <spellId>rwom.tm_bladespin</spellId>
+    <iconPath>UI/bladespin</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_BladeSpin</verbClass>
       <hasStandardCommand>true</hasStandardCommand>
@@ -104,6 +110,8 @@ Level 3: Moving +25%, Manipulation +25%, Breathing +15%, Blood pumping +10%, Blo
     <label>Seismic Slash</label>
     <description>Harnessing the emotionless soul of the blade, the bladedancer unleashes a strike that rends the fabric of space along a line.</description>
     <spellId>rwom.tm_seismicslash</spellId>
+    <iconPath>UI/seismicslash</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_SeismicSlash</verbClass>
       <hasStandardCommand>true</hasStandardCommand>
@@ -136,6 +144,8 @@ Warmup: .3s
 Cooldown: 25s
 Range: 30</description>
     <spellId>rwom.tm_phasestrike</spellId>
+    <iconPath>UI/phased</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_PhaseStrike</verbClass>
       <hasStandardCommand>true</hasStandardCommand>
@@ -169,6 +179,8 @@ Warmup: .2s
 Cooldown: 23s
 Range: 35</description>
     <spellId>rwom.tm_phasestrike_i</spellId>
+    <iconPath>UI/phased</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_PhaseStrike</verbClass>
       <hasStandardCommand>true</hasStandardCommand>
@@ -202,6 +214,8 @@ Warmup: .1s
 Cooldown: 21s
 Range: 40</description>
     <spellId>rwom.tm_phasestrike_ii</spellId>
+    <iconPath>UI/phased</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_PhaseStrike</verbClass>
       <hasStandardCommand>true</hasStandardCommand>
@@ -235,6 +249,8 @@ Warmup: 0s
 Cooldown: 20s
 Range: 45</description>
     <spellId>rwom.tm_phasestrike_iii</spellId>
+    <iconPath>UI/phased</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_PhaseStrike</verbClass>
       <hasStandardCommand>true</hasStandardCommand>

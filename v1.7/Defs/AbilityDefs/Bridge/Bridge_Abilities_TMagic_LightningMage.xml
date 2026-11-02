@@ -10,6 +10,8 @@ Physical capacity: 	~+30%
 Physical demand: 	+40%
 Pain:		-20%</description>
     <spellId>rwom.tm_amp</spellId>
+    <iconPath>UI/amp</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_BLOS</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -63,6 +65,8 @@ Physical capacity: 	~+50%
 Physical demand: 	+60%
 Pain:		-20%</description>
     <spellId>rwom.tm_amp_i</spellId>
+    <iconPath>UI/amp</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_BLOS</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -116,6 +120,8 @@ Physical capacity: 	~+65%
 Physical demand: 	+60%
 Pain:		-30%</description>
     <spellId>rwom.tm_amp_ii</spellId>
+    <iconPath>UI/amp</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_BLOS</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -169,6 +175,8 @@ Physical capacity: 	~+80%
 Physical demand: 	+100%
 Pain:		-40%</description>
     <spellId>rwom.tm_amp_iii</spellId>
+    <iconPath>UI/amp</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_BLOS</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -217,6 +225,8 @@ Pain:		-40%</description>
     <label>Lightning Cloud</label>
     <description>Creates an area charged with lightning. Damages and stuns anything in its mists.</description>
     <spellId>rwom.tm_lightningcloud</spellId>
+    <iconPath>UI/stormcloud</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_LightningCloud</verbClass>
       <tooltipShowProjectileDamage>true</tooltipShowProjectileDamage>
@@ -249,6 +259,8 @@ Pain:		-40%</description>
     <label>Lightning Bolt</label>
     <description>Launch a bolt of lightning to strike your target.</description>
     <spellId>rwom.tm_lightningbolt</spellId>
+    <iconPath>UI/lightningbolt2</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>AbilityUser.Verb_UseAbility_TrueBurst</verbClass>
       <tooltipShowProjectileDamage>true</tooltipShowProjectileDamage>
@@ -280,6 +292,8 @@ Pain:		-40%</description>
     <label>Lightning Storm</label>
     <description>Create a fierce, but uncontrolled, lightning storm over the target location.</description>
     <spellId>rwom.tm_lightningstorm</spellId>
+    <iconPath>UI/lightningstorm</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>AbilityUser.Verb_UseAbility</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -311,6 +325,8 @@ Pain:		-40%</description>
     <label>Eye of the Storm</label>
     <description>Release a ball of pure electrical energy that annihilates everything it its path.</description>
     <spellId>rwom.tm_eyeofthestorm</spellId>
+    <iconPath>Spells/eyeofthestorm</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Effect_EyeOfTheStorm</verbClass>
       <hasStandardCommand>true</hasStandardCommand>

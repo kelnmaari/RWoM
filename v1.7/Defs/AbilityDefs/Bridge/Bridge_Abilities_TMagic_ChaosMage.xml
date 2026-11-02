@@ -5,6 +5,8 @@
     <label>Chaos Tradition</label>
     <description>Chaos Tradition is the practice in which chaos mages redefines their thought process to exchange their available magic abilities. True to its name, the abilities learned cannot be controlled and will be randomly selected. Every ability cast by a chaos mage has a chance to be affected by arcane fluctuations.</description>
     <spellId>rwom.tm_chaostradition</spellId>
+    <iconPath>UI/ChaosTradition</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_ChaosTradition</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>

@@ -5,6 +5,8 @@
     <label>Provisioner</label>
     <description>Use ability to toggle the Provisioner Aura: improves rest and reduces hunger of nearby pawns. Can be improved to repair equipment, increase natural healing rates, and boost energy regeneration. This aura requires 60 stamina to maintain.</description>
     <spellId>rwom.tm_provisioneraura</spellId>
+    <iconPath>UI/provisioner</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_CommanderAuras</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -35,6 +37,8 @@
     <label>Task Master</label>
     <description>Use ability to toggle the Task Master Aura: increases work speed, eating speed, and carrying capacity but causes pawns to be less social. Pawns under the scrutiny of a Task Master will acquire a mood penalty. This aura requires 70 stamina to maintain.</description>
     <spellId>rwom.tm_taskmasteraura</spellId>
+    <iconPath>UI/taskmaster</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_CommanderAuras</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -65,6 +69,8 @@
     <label>Commander</label>
     <description>Use ability to toggle the Commander Aura: improves the mood of all nearby pawns but decreases their productivity. While this aura is enabled, the Commander will seek out pawns that have broken down due to mental stress and give them a motivational speech to overcome a breakdown. Pawns that overcome a mental break in this manner will not gain Catharsis. This aura requires 80 stamina to maintain.</description>
     <spellId>rwom.tm_commanderaura</spellId>
+    <iconPath>UI/commander</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_CommanderAuras</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -103,6 +109,8 @@ Pawns may reject commands if the commander's social skill is below 10; a social 
 Commands cause a mood debuff; each command increases the severity of the debuff.
 Commands do not affect the commander.</description>
     <spellId>rwom.tm_stayalert</spellId>
+    <iconPath>UI/stayalert</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_CommanderOrders</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -149,6 +157,8 @@ Pawns may reject commands if the commander's social skill is below 10; a social 
 Commands cause a mood debuff; each command increases the severity of the debuff.
 Commands do not affect the commander.</description>
     <spellId>rwom.tm_stayalert_i</spellId>
+    <iconPath>UI/stayalert</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_CommanderOrders</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -195,6 +205,8 @@ Pawns may reject commands if the commander's social skill is below 10; a social 
 Commands cause a mood debuff; each command increases the severity of the debuff.
 Commands do not affect the commander.</description>
     <spellId>rwom.tm_stayalert_ii</spellId>
+    <iconPath>UI/stayalert</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_CommanderOrders</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -241,6 +253,8 @@ Pawns may reject commands if the commander's social skill is below 10; a social 
 Commands cause a mood debuff; each command increases the severity of the debuff.
 Commands do not affect the commander.</description>
     <spellId>rwom.tm_stayalert_iii</spellId>
+    <iconPath>UI/stayalert</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_CommanderOrders</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -287,6 +301,8 @@ Pawns may reject commands if the commander's social skill is below 10; a social 
 Commands cause a mood debuff; each command increases the severity of the debuff.
 Commands do not affect the commander.</description>
     <spellId>rwom.tm_moveout</spellId>
+    <iconPath>UI/MoveOut</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_CommanderOrders</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -333,6 +349,8 @@ Pawns may reject commands if the commander's social skill is below 10; a social 
 Commands cause a mood debuff; each command increases the severity of the debuff.
 Commands do not affect the commander.</description>
     <spellId>rwom.tm_moveout_i</spellId>
+    <iconPath>UI/MoveOut</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_CommanderOrders</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -379,6 +397,8 @@ Pawns may reject commands if the commander's social skill is below 10; a social 
 Commands cause a mood debuff; each command increases the severity of the debuff.
 Commands do not affect the commander.</description>
     <spellId>rwom.tm_moveout_ii</spellId>
+    <iconPath>UI/MoveOut</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_CommanderOrders</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -425,6 +445,8 @@ Pawns may reject commands if the commander's social skill is below 10; a social 
 Commands cause a mood debuff; each command increases the severity of the debuff.
 Commands do not affect the commander.</description>
     <spellId>rwom.tm_moveout_iii</spellId>
+    <iconPath>UI/MoveOut</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_CommanderOrders</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -471,6 +493,8 @@ Pawns may reject commands if the commander's social skill is below 10; a social 
 Commands cause a mood debuff; each command increases the severity of the debuff.
 Commands do not affect the commander.</description>
     <spellId>rwom.tm_holdtheline</spellId>
+    <iconPath>UI/HoldTheLine</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_CommanderOrders</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -517,6 +541,8 @@ Pawns may reject commands if the commander's social skill is below 10; a social 
 Commands cause a mood debuff; each command increases the severity of the debuff.
 Commands do not affect the commander.</description>
     <spellId>rwom.tm_holdtheline_i</spellId>
+    <iconPath>UI/HoldTheLine</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_CommanderOrders</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -563,6 +589,8 @@ Pawns may reject commands if the commander's social skill is below 10; a social 
 Commands cause a mood debuff; each command increases the severity of the debuff.
 Commands do not affect the commander.</description>
     <spellId>rwom.tm_holdtheline_ii</spellId>
+    <iconPath>UI/HoldTheLine</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_CommanderOrders</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -609,6 +637,8 @@ Pawns may reject commands if the commander's social skill is below 10; a social 
 Commands cause a mood debuff; each command increases the severity of the debuff.
 Commands do not affect the commander.</description>
     <spellId>rwom.tm_holdtheline_iii</spellId>
+    <iconPath>UI/HoldTheLine</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_CommanderOrders</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>

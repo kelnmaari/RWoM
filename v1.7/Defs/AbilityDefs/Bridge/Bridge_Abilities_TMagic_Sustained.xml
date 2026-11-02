@@ -5,6 +5,8 @@
     <label>Gear Repair</label>
     <description>Activates or deactivates the sustained combat skill Gear Repair - slowly repairs equipped apparel and weapons. Requires 20 Stamina to sustain.</description>
     <spellId>rwom.tm_gearrepair</spellId>
+    <iconPath>UI/gearrepair</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_GearRepair</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -35,6 +37,8 @@
     <label>Inner Healing</label>
     <description>Activates or deactivates the sustained combat skill Inner Healing - sacrifices physical energy to increase healing rate and disease immunity. Requires 10 Stamina to sustain.</description>
     <spellId>rwom.tm_innerhealing</spellId>
+    <iconPath>UI/innerhealing</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_InnerHealing</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -65,6 +69,8 @@
     <label>Heavy Blow</label>
     <description>Activates or deactivates the sustained combat skill Heavy Blow - increases damage of all attacks by 20%. Requires 30 Stamina to sustain.</description>
     <spellId>rwom.tm_heavyblow</spellId>
+    <iconPath>UI/heavyblow</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_HeavyBlow</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -95,6 +101,8 @@
     <label>Strong Back</label>
     <description>Activates or deactivates the sustained combat skill Strong Back - increases carry capacity by 40 and inventory capacity by 50% but causes a 10% increase in exhaustion rate. Requires 20 Stamina to sustain.</description>
     <spellId>rwom.tm_strongback</spellId>
+    <iconPath>UI/strongback</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_StrongBack</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -125,6 +133,8 @@
     <label>Thick Skin</label>
     <description>Activates or deactivates the sustained combat skill Thick Skin - increases all armor values by 10% and improves temperature thresholds slightly. Requires 30 Stamina to sustain and reduces stamina regeneration by 15%.</description>
     <spellId>rwom.tm_thickskin</spellId>
+    <iconPath>UI/thickskin</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_ThickSkin</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -155,6 +165,8 @@
     <label>Fighters Focus</label>
     <description>Activates or deactivates the sustained combat skill Fighters Focus - increases mental break threshold by 5% and pain threshold by 20%. Requires 15 Stamina to sustain.</description>
     <spellId>rwom.tm_fightersfocus</spellId>
+    <iconPath>UI/fightersfocus</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_FightersFocus</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -198,6 +210,8 @@ While active, the caster cannot be staggered and will reduce all incoming damage
 
 This ability actively consumes stamina, and will automatically cancel once the caster's stamina reaches 0.</description>
     <spellId>rwom.tm_burningfury</spellId>
+    <iconPath>UI/burningfury</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_BurningFury</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>

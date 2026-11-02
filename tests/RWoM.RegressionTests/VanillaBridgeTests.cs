@@ -1,6 +1,7 @@
-using System.Reflection;
+﻿using System.Reflection;
 using System.Runtime.CompilerServices;
 using RimWorld;
+using RimWorld.Planet;
 using TorannMagic;
 using Verse;
 using AbilityDef = AbilityUser.AbilityDef;
@@ -23,15 +24,95 @@ internal static class VanillaBridgeTests
         yield return new("VanillaBridge.SyncGrantsFromKnowledge", SyncGrantsFromKnowledge);
         yield return new("VanillaBridge.SyncRespectsAllowList", SyncRespectsAllowList);
         yield return new("VanillaBridge.GeneratedBridgesAreWellFormed", GeneratedBridgesAreWellFormed);
+        yield return new("VanillaBridge.BridgesCarryIcons", BridgesCarryIcons);
+        yield return new("VanillaBridge.AllFamiliesEnabled", AllFamiliesEnabled);
+        yield return new("VanillaBridge.LegacyGizmoHiddenForEnabled", LegacyGizmoHiddenForEnabled);
+        yield return new("VanillaBridge.GizmoDisabledReflectsResources", GizmoDisabledReflectsResources);
     }
 
-    // RED 6: bridges outside the rollout allow-list stay dormant even when the
-    // knowledge store has a learned entry and the bridge def exists.
+    // Generated bridge defs carry the original's icon so the vanilla gizmo
+    // grid renders recognizably.
+    private static void BridgesCarryIcons(RuntimeFixture f)
+    {
+        string heal = Path.Combine(f.Repository, "v1.7", "Defs", "AbilityDefs", "Bridge", "Bridge_Abilities_TMagic_Paladin.xml");
+        var doc = System.Xml.Linq.XDocument.Load(heal);
+        var bridge = doc.Root.Elements("AbilityDef").First(el => (string)el.Element("defName") == "TM_Bridge_Heal");
+        Check.Equal("UI/Heal", (string)bridge.Element("iconPath"), "iconPath copied from the original uiIconPath");
+        Check.Equal(true, (bool?)bridge.Element("displayGizmoWhileUndrafted") == true,
+            "undrafted visibility matches the classic gizmo behavior");
+    }
+
+    // Full rollout: every convention spellId family is enabled — the boundary
+    // check still applies, so unrelated rwom.* ids stay untouched.
+    private static void AllFamiliesEnabled(RuntimeFixture _)
+    {
+        Check.Equal(true, VanillaBridgeSync.FamilyEnabled("rwom.tm_heal"), "heal enabled");
+        Check.Equal(true, VanillaBridgeSync.FamilyEnabled("rwom.tm_firebolt_ii"), "variant families enabled");
+        Check.Equal(true, VanillaBridgeSync.FamilyEnabled("rwom.tm_advanced_heal"), "multi-word families enabled");
+        Check.Equal(false, VanillaBridgeSync.FamilyEnabled("rwom.custom.heal"), "foreign namespaces stay excluded");
+    }
+
+    // Phase Б: our classic gizmo hides when the vanilla bridge provides one.
+    private static void LegacyGizmoHiddenForEnabled(RuntimeFixture f)
+    {
+        EnsureCoreLoaded(f);
+        var def = Original("TM_HideGizmoA");
+        CoreBridge.RegisterSpell(def);
+        Check.Equal(false, VanillaBridgeSync.ShouldHideLegacyGizmo(def), "no bridge def — classic gizmo stays");
+
+        var bridge = BridgeDef("TM_Bridge_Hidegizmoa", "rwom.tm_hidegizmoa"); // matches the DisplayName convention
+        DefDatabase<RimWorld.AbilityDef>.Clear();
+        DefDatabase<RimWorld.AbilityDef>.Add(bridge);
+        try
+        {
+            Check.Equal(true, VanillaBridgeSync.ShouldHideLegacyGizmo(def), "enabled family with a bridge def hides the classic gizmo");
+            var other = Original("TM_HideGizmoB");
+            CoreBridge.RegisterSpell(other);
+            Check.Equal(false, VanillaBridgeSync.ShouldHideLegacyGizmo(other), "spell without a bridge def keeps its classic gizmo");
+        }
+        finally
+        {
+            DefDatabase<RimWorld.AbilityDef>.Clear();
+        }
+    }
+
+    // The gizmo's grey-out consults the companion's CanCastPowerCheck, which
+    // probes ambient state a generated or exotic pawn may not carry — the
+    // probe must never throw out of the gizmo (the cast re-checks anyway).
+    // The bridge is also invisible to vanilla AI: our ResolveAIAutoCast keeps
+    // AI ownership, so the bridge must not double-cast.
+    private static void GizmoDisabledReflectsResources(RuntimeFixture f)
+    {
+        EnsureCoreLoaded(f);
+        CoreBridge.RegisterSpell(Original("TM_Heal"));
+        var def = BridgeDef("TM_Bridge_Heal", "rwom.tm_heal");
+        var pawn = BridgePawn();
+        var magic = new CompAbilityUserMagic { parent = pawn };
+        pawn.AllComps.Add(magic);
+        var knowledge = new AbilityKnowledgeComp { parent = pawn };
+        pawn.AllComps.Add(knowledge);
+
+        var ability = (TMBridgeAbility)AbilityUtility.MakeAbility(def, pawn);
+        Check.NotNull(ability.Companion, "companion built for the disabled-state check");
+        bool disabled = false;
+        try
+        {
+            disabled = ability.GizmoDisabled(out _);
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException("GizmoDisabled must tolerate ambient state: " + ex.Message, ex);
+        }
+        Check.Equal(true, disabled || !disabled, "gizmo disabled-state evaluated without throwing");
+        Check.Equal(false, ability.AICanTargetNow(pawn), "bridges are excluded from vanilla AI targeting");
+    }
+
+    // Full rollout: foreign namespaces (non "rwom.tm_*") stay excluded even
+    // when the knowledge store has a learned entry and a bridge def exists.
     private static void SyncRespectsAllowList(RuntimeFixture f)
     {
         EnsureCoreLoaded(f);
-        CoreBridge.RegisterSpell(Original("TM_Firebolt"));
-        var bridge = BridgeDef("TM_Bridge_Firebolt", "rwom.tm_firebolt");
+        var bridge = BridgeDef("TM_Bridge_Customheal", "rwom.custom_heal");
         DefDatabase<RimWorld.AbilityDef>.Clear();
         DefDatabase<RimWorld.AbilityDef>.Add(bridge);
         try
@@ -40,12 +121,12 @@ internal static class VanillaBridgeTests
             pawn.abilities = new Pawn_AbilityTracker(pawn);
             var knowledge = new AbilityKnowledgeComp { parent = pawn };
             pawn.AllComps.Add(knowledge);
-            var entry = knowledge.GetOrCreate("rwom.tm_firebolt", 0);
+            var entry = knowledge.GetOrCreate("rwom.custom_heal", 0);
             entry.learned = true;
 
             VanillaBridgeSync.Sync(pawn);
             Check.Equal(true, pawn.abilities.GetAbility(bridge) == null,
-                "a family outside the allow-list is not granted (dormant bridge)");
+                "a foreign namespace is not granted (FamilyEnabled gate)");
         }
         finally
         {

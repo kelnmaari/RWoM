@@ -5,6 +5,8 @@
     <label>elemental icebolt</label>
     <description>Bolt of ice specially created to shatter into glass like shards upon impact, causing severe bleeding and damage in a small area.</description>
     <spellId>rwom.tm_elemental_icebolt</spellId>
+    <iconPath>Spells/Icebolt</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>AbilityUser.Verb_UseAbility</verbClass>
       <tooltipShowProjectileDamage>true</tooltipShowProjectileDamage>
@@ -43,6 +45,8 @@
     <label>Firebolt</label>
     <description>Bolt of  magic fire. Sets fire to the target.</description>
     <spellId>rwom.tm_elemental_firebolt</spellId>
+    <iconPath>Spells/firebolt</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>AbilityUser.Verb_UseAbility</verbClass>
       <tooltipShowProjectileDamage>true</tooltipShowProjectileDamage>

@@ -15,6 +15,8 @@ Mood decrease: -3
 
 Requires 40 mana to maintain and reduces mana regeneration by 30%; cast again to deactivate. The caster gains xp each time an ally is buffed.</description>
     <spellId>rwom.tm_shadow</spellId>
+    <iconPath>UI/shadow</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_ApplyAura</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -59,6 +61,8 @@ Mood decrease:	-4
 
 Requires 40 mana to maintain and reduces mana regeneration by 30%; cast again to deactivate. The caster gains xp each time an ally is buffed.</description>
     <spellId>rwom.tm_shadow_i</spellId>
+    <iconPath>UI/shadow</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_ApplyAura</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -104,6 +108,8 @@ Mood decrease:	-6
 
 Requires 40 mana to maintain and reduces mana regeneration by 30%; cast again to deactivate. The caster gains xp each time an ally is buffed.</description>
     <spellId>rwom.tm_shadow_ii</spellId>
+    <iconPath>UI/shadow</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_ApplyAura</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -149,6 +155,8 @@ Mood decrease:	-8
 
 Requires 40 mana to maintain and reduces mana regeneration by 30%; cast again to deactivate. The caster gains xp each time an ally is buffed.</description>
     <spellId>rwom.tm_shadow_iii</spellId>
+    <iconPath>UI/shadow</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_ApplyAura</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -189,6 +197,8 @@ Range: 24
 Projectiles: 14 over 2.8s
 Damage: 4</description>
     <spellId>rwom.tm_magicmissile</spellId>
+    <iconPath>Spells/MagicMissile</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>AbilityUser.Verb_UseAbility_TrueBurst</verbClass>
       <tooltipShowProjectileDamage>true</tooltipShowProjectileDamage>
@@ -229,6 +239,8 @@ Range: 28
 Projectiles: 17 over 2.83s
 Damage: 5</description>
     <spellId>rwom.tm_magicmissile_i</spellId>
+    <iconPath>Spells/MagicMissile</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>AbilityUser.Verb_UseAbility_TrueBurst</verbClass>
       <tooltipShowProjectileDamage>true</tooltipShowProjectileDamage>
@@ -269,6 +281,8 @@ Range: 32
 Projectiles: 20 over 2.67s
 Damage: 6</description>
     <spellId>rwom.tm_magicmissile_ii</spellId>
+    <iconPath>Spells/MagicMissile</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>AbilityUser.Verb_UseAbility_TrueBurst</verbClass>
       <tooltipShowProjectileDamage>true</tooltipShowProjectileDamage>
@@ -309,6 +323,8 @@ Range: 36
 Projectiles: 24 over 2.4s
 Damage: 7</description>
     <spellId>rwom.tm_magicmissile_iii</spellId>
+    <iconPath>Spells/MagicMissile</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>AbilityUser.Verb_UseAbility_TrueBurst</verbClass>
       <tooltipShowProjectileDamage>true</tooltipShowProjectileDamage>
@@ -343,6 +359,8 @@ Damage: 7</description>
     <label>Teleport</label>
     <description>Mass teleport spell. Creates a temporary method of long range transport; be warned, the portal collapses after a brief period causing a feedback explosion at the point the portal was created.</description>
     <spellId>rwom.tm_teleport</spellId>
+    <iconPath>UI/teleport</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_SB</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -378,6 +396,8 @@ Casting time: .5s
 Recharge time: 10s
 Range: 30</description>
     <spellId>rwom.tm_blink</spellId>
+    <iconPath>UI/blink</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_Blink</verbClass>
       <hasStandardCommand>true</hasStandardCommand>
@@ -408,6 +428,8 @@ Casting time: .3s
 Recharge time: 8s
 Range: 50</description>
     <spellId>rwom.tm_blink_i</spellId>
+    <iconPath>UI/blink</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_Blink</verbClass>
       <hasStandardCommand>true</hasStandardCommand>
@@ -439,6 +461,8 @@ Casting time: .1s
 Recharge time: 6s
 Range: 70</description>
     <spellId>rwom.tm_blink_ii</spellId>
+    <iconPath>UI/blink</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_Blink</verbClass>
       <hasStandardCommand>true</hasStandardCommand>
@@ -469,6 +493,8 @@ Casting time: 0s
 Recharge time: 5s
 Range: 90</description>
     <spellId>rwom.tm_blink_iii</spellId>
+    <iconPath>UI/blink</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_Blink</verbClass>
       <hasStandardCommand>true</hasStandardCommand>
@@ -499,6 +525,8 @@ Casting time: 3s
 Recharge time: 20s
 Range: 70</description>
     <spellId>rwom.tm_summon</spellId>
+    <iconPath>UI/summon</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_Summon</verbClass>
       <hasStandardCommand>true</hasStandardCommand>
@@ -532,6 +560,8 @@ Casting time: 2.7s
 Recharge time: 18s
 Range: 80</description>
     <spellId>rwom.tm_summon_i</spellId>
+    <iconPath>UI/summon</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_Summon</verbClass>
       <hasStandardCommand>true</hasStandardCommand>
@@ -565,6 +595,8 @@ Casting time: 2.5s
 Recharge time: 16s
 Range: 90</description>
     <spellId>rwom.tm_summon_ii</spellId>
+    <iconPath>UI/summon</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_Summon</verbClass>
       <hasStandardCommand>true</hasStandardCommand>
@@ -598,6 +630,8 @@ Casting time: 2.4s
 Recharge time: 15s
 Range: 100</description>
     <spellId>rwom.tm_summon_iii</spellId>
+    <iconPath>UI/summon</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_Summon</verbClass>
       <hasStandardCommand>true</hasStandardCommand>
@@ -627,6 +661,8 @@ Range: 100</description>
     <label>Gateway</label>
     <description>Folds reality to open a gateway to another player controlled location and instantly moves all pawns and items in a 7 cell radius around the target cell to the caster.</description>
     <spellId>rwom.tm_foldreality</spellId>
+    <iconPath>UI/gateway2</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_FoldReality</verbClass>
       <hasStandardCommand>true</hasStandardCommand>

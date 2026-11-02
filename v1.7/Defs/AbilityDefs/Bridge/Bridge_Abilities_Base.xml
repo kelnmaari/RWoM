@@ -5,6 +5,8 @@
     <label>secondary targeter</label>
     <description>verb used in secondary targeting</description>
     <spellId>rwom.tm_compverb</spellId>
+    <iconPath>Spells/invis</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>AbilityUser.Verb_UseAbility</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>

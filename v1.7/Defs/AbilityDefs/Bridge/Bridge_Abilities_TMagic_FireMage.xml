@@ -16,6 +16,8 @@ Cold resistance: +6c
 
 Requires 40 mana to maintain and reduces mana regeneration by 30%; cast again to deactivate. The caster gains xp each time an ally is buffed.</description>
     <spellId>rwom.tm_rayofhope</spellId>
+    <iconPath>UI/innerfire</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_ApplyAura</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -61,6 +63,8 @@ Cold resistance: +8c
 
 Requires 40 mana to maintain and reduces mana regeneration by 30%; cast again to deactivate. The caster gains xp each time an ally is buffed.</description>
     <spellId>rwom.tm_rayofhope_i</spellId>
+    <iconPath>UI/innerfire</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_ApplyAura</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -106,6 +110,8 @@ Cold resistance: +9c
 
 Requires 40 mana to maintain and reduces mana regeneration by 30%; cast again to deactivate. The caster gains xp each time an ally is buffed.</description>
     <spellId>rwom.tm_rayofhope_ii</spellId>
+    <iconPath>UI/innerfire</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_ApplyAura</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -151,6 +157,8 @@ Cold resistance: +10c
 
 Requires 40 mana to maintain and reduces mana regeneration by 30%; cast again to deactivate. The caster gains xp each time an ally is buffed.</description>
     <spellId>rwom.tm_rayofhope_iii</spellId>
+    <iconPath>UI/innerfire</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_ApplyAura</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -185,6 +193,8 @@ Requires 40 mana to maintain and reduces mana regeneration by 30%; cast again to
     <label>Firebolt</label>
     <description>Launches a bolt of super-heated magma that damages and can set fire to the target.</description>
     <spellId>rwom.tm_firebolt</spellId>
+    <iconPath>Spells/firebolt</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>AbilityUser.Verb_UseAbility</verbClass>
       <tooltipShowProjectileDamage>true</tooltipShowProjectileDamage>
@@ -216,6 +226,8 @@ Requires 40 mana to maintain and reduces mana regeneration by 30%; cast again to
     <label>Fireball</label>
     <description>Throws a massive, slow moving fireball. Wreaks havoc and creates a fiery explosion at the target area.</description>
     <spellId>rwom.tm_fireball</spellId>
+    <iconPath>Spells/fireball4</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>AbilityUser.Verb_UseAbility</verbClass>
       <tooltipShowProjectileDamage>true</tooltipShowProjectileDamage>
@@ -248,6 +260,8 @@ Requires 40 mana to maintain and reduces mana regeneration by 30%; cast again to
     <label>Fireclaw</label>
     <description>Create streaming tendrils of fire that rake across your enemies, leaving destruction and fire in its wake.</description>
     <spellId>rwom.tm_fireclaw</spellId>
+    <iconPath>UI/tendril</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>AbilityUser.Verb_UseAbility</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -279,6 +293,8 @@ Requires 40 mana to maintain and reduces mana regeneration by 30%; cast again to
     <label>Firestorm</label>
     <description>Calls forth the full fury of elemental fire in a meteor storm of death and destruction.</description>
     <spellId>rwom.tm_firestorm</spellId>
+    <iconPath>UI/firestorm</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_Firestorm</verbClass>
       <tooltipShowProjectileDamage>true</tooltipShowProjectileDamage>

@@ -5,6 +5,8 @@
     <label>Herbalist</label>
     <description>Training in herbalism allows the apothecary to identify and efficiently harvest the ingredients for their concoctions.</description>
     <spellId>rwom.tm_herbalist</spellId>
+    <iconPath>UI/herbs-bundle</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_SB</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -35,6 +37,8 @@
     <label>Poison Flask</label>
     <description>Throw a noxious concoction that bursts into a thick cloud of poisonous gas. The poison gas will remain in proximity for a small time before dispersing. Any person that inhales the fumes will suffer corrosive damage to their throat and lungs.</description>
     <spellId>rwom.tm_poisonflask</spellId>
+    <iconPath>UI/poison_flask</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_SB</verbClass>
       <tooltipShowProjectileDamage>true</tooltipShowProjectileDamage>
@@ -66,6 +70,8 @@
     <label>Elixir</label>
     <description>Herbal elixirs are created through a mixture of potent herbs, herbal extracts, and other organic matter. The potency of the herbal elixir comes from the immediate reaction of ingredients when they are combined. The chemical reaction has a short half-life, which make it impractical and uneconomical for mass production and distribution. When immediately consumed, the elixir's potent health benefits are powerful enough to bring a pawn back from the brink of death. The elixir's effects last for nearly a day.</description>
     <spellId>rwom.tm_elixir</spellId>
+    <iconPath>UI/elixir</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_Elixir</verbClass>
       <tooltipShowProjectileDamage>true</tooltipShowProjectileDamage>
@@ -98,6 +104,8 @@
     <label>Soothing Balm</label>
     <description>The apothecary's soothing balm can be applied to open wounds to fight infection, promote blood clotting, and reduce pain. Side effects may include hallucinations, a sense of euphoria, and loss of consciousness.</description>
     <spellId>rwom.tm_soothingbalm</spellId>
+    <iconPath>UI/health-capsule</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_SoothingBalm</verbClass>
       <tooltipShowProjectileDamage>true</tooltipShowProjectileDamage>
@@ -134,6 +142,8 @@ Range: 20
 Cooldown: 30
 Radius: 6</description>
     <spellId>rwom.tm_firesuppressionflask</spellId>
+    <iconPath>UI/fire-suppression</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_SB</verbClass>
       <tooltipShowProjectileDamage>true</tooltipShowProjectileDamage>
@@ -169,6 +179,8 @@ Range: 25
 Cooldown: 20
 Radius: 8</description>
     <spellId>rwom.tm_firesuppressionflask_i</spellId>
+    <iconPath>UI/fire-suppression</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_SB</verbClass>
       <tooltipShowProjectileDamage>true</tooltipShowProjectileDamage>
@@ -204,6 +216,8 @@ Range: 30
 Cooldown: 15
 Radius: 10</description>
     <spellId>rwom.tm_firesuppressionflask_ii</spellId>
+    <iconPath>UI/fire-suppression</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_SB</verbClass>
       <tooltipShowProjectileDamage>true</tooltipShowProjectileDamage>
@@ -239,6 +253,8 @@ Range: 34
 Cooldown: 10
 Radius: 11</description>
     <spellId>rwom.tm_firesuppressionflask_iii</spellId>
+    <iconPath>UI/fire-suppression</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_SB</verbClass>
       <tooltipShowProjectileDamage>true</tooltipShowProjectileDamage>
@@ -272,6 +288,8 @@ Radius: 11</description>
 		
 *Ability may autocast when a nearby mage is below 20 mana.</description>
     <spellId>rwom.tm_herbalclarity</spellId>
+    <iconPath>UI/clarity</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_SB</verbClass>
       <tooltipShowProjectileDamage>true</tooltipShowProjectileDamage>
@@ -313,6 +331,8 @@ Radius: 11</description>
 		
 *Ability may autocast when a nearby pawn is is below 5% mood.</description>
     <spellId>rwom.tm_herbalbliss</spellId>
+    <iconPath>UI/bliss</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_SB</verbClass>
       <tooltipShowProjectileDamage>true</tooltipShowProjectileDamage>

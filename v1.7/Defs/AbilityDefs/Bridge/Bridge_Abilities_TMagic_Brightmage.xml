@@ -5,6 +5,8 @@
     <label>Light Lance</label>
     <description>Focus light into an intense beam that burns everything along its path. This ability is empowered by stored light.</description>
     <spellId>rwom.tm_lightlance</spellId>
+    <iconPath>UI/lightlance</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Effect_LightLance</verbClass>
       <tooltipShowProjectileDamage>true</tooltipShowProjectileDamage>
@@ -45,6 +47,8 @@ Cooldown: 60s
 Radius: 5
 Count: 13</description>
     <spellId>rwom.tm_sunfire</spellId>
+    <iconPath>UI/sunfire</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_BLOS</verbClass>
       <tooltipShowProjectileDamage>true</tooltipShowProjectileDamage>
@@ -84,6 +88,8 @@ Cooldown: 55s
 Radius: 6
 Count: 14</description>
     <spellId>rwom.tm_sunfire_i</spellId>
+    <iconPath>UI/sunfire</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_BLOS</verbClass>
       <tooltipShowProjectileDamage>true</tooltipShowProjectileDamage>
@@ -123,6 +129,8 @@ Cooldown: 50s
 Radius: 7
 Count: 15</description>
     <spellId>rwom.tm_sunfire_ii</spellId>
+    <iconPath>UI/sunfire</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_BLOS</verbClass>
       <tooltipShowProjectileDamage>true</tooltipShowProjectileDamage>
@@ -162,6 +170,8 @@ Cooldown: 45s
 Radius: 8
 Count: 16</description>
     <spellId>rwom.tm_sunfire_iii</spellId>
+    <iconPath>UI/sunfire</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_BLOS</verbClass>
       <tooltipShowProjectileDamage>true</tooltipShowProjectileDamage>
@@ -195,6 +205,8 @@ Count: 16</description>
     <label>Light Burst</label>
     <description>Creates flashes of light that blind and disorient pawns caught in the blast. Disoriented pawns will be unable to distinguish between friend and foe and may fire on nearby friendly pawns. This ability is empowered by stored light.</description>
     <spellId>rwom.tm_lightburst</spellId>
+    <iconPath>UI/lightburst</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_LightBurst</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -235,6 +247,8 @@ Count: 16</description>
     <label>Light Skip</label>
     <description>The caster rides a wave of light for near-instant travel. Neither the caster's position or target's position can be roofed.</description>
     <spellId>rwom.tm_lightskip</spellId>
+    <iconPath>UI/lightskip</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_LightSkip</verbClass>
       <tooltipShowProjectileDamage>true</tooltipShowProjectileDamage>
@@ -269,6 +283,8 @@ Count: 16</description>
     <label>Mass Light Skip</label>
     <description>The caster and all allies in a 5 cell radius rides waves of light for near-instant travel. Pawns under a roof will not be transported.</description>
     <spellId>rwom.tm_lightskipmass</spellId>
+    <iconPath>UI/masslightskip</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_LightSkip</verbClass>
       <tooltipShowProjectileDamage>true</tooltipShowProjectileDamage>
@@ -303,6 +319,8 @@ Count: 16</description>
     <label>Global Light Skip</label>
     <description>The caster and all allies in a 5 cell radius rides waves of light for near-instant travel. Pawns under a roof will not be transported.</description>
     <spellId>rwom.tm_lightskipglobal</spellId>
+    <iconPath>UI/globallightskip</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_LightSkipGlobal</verbClass>
       <tooltipShowProjectileDamage>true</tooltipShowProjectileDamage>
@@ -338,6 +356,8 @@ Count: 16</description>
     <label>Refraction</label>
     <description>Creates a wall of light that affects projectiles as they pass through the wall. Enemy projectiles may be offset from their intended targets. Friendly projectiles may use a portion of the light energy to create a mirrored reflection of the projectile. The wall will last about 25 seconds or until it runs out of energy. This ability is empowered by stored light.</description>
     <spellId>rwom.tm_refraction</spellId>
+    <iconPath>UI/refraction</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_SB</verbClass>
       <tooltipShowProjectileDamage>true</tooltipShowProjectileDamage>
@@ -379,6 +399,8 @@ o Improve mood of nearby allies
 o Create a burst of joy
 o Protects the caster's dreams</description>
     <spellId>rwom.tm_spiritoflight</spellId>
+    <iconPath>UI/sol</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Effect_SpiritOfLight</verbClass>
       <tooltipShowProjectileDamage>true</tooltipShowProjectileDamage>
@@ -412,6 +434,8 @@ o Protects the caster's dreams</description>
     <label>Create Light</label>
     <description>Directs the Spirit of Light to create light at an area. This reduces the Spirit's light regeneration by 70%. Use this ability again at any location to dismiss the light.</description>
     <spellId>rwom.tm_sol_createlight</spellId>
+    <iconPath>UI/createlight</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_SoL_CreateLight</verbClass>
       <tooltipShowProjectileDamage>true</tooltipShowProjectileDamage>
@@ -455,6 +479,8 @@ o Protects the caster's dreams</description>
     <label>Equalize</label>
     <description>Equalizes the light energy between the Spirit of Light and caster.</description>
     <spellId>rwom.tm_sol_equalize</spellId>
+    <iconPath>UI/equalize</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_SoL_Equalize</verbClass>
       <tooltipShowProjectileDamage>true</tooltipShowProjectileDamage>

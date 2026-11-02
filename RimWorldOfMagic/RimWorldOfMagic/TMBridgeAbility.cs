@@ -1,3 +1,4 @@
+using System;
 using AbilityUser;
 using RimWorld;
 using Verse.AI;
@@ -44,12 +45,39 @@ namespace TorannMagic
 
         public override bool GizmoDisabled(out string reason)
         {
-            if (Companion == null)
+            // The vanilla gizmo greys out on the REAL resource/cooldown state
+            // through the companion's own admission check. Both that check and
+            // the vanilla base logic probe ambient state (faction, needs,
+            // story, world) a generated or exotic pawn may not carry — the
+            // grey-out is cosmetic and must never break the gizmo; the cast
+            // itself re-checks admission.
+            try
             {
-                reason = "TM_SleepingSpellsDesc".Translate();
-                return true;
+                PawnAbility owner = Companion;
+                if (owner == null)
+                {
+                    reason = "TM_SleepingSpellsDesc".Translate();
+                    return true;
+                }
+                if (!owner.CanCastPowerCheck(AbilityContext.Player, out string why))
+                {
+                    reason = why;
+                    return true;
+                }
+                return base.GizmoDisabled(out reason);
             }
-            return base.GizmoDisabled(out reason);
+            catch (Exception)
+            {
+                reason = null;
+                return false;
+            }
+        }
+
+        // Phased out of vanilla AI targeting on purpose: our ResolveAIAutoCast
+        // keeps AI ownership, so the bridge must not double-cast.
+        public override bool AICanTargetNow(LocalTargetInfo target)
+        {
+            return false;
         }
 
         public override bool Activate(LocalTargetInfo target, LocalTargetInfo dest)

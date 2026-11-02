@@ -5,6 +5,8 @@
     <label>The Wanderer</label>
     <description>Increase attributes through hard work and creativity. See skills for more details.</description>
     <spellId>rwom.tm_wanderercraft</spellId>
+    <iconPath>UI/wanderer</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_SB</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -39,6 +41,8 @@ Cantrips are discarded by most mages as mere conveniences which require no addit
 
 See skills for more details.</description>
     <spellId>rwom.tm_cantrips</spellId>
+    <iconPath>UI/cantrips</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_SB</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>

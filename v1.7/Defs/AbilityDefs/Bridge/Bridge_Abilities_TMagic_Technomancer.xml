@@ -9,6 +9,8 @@ Undrafted: the techno-bit assists in crafting, mining and construction tasks. It
 
 Drafted: uses an internal focus-LED to fire micro lasers at the technomancers target. Performs accelerated repairs to nearby robotic pawns or buildings.</description>
     <spellId>rwom.tm_technobit</spellId>
+    <iconPath>UI/bit_c</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>AbilityUser.Verb_UseAbility</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -41,6 +43,8 @@ Drafted: uses an internal focus-LED to fire micro lasers at the technomancers ta
 
 The Mark-IV will automatically miniaturize itself when it takes critical damage and can cause neural feedback to the technomancer controlling the system.</description>
     <spellId>rwom.tm_technoturret</spellId>
+    <iconPath>Other/TechnoTurret</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_SB</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -75,6 +79,8 @@ Weapon specialists also have access to modified ammunition and nano stimulants f
 
 To create a techno weapon: target a weapon on the ground. Targeted weapon must be ranged, with an industrial or higher tech level, and use standard firing action.</description>
     <spellId>rwom.tm_technoweapon</spellId>
+    <iconPath>Items/weapons/technoweapon</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_TechnoWeapon</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -109,6 +115,8 @@ The nanites are fueled by mana and energy within the body and will rapidly cause
 
 When the nanites burn out, they will form platelets to cauterize and stop bleeding and even heal small wounds. Use of nano stimulants will accelerate any active disease or infection.</description>
     <spellId>rwom.tm_nanostimulant</spellId>
+    <iconPath>UI/nano_stim</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_NanoStimulant</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -141,6 +149,8 @@ When the nanites burn out, they will form platelets to cauterize and stop bleedi
 		
 The amount of kinetic energy involved in a deflection is determined by the amount of damage that would be caused by the projectile.</description>
     <spellId>rwom.tm_technoshield</spellId>
+    <iconPath>UI/technoshield</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_TechnoShield</verbClass>
       <tooltipShowProjectileDamage>true</tooltipShowProjectileDamage>
@@ -176,6 +186,8 @@ The amount of kinetic energy involved in a deflection is determined by the amoun
 
 Can be applied to: batteries, power generators, turrets, robots, androids, and mechanoids.</description>
     <spellId>rwom.tm_sabotage</spellId>
+    <iconPath>UI/sabotage</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_BLOS</verbClass>
       <tooltipShowProjectileDamage>true</tooltipShowProjectileDamage>
@@ -212,6 +224,8 @@ Can be applied to: batteries, power generators, turrets, robots, androids, and m
 
 Can be applied to: power generators, turrets, robots, androids, and mechanoids.</description>
     <spellId>rwom.tm_overdrive</spellId>
+    <iconPath>UI/overdrive</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_Overdrive</verbClass>
       <tooltipShowProjectileDamage>true</tooltipShowProjectileDamage>
@@ -250,6 +264,8 @@ Range: 70
 Warmup: 3s
 Radius: 2.5</description>
     <spellId>rwom.tm_orbitalstrike</spellId>
+    <iconPath>UI/orbitalstrike</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_SB</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -287,6 +303,8 @@ Range: 80
 Warmup: 2.1s
 Radius: 4.2</description>
     <spellId>rwom.tm_orbitalstrike_i</spellId>
+    <iconPath>UI/orbitalstrike</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_SB</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -324,6 +342,8 @@ Range: 90
 Warmup: 1.8s
 Radius: 5.0</description>
     <spellId>rwom.tm_orbitalstrike_ii</spellId>
+    <iconPath>UI/orbitalstrike</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_SB</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -361,6 +381,8 @@ Range: 100
 Warmup: 1.6s
 Radius: 5.6</description>
     <spellId>rwom.tm_orbitalstrike_iii</spellId>
+    <iconPath>UI/orbitalstrike</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_SB</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>

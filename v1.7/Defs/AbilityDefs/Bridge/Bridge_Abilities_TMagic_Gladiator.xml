@@ -5,6 +5,8 @@
     <label>Sprint</label>
     <description>Activates or deactivates the sustained combat skill Sprint - greatly increases movement speed but causes exhaustion. Requires 30 Stamina to sustain and reduces stamina regen by 20%.</description>
     <spellId>rwom.tm_sprint</spellId>
+    <iconPath>UI/sprint2</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_Sprint</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -38,6 +40,8 @@
 Activating sprint grants the user 10s of evasion (25% dodge chance) and 5s of adrenaline.
 Deactivating sprint instantly returns 20 stamina and applies 5s of +20% energy regeneration.</description>
     <spellId>rwom.tm_sprint_i</spellId>
+    <iconPath>UI/sprint2</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_Sprint</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -71,6 +75,8 @@ Deactivating sprint instantly returns 20 stamina and applies 5s of +20% energy r
 Activating sprint grants the user 10s of 35% evasion, 8s of adrenaline, and all friendly pawns within 5 cells 10s of 25% evasion.
 Deactivating sprint instantly returns 35 stamina and applies 8s of +30% energy regeneration.</description>
     <spellId>rwom.tm_sprint_ii</spellId>
+    <iconPath>UI/sprint2</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_Sprint</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -104,6 +110,8 @@ Deactivating sprint instantly returns 35 stamina and applies 8s of +30% energy r
 Activating sprint grants the user 10s of 40% evasion, 10s of adrenaline, and all friendly pawns within 10 cells 10s of 30% evasion.
 Deactivating sprint instantly returns 40 stamina and applies 10s of +40% energy regeneration.</description>
     <spellId>rwom.tm_sprint_iii</spellId>
+    <iconPath>UI/sprint2</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_Sprint</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -135,6 +143,8 @@ Deactivating sprint instantly returns 40 stamina and applies 10s of +40% energy 
     <description>Mitigates a set amount of damage each hit.
 Base mitigation: 5</description>
     <spellId>rwom.tm_fortitude</spellId>
+    <iconPath>UI/fortitude</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>AbilityUser.Verb_UseAbility</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -175,6 +185,8 @@ Base mitigation: 5</description>
 Casting time: 1s
 Range: 15</description>
     <spellId>rwom.tm_grapple</spellId>
+    <iconPath>UI/grapplinghook</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_Grapple</verbClass>
       <hasStandardCommand>true</hasStandardCommand>
@@ -204,6 +216,8 @@ Range: 15</description>
 Casting time: .6s
 Range: 17</description>
     <spellId>rwom.tm_grapple_i</spellId>
+    <iconPath>UI/grapplinghook</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_Grapple</verbClass>
       <hasStandardCommand>true</hasStandardCommand>
@@ -234,6 +248,8 @@ Range: 17</description>
 Casting time: .4s
 Range: 20</description>
     <spellId>rwom.tm_grapple_ii</spellId>
+    <iconPath>UI/grapplinghook</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_Grapple</verbClass>
       <hasStandardCommand>true</hasStandardCommand>
@@ -264,6 +280,8 @@ Range: 20</description>
 Casting time: .2s
 Range: 23</description>
     <spellId>rwom.tm_grapple_iii</spellId>
+    <iconPath>UI/grapplinghook</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_Grapple</verbClass>
       <hasStandardCommand>true</hasStandardCommand>
@@ -291,6 +309,8 @@ Range: 23</description>
     <label>Cleave</label>
     <description>Executes a powerful, sweeping blow that can strike multiple enemies adjacent to the target. As long as the gladiator has enough stamina, this ability works automatically whenever the gladiator performs a melee attack. Cleave chance is calculated from weapon mass - heavier weapons are more likely to cleave.</description>
     <spellId>rwom.tm_cleave</spellId>
+    <iconPath>UI/cleave</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_Cleave</verbClass>
       <hasStandardCommand>true</hasStandardCommand>
@@ -319,6 +339,8 @@ Range: 23</description>
     <label>Whirlwind</label>
     <description>The Gladiator launches into a frenzied attack, dancing forward in a furious whirlwind of steel and death.</description>
     <spellId>rwom.tm_whirlwind</spellId>
+    <iconPath>UI/whirlwind</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Effect_Whirlwind</verbClass>
       <hasStandardCommand>true</hasStandardCommand>

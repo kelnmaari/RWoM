@@ -9,6 +9,8 @@ Using this ability while the enchantment is active will dispel the enchantment. 
 
 *All Enchanted Body skills apply to Enchanted Aura</description>
     <spellId>rwom.tm_enchantedbody</spellId>
+    <iconPath>UI/enchantedbody</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_EnchantedBody</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -41,6 +43,8 @@ Using this ability while the enchantment is active will dispel the enchantment. 
 	
 Using this ability while the enchantment is active will dispel the enchantment. Only one enchantment type may be active at a given time.</description>
     <spellId>rwom.tm_enchantedaura</spellId>
+    <iconPath>UI/enchantedaura</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_EnchantedAura</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -75,6 +79,8 @@ This ability only works on raw resources (silver, steel, furs, cloth, etc) and b
 
 Check skill descriptions for additional details.</description>
     <spellId>rwom.tm_transmutate</spellId>
+    <iconPath>UI/transmutate</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_Transmutate</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -112,6 +118,8 @@ The benefits of the artifact are granted to the pawn that has the item equipped.
 
 This ability is used on raw resources such as stone chunks, steel, or silver - see skill descriptions for a full list of resources that can be used to create an enchanter's stone.</description>
     <spellId>rwom.tm_enchanterstone</spellId>
+    <iconPath>UI/enchanterstone</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_EnchanterStone</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -145,6 +153,8 @@ This ability is used on raw resources such as stone chunks, steel, or silver - s
     <label>Dismiss Enchanter Stone</label>
     <description>Destroys the oldest enchanter's stone</description>
     <spellId>rwom.tm_dismissenchanterstones</spellId>
+    <iconPath>UI/dismissenchanterstone</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_DismissEnchanterStones</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -186,6 +196,8 @@ Enchanted weapons require an allotment of mana equal to the casting cost to sust
 
 The enchantment will only remain active as long as the pawn holds the enchanted weapon. If it is dropped or swapped for another weapon, the enchantment will disperse. Weapon enchantments only affect melee weapons.</description>
     <spellId>rwom.tm_enchantweapon</spellId>
+    <iconPath>UI/enchantweapon</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_EnchantWeapon</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -219,6 +231,8 @@ The enchantment will only remain active as long as the pawn holds the enchanted 
     <label>Dispel Weapon Enchantment</label>
     <description>Removes all weapon enchantments maintained by this enchanter.</description>
     <spellId>rwom.tm_dispelenchantweapon</spellId>
+    <iconPath>UI/dispelenchantweapon</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_DispelEnchantWeapon</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -264,6 +278,8 @@ Radius: 3
 Range: 36
 Cast time: 3s</description>
     <spellId>rwom.tm_polymorph</spellId>
+    <iconPath>UI/Polymorph</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_Polymorph</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -315,6 +331,8 @@ Radius: 3
 Range: 38
 Cast time: 2.8s</description>
     <spellId>rwom.tm_polymorph_i</spellId>
+    <iconPath>UI/Polymorph</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_Polymorph</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -366,6 +384,8 @@ Radius: 4
 Range: 40
 Cast time: 2.6s</description>
     <spellId>rwom.tm_polymorph_ii</spellId>
+    <iconPath>UI/Polymorph</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_Polymorph</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -417,6 +437,8 @@ Radius: 4
 Range: 42
 Cast time: 2.4s</description>
     <spellId>rwom.tm_polymorph_iii</spellId>
+    <iconPath>UI/Polymorph</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_Polymorph</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -459,6 +481,8 @@ Cast time: 2.4s</description>
 	
 Shapeshifting is not without minor side effects; shapeshifting into an animal will cause the enchanter to inherit instincts and behavior of the animal, if they haven't been given specific instructions, they will wander or do other random tasks an animal would normally do.</description>
     <spellId>rwom.tm_shapeshift</spellId>
+    <iconPath>UI/shapeshift1</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_Shapeshift</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -493,6 +517,8 @@ Shapeshifting is not without minor side effects; shapeshifting into an animal wi
 	
 Dire wolves are unique animals with a special connection to magic. While in dire wolf form, enchanters can exert small quantities of magic to allow the dire wolf to briefly phase in and out of reality.</description>
     <spellId>rwom.tm_shapeshiftdw</spellId>
+    <iconPath>UI/shapeshiftDW</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_ShapeshiftDW</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>

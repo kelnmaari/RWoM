@@ -7,6 +7,8 @@
 	
 Disguise will not fool any pawn that already sees the faceless as a threat.</description>
     <spellId>rwom.tm_disguise</spellId>
+    <iconPath>UI/disguise</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_Disguise</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -38,6 +40,8 @@ Disguise will not fool any pawn that already sees the faceless as a threat.</des
     <label>Mimic</label>
     <description>The faceless copies a random ability from a mage or fighter. Only one ability may be stored at a time. The ability is retained after use; reusing Mimic will replace the stored ability.</description>
     <spellId>rwom.tm_mimic</spellId>
+    <iconPath>UI/mimic</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_Mimic</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -68,6 +72,8 @@ Disguise will not fool any pawn that already sees the faceless as a threat.</des
     <label>Reversal</label>
     <description>Reverses the kinetic energy of all melee and projectile attacks for a brief period. The faceless will take no damage from these attacks. Direct application and explosive attacks cannot be reversed.</description>
     <spellId>rwom.tm_reversal</spellId>
+    <iconPath>UI/reversal</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_Reversal</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -101,6 +107,8 @@ Cast time: .8s
 Range: 40
 Cooldown: 15</description>
     <spellId>rwom.tm_transpose</spellId>
+    <iconPath>UI/transpose</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_Transpose</verbClass>
       <hasStandardCommand>true</hasStandardCommand>
@@ -133,6 +141,8 @@ Cast time: .6s
 Range: 44
 Cooldown: 13</description>
     <spellId>rwom.tm_transpose_i</spellId>
+    <iconPath>UI/transpose</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_Transpose</verbClass>
       <hasStandardCommand>true</hasStandardCommand>
@@ -165,6 +175,8 @@ Cast time: .4s
 Range: 47
 Cooldown: 11</description>
     <spellId>rwom.tm_transpose_ii</spellId>
+    <iconPath>UI/transpose</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_Transpose</verbClass>
       <hasStandardCommand>true</hasStandardCommand>
@@ -197,6 +209,8 @@ Cast time: .2s
 Range: 50
 Cooldown: 9</description>
     <spellId>rwom.tm_transpose_iii</spellId>
+    <iconPath>UI/transpose</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_Transpose</verbClass>
       <hasStandardCommand>true</hasStandardCommand>
@@ -231,6 +245,8 @@ Nearby enemies are unlikely to immediately detect the possession unless they see
 
 Only creatures with a human-like mind capable of self-doubt can be possessed.</description>
     <spellId>rwom.tm_possess</spellId>
+    <iconPath>UI/possess</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>AbilityUser.Verb_UseAbility</verbClass>
       <hasStandardCommand>true</hasStandardCommand>

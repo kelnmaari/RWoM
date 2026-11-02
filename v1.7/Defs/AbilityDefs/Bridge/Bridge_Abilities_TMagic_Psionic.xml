@@ -7,6 +7,8 @@
 	
 A well trained psionic is able to achieve incredible physical feats using a blend of psionic and physical strength. Psionic augmentation becomes second nature and occurs naturally both in and out of combat.</description>
     <spellId>rwom.tm_psionicaugmentation</spellId>
+    <iconPath>UI/psionicaugmentation</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>AbilityUser.Verb_UseAbility</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -39,6 +41,8 @@ A well trained psionic is able to achieve incredible physical feats using a blen
 
 This ability requires 2 points to level.</description>
     <spellId>rwom.tm_psionicbarrier</spellId>
+    <iconPath>UI/psionicbarrier</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_PsionicBarrier</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -71,6 +75,8 @@ This ability requires 2 points to level.</description>
 
 This barrier can be projected to a designation location.</description>
     <spellId>rwom.tm_psionicbarrier_projected</spellId>
+    <iconPath>UI/psionicbarrier</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_PsionicBarrier</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -104,6 +110,8 @@ Cast time: 	2s
 Cooldown:	12s
 Range:		28</description>
     <spellId>rwom.tm_psionicblast</spellId>
+    <iconPath>Spells/psiblast</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_PsionicBlast</verbClass>
       <hasStandardCommand>true</hasStandardCommand>
@@ -136,6 +144,8 @@ Cast time: 	1.6s
 Cooldown:	10s
 Range:		34</description>
     <spellId>rwom.tm_psionicblast_i</spellId>
+    <iconPath>Spells/psiblast</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_PsionicBlast</verbClass>
       <hasStandardCommand>true</hasStandardCommand>
@@ -168,6 +178,8 @@ Cast time: 	1.2s
 Cooldown:	8s
 Range:		40</description>
     <spellId>rwom.tm_psionicblast_ii</spellId>
+    <iconPath>Spells/psiblast</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_PsionicBlast</verbClass>
       <hasStandardCommand>true</hasStandardCommand>
@@ -200,6 +212,8 @@ Cast time: 	.8s
 Cooldown:	6s
 Range:		46</description>
     <spellId>rwom.tm_psionicblast_iii</spellId>
+    <iconPath>Spells/psiblast</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_PsionicBlast</verbClass>
       <hasStandardCommand>true</hasStandardCommand>
@@ -228,6 +242,8 @@ Range:		46</description>
     <label>Psionic Dash</label>
     <description>The Psionic infuses their body with an overwhelming amount of energy and uses it to propel themselves in a rapid burst of movement. Each step emits shockwaves of energy.</description>
     <spellId>rwom.tm_psionicdash</spellId>
+    <iconPath>UI/psionicdash</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Effect_PsionicDash</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -257,6 +273,8 @@ Range:		46</description>
     <label>Psionic Storm</label>
     <description>The Psionic lets down all mental barriers and unleashes their unrestrained psionic power. Due to the nature of this attack, the psionic will expend a tremendous amount of energy and will be left vulnerable, unable to exert psionic power, for a period following the attack.</description>
     <spellId>rwom.tm_psionicstorm</spellId>
+    <iconPath>UI/psionicstorm</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Effect_PsionicStorm</verbClass>
       <hasStandardCommand>true</hasStandardCommand>

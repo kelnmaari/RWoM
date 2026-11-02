@@ -13,6 +13,8 @@ Neither method is infallible, but practice can improve the accuracy of predictio
 
 This ability reduces mana regeneration by 50%.</description>
     <spellId>rwom.tm_prediction</spellId>
+    <iconPath>UI/prediction</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_Prediction</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -45,6 +47,8 @@ This ability reduces mana regeneration by 50%.</description>
 	
 Alter Fate is most effective against environmental conditions. This ability can backfire, however, causing the event to change, become more severe, or trigger the infamous "butterfly effect."</description>
     <spellId>rwom.tm_alterfate</spellId>
+    <iconPath>UI/alterfate</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_AlterFate</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -84,6 +88,8 @@ When use at a location or on a hostile enemy, all enemies in the area will be cu
 
 When used on friendly pawns, there is no area of effect, only the primary target will be affected. The aging process for friendly pawns is much more gradual, and may be canceled by Reverse Time.</description>
     <spellId>rwom.tm_acceleratetime</spellId>
+    <iconPath>UI/acceleratetime</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_SB</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -125,6 +131,8 @@ Warning: when used to reverse a death condition, both the chronomancer and pawn 
 
 Reverse Time can be dispelled/countered with Accelerate Time.</description>
     <spellId>rwom.tm_reversetime</spellId>
+    <iconPath>UI/reversetime</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_ReverseTime</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -162,6 +170,8 @@ Radius: 3
 Range: 40
 Cast time: 1s</description>
     <spellId>rwom.tm_chronostaticfield</spellId>
+    <iconPath>UI/timebubble</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_SB</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -197,6 +207,8 @@ Radius: 3.5
 Range: 44
 Cast time: .8s</description>
     <spellId>rwom.tm_chronostaticfield_i</spellId>
+    <iconPath>UI/timebubble</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_SB</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -232,6 +244,8 @@ Radius: 4
 Range: 48
 Cast time: .6s</description>
     <spellId>rwom.tm_chronostaticfield_ii</spellId>
+    <iconPath>UI/timebubble</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_SB</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -267,6 +281,8 @@ Radius: 4.5
 Range: 50
 Cast time: .5s</description>
     <spellId>rwom.tm_chronostaticfield_iii</spellId>
+    <iconPath>UI/timebubble</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_SB</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -304,6 +320,8 @@ When set to autocast, the chronomancer will attempt to maintain a recall marker 
 
 To maintain physical cohesion during a recall, the caster will retain all conditions with permanence (missing or added body parts, permanent injuries).  All chronomancer spells are reset following a Recall except Recall itself.</description>
     <spellId>rwom.tm_timemark</spellId>
+    <iconPath>UI/markrecall</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_TimeMark</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -334,6 +352,8 @@ To maintain physical cohesion during a recall, the caster will retain all condit
     <label>Recall</label>
     <description>Returns the caster to a previous point in time. Cannot be used without an active time marker.</description>
     <spellId>rwom.tm_recall</spellId>
+    <iconPath>UI/recall</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_Recall</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>

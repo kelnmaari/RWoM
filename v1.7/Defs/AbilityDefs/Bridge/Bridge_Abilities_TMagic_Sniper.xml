@@ -11,6 +11,8 @@ Sniper: Speed +0.15c/s, Aiming Delay -15%, Shooting Acc. +4%, Research and work 
 Master Sniper: Speed +0.2c/s, Aiming Delay -22%, Shooting Acc. +6%, Research and work speed -15%, tame and train animal -15%
 Legendary Sniper: Speed +0.25c/s, Aiming Delay -30%, Shooting Acc. +8%, Research and work speed -16%, tame and train animal -16%</description>
     <spellId>rwom.tm_sniperfocus</spellId>
+    <iconPath>UI/sniper_training</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_SniperFocus</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -41,6 +43,8 @@ Legendary Sniper: Speed +0.25c/s, Aiming Delay -30%, Shooting Acc. +8%, Research
     <label>Headshot</label>
     <description>A lethal shot that targets a vital bodypart like the head or heart. Effective on non-humanoids and humanoids alike. Headshot success chance is reduced against targets with thick armor protecting their vital organs.</description>
     <spellId>rwom.tm_headshot</spellId>
+    <iconPath>UI/headshot</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_SniperShot</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -74,6 +78,8 @@ Range: 20
 Firing Delay: 2.5s
 Recharge 45s</description>
     <spellId>rwom.tm_disablingshot</spellId>
+    <iconPath>UI/disablingshot</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_SniperShot</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -107,6 +113,8 @@ Range: 22
 Firing Delay: 2.3s
 Recharge 43s</description>
     <spellId>rwom.tm_disablingshot_i</spellId>
+    <iconPath>UI/disablingshot</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_SniperShot</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -140,6 +148,8 @@ Range: 25
 Firing Delay: 2.1s
 Recharge 41s</description>
     <spellId>rwom.tm_disablingshot_ii</spellId>
+    <iconPath>UI/disablingshot</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_SniperShot</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -173,6 +183,8 @@ Range: 27
 Firing Delay: 2s
 Recharge 40s</description>
     <spellId>rwom.tm_disablingshot_iii</spellId>
+    <iconPath>UI/disablingshot</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_SniperShot</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -202,6 +214,8 @@ Recharge 40s</description>
     <label>Anti-Armor</label>
     <description>The sniper carries anti armor rounds for those special occasions. When this ammunition shatters, it releases nanites that will shred any armor they make contact with. Relatively ineffective against soft targets but does extra damage to armored targets, as long as the resistance on impact activates the nanites. Armored targets may be any mechanoid or a target with a Sharp armor rating above 100%.</description>
     <spellId>rwom.tm_antiarmor</spellId>
+    <iconPath>Spells/InfernoCannonShot</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_SniperShot</verbClass>
       <tooltipShowProjectileDamage>true</tooltipShowProjectileDamage>
@@ -233,6 +247,8 @@ Recharge 40s</description>
 
 The shadow slayer cloaking field is a long duration form of invisibility. Unlike normal cloaking technology, this stealth field relies heavily on a form of predictive cloaking that rapidly wears off when the user performs rapid or violent actions (such as firing a weapon).</description>
     <spellId>rwom.tm_shadowslayer</spellId>
+    <iconPath>UI/shadowslayer</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_ShadowSlayerCloak</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>

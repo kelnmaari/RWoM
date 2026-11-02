@@ -5,6 +5,8 @@
     <label>Possess</label>
     <description>Possess a physical body, either dead or living. Possessing a body decreases how quickly spirit energy is lost. Deceased bodies or animals may be freely possessed, but do not generate spirit energy on their own, only another body with an existing spirit host will generate spirit energy. However, a body that is already occupied is more difficult to possess and the possessing spirit may struggle with the original spirit of the host. If the spirit still has energy, then it will extract from the body and become a wandering spirit once again. If a spirit's energy is completely drained, then it will cease to exist. When a spirit leaves a body, then the body will return to its original state or owner. Spirit Energy may be gained by siphoning energy through physical harm, using Spirit Drain, or through meditation. Killing another pawn with spirit drain absorbs a large amount of spirit. The body of a possessed pawn will not recover naturally, and only heals wounds and maladies when it gains spirit energy.</description>
     <spellId>rwom.tm_spiritpossession</spellId>
+    <iconPath>UI/spiritpossession</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_SB</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -34,6 +36,8 @@
     <label>Spirit Drain</label>
     <description>Drains the spirit of a living being to restore spirit energy of the caster.</description>
     <spellId>rwom.tm_spiritdrain</spellId>
+    <iconPath>UI/spiritdrain</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_SpiritDrain</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -67,6 +71,8 @@ Range: 35
 Cast time: 3s
 Recharge: 60s</description>
     <spellId>rwom.tm_distortspirit</spellId>
+    <iconPath>UI/distortspirit</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_SB</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -100,6 +106,8 @@ Range: 40
 Cast time: 2s
 Recharge: 45s</description>
     <spellId>rwom.tm_distortspirit_i</spellId>
+    <iconPath>UI/distortspirit</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_SB</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -133,6 +141,8 @@ Range: 45
 Cast time: 1.5s
 Recharge: 30s</description>
     <spellId>rwom.tm_distortspirit_ii</spellId>
+    <iconPath>UI/distortspirit</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_SB</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -166,6 +176,8 @@ Range: 50
 Cast time: 1s
 Recharge: 20s</description>
     <spellId>rwom.tm_distortspirit_iii</spellId>
+    <iconPath>UI/distortspirit</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_SB</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -195,6 +207,8 @@ Recharge: 20s</description>
     <label>Spirit Animals</label>
     <description>Summons 1 of each spirit animal for a short time.</description>
     <spellId>rwom.tm_summonspiritanimalmass</spellId>
+    <iconPath>UI/summonspiritanimals</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_SB</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -227,6 +241,8 @@ Recharge: 20s</description>
 Cast time: 2s
 Cooldown: 45s</description>
     <spellId>rwom.tm_spiritrally</spellId>
+    <iconPath>UI/spiritcall</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_SpiritRally</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -260,6 +276,8 @@ Cooldown: 45s</description>
 Cast time: 1s
 Cooldown: 30s</description>
     <spellId>rwom.tm_spiritrally_i</spellId>
+    <iconPath>UI/spiritcall</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_SpiritRally</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -293,6 +311,8 @@ Cooldown: 30s</description>
 Cast time: .5s
 Cooldown: 20s</description>
     <spellId>rwom.tm_spiritrally_ii</spellId>
+    <iconPath>UI/spiritcall</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_SpiritRally</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -326,6 +346,8 @@ Cooldown: 20s</description>
 Cast time: 0s
 Cooldown: 15s</description>
     <spellId>rwom.tm_spiritrally_iii</spellId>
+    <iconPath>UI/spiritcall</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_SpiritRally</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -356,6 +378,8 @@ Cooldown: 15s</description>
     <label>Spirit Storm</label>
     <description>Create a spirit beacon that attracts spirits of loss, spite, and vengeance. The swarm of angry spirits will quickly develop into a vortex that rips away reality and hope. The malevolent spirits within this storm will seek out the spirits of living beings to inflict their suffering. The direction of the spirit storm can be controlled for a short time after it is created.</description>
     <spellId>rwom.tm_spiritstorm</spellId>
+    <iconPath>UI/spiritstorm</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Effect_SpiritStorm</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -385,6 +409,8 @@ Cooldown: 15s</description>
     <label>Control Spirit Storm</label>
     <description>Directs the spirit storm to a designated location.</description>
     <spellId>rwom.tm_controlspiritstorm</spellId>
+    <iconPath>UI/controlspiritstorm</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_ControlSpiritStorm</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>

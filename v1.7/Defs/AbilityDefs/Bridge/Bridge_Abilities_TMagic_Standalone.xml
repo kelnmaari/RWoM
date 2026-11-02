@@ -5,6 +5,8 @@
     <label>Magical heater</label>
     <description>Creates a dimensional pocket that taps into the Plane of Fire, generating constant heat in a confined area. The heater must be sustained by the mage - reduces max mana by 25 while active.</description>
     <spellId>rwom.tm_heater</spellId>
+    <iconPath>UI/heater</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_SB</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -36,6 +38,8 @@
     <label>Dismiss Heater</label>
     <description>Dismisses a magical heater</description>
     <spellId>rwom.tm_dismissheater</spellId>
+    <iconPath>UI/dismissheater</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_DismissHeater</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -68,6 +72,8 @@
     <label>Magical cooler</label>
     <description>Creates a dimensional pocket that taps into the Plane of Ice, reducing heat in a confined area. The cooler must be sustained by the mage - reduces max mana by 25 while active.</description>
     <spellId>rwom.tm_cooler</spellId>
+    <iconPath>Other/cooler</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_SB</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -99,6 +105,8 @@
     <label>Dismiss Cooler</label>
     <description>Dismisses a magical cooler</description>
     <spellId>rwom.tm_dismisscooler</spellId>
+    <iconPath>UI/dismisscooler</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_DismissCooler</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -131,6 +139,8 @@
     <label>Arcane Power Node</label>
     <description>Creates an energy node that slowly releases arcane energy in the form of electricity. Can be used as a power source. The power node must be sustained by the mage - reduces max mana by 25 and mana regen by 25% while active.</description>
     <spellId>rwom.tm_powernode</spellId>
+    <iconPath>Other/energynode_1</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_SB</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -162,6 +172,8 @@
     <label>Dismiss Power Node</label>
     <description>Dismisses an arcane power node</description>
     <spellId>rwom.tm_dismisspowernode</spellId>
+    <iconPath>UI/dismissenergynode</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_DismissPowerNode</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -194,6 +206,8 @@
     <label>Sun Light</label>
     <description>Creates a beacon of sunlight strong enough to grow plants. The beacon must be sustained by the mage - reduces max mana by 40 and mana regeneration by 40% while active.</description>
     <spellId>rwom.tm_sunlight</spellId>
+    <iconPath>UI/sunlight</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_SB</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -225,6 +239,8 @@
     <label>Dismiss Sun Light</label>
     <description>Dismisses a Sun Light</description>
     <spellId>rwom.tm_dismisssunlight</spellId>
+    <iconPath>UI/dismisssunlight</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_DismissSunlight</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -257,6 +273,8 @@
     <label>Dry Ground</label>
     <description>Infuses the ground with heat, evaporating most of the moisture from a patch of ground. Only works on muddy ground.</description>
     <spellId>rwom.tm_dryground</spellId>
+    <iconPath>UI/dryground</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_BLOS</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -288,6 +306,8 @@
     <label>Moisturize Ground</label>
     <description>Infuses sand with water, creating usable soil.</description>
     <spellId>rwom.tm_wetground</spellId>
+    <iconPath>UI/wetground</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_BLOS</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -319,6 +339,8 @@
     <label>Charge Battery</label>
     <description>Converts raw magic power into electrical energy. This spell can only be used on batteries or golems. Generates 400Wd.</description>
     <spellId>rwom.tm_chargebattery</spellId>
+    <iconPath>UI/chargebattery</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_SB</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -350,6 +372,8 @@
     <label>Smoke Cloud</label>
     <description>Draws in and ignites water and dirt particles in the air to create a smoke screen that temporarily conceals the area.</description>
     <spellId>rwom.tm_smokecloud</spellId>
+    <iconPath>UI/smokecloud</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_SB</verbClass>
       <tooltipShowProjectileDamage>true</tooltipShowProjectileDamage>
@@ -383,6 +407,8 @@
     <label>Extinguish</label>
     <description>Removes the fire element from the target location, instantly extinguishing undesired fires.</description>
     <spellId>rwom.tm_extinguish</spellId>
+    <iconPath>UI/Extinguish</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_SB</verbClass>
       <tooltipShowProjectileDamage>true</tooltipShowProjectileDamage>
@@ -416,6 +442,8 @@
     <label>EMP</label>
     <description>Generate a burst of electromagnetic radiation at a target site, disabling mechanoids for a short period.</description>
     <spellId>rwom.tm_emp</spellId>
+    <iconPath>UI/EMP</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_SB</verbClass>
       <tooltipShowProjectileDamage>true</tooltipShowProjectileDamage>
@@ -449,6 +477,8 @@
     <label>Transfer Mana</label>
     <description>Transfers magical energy from one caster to another. Recipients that are not magic users will receive significant, if random, physical augmentation for a short period. Can be harmful, even lethal, at extreme levels.</description>
     <spellId>rwom.tm_transfermana</spellId>
+    <iconPath>UI/transfermana</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_BLOS</verbClass>
       <tooltipShowProjectileDamage>true</tooltipShowProjectileDamage>
@@ -482,6 +512,8 @@
     <label>Siphon Mana</label>
     <description>Siphons magical energy from another caster. Recipients that are not magic users will have physical capacities drained instead. Can be lethal if too much life force is drained.</description>
     <spellId>rwom.tm_siphonmana</spellId>
+    <iconPath>UI/siphonmana</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_BLOS</verbClass>
       <tooltipShowProjectileDamage>true</tooltipShowProjectileDamage>
@@ -517,6 +549,8 @@
 
 Casting the spell when a barrier is active will remove the barrier. Can be used in conjunction with shield belts. Does not impede spell casting of any type.</description>
     <spellId>rwom.tm_manashield</spellId>
+    <iconPath>UI/manashield</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_ManaShield</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -550,6 +584,8 @@ Casting the spell when a barrier is active will remove the barrier. Can be used 
     <label>Arcane Barrier</label>
     <description>Creates an arcane barrier at the target location that is horizontal to the caster. The barrier lasts 60 seconds.</description>
     <spellId>rwom.tm_arcanebarrier</spellId>
+    <iconPath>UI/arcanebarrier</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Weapon.Verb_ArcaneBarrier</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -581,6 +617,8 @@ Casting the spell when a barrier is active will remove the barrier. Can be used 
     <label>Flight</label>
     <description>Quickly fly to a target location.</description>
     <spellId>rwom.tm_flight</spellId>
+    <iconPath>UI/wraithflight</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Effect_Flight</verbClass>
       <hasStandardCommand>true</hasStandardCommand>
@@ -610,6 +648,8 @@ Casting the spell when a barrier is active will remove the barrier. Can be used 
     <label>Fertile Lands</label>
     <description>Infuses an area of land with power from the druid that increases its fertility. This ability must be maintained and reduces mana regeneration by 40%. The druid is limited to one area.</description>
     <spellId>rwom.tm_fertilelands</spellId>
+    <iconPath>UI/blessland</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_SB</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -643,6 +683,8 @@ Casting the spell when a barrier is active will remove the barrier. Can be used 
     <label>End Fertile Lands</label>
     <description>Releases the druid's power infusing the land with fertility.</description>
     <spellId>rwom.tm_dismissfertilelands</spellId>
+    <iconPath>UI/blesslandx</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_DismissFertileLands</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -676,6 +718,8 @@ Casting the spell when a barrier is active will remove the barrier. Can be used 
     <label>Spell Mending</label>
     <description>Cast an enchantment upon a person that slowly reconstructs their equipment at a molecular level. Spell mending requires a the equipment to be worn in order to extract 'memories' from the wearer to perform the reconstruction. This places a physical strain on the affected pawn and will slow their physical activities. Spell mending dissipates after several hours.</description>
     <spellId>rwom.tm_spellmending</spellId>
+    <iconPath>UI/spellmending</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_SpellMending</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -710,6 +754,8 @@ Casting the spell when a barrier is active will remove the barrier. Can be used 
     <label>Cauterize Wounds</label>
     <description>The fire mage invokes elemental fire to instantly cauterize wounds on a patient. However, this process is likely to leave burn scars.</description>
     <spellId>rwom.tm_cauterizewound</spellId>
+    <iconPath>UI/cauterizewound</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_CauterizeWound</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -746,6 +792,8 @@ Casting the spell when a barrier is active will remove the barrier. Can be used 
 		
 Mentored mages will gain class XP.  The amount of XP gained depends on the social status and difference in levels between the two mages.</description>
     <spellId>rwom.tm_teachmagic</spellId>
+    <iconPath>UI/teachbook</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_Teach</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -779,6 +827,8 @@ Mentored mages will gain class XP.  The amount of XP gained depends on the socia
 		
 Trained fighters will gain class XP.  The amount of XP gained depends on the social status and difference in levels between the two fighters.</description>
     <spellId>rwom.tm_teachmight</spellId>
+    <iconPath>UI/teachbook</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_Teach</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -809,6 +859,8 @@ Trained fighters will gain class XP.  The amount of XP gained depends on the soc
     <label>Blur</label>
     <description>Additional 20% chance to avoid all attacks by distorting light around the caster. Requires 20 mana to sustain and reduces mana regeneration by 10%. Re-use the ability to deactivate blur.</description>
     <spellId>rwom.tm_blur</spellId>
+    <iconPath>UI/blur</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_Blur</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -844,6 +896,8 @@ Trained fighters will gain class XP.  The amount of XP gained depends on the soc
 		
 AoE effects are only applied when the primary target is not a friendly pawn. Friendly pawns will lose both good and bad memories.</description>
     <spellId>rwom.tm_blankmind</spellId>
+    <iconPath>UI/blankmind</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_BlankMind</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -885,6 +939,8 @@ AoE effects are only applied when the primary target is not a friendly pawn. Fri
     <label>Dirt Devil</label>
     <description>Create a small vacuum of elemental air that seeks out and vaporizes dirt and debris.</description>
     <spellId>rwom.tm_dirtdevil</spellId>
+    <iconPath>UI/dirtdevil</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Effect_DirtDevil</verbClass>
       <hasStandardCommand>true</hasStandardCommand>
@@ -913,6 +969,8 @@ AoE effects are only applied when the primary target is not a friendly pawn. Fri
     <label>Reprogram Mechanites</label>
     <description>Reprograms fibrous or sensory mechanites to harmonize with a hosts biological systems. The result will significantly reduce the strain on the host while the mechanites are active.</description>
     <spellId>rwom.tm_mechanitereprogramming</spellId>
+    <iconPath>UI/mechanitereprogramming</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_MechaniteReprogramming</verbClass>
       <hasStandardCommand>true</hasStandardCommand>
@@ -943,6 +1001,8 @@ AoE effects are only applied when the primary target is not a friendly pawn. Fri
 
 Arcane Bolt is inefficient because of the unrefined nature of the spell, but it can be learned and cast by any mage capable of violence.</description>
     <spellId>rwom.tm_arcanebolt</spellId>
+    <iconPath>UI/arcanebolt</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_ArcaneBolt</verbClass>
       <tooltipShowProjectileDamage>true</tooltipShowProjectileDamage>
@@ -975,6 +1035,8 @@ Arcane Bolt is inefficient because of the unrefined nature of the spell, but it 
     <label>Throwing Knife</label>
     <description>A ranged attack using a concealed throwing knife, designed to complement any equipped weapon system.</description>
     <spellId>rwom.tm_throwingknife</spellId>
+    <iconPath>UI/throwingknife</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_SB</verbClass>
       <tooltipShowProjectileDamage>true</tooltipShowProjectileDamage>
@@ -1010,6 +1072,8 @@ This ability can instantly down a target pawn; the more pain the target is in, t
 
 Autocast only triggers when the target has 80% or greater chance of being downed from this attack.</description>
     <spellId>rwom.tm_pommelstrike</spellId>
+    <iconPath>UI/pommelstrike</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_PommelStrike</verbClass>
       <tooltipShowProjectileDamage>true</tooltipShowProjectileDamage>
@@ -1040,6 +1104,8 @@ Autocast only triggers when the target has 80% or greater chance of being downed
     <label>Lightning Trap</label>
     <description>Elemental lightning is charged inside a hardened arcane shell and placed as a trap. Arcane strands that activate the spell are extended around the trap and trigger when disturbed by enemies. Traps last indefinitely, but a mage is only able to sustain a single trap.</description>
     <spellId>rwom.tm_lightningtrap</spellId>
+    <iconPath>UI/lightningtrap</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_LightningTrap</verbClass>
       <tooltipShowProjectileDamage>true</tooltipShowProjectileDamage>
@@ -1071,6 +1137,8 @@ Autocast only triggers when the target has 80% or greater chance of being downed
     <label>Dismiss Lightning Trap</label>
     <description>Dismisses a lightning trap</description>
     <spellId>rwom.tm_dismisslightningtrap</spellId>
+    <iconPath>UI/dismisslightningtrap</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_DismissLightningTrap</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -1103,6 +1171,8 @@ Autocast only triggers when the target has 80% or greater chance of being downed
     <label>Invisibility</label>
     <description>Become invisible for 20 seconds. Any overt interaction will immediately break the spell. Clears caster from all hostile targeting.</description>
     <spellId>rwom.tm_invisibility</spellId>
+    <iconPath>UI/invisibility</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_Invisibility</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -1136,6 +1206,8 @@ Autocast only triggers when the target has 80% or greater chance of being downed
     <label>Briar Patch</label>
     <description>Creates a hazard made of thorny vines. Any movement over the affected area will be slowed, and creatures moving through the briar patch may take minor damage.</description>
     <spellId>rwom.tm_briarpatch</spellId>
+    <iconPath>UI/briarpatch</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_BriarPatch</verbClass>
       <tooltipShowProjectileDamage>true</tooltipShowProjectileDamage>
@@ -1171,6 +1243,8 @@ Magelight grants a 20% vision bonus; only the caster benefits from this bonus.
 
 Magelight can be dispelled by using this ability on the caster.</description>
     <spellId>rwom.tm_magelight</spellId>
+    <iconPath>Other/magelight</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_MageLight</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -1203,6 +1277,8 @@ Magelight can be dispelled by using this ability on the caster.</description>
     <label>Legion</label>
     <description>Copy an ability from another fighter. All bonuses and restrictions of the copied ability apply. Only one ability may be stored at a time.</description>
     <spellId>rwom.tm_legion</spellId>
+    <iconPath>UI/legion</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_Legion</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -1237,6 +1313,8 @@ Melee weapons generate blades of energy.
 	
 This attack only works when the weapon equipped is not normally consumed after use.</description>
     <spellId>rwom.tm_tempeststrike</spellId>
+    <iconPath>UI/tempeststrike</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_TempestStrike</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -1269,6 +1347,8 @@ This attack only works when the weapon equipped is not normally consumed after u
     <label>Ignite</label>
     <description>Concentrates and enormous amount of heat at a focus point and then releases it. The released heat can ignite nearby creatures and will always set fire to corpses. The released heat will also dramatically increase the room temperature for any enclosed area.</description>
     <spellId>rwom.tm_ignite</spellId>
+    <iconPath>UI/ignite</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_Ignite</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -1310,6 +1390,8 @@ This attack only works when the weapon equipped is not normally consumed after u
     <label>Snap Freeze</label>
     <description>Removes almost all heat at a focus point causing a snap freeze of any living object. Creatures may suffer from frostbite and most plant life will die. The removal of heat will also dramatically decrease the room temperature for any enclosed area.</description>
     <spellId>rwom.tm_snapfreeze</spellId>
+    <iconPath>UI/snapfreeze</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_SnapFreeze</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -1353,6 +1435,8 @@ This attack only works when the weapon equipped is not normally consumed after u
 		
 Effects include dizziness, nausea, vision and hearing loss, vomiting, inability to determine friend from foe, can no longer maths, dislike of other pawns, loss of motor skills, loss of reason, urge to discuss politics, paroxysm, brain hemorrhaging and cranial detonation. Results may vary when targeting friendly pawns. Consult your therapist channel before using.</description>
     <spellId>rwom.tm_discord</spellId>
+    <iconPath>UI/discordance</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_Discord</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -1385,6 +1469,8 @@ Effects include dizziness, nausea, vision and hearing loss, vomiting, inability 
     <label>Magic Wardrobe</label>
     <description>A simple ability that stores all equipped clothing in a dimensional pocket. When used again, the stored clothing becomes equipped and any current equipment becomes stored. Works for all apparel, but not weapons or held items. Useful for storing gear or for quickly swapping between equipment sets.</description>
     <spellId>rwom.tm_magicwardrobe</spellId>
+    <iconPath>UI/magicwardrobe</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_MagicWardrobe</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -1418,6 +1504,8 @@ Effects include dizziness, nausea, vision and hearing loss, vomiting, inability 
     <label>Heat Shield</label>
     <description>Place a heat barrier on allies that provides 75% bonus protection against heat damage and prevents catching on fire. Effects up to 6 targets and lasts about 30 seconds.</description>
     <spellId>rwom.tm_heatshield</spellId>
+    <iconPath>UI/heatshield</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_HeatShield</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -1458,6 +1546,8 @@ Effects include dizziness, nausea, vision and hearing loss, vomiting, inability 
     <label>Alter Storm</label>
     <description>Alters the weather to create new conditions. Rainy storms will be changed to healing rain. Snow will be changed to a hailstorm. The hailstorm can be partially controlled by directing the hail towards enemies on the map, but once this weather even is started it must run its course and cannot be influenced by rainmaker.</description>
     <spellId>rwom.tm_alterstorm</spellId>
+    <iconPath>UI/alterstorm</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_AlterStorm</verbClass>
       <hasStandardCommand>true</hasStandardCommand>

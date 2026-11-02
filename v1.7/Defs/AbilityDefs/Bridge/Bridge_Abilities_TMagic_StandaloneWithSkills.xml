@@ -5,6 +5,8 @@
     <label>Explosion!</label>
     <description>Blackness shrouded in light, frenzied blaze clad in night, in the name of the crimson demons, let the collapse of thine origin manifest. Summon before me the root of thy power, hidden within the blossoming kingdom of demise. Explosion!</description>
     <spellId>rwom.tm_explosion</spellId>
+    <iconPath>UI/explosion</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_SB</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -34,6 +36,8 @@
     <label>Taunt</label>
     <description>Taunts nearby targets to attack this pawn.</description>
     <spellId>rwom.tm_taunt</spellId>
+    <iconPath>UI/taunt</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_Taunt</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
@@ -66,6 +70,8 @@
 Absorbs up to 80 damage.
 The shield absorbs an additional .5 damage for each level of the caster.</description>
     <spellId>rwom.tm_shieldother</spellId>
+    <iconPath>UI/shieldother</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_ShieldOther</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>

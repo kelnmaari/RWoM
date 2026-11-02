@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using RimWorld;
 using Verse;
 
@@ -12,8 +12,9 @@ namespace TorannMagic
     public static class VanillaBridgeSync
     {
         // Rollout gate: spellId prefixes enabled in the vanilla tracker.
-        // "rwom.tm_heal" = the Heal pilot family.
-        private static readonly string[] EnabledFamilyPrefixes = { "rwom.tm_heal" };
+        // Full rollout: every convention spellId ("rwom.tm_*") — the boundary
+        // check keeps foreign rwom.* namespaces out.
+        private static readonly string[] EnabledFamilyPrefixes = { "rwom.tm_" };
 
         private static readonly Dictionary<string, TMBridgeAbilityDef> BridgeDefs =
             new Dictionary<string, TMBridgeAbilityDef>();
@@ -34,16 +35,31 @@ namespace TorannMagic
             }
         }
 
-        // Prefix match with a defName boundary: "rwom.tm_heal" must not swallow
-        // "rwom.tm_healingcircle".
-        private static bool FamilyEnabled(string spellId)
+        // Prefix match with a family boundary: "rwom.tm_heal" must not swallow
+        // "rwom.tm_healingcircle" (exact match or '_' follows), while a
+        // namespace prefix like "rwom.tm_" (ends with the separator itself)
+        // matches everything under it.
+        public static bool FamilyEnabled(string spellId)
         {
+            if (spellId == null) return false;
             foreach (string prefix in EnabledFamilyPrefixes)
             {
                 if (!spellId.StartsWith(prefix)) continue;
-                if (spellId.Length == prefix.Length || spellId[prefix.Length] == '_') return true;
+                if (spellId.Length == prefix.Length) return true;
+                if (prefix.EndsWith("_") || prefix.EndsWith(".")) return true;
+                if (spellId[prefix.Length] == '_') return true;
             }
             return false;
+        }
+
+        // Phase Б: the classic gizmo hides when the vanilla tracker provides
+        // the bridge gizmo for this spell (family enabled + bridge def exists).
+        public static bool ShouldHideLegacyGizmo(TMAbilityDef def)
+        {
+            if (def == null) return false;
+            string spellId = SpellIds.Of(def);
+            if (!FamilyEnabled(spellId)) return false;
+            return BridgeDef(spellId) != null;
         }
 
         private static TMBridgeAbilityDef BridgeDef(string spellId)

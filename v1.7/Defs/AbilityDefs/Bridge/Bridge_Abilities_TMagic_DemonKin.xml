@@ -9,6 +9,8 @@ The soul bond contract may be canceled at any time by the demonkin by re-using t
 
 Succubi and Warlocks form distinct types of soul bonds - warlocks bonds are mentally reciprocal while a succubus bonds are physical in nature. Demonkin can only sustain a single bond; hosts can only sustain a single bond of each type (mental/physical).</description>
     <spellId>rwom.tm_soulbond</spellId>
+    <iconPath>UI/soulbond</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_SoulBond</verbClass>
       <tooltipShowProjectileDamage>true</tooltipShowProjectileDamage>
@@ -43,6 +45,8 @@ Succubi and Warlocks form distinct types of soul bonds - warlocks bonds are ment
     <label>Shadow Call</label>
     <description>Commands the soul of a bonded host to travel to your location.</description>
     <spellId>rwom.tm_shadowcall</spellId>
+    <iconPath>UI/shadowcall</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_ShadowCall</verbClass>
       <tooltipShowProjectileDamage>true</tooltipShowProjectileDamage>
@@ -76,6 +80,8 @@ Succubi and Warlocks form distinct types of soul bonds - warlocks bonds are ment
     <label>Shadow Step</label>
     <description>Step through shadow to the location of your soul bonded host.</description>
     <spellId>rwom.tm_shadowstep</spellId>
+    <iconPath>UI/shadowstep</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_ShadowStep</verbClass>
       <tooltipShowProjectileDamage>true</tooltipShowProjectileDamage>
@@ -111,6 +117,8 @@ Cast time: 2s
 Cooldown : 20s
 Range: 40</description>
     <spellId>rwom.tm_shadowbolt</spellId>
+    <iconPath>UI/shadowbolt</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Effect_ShadowBolt</verbClass>
       <tooltipShowProjectileDamage>true</tooltipShowProjectileDamage>
@@ -148,6 +156,8 @@ Cast time: 1.8s
 Cooldown : 18s
 Range: 45</description>
     <spellId>rwom.tm_shadowbolt_i</spellId>
+    <iconPath>UI/shadowbolt</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Effect_ShadowBolt</verbClass>
       <tooltipShowProjectileDamage>true</tooltipShowProjectileDamage>
@@ -185,6 +195,8 @@ Cast time: 1.6s
 Cooldown : 16s
 Range: 50</description>
     <spellId>rwom.tm_shadowbolt_ii</spellId>
+    <iconPath>UI/shadowbolt</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Effect_ShadowBolt</verbClass>
       <tooltipShowProjectileDamage>true</tooltipShowProjectileDamage>
@@ -222,6 +234,8 @@ Cast time: 1.5s
 Cooldown : 15s
 Range: 55</description>
     <spellId>rwom.tm_shadowbolt_iii</spellId>
+    <iconPath>UI/shadowbolt</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Effect_ShadowBolt</verbClass>
       <tooltipShowProjectileDamage>true</tooltipShowProjectileDamage>
@@ -257,6 +271,8 @@ Range: 55</description>
 		
 Warlocks and Succubi dominate their foes in different ways. Warlocks will attempt to break the mind of their enemies, while a succubus will reduce the physical prowess of their victims.</description>
     <spellId>rwom.tm_dominate</spellId>
+    <iconPath>UI/dominate_c</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_Dominate</verbClass>
       <tooltipShowProjectileDamage>true</tooltipShowProjectileDamage>
@@ -294,6 +310,8 @@ Cast time: 3s
 Range: 40
 Cooldown: 60</description>
     <spellId>rwom.tm_attraction</spellId>
+    <iconPath>UI/repulsion</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_Attraction</verbClass>
       <tooltipShowProjectileDamage>true</tooltipShowProjectileDamage>
@@ -330,6 +348,8 @@ Cast time: 2.6s
 Range: 45
 Cooldown: 55</description>
     <spellId>rwom.tm_attraction_i</spellId>
+    <iconPath>UI/repulsion</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_Attraction</verbClass>
       <tooltipShowProjectileDamage>true</tooltipShowProjectileDamage>
@@ -366,6 +386,8 @@ Cast time: 2.3s
 Range: 50
 Cooldown: 50</description>
     <spellId>rwom.tm_attraction_ii</spellId>
+    <iconPath>UI/repulsion</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_Attraction</verbClass>
       <tooltipShowProjectileDamage>true</tooltipShowProjectileDamage>
@@ -402,6 +424,8 @@ Cast time: 2s
 Range: 55
 Cooldown: 45</description>
     <spellId>rwom.tm_attraction_iii</spellId>
+    <iconPath>UI/repulsion</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_Attraction</verbClass>
       <tooltipShowProjectileDamage>true</tooltipShowProjectileDamage>
@@ -439,6 +463,8 @@ Range: 40
 Cooldown: 30s
 Radius: 5</description>
     <spellId>rwom.tm_repulsion</spellId>
+    <iconPath>UI/repulsion</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_SB</verbClass>
       <tooltipShowProjectileDamage>true</tooltipShowProjectileDamage>
@@ -477,6 +503,8 @@ Range: 47
 Cooldown: 25s
 Radius: 6</description>
     <spellId>rwom.tm_repulsion_i</spellId>
+    <iconPath>UI/repulsion</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_SB</verbClass>
       <tooltipShowProjectileDamage>true</tooltipShowProjectileDamage>
@@ -515,6 +543,8 @@ Range: 54
 Cooldown: 20s
 Radius: 7</description>
     <spellId>rwom.tm_repulsion_ii</spellId>
+    <iconPath>UI/repulsion</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_SB</verbClass>
       <tooltipShowProjectileDamage>true</tooltipShowProjectileDamage>
@@ -553,6 +583,8 @@ Range: 60
 Cooldown: 15s
 Radius: 8</description>
     <spellId>rwom.tm_repulsion_iii</spellId>
+    <iconPath>UI/repulsion</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_SB</verbClass>
       <tooltipShowProjectileDamage>true</tooltipShowProjectileDamage>
@@ -588,6 +620,8 @@ Radius: 8</description>
 		
 A succubus will retain her partial demon form for a short period after using this ability, granting her improved physical capacities and a damage shield.</description>
     <spellId>rwom.tm_scorn</spellId>
+    <iconPath>UI/scorn</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_Scorn</verbClass>
       <tooltipShowProjectileDamage>true</tooltipShowProjectileDamage>
@@ -624,6 +658,8 @@ A succubus will retain her partial demon form for a short period after using thi
 		
 The Warlock who will use the minds of others to propagate the psychic wave. The Warlock will also attempt to destroy the mind of any enemy touched by psychic energy. Being subjected to this mental assault will disorient pawns for a short period and may even disorient the warlock if he is affected by reflected psychic energy. Psychic Shock receives a bonus based on the psychic sensitivity of the warlock and may fail to affect pawns with reduced psychic sensitivity.</description>
     <spellId>rwom.tm_psychicshock</spellId>
+    <iconPath>UI/psychicshock</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_SB</verbClass>
       <tooltipShowProjectileDamage>true</tooltipShowProjectileDamage>
@@ -660,6 +696,8 @@ The Warlock who will use the minds of others to propagate the psychic wave. The 
  
 The summoning is initiated when a Succubus anchors the physical offering and is completed when a Warlock finalizes the terms of the demonic contract.</description>
     <spellId>rwom.tm_summondemon</spellId>
+    <iconPath>UI/summon_demon</iconPath>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_SummonDemon</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
