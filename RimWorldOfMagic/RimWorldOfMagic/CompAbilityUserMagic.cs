@@ -3976,6 +3976,10 @@ namespace TorannMagic
         // Outer game/job admission stays in ResolveAutoCast.
         private void ResolvePlayerAutocastPowers()
         {
+            // Ф4 step 3: knowledge store gates the generic dispatch; sleeping
+            // knowledge is reported once per pawn per day.
+            TorannMagic.AbilityKnowledgeComp knowledge = this.Pawn.TryGetComp<TorannMagic.AbilityKnowledgeComp>();
+            KnowledgeDiagnostics.ReportSleeping(this.Pawn, knowledge);
             var legacyPowers = AutoCast.AutocastPolicy.LegacyMagicPowers(this.MagicData).ToList();
             bool shadowBoltAttempted = false;
             bool healAttempted = false;
@@ -3997,10 +4001,11 @@ namespace TorannMagic
                 if (this.Pawn.drafter != null && !this.Pawn.Drafted && this.Mana != null && this.Mana.CurLevelPercentage >= ModOptions.Settings.Instance.autocastMinThreshold)
                 {
                     // All learned powers (custom included) — every power now carries
-                    // autocast defaults, gated per-pawn by the mp.autocast toggle.
-                    foreach (MagicPower mp in AutoCast.AutocastPolicy.MagicPowers(this.MagicData))
+                    // autocast defaults, gated per-pawn by the mp.autocast toggle
+                    // (knowledge store override, Ф4 step 3).
+                    foreach (MagicPower mp in AutoCast.AutocastPolicy.MagicPowers(this.MagicData, knowledge))
                     {
-                        if (mp.learned && mp.autocast && mp.autocasting != null && mp.autocasting.magicUser && mp.autocasting.undrafted)
+                        if (AutoCast.AutocastPolicy.EnabledForAutocast(mp, knowledge) && mp.autocasting != null && mp.autocasting.magicUser && mp.autocasting.undrafted)
                         {
                             TMAbilityDef tmad = mp.TMabilityDefs[mp.level] as TMAbilityDef; // issues with index?
                             bool canUseWithEquippedWeapon = true;
@@ -4529,9 +4534,9 @@ namespace TorannMagic
                 //combat (drafted) spells
                 if (this.Pawn.drafter != null && this.Pawn.Drafted && this.Pawn.drafter.FireAtWill && this.Pawn.CurJob.def != JobDefOf.Goto && this.Mana != null && this.Mana.CurLevelPercentage >= ModOptions.Settings.Instance.autocastCombatMinThreshold)
                 {
-                    foreach (MagicPower mp in AutoCast.AutocastPolicy.MagicPowers(this.MagicData))
+                    foreach (MagicPower mp in AutoCast.AutocastPolicy.MagicPowers(this.MagicData, knowledge))
                     {
-                        if (mp.learned && mp.autocast && mp.autocasting != null && mp.autocasting.magicUser && mp.autocasting.drafted)
+                        if (AutoCast.AutocastPolicy.EnabledForAutocast(mp, knowledge) && mp.autocasting != null && mp.autocasting.magicUser && mp.autocasting.drafted)
                         {
                             TMAbilityDef tmad = mp.TMabilityDefs[mp.level] as TMAbilityDef; // issues with index?
                             bool canUseWithEquippedWeapon = true;

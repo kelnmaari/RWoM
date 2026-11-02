@@ -12,6 +12,17 @@ namespace TorannMagic.Core
 
         public static void Invalidate() => _byId = null;
 
+        // Host-mod registration for convention ids (and any other late id).
+        // Extension ids take precedence: the registry is always rebuilt (and
+        // extension ids indexed) before the first registration lands, and an
+        // existing key is never overwritten.
+        public static void Register(string spellId, Def def)
+        {
+            if (spellId == null || def == null) return;
+            if (_byId == null) Rebuild();
+            if (!_byId.ContainsKey(spellId)) _byId[spellId] = def;
+        }
+
         public static Def Resolve(string spellId)
         {
             var reg = Registry;

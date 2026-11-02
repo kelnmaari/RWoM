@@ -81,7 +81,7 @@ namespace TorannMagic.AutoCast
         public static IEnumerable<MagicPower> MagicPowers(MagicData data)
         {
             // Distinct is by saved object identity, not base def: an unlearned class
-            // entry must not hide a separate learned custom/hybrid power.
+            // entry must not hide a separately learned custom/hybrid power.
             return data.AllMagicPowers.Where(power => power != null && power.learned &&
                 power.TMabilityDefs != null && power.abilityDef is TMAbilityDef def &&
                 !TM_AutocastDefaults.IsManualOnly(def)).Distinct();
@@ -92,6 +92,38 @@ namespace TorannMagic.AutoCast
             return data.AllMightPowers.Where(power => power != null && power.learned &&
                 power.TMabilityDefs != null && power.abilityDef is TMAbilityDef def &&
                 !TM_AutocastDefaults.IsManualOnly(def)).Distinct();
+        }
+
+        // Ф4 step 3: knowledge-aware dispatch sources. A knowledge entry
+        // overrides the legacy learned/autocast flags; without an entry (store
+        // absent or the import has not run yet) the legacy flags decide, so
+        // classic pawns behave exactly as before.
+        public static IEnumerable<MagicPower> MagicPowers(MagicData data, TorannMagic.AbilityKnowledgeComp knowledge)
+            => KnowledgePowers(MagicPowers(data), knowledge);
+
+        public static IEnumerable<MightPower> MightPowers(MightData data, TorannMagic.AbilityKnowledgeComp knowledge)
+            => KnowledgePowers(MightPowers(data), knowledge);
+
+        public static IEnumerable<MagicPower> KnowledgePowers(IEnumerable<MagicPower> powers,
+            TorannMagic.AbilityKnowledgeComp knowledge)
+            => powers.Where(power => EnabledForAutocast(power, knowledge));
+
+        public static IEnumerable<MightPower> KnowledgePowers(IEnumerable<MightPower> powers,
+            TorannMagic.AbilityKnowledgeComp knowledge)
+            => powers.Where(power => EnabledForAutocast(power, knowledge));
+
+        public static bool EnabledForAutocast(MagicPower power, TorannMagic.AbilityKnowledgeComp knowledge)
+            => KnowledgeAllows(power?.abilityDef, power?.learned ?? false, power?.autocast ?? false, knowledge);
+
+        public static bool EnabledForAutocast(MightPower power, TorannMagic.AbilityKnowledgeComp knowledge)
+            => KnowledgeAllows(power?.abilityDef, power?.learned ?? false, power?.autocast ?? false, knowledge);
+
+        private static bool KnowledgeAllows(AbilityUser.AbilityDef def, bool legacyLearned, bool legacyAutocast,
+            TorannMagic.AbilityKnowledgeComp knowledge)
+        {
+            if (def == null) return false;
+            SpellKnowledge entry = knowledge?.Find(TorannMagic.SpellIds.Of(def));
+            return entry == null ? legacyLearned && legacyAutocast : entry.learned && entry.autocast;
         }
 
         // Dedicated evaluators must read the same saved owner as the toggle.

@@ -2761,6 +2761,10 @@ namespace TorannMagic
         // together so every evaluator consumes the same saved-owner snapshot.
         private void ResolvePlayerAutocastPowers()
         {
+            // Ф4 step 3: knowledge store gates the generic dispatch; sleeping
+            // knowledge is reported once per pawn per day.
+            TorannMagic.AbilityKnowledgeComp knowledge = this.Pawn.TryGetComp<TorannMagic.AbilityKnowledgeComp>();
+            KnowledgeDiagnostics.ReportSleeping(this.Pawn, knowledge);
             var legacyPowers = AutoCast.AutocastPolicy.LegacyMightPowers(this.MightData).ToList();
             bool hasLearnedPowers = legacyPowers.Any(power => power.learned);
 
@@ -2773,11 +2777,12 @@ namespace TorannMagic
                 if (this.Pawn.drafter != null && !this.Pawn.Drafted && this.Stamina != null && this.Stamina.CurLevelPercentage >= ModOptions.Settings.Instance.autocastMinThreshold)
                 {
                     // All learned powers (custom included) — every power now carries
-                    // autocast defaults, gated per-pawn by the mp.autocast toggle.
-                    foreach (MightPower mp in AutoCast.AutocastPolicy.MightPowers(this.MightData))
+                    // autocast defaults, gated per-pawn by the mp.autocast toggle
+                    // (knowledge store override, Ф4 step 3).
+                    foreach (MightPower mp in AutoCast.AutocastPolicy.MightPowers(this.MightData, knowledge))
                     {
                         //Log.Message("checking custom power " + mp.abilityDef.defName);
-                        if (mp.learned && mp.autocast && mp.autocasting != null && mp.autocasting.mightUser && mp.autocasting.undrafted)
+                        if (AutoCast.AutocastPolicy.EnabledForAutocast(mp, knowledge) && mp.autocasting != null && mp.autocasting.mightUser && mp.autocasting.undrafted)
                         {
                             TMAbilityDef tmad = mp.TMabilityDefs[mp.level] as TMAbilityDef; // issues with index?
                             //Log.Message("checking autocast for ability " + tmad.defName);
@@ -3178,9 +3183,9 @@ namespace TorannMagic
                 //combat (drafted) spells
                 if (this.Pawn.drafter != null && this.Pawn.Drafted && this.Pawn.drafter.FireAtWill && this.Stamina != null && (this.Stamina.CurLevelPercentage >= ModOptions.Settings.Instance.autocastCombatMinThreshold || this.Pawn.story.traits.HasTrait(TorannMagicDefOf.TM_Monk)) && this.Pawn.CurJob.def != JobDefOf.Goto && this.Pawn.CurJob.def != JobDefOf.AttackMelee)
                 {
-                    foreach (MightPower mp in AutoCast.AutocastPolicy.MightPowers(this.MightData))
+                    foreach (MightPower mp in AutoCast.AutocastPolicy.MightPowers(this.MightData, knowledge))
                     {
-                        if (mp.learned && mp.autocast && mp.autocasting != null && mp.autocasting.mightUser && mp.autocasting.drafted)
+                        if (AutoCast.AutocastPolicy.EnabledForAutocast(mp, knowledge) && mp.autocasting != null && mp.autocasting.mightUser && mp.autocasting.drafted)
                         {
                             //try
                             //{ 

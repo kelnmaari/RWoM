@@ -67,7 +67,7 @@ namespace TorannMagic
                 foreach (var power in magicComp.MagicData.AllMagicPowers)
                 {
                     if (power?.abilityDef == null) continue;
-                    var spellId = "rwom." + power.abilityDef.defName.ToLower();
+                    var spellId = SpellIds.Of(power.abilityDef);
                     var entry = GetOrCreate(spellId, power.level);
                     entry.learned = power.learned;
                     entry.autocast = power.autocast;
@@ -80,7 +80,7 @@ namespace TorannMagic
                 foreach (var power in mightComp.MightData.AllMightPowers)
                 {
                     if (power?.abilityDef == null) continue;
-                    var spellId = "rwom." + power.abilityDef.defName.ToLower();
+                    var spellId = SpellIds.Of(power.abilityDef);
                     var entry = GetOrCreate(spellId, power.level);
                     entry.learned = power.learned;
                     entry.autocast = power.autocast;

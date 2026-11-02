@@ -654,13 +654,13 @@ internal static class AutocastTests
 
     private static IEnumerable<MagicPower> MagicCandidates(MagicData data)
     {
-        var method = typeof(AutoCastContext).Assembly.GetType("TorannMagic.AutoCast.AutocastPolicy")?.GetMethod("MagicPowers");
+        var method = typeof(AutoCastContext).Assembly.GetType("TorannMagic.AutoCast.AutocastPolicy")?.GetMethod("MagicPowers", [typeof(MagicData)]);
         return method != null ? (IEnumerable<MagicPower>)method.Invoke(null, [data])! : data.AllMagicPowersWithSkills.Where(power => power.learned);
     }
 
     private static IEnumerable<MightPower> MightCandidates(MightData data)
     {
-        var method = typeof(AutoCastContext).Assembly.GetType("TorannMagic.AutoCast.AutocastPolicy")?.GetMethod("MightPowers");
+        var method = typeof(AutoCastContext).Assembly.GetType("TorannMagic.AutoCast.AutocastPolicy")?.GetMethod("MightPowers", [typeof(MightData)]);
         return method != null ? (IEnumerable<MightPower>)method.Invoke(null, [data])! : data.AllMightPowersWithSkills.Where(power => power.learned);
     }
 
