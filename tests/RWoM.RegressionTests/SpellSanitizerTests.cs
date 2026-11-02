@@ -51,6 +51,13 @@ internal static class SpellSanitizerTests
     // the sanitizer must purge it and clamp the level into range.
     private static void PurgesNullsAndClamps(RuntimeFixture _)
     {
+        var third = Ability("SanIII"); var fourth = Ability("SanIV");
+        var magic = Power(Ability("SanI"), null, third, fourth);
+        magic.level = 2;
+        var might = new MightPower(new List<AbilityDef>(magic.TMabilityDefs)) { learned = true, level = 2 };
+        SpellSanitizer.Sanitize(magic); SpellSanitizer.Sanitize(might);
+        Check.Same(third, magic.abilityDef, "missing II must not promote magic III to IV");
+        Check.Same(third, might.abilityDef, "missing II must not promote might III to IV");
         var a = Ability("SpellSanA"); var b = Ability("SpellSanB");
         var power = Power(a, b);
         power.level = 1;

@@ -54,13 +54,14 @@ namespace TorannMagic.ClassProgression
         // do not call it. Migration requires its own preservation-checked transaction.
         public bool BeginNewProgression(Vocation vocation)
         {
-            if (state != null || vocation == Vocation.None || (vocation & ~Vocation.WarriorMage) != 0) return false;
+            if (!ClassProgressionFeature.Enabled || state != null || vocation == Vocation.None || (vocation & ~Vocation.WarriorMage) != 0) return false;
             state = new ClassProgressionState(vocation);
             return true;
         }
 
         public override IEnumerable<Gizmo> CompGetGizmosExtra()
         {
+            if (!ClassProgressionFeature.Enabled) yield break;
             var pawn = parent as Pawn;
             if (pawn?.IsColonistPlayerControlled != true) yield break;
             if (ClassIdentity.TryGetState(pawn, out _))
@@ -88,6 +89,7 @@ namespace TorannMagic.ClassProgression
         public override void CompTick()
         {
             base.CompTick();
+            if (!ClassProgressionFeature.Enabled) return;
             if (spiritRebirth?.DepletionPending == true) SpiritRebirthEnergy.Retry(parent as Pawn);
             if (state?.Find("rwom.summoner")?.Stage == InitiationStage.Foundation && Find.TickManager.TicksGame % 30 == 0)
                 SummonerTrials.Observe(parent as Pawn, Find.TickManager.TicksGame);
@@ -95,6 +97,7 @@ namespace TorannMagic.ClassProgression
 
         public override void PostDeSpawn(Map map, DestroyMode mode = DestroyMode.Vanish)
         {
+            if (!ClassProgressionFeature.Enabled) { base.PostDeSpawn(map, mode); return; }
             var path = state?.Find("rwom.summoner");
             if (path != null) path.SummonerTrials.LastActive = false;
             base.PostDeSpawn(map, mode);
@@ -103,6 +106,7 @@ namespace TorannMagic.ClassProgression
         public override void PostSpawnSetup(bool respawningAfterLoad)
         {
             base.PostSpawnSetup(respawningAfterLoad);
+            if (!ClassProgressionFeature.Enabled) return;
             var summoner = state?.Find("rwom.summoner");
             if (summoner != null) summoner.SummonerTrials.LastActive = false;
             NecromancerControlTrial.PauseOwner(parent as Pawn);
@@ -134,7 +138,7 @@ namespace TorannMagic.ClassProgression
         public override void PostExposeData()
         {
             base.PostExposeData();
-            if (Scribe.mode == LoadSaveMode.Saving && state == null && spiritRebirth == null && spiritRitual == null) return;
+            if (Scribe.mode == LoadSaveMode.Saving && state == null && spiritRebirth == null && spiritRitual == null && tomeQuestAvailableAtTick == 0) return;
             Scribe_Deep.Look(ref state, "TM_classProgression");
             Scribe_Deep.Look(ref spiritRebirth, "TM_spiritRebirth");
             Scribe_Deep.Look(ref spiritRitual, "TM_spiritRitual");
@@ -156,16 +160,12 @@ namespace TorannMagic.ClassProgression
                 if (!def.comps.Any(p => p?.compClass == typeof(TorannMagic.AbilityKnowledgeComp)))
                     def.comps.Add(new CompProperties { compClass = typeof(TorannMagic.AbilityKnowledgeComp) });
             }
-            // Beta progression kill switch: without the comp no pawn can hold
-            // progression state, and every ClassIdentity predicate falls back to the
-            // classic trait checks.
-            if (!ClassProgressionFeature.Enabled) return;
+            // The save carrier stays registered while gameplay is disabled.
             foreach (var def in DefDatabase<ThingDef>.AllDefsListForReading) EnsureComp(def);
         }
 
         public static void EnsureComp(ThingDef def)
         {
-            if (!ClassProgressionFeature.Enabled) return;
             if (def?.race == null || !def.race.Humanlike) return;
             if (def.comps == null) def.comps = new List<CompProperties>();
             if (!def.comps.Any(p => p?.compClass == typeof(CompClassProgression)))

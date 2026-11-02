@@ -115,6 +115,9 @@ namespace TorannMagic.Odyssey
             if (mark?.Core == parent) pawn.health.RemoveHediff(mark);
             Unregister(pawn);
         }
+        internal bool CanOrderMark(Pawn pawn, Hediff_CoreReturnMark expectedMark, Thing expectedCore)
+            => CanMark(pawn) && FindMark(pawn) == expectedMark && expectedMark?.Core == expectedCore;
+
         private void ChooseMark()
         {
             if (!Operational) return;
@@ -124,13 +127,14 @@ namespace TorannMagic.Odyssey
                 Pawn pawn = candidate;
                 var old = FindMark(pawn);
                 if (old?.Core == parent) continue;
+                var previousCore = old?.Core;
                 Action order = () =>
                 {
                     // Sleep is not a blocker; anything still blocking shows as a reason.
-                    if (FindMark(pawn) != null || MarkBlockReason(pawn) != null) return;
+                    if (!CanOrderMark(pawn, old, previousCore)) return;
                     // Rebinding is explicit and only removes the old mark upon arrival.
                     var job = JobMaker.MakeJob(DefDatabase<JobDef>.GetNamed("TM_ReceiveCoreReturnMark"), parent);
-                    job.targetB = old?.Core;
+                    job.targetB = previousCore;
                     pawn.jobs.TryTakeOrderedJob(job, JobTag.Misc);
                 };
                 string blocked = CanMark(pawn) ? null : MarkBlockReason(pawn);

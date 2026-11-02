@@ -17,35 +17,26 @@ namespace TorannMagic
         public static void Sanitize(MagicPower power)
         {
             if (power?.TMabilityDefs == null) return;
-            power.TMabilityDefs.RemoveAll(d => d == null);
-            if (power.TMabilityDefs.Count == 0)
-            {
-                power.learned = false;
-                power.autocast = false;
-                power.level = 0;
-            }
-            else
-            {
-                power.level = Mathf.Clamp(power.level, 0, power.TMabilityDefs.Count - 1);
-                power.maxLevel = power.TMabilityDefs.Count - 1;
-            }
+            CompactRanks(power.TMabilityDefs, ref power.level, ref power.maxLevel, ref power.learned, ref power.autocast);
         }
 
         public static void Sanitize(MightPower power)
         {
             if (power?.TMabilityDefs == null) return;
-            power.TMabilityDefs.RemoveAll(d => d == null);
-            if (power.TMabilityDefs.Count == 0)
-            {
-                power.learned = false;
-                power.autocast = false;
-                power.level = 0;
-            }
-            else
-            {
-                power.level = Mathf.Clamp(power.level, 0, power.TMabilityDefs.Count - 1);
-                power.maxLevel = power.TMabilityDefs.Count - 1;
-            }
+            CompactRanks(power.TMabilityDefs, ref power.level, ref power.maxLevel, ref power.learned, ref power.autocast);
+        }
+
+        private static void CompactRanks(List<AbilityUser.AbilityDef> defs, ref int level, ref int maxLevel,
+            ref bool learned, ref bool autocast)
+        {
+            int retained = 0;
+            int selected = Mathf.Clamp(level, 0, defs.Count - 1);
+            for (int i = 0; i < defs.Count && i <= selected; i++)
+                if (defs[i] != null) retained++;
+            defs.RemoveAll(def => def == null);
+            maxLevel = System.Math.Max(0, defs.Count - 1);
+            level = System.Math.Max(0, retained - 1);
+            if (retained == 0) { learned = false; autocast = false; }
         }
 
         // Runtime wrappers whose spell def died with an old version: dropped so

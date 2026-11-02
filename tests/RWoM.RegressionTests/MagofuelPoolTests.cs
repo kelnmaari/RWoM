@@ -156,6 +156,16 @@ internal static class MagofuelPoolTests
         Check.Equal(1f, Fuel(a), "synthesis produces one unit from pooled mana");
         Check.Equal(10f, Mana(b), "synthesis debited the pool source");
         Check.Equal(0f, Mana(a), "synthesis consumed the local top-up");
+        var fuel = a.parent.GetComp<CompRefuelable>();
+        fuel.Refuel(99f);
+        Set(a, "chemfuelHopper", 1f);
+        Call(a, "CompTickInterval", 1200);
+        Check.Equal(10f, Mana(b), "full target never withdraws remote mana");
+        fuel.ConsumeFuel(1f);
+        Call(a, "CompTickInterval", 59);
+        Check.Equal(99f, Fuel(a), "paused production does not probe every tick");
+        Call(a, "CompTickInterval", 1);
+        Check.Equal(100f, Fuel(a), "bounded retry resumes once space is available");
     }
 
     static void FuelReserve()

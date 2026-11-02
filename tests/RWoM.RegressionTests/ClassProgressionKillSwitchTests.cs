@@ -19,7 +19,7 @@ internal static class ClassProgressionKillSwitchTests
 {
     public static IEnumerable<TestCase> Cases()
     {
-        yield return new("KillSwitch.EnsureCompSkipsInjection", EnsureCompSkips);
+        yield return new("KillSwitch.DisabledSaveRetainsProgression", EnsureCompSkips);
         yield return new("KillSwitch.IdentityFallsBackToClassicTraits", IdentityFallback);
         yield return new("KillSwitch.AuraChainAppliesClassicSeverity", AuraSeverity);
         yield return new("KillSwitch.GravitySlowStillApplied", GravitySlow);
@@ -76,9 +76,46 @@ internal static class ClassProgressionKillSwitchTests
         {
             var def = HumanDef();
             ClassProgressionBootstrap.EnsureComp(def);
-            Check.Equal(false, HasProgressionComp(def), "disabled feature must not inject the progression comp");
+            Check.Equal(true, HasProgressionComp(def), "disabled feature keeps the save carrier");
+            Check.Equal(false, new CompClassProgression().BeginNewProgression(Vocation.Mage), "disabled enrollment");
         }
-        Check.Equal(true, ClassProgressionFeature.Enabled, "flag must be restored after the case");
+        var original = new Carrier();
+        original.Comp.BeginNewProgression(Vocation.Mage);
+        original.Comp.State.TryAddFoundation("rwom.fire", DisciplineDomain.Magic);
+        original.Comp.State.TryChooseNoviceSpell("rwom.first");
+        original.Comp.DelayNextTomeQuest(123);
+        string path = System.IO.Path.Combine(f.WorkingDirectory, "beta.xml");
+        void Save(Carrier value)
+        {
+            Scribe.saver.InitSaving(path, "regression");
+            Scribe_Deep.Look(ref value, "carrier");
+            Scribe.saver.FinalizeSaving();
+        }
+        Carrier Load()
+        {
+            Carrier value = null;
+            Scribe.loader.InitLoading(path);
+            Scribe_Deep.Look(ref value, "carrier");
+            Scribe.loader.FinalizeLoading();
+            return value;
+        }
+        Save(original);
+        using (new Flag())
+        {
+            var paused = Load();
+            paused.Comp.CompTick();
+            Save(paused);
+        }
+        var restored = Load();
+        Check.Equal(InitiationStage.Foundation, restored.Comp.State.Find("rwom.fire").Stage, "discipline survives disabled resave");
+        Check.Equal("rwom.first", restored.Comp.State.NoviceSpells.Single(), "novice choice survives disabled resave");
+        Check.Equal(60123, restored.Comp.TomeQuestAvailableAtTick, "quest timer survives disabled resave");
+    }
+
+    public sealed class Carrier : IExposable
+    {
+        public CompClassProgression Comp = new();
+        public void ExposeData() => Comp.PostExposeData();
     }
 
     private static void IdentityFallback(RuntimeFixture f)

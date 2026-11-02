@@ -76,7 +76,9 @@ internal static class GolemEnergyTests
     private static void CollapseCell(RuntimeFixture fixture)
     {
         using var world = new GolemWorld(fixture);
-        IntVec3 Spot() => (IntVec3)CallPrivate(world.Comp, "SafeCollapseCell");
+        var station = Blank<ThingDef>();
+        station.category = ThingCategory.Building; station.size = new IntVec2(1, 1);
+        IntVec3 Spot() => (IntVec3)CallPrivate(world.Comp, "SafeCollapseCell", world.Map, station);
         Check.Equal(new IntVec3(5, 0, 5), Spot(), "a clear cell collapses the golem exactly where it stands");
         world.PlaceEdifice(new IntVec3(5, 0, 5));
         var alternative = Spot();
@@ -88,7 +90,7 @@ internal static class GolemEnergyTests
             for (int dz = -1; dz <= 1; dz++)
                 if (dx != 0 || dz != 0)
                     world.PlaceEdifice(new IntVec3(5 + dx, 0, 5 + dz));
-        Check.Equal(IntVec3.Invalid, Spot(), "a fully surrounded golem keeps the legacy placement as a last resort");
+        Check.Equal(IntVec3.Invalid, Spot(), "a surrounded golem has no safe placement");
     }
 
     private static void Arrival(RuntimeFixture fixture)
@@ -101,11 +103,11 @@ internal static class GolemEnergyTests
         Check.Equal(false, (bool)CallPrivate(world.Comp, "ShouldDespawnNow")!, "the shutdown waits until the golem arrives");
     }
 
-    private static object CallPrivate(object target, string name)
+    private static object CallPrivate(object target, string name, params object[] args)
     {
         var type = typeof(CompGolem);
         var method = type.GetMethod(name, BindingFlags.Instance | BindingFlags.NonPublic);
-        if (method != null) return method.Invoke(target, null)!;
+        if (method != null) return method.Invoke(target, args)!;
         return type.GetProperty(name, BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(target)!;
     }
 

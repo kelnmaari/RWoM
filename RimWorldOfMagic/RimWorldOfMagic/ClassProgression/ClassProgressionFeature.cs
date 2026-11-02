@@ -6,8 +6,8 @@ namespace TorannMagic.ClassProgression
     // once at startup (TorannMagicMod ctor, before Harmony patch application) from
     // the "new progression (beta)" mod setting; toggling the setting requires a
     // game restart. When disabled the mod behaves like the classic class system:
-    // CompClassProgression is not injected, ClassProgression Harmony patches are
-    // not applied, and every ClassIdentity predicate falls back to legacy traits.
+    // The progression comp still scribes its data. Gameplay uses legacy class
+    // identity until the player enables the feature again.
     public static class ClassProgressionFeature
     {
         public static bool Enabled { get; set; }

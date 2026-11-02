@@ -129,6 +129,7 @@ namespace TorannMagic.Golems
         private bool initialized = false;
         public bool shouldDespawn = false;
         public bool despawnNow = false;
+        private int nextCollapseAttempt;
         private int abilityTick = 0;
         private int abilityBurstTick = 0;
         private int abilityMaxTicks = 0;
@@ -793,6 +794,19 @@ namespace TorannMagic.Golems
 
         public void DeSpawnGolem()
         {
+            int now = Find.TickManager.TicksGame;
+            if (now < nextCollapseAttempt) return;
+            var map = Pawn.Map;
+            var station = InnerWorkstation;
+            var defToPlace = station?.def ?? TM_GolemUtility.GetGolemDefFromThing(Pawn)?.golemWorkstationDef;
+            if (map == null || defToPlace == null) return;
+            var despawnPos = SafeCollapseCell(map, defToPlace);
+            if (!despawnPos.IsValid)
+            {
+                despawnNow = true;
+                nextCollapseAttempt = now + 60;
+                return;
+            }
             for(int i =0; i < 4; i++)
             {
                 Vector3 rndPos = dormantPosition.ToVector3Shifted();
@@ -805,45 +819,17 @@ namespace TorannMagic.Golems
                 Find.CameraDriver.shaker.DoShake(.25f);
             }
             Building_TMGolemBase spawnedThing = null;
-            IntVec3 despawnPos = Pawn.Position;
-            if((dormantPosition - despawnPos).LengthHorizontal <= 1.4f)
+            if (station != null)
             {
-                despawnPos = dormantPosition;
+                if (!GenPlace.TryPlaceThing(station, despawnPos, map, ThingPlaceMode.Direct, null, null, dormantRotation)) return;
+                spawnedThing = station;
             }
             else
             {
-                IntVec3 clear = SafeCollapseCell();
-                if (clear.IsValid)
-                {
-                    despawnPos = clear;
-                }
-            }
-            if (InnerWorkstation != null)
-            {
-                GenPlace.TryPlaceThing(InnerWorkstation.SplitOff(1), despawnPos, Pawn.Map, ThingPlaceMode.Direct, null, null, dormantRotation);
-                spawnedThing = InnerWorkstation;
-            }
-            else
-            {
-                
-                AbilityUser.SpawnThings spawnables = new SpawnThings();
-                spawnables.def = TM_GolemUtility.GetGolemDefFromThing(Pawn).golemWorkstationDef;
-                spawnables.spawnCount = 1;
-                bool flag = spawnables.def != null;
-                if (flag)
-                {
-                    Faction faction = Pawn.Faction;
-                    ThingDef def = spawnables.def;
-                    ThingDef stuff = null;
-                    bool madeFromStuff = def.MadeFromStuff;
-                    if (madeFromStuff && TM_GolemUtility.GetGolemDefFromThing(Pawn).golemStuff != null)
-                    {
-                        stuff = TM_GolemUtility.GetGolemDefFromThing(Pawn).golemStuff;
-                    }
-                    spawnedThing = ThingMaker.MakeThing(def, stuff) as Building_TMGolemBase;
-                    spawnedThing.SetFaction(Pawn.Faction);
-                    GenSpawn.Spawn(spawnedThing, despawnPos, this.Pawn.Map, dormantRotation, WipeMode.Vanish, false);
-                }
+                var stuff = defToPlace.MadeFromStuff ? TM_GolemUtility.GetGolemDefFromThing(Pawn).golemStuff : null;
+                spawnedThing = (Building_TMGolemBase)ThingMaker.MakeThing(defToPlace, stuff);
+                spawnedThing.SetFaction(Pawn.Faction);
+                GenSpawn.Spawn(spawnedThing, despawnPos, map, dormantRotation, WipeMode.Vanish, false);
             }
             if (Find.Selector.SingleSelectedThing == this.parent)
             {
@@ -860,30 +846,20 @@ namespace TorannMagic.Golems
 
         // Emergency shutdown away from the rest spot: pick a cell where placing the
         // dormant golem will not destroy whatever furniture or storage is underfoot.
-        private IntVec3 SafeCollapseCell()
+        private IntVec3 SafeCollapseCell(Map map, ThingDef station)
         {
-            Map map = Pawn.Map;
-            if(map == null)
+            bool Clear(IntVec3 position)
             {
-                return IntVec3.Invalid;
+                foreach (var cell in GenAdj.OccupiedRect(position, dormantRotation, station.Size))
+                    if (!cell.InBounds(map) || cell.GetEdifice(map) != null || !cell.Standable(map)) return false;
+                return !GenSpawn.WouldWipeAnythingWith(position, dormantRotation, station, map, _ => true);
             }
-            if (CollapseCellClear(Pawn.Position, map))
-            {
-                return Pawn.Position;
-            }
+            if (dormantMap == map && dormantPosition.IsValid &&
+                (dormantPosition - Pawn.Position).LengthHorizontal <= 1.4f && Clear(dormantPosition)) return dormantPosition;
+            if (Clear(Pawn.Position)) return Pawn.Position;
             foreach (IntVec3 cell in GenAdj.CellsAdjacent8Way(Pawn))
-            {
-                if (CollapseCellClear(cell, map))
-                {
-                    return cell;
-                }
-            }
+                if (Clear(cell)) return cell;
             return IntVec3.Invalid;
-        }
-
-        private static bool CollapseCellClear(IntVec3 cell, Map map)
-        {
-            return cell.InBounds(map) && cell.Standable(map) && cell.GetEdifice(map) == null;
         }
 
         public override void PostDestroy(DestroyMode mode, Map previousMap)

@@ -10,6 +10,9 @@ internal static partial class TeleportSpiritTests
 {
     public static IEnumerable<TestCase> CoreReturnCases()
     {
+        yield return new("SynthHaul.ResumeWithCargo", f => CoreReturnWorld(f, ResumeSynthHaul));
+        yield return new("GolemTravel.BlockedFootprintKeepsPawn", f => CoreReturnWorld(f, BlockedGolem));
+        yield return new("CoreReturn.ConfirmedRebinding", f => CoreReturnWorld(f, ConfirmedRebind));
         yield return new("CoreReturn.NativeNetworkLocalFirstAtomic", OdysseyBeaconTests.CoreReturnNetworkCase);
         yield return new("CoreReturn.NativeBindingNonmageAndOwnership", f => CoreReturnWorld(f, CoreReturnBinding));
         yield return new("CoreReturn.MaintenancePartitionAndNoCatchup", f => CoreReturnWorld(f, CoreReturnMaintenance));
@@ -30,6 +33,64 @@ internal static partial class TeleportSpiritTests
 
     // Player report: after the first bind+return cycle, "Пометить" claims no
     // suitable colonists exist. A second unbound colonist must remain markable.
+    static void ConfirmedRebind(WorldState w)
+    {
+        using var def = CoreReturnDef(); using var health = CoreReturnHealthBoundary();
+        var old = CoreReturnCore(w); var target = CoreReturnCore(w);
+        Check.Equal(true, old.Bind(w.Caster), "first mark");
+        var mark = CompCoreReturn.FindMark(w.Caster)!;
+        var canOrder = typeof(CompCoreReturn).GetMethod("CanOrderMark", Flags)!;
+        Check.Equal(true, (bool)canOrder.Invoke(target, [w.Caster, mark, old.parent])!, "confirmed current mark accepted");
+        Check.Equal(false, (bool)canOrder.Invoke(target, [w.Caster, null, null])!, "stale unbound snapshot refused");
+        var driver = new JobDriver_ReceiveCoreReturnMark { pawn = w.Caster, job = new Job(new JobDef(), target.parent, old.parent) };
+        var steps = ((IEnumerable<Toil>)typeof(JobDriver_ReceiveCoreReturnMark).GetMethod("MakeNewToils", Flags)!.Invoke(driver, null)!).ToList();
+        steps.Last().initAction();
+        Check.Same(mark, CompCoreReturn.FindMark(w.Caster), "same hediff rebound on arrival");
+        Check.Equal(true, target.IsBound(w.Caster) && !old.IsBound(w.Caster), "only new core owns pawn");
+    }
+
+    static void ResumeSynthHaul(WorldState w)
+    {
+        var target = LegacyBuilding<Building>(w);
+        var bank = new CompMagofuelReservoir { parent = target, props = new CompProperties_MagofuelReservoir() };
+        target.AllComps.Add(bank);
+        var oldFuel = ThingDefOf.Chemfuel;
+        try
+        {
+            var fuel = Blank<ThingDef>(); fuel.defName = "TestChemfuel"; fuel.category = ThingCategory.Item;
+            fuel.thingClass = typeof(Thing); fuel.stackLimit = 75; fuel.destroyable = true;
+            ThingDefOf.Chemfuel = fuel;
+            w.Map.reservationManager = new ReservationManager(w.Map);
+            w.Map.physicalInteractionReservationManager = new PhysicalInteractionReservationManager();
+            var stack = new Thing { def = fuel, stackCount = 10 };
+            w.Caster.carryTracker = new Pawn_CarryTracker(w.Caster);
+            Check.Equal(true, w.Caster.carryTracker.innerContainer.TryAdd(stack, false), "actual carry owns last stack");
+            Set(bank, "chemfuelHopper", 95f);
+            var driver = new JobDriver_LoadSynthChemfuel { pawn = w.Caster, job = new Job(new JobDef(), stack, target) };
+            var steps = ((IEnumerable<Toil>)typeof(JobDriver_LoadSynthChemfuel).GetMethod("MakeNewToils", Flags)!.Invoke(driver, null)!).ToList();
+            Check.Equal(5, steps.Count, "saved delivery index survives without ground fuel");
+            steps[4].initAction();
+            Check.Equal(100f, bank.ChemfuelHopper, "only available space accepted");
+            Check.Equal(5, w.Caster.carryTracker.CarriedThing.stackCount, "excess remains in real carry tracker");
+        }
+        finally { ThingDefOf.Chemfuel = oldFuel; }
+    }
+
+    static void BlockedGolem(WorldState w)
+    {
+        var station = new TorannMagic.Golems.Building_TMGolemBase { def = Blank<ThingDef>() };
+        station.def.size = new IntVec2(2,2);
+        var comp = new TorannMagic.Golems.CompGolem { parent = w.Caster, dormantThing = station,
+            dormantMap = w.Map, dormantPosition = w.Caster.Position, dormantRotation = Rot4.North };
+        var furniture = LegacyBuilding<Building>(w);
+        furniture.def.size = new IntVec2(5,5);
+        Set(furniture, "positionInt", w.Caster.Position);
+        w.Map.edificeGrid.Register(furniture);
+        comp.DeSpawnGolem();
+        Check.Equal(true, w.Caster.Spawned && !furniture.Destroyed, "blocked shutdown keeps pawn and furniture");
+        Check.Same(station, comp.InnerWorkstation, "dormant building retained for retry");
+    }
+
     static void CoreReturnSecondBind(WorldState w)
     {
         using var def=CoreReturnDef();using var health=CoreReturnHealthBoundary();

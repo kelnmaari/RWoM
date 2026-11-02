@@ -125,9 +125,8 @@ namespace TorannMagic.Odyssey
                 synthesisTicks -= 1200f;
                 if (!TrySynthesizeOne(fuel))
                 {
-                    // Paused: keep the remainder so synthesis resumes the tick after
-                    // the missing chemfuel or mana arrives.
-                    synthesisTicks = 1200f;
+                    // Retry after 60 ticks without accumulating missed production.
+                    synthesisTicks = 1200f - 60f;
                     return;
                 }
             }
@@ -135,12 +134,12 @@ namespace TorannMagic.Odyssey
 
         private bool TrySynthesizeOne(CompRefuelable fuel)
         {
-            if (chemfuelHopper < SynthChemfuelPerFuel) return false;
+            if (chemfuelHopper < SynthChemfuelPerFuel ||
+                Math.Min(fuel.TargetFuelLevel, fuel.Props.fuelCapacity) - fuel.Fuel < 1f) return false;
             // Synthesis feeds from the shared pool when the local mana is short.
             if (storedMana < SynthManaPerFuel)
                 MagofuelPool.DrawMana(this, SynthManaPerFuel - storedMana);
             if (storedMana < SynthManaPerFuel) return false;
-            if (fuel.Fuel >= fuel.TargetFuelLevel) return false;
             chemfuelHopper -= SynthChemfuelPerFuel;
             storedMana -= SynthManaPerFuel;
             fuel.Refuel(1f);

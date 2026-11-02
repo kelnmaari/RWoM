@@ -178,14 +178,9 @@ namespace TorannMagic
             Scribe_Deep.Look<TMDefs.TM_Autocast>(ref this.autocasting, "autocasting", new object[0]);
             if (Scribe.mode == LoadSaveMode.PostLoadInit)
             {
-                // old saves stored null for powers without legacy entries
-                if (this.autocasting == null)
-                {
-                    this.autocasting = TMDefs.TM_AutocastDefaults.For(this.abilityDef as TMAbilityDef, false);
-                }
-                // Ф1 sanitizer: spell defs removed by an update come back from the
-                // save as null entries — purge them before anything dereferences.
                 SpellSanitizer.Sanitize(this);
+                if (autocasting == null)
+                    autocasting = TMDefs.TM_AutocastDefaults.For(abilityDef as TMAbilityDef, false);
             }
         }
 

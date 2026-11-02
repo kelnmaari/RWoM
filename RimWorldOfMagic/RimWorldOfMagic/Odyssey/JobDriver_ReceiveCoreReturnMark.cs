@@ -24,9 +24,12 @@ namespace TorannMagic.Odyssey
                         // The consent captured by target B must still describe the current binding.
                         if (mark.Core == Core.parent) return;
                         if (mark.Core != job.targetB.Thing) { EndJobWith(JobCondition.Incompletable); return; }
-                        pawn.health.RemoveHediff(mark);
+                        mark.Comp?.Unregister(pawn);
+                        mark.Core = Core.parent;
+                        Core.Register(pawn);
+                        return;
                     }
-                    if (!Core.Bind(pawn)) EndJobWith(JobCondition.Incompletable);
+                    if (job.targetB.HasThing || !Core.Bind(pawn)) EndJobWith(JobCondition.Incompletable);
                 },
                 defaultCompleteMode = ToilCompleteMode.Instant
             };
