@@ -1,9 +1,11 @@
+﻿using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using RimWorld;
 using TorannMagic;
 using Verse;
 using Verse.AI;
+using AbilityUser;
 
 namespace RWoM.RegressionTests;
 
@@ -21,7 +23,57 @@ internal static class MonkMeditateTests
         yield return new("MonkMeditate.TiredBuildsRest", Tired);
         yield return new("MonkMeditate.InjuryAlwaysWorthIt", Injured);
         yield return new("MonkMeditate.NoChiHediffSkipsUntilGrant", NoChi);
+        yield return new("MonkMeditate.JobGateHonorsKnowledge", JobGateHonorsKnowledge);
+        yield return new("MonkMeditate.JobGateToleratesMissingChi", JobGateToleratesMissingChi);
     }
+
+    // Ф4: the JobGiver decision core reads the knowledge store like the
+    // dispatch, and the chi hediff lag (60-tick grant cadence) must skip
+    // quietly instead of NRE-ing.
+    static void JobGateHonorsKnowledge(RuntimeFixture _)
+    {
+        var pawn = Pawn(working: false);
+        SetChi(pawn, 10f);
+        var power = new MightPower(new List<AbilityUser.AbilityDef> { MeditateDef() }) { learned = true, autocast = true };
+        var ability = new PawnAbility { Def = MeditateDef() };
+
+        // No knowledge comp: legacy flags decide — on.
+        Check.Equal(true, TM_Calc.MonkMeditateJobGate(pawn, power, ability, FindChi(pawn)), "legacy-only path stays on");
+
+        // The store says OFF while legacy says ON.
+        var knowledge = new AbilityKnowledgeComp { parent = pawn };
+        pawn.AllComps.Add(knowledge);
+        var entry = knowledge.GetOrCreate(TorannMagic.SpellIds.Of(power.abilityDef), 0);
+        entry.learned = true;
+        entry.autocast = false;
+        Check.Equal(false, TM_Calc.MonkMeditateJobGate(pawn, power, ability, FindChi(pawn)), "knowledge autocast=false gates the job giver");
+
+        // The store says ON while legacy says OFF.
+        power.autocast = false;
+        entry.autocast = true;
+        Check.Equal(true, TM_Calc.MonkMeditateJobGate(pawn, power, ability, FindChi(pawn)), "knowledge autocast=true enables the job giver");
+    }
+
+    static void JobGateToleratesMissingChi(RuntimeFixture _)
+    {
+        var pawn = Pawn(working: false); // no chi hediff added
+        var power = new MightPower(new List<AbilityUser.AbilityDef> { MeditateDef() }) { learned = true, autocast = true };
+        var ability = new PawnAbility { Def = MeditateDef() };
+        Check.Equal(false, TM_Calc.MonkMeditateJobGate(pawn, power, ability, null), "missing chi hediff skips without throwing");
+        Check.Equal(false, TM_Calc.MonkMeditateJobGate(pawn, power, null, null), "missing runtime ability skips without throwing");
+    }
+
+    // The real AbilityDef ctor loads shaders (BaseContent) — bypass only that.
+    static TMAbilityDef MeditateDef()
+    {
+        var def = (TMAbilityDef)RuntimeHelpers.GetUninitializedObject(typeof(TMAbilityDef));
+        def.defName = "TM_Meditate";
+        def.label = "TM_Meditate";
+        return def;
+    }
+
+    static Hediff FindChi(Pawn pawn)
+        => pawn.health.hediffSet.hediffs.FirstOrDefault(h => h.def == ChiDef);
 
     static Pawn Pawn(bool working, float rest = 1f)
     {
@@ -34,6 +86,16 @@ internal static class MonkMeditateTests
         pawn.needs.rest = new Need_Rest(pawn) { def = new NeedDef { defName = "MonkMeditateRest" } };
         pawn.needs.rest.CurLevel = rest;
         pawn.jobs = new Pawn_JobTracker(pawn);
+        // Comps must be a real per-pawn list: the AllComps getter returns the
+        // SHARED EmptyCompsList when the field is null, and Add would pollute it.
+        // The field is declared on ThingWithComps, not Pawn.
+        for (Type type = pawn.GetType(); type != null; type = type.BaseType)
+        {
+            var compsField = type.GetField("comps", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
+            if (compsField == null) continue;
+            compsField.SetValue(pawn, new List<ThingComp>());
+            break;
+        }
         if (working)
         {
             // Any work-giver job registers as "busy with real work".

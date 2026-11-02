@@ -966,6 +966,26 @@ namespace TorannMagic
                 .Sum(injury => injury.Severity) > minInjurySeverity;
         }
 
+        // JobGiver_MonkMeditate decision core (Ф4): the knowledge store gates
+        // this path exactly like the dispatch, and the chi hediff / runtime
+        // ability may lag the scan (60-tick grant cadence) — skip quietly
+        // instead of NRE-ing. Extracted so the contract is testable.
+        public static bool MonkMeditateJobGate(Pawn pawn, MightPower mightPower, PawnAbility ability, Hediff chi)
+        {
+            if (mightPower == null) return false;
+            // Safe comp lookup: 1.7 TryGetComp throws on an EMPTY comps list.
+            TorannMagic.AbilityKnowledgeComp knowledge = pawn?.AllComps?
+                .OfType<TorannMagic.AbilityKnowledgeComp>().FirstOrDefault();
+            if (!AutoCast.AutocastPolicy.EnabledForAutocast(mightPower, knowledge))
+            {
+                return false;
+            }
+            if (ability == null || chi == null) return false;
+            if (ability.CooldownTicksLeft > 0) return false;
+            if (chi.Severity >= 70) return false;
+            return true;
+        }
+
         // Autocast utility gate for the monk's Meditate (player report: the autocast
         // re-proc'd its activation every cooldown even mid-task). The cast heals
         // wounds, purges afflictions and addictions, lifts break risk, and only
