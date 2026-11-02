@@ -24,7 +24,7 @@
       <soundCast>Message_PositiveEvent</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
       <AlwaysHits>true</AlwaysHits>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <targetParams>
         <canTargetPawns>false</canTargetPawns>
         <canTargetBuildings>false</canTargetBuildings>
@@ -57,7 +57,7 @@
       <soundCast>Message_PositiveEvent</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
       <AlwaysHits>true</AlwaysHits>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <AbilityTargetCategory>TargetSelf</AbilityTargetCategory>
       <targetParams>
         <canTargetPawns>true</canTargetPawns>
@@ -91,7 +91,7 @@
       <soundCast>Message_PositiveEvent</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
       <AlwaysHits>true</AlwaysHits>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <targetParams>
         <canTargetPawns>false</canTargetPawns>
         <canTargetBuildings>false</canTargetBuildings>
@@ -124,7 +124,7 @@
       <soundCast>Message_PositiveEvent</soundCast>
       <muzzleFlashScale>10</muzzleFlashScale>
       <AlwaysHits>true</AlwaysHits>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <targetParams>
         <canTargetPawns>false</canTargetPawns>
         <canTargetBuildings>false</canTargetBuildings>
@@ -157,7 +157,7 @@
       <soundCast>Message_PositiveEvent</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
       <AlwaysHits>true</AlwaysHits>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <targetParams>
         <canTargetPawns>false</canTargetPawns>
         <canTargetBuildings>false</canTargetBuildings>
@@ -190,7 +190,7 @@
       <soundCast>Message_PositiveEvent</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
       <AlwaysHits>true</AlwaysHits>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <targetParams>
         <canTargetPawns>false</canTargetPawns>
         <canTargetBuildings>false</canTargetBuildings>

@@ -22,7 +22,7 @@
       <range>0</range>
       <soundCast>Message_PositiveEvent</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <AbilityTargetCategory>TargetSelf</AbilityTargetCategory>
       <targetParams>
         <canTargetPawns>true</canTargetPawns>
@@ -57,7 +57,7 @@ Deactivating sprint instantly returns 20 stamina and applies 5s of +20% energy r
       <range>0</range>
       <soundCast>Message_PositiveEvent</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <AbilityTargetCategory>TargetSelf</AbilityTargetCategory>
       <targetParams>
         <canTargetPawns>true</canTargetPawns>
@@ -92,7 +92,7 @@ Deactivating sprint instantly returns 35 stamina and applies 8s of +30% energy r
       <range>0</range>
       <soundCast>Message_PositiveEvent</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <AbilityTargetCategory>TargetSelf</AbilityTargetCategory>
       <targetParams>
         <canTargetPawns>true</canTargetPawns>
@@ -127,7 +127,7 @@ Deactivating sprint instantly returns 40 stamina and applies 10s of +40% energy 
       <range>0</range>
       <soundCast>Message_PositiveEvent</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <AbilityTargetCategory>TargetSelf</AbilityTargetCategory>
       <targetParams>
         <canTargetPawns>true</canTargetPawns>
@@ -160,7 +160,7 @@ Base mitigation: 5</description>
       <range>0</range>
       <soundCast>Message_PositiveEvent</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <AbilityTargetCategory>TargetSelf</AbilityTargetCategory>
       <targetParams>
         <canTargetPawns>true</canTargetPawns>
@@ -206,7 +206,7 @@ Range: 15</description>
       <ticksBetweenBurstShots>1</ticksBetweenBurstShots>
       <soundCast>Message_PositiveEvent</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
     </verbProperties>
   </AbilityDef>
   <AbilityDef Class="TorannMagic.TMBridgeAbilityDef" ParentName="TMBridgeAbilityBase">
@@ -237,7 +237,7 @@ Range: 17</description>
       <ticksBetweenBurstShots>1</ticksBetweenBurstShots>
       <soundCast>Message_PositiveEvent</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
     </verbProperties>
   </AbilityDef>
   <AbilityDef Class="TorannMagic.TMBridgeAbilityDef" ParentName="TMBridgeAbilityBase">
@@ -269,7 +269,7 @@ Range: 20</description>
       <ticksBetweenBurstShots>1</ticksBetweenBurstShots>
       <soundCast>Message_PositiveEvent</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
     </verbProperties>
   </AbilityDef>
   <AbilityDef Class="TorannMagic.TMBridgeAbilityDef" ParentName="TMBridgeAbilityBase">
@@ -301,7 +301,7 @@ Range: 23</description>
       <ticksBetweenBurstShots>1</ticksBetweenBurstShots>
       <soundCast>Message_PositiveEvent</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
     </verbProperties>
   </AbilityDef>
   <AbilityDef Class="TorannMagic.TMBridgeAbilityDef" ParentName="TMBridgeAbilityBase">
@@ -331,7 +331,7 @@ Range: 23</description>
       <ticksBetweenBurstShots>1</ticksBetweenBurstShots>
       <soundCast>MeleeHit_Metal_Sharp</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
     </verbProperties>
   </AbilityDef>
   <AbilityDef Class="TorannMagic.TMBridgeAbilityDef" ParentName="TMBridgeAbilityBase">
@@ -358,7 +358,7 @@ Range: 23</description>
       <ticksBetweenBurstShots>1</ticksBetweenBurstShots>
       <soundCast>DropPod_Leaving</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
     </verbProperties>
   </AbilityDef>
 </Defs>

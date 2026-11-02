@@ -35,7 +35,7 @@ Requires 40 mana to maintain and reduces mana regeneration by 30%; cast again to
       <soundCastTail>GunTail_Medium</soundCastTail>
       <muzzleFlashScale>20</muzzleFlashScale>
       <AlwaysHits>true</AlwaysHits>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <isViolent>false</isViolent>
       <AbilityTargetCategory>TargetSelf</AbilityTargetCategory>
       <targetParams>
@@ -81,7 +81,7 @@ Requires 40 mana to maintain and reduces mana regeneration by 30%; cast again to
       <soundCastTail>GunTail_Medium</soundCastTail>
       <muzzleFlashScale>20</muzzleFlashScale>
       <AlwaysHits>true</AlwaysHits>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <isViolent>false</isViolent>
       <AbilityTargetCategory>TargetSelf</AbilityTargetCategory>
       <targetParams>
@@ -128,7 +128,7 @@ Requires 40 mana to maintain and reduces mana regeneration by 30%; cast again to
       <soundCastTail>GunTail_Medium</soundCastTail>
       <muzzleFlashScale>20</muzzleFlashScale>
       <AlwaysHits>true</AlwaysHits>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <isViolent>false</isViolent>
       <AbilityTargetCategory>TargetSelf</AbilityTargetCategory>
       <targetParams>
@@ -175,7 +175,7 @@ Requires 40 mana to maintain and reduces mana regeneration by 30%; cast again to
       <soundCastTail>GunTail_Medium</soundCastTail>
       <muzzleFlashScale>20</muzzleFlashScale>
       <AlwaysHits>true</AlwaysHits>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <isViolent>false</isViolent>
       <AbilityTargetCategory>TargetSelf</AbilityTargetCategory>
       <targetParams>
@@ -214,7 +214,7 @@ Damage: 4</description>
       <forcedMissRadius>4.5</forcedMissRadius>
       <burstShotCount>14</burstShotCount>
       <ticksBetweenBurstShots>12</ticksBetweenBurstShots>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <soundCast>InfernoCannon_Fire</soundCast>
       <soundCastTail>GunTail_Medium</soundCastTail>
       <muzzleFlashScale>4</muzzleFlashScale>
@@ -256,7 +256,7 @@ Damage: 5</description>
       <forcedMissRadius>4.0</forcedMissRadius>
       <burstShotCount>17</burstShotCount>
       <ticksBetweenBurstShots>10</ticksBetweenBurstShots>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <soundCast>InfernoCannon_Fire</soundCast>
       <soundCastTail>GunTail_Medium</soundCastTail>
       <muzzleFlashScale>6</muzzleFlashScale>
@@ -298,7 +298,7 @@ Damage: 6</description>
       <forcedMissRadius>3.5</forcedMissRadius>
       <burstShotCount>20</burstShotCount>
       <ticksBetweenBurstShots>8</ticksBetweenBurstShots>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <soundCast>InfernoCannon_Fire</soundCast>
       <soundCastTail>GunTail_Heavy</soundCastTail>
       <muzzleFlashScale>9</muzzleFlashScale>
@@ -340,7 +340,7 @@ Damage: 7</description>
       <forcedMissRadius>3.0</forcedMissRadius>
       <burstShotCount>24</burstShotCount>
       <ticksBetweenBurstShots>6</ticksBetweenBurstShots>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <soundCast>InfernoCannon_Fire</soundCast>
       <soundCastTail>GunTail_Heavy</soundCastTail>
       <muzzleFlashScale>12</muzzleFlashScale>
@@ -378,7 +378,7 @@ Damage: 7</description>
       <soundCast>ThrowGrenade</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
       <AlwaysHits>true</AlwaysHits>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <targetParams>
         <canTargetPawns>false</canTargetPawns>
         <canTargetBuildings>false</canTargetBuildings>
@@ -416,7 +416,7 @@ Range: 30</description>
       <ticksBetweenBurstShots>1</ticksBetweenBurstShots>
       <soundCast>Message_PositiveEvent</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
     </verbProperties>
   </AbilityDef>
   <AbilityDef Class="TorannMagic.TMBridgeAbilityDef" ParentName="TMBridgeAbilityBase">
@@ -449,7 +449,7 @@ Range: 50</description>
       <ticksBetweenBurstShots>1</ticksBetweenBurstShots>
       <soundCast>Message_PositiveEvent</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
     </verbProperties>
   </AbilityDef>
   <AbilityDef Class="TorannMagic.TMBridgeAbilityDef" ParentName="TMBridgeAbilityBase">
@@ -481,7 +481,7 @@ Range: 70</description>
       <ticksBetweenBurstShots>1</ticksBetweenBurstShots>
       <soundCast>Message_PositiveEvent</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
     </verbProperties>
   </AbilityDef>
   <AbilityDef Class="TorannMagic.TMBridgeAbilityDef" ParentName="TMBridgeAbilityBase">
@@ -513,7 +513,7 @@ Range: 90</description>
       <ticksBetweenBurstShots>1</ticksBetweenBurstShots>
       <soundCast>Message_PositiveEvent</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
     </verbProperties>
   </AbilityDef>
   <AbilityDef Class="TorannMagic.TMBridgeAbilityDef" ParentName="TMBridgeAbilityBase">
@@ -548,7 +548,7 @@ Range: 70</description>
       <ticksBetweenBurstShots>1</ticksBetweenBurstShots>
       <soundCast>TM_Gong</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
     </verbProperties>
   </AbilityDef>
   <AbilityDef Class="TorannMagic.TMBridgeAbilityDef" ParentName="TMBridgeAbilityBase">
@@ -583,7 +583,7 @@ Range: 80</description>
       <ticksBetweenBurstShots>1</ticksBetweenBurstShots>
       <soundCast>TM_Gong</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
     </verbProperties>
   </AbilityDef>
   <AbilityDef Class="TorannMagic.TMBridgeAbilityDef" ParentName="TMBridgeAbilityBase">
@@ -618,7 +618,7 @@ Range: 90</description>
       <ticksBetweenBurstShots>1</ticksBetweenBurstShots>
       <soundCast>TM_Gong</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
     </verbProperties>
   </AbilityDef>
   <AbilityDef Class="TorannMagic.TMBridgeAbilityDef" ParentName="TMBridgeAbilityBase">
@@ -653,7 +653,7 @@ Range: 100</description>
       <ticksBetweenBurstShots>1</ticksBetweenBurstShots>
       <soundCast>Message_PositiveEvent</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
     </verbProperties>
   </AbilityDef>
   <AbilityDef Class="TorannMagic.TMBridgeAbilityDef" ParentName="TMBridgeAbilityBase">
@@ -684,7 +684,7 @@ Range: 100</description>
       <ticksBetweenBurstShots>1</ticksBetweenBurstShots>
       <soundCast>Message_PositiveEvent</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
     </verbProperties>
   </AbilityDef>
 </Defs>

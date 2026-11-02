@@ -22,7 +22,7 @@
       <range>0</range>
       <soundCast>Message_PositiveEvent</soundCast>
       <muzzleFlashScale>10</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <AbilityTargetCategory>TargetSelf</AbilityTargetCategory>
       <targetParams>
         <canTargetPawns>true</canTargetPawns>
@@ -54,7 +54,7 @@
       <range>0</range>
       <soundCast>Message_PositiveEvent</soundCast>
       <muzzleFlashScale>10</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <AbilityTargetCategory>TargetSelf</AbilityTargetCategory>
       <targetParams>
         <canTargetPawns>true</canTargetPawns>
@@ -86,7 +86,7 @@
       <range>0</range>
       <soundCast>Message_PositiveEvent</soundCast>
       <muzzleFlashScale>10</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <AbilityTargetCategory>TargetSelf</AbilityTargetCategory>
       <targetParams>
         <canTargetPawns>true</canTargetPawns>
@@ -126,7 +126,7 @@ Commands do not affect the commander.</description>
       <range>0</range>
       <soundCast>Message_PositiveEvent</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <AbilityTargetCategory>TargetSelf</AbilityTargetCategory>
       <TargetAoEProperties>
         <targetClass>Pawn</targetClass>
@@ -174,7 +174,7 @@ Commands do not affect the commander.</description>
       <range>0</range>
       <soundCast>Message_PositiveEvent</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <AbilityTargetCategory>TargetSelf</AbilityTargetCategory>
       <TargetAoEProperties>
         <targetClass>Pawn</targetClass>
@@ -222,7 +222,7 @@ Commands do not affect the commander.</description>
       <range>0</range>
       <soundCast>Message_PositiveEvent</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <AbilityTargetCategory>TargetSelf</AbilityTargetCategory>
       <TargetAoEProperties>
         <targetClass>Pawn</targetClass>
@@ -270,7 +270,7 @@ Commands do not affect the commander.</description>
       <range>0</range>
       <soundCast>Message_PositiveEvent</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <AbilityTargetCategory>TargetSelf</AbilityTargetCategory>
       <TargetAoEProperties>
         <targetClass>Pawn</targetClass>
@@ -318,7 +318,7 @@ Commands do not affect the commander.</description>
       <range>0</range>
       <soundCast>Message_PositiveEvent</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <AbilityTargetCategory>TargetSelf</AbilityTargetCategory>
       <TargetAoEProperties>
         <targetClass>Pawn</targetClass>
@@ -366,7 +366,7 @@ Commands do not affect the commander.</description>
       <range>0</range>
       <soundCast>Message_PositiveEvent</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <AbilityTargetCategory>TargetSelf</AbilityTargetCategory>
       <TargetAoEProperties>
         <targetClass>Pawn</targetClass>
@@ -414,7 +414,7 @@ Commands do not affect the commander.</description>
       <range>0</range>
       <soundCast>Message_PositiveEvent</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <AbilityTargetCategory>TargetSelf</AbilityTargetCategory>
       <TargetAoEProperties>
         <targetClass>Pawn</targetClass>
@@ -462,7 +462,7 @@ Commands do not affect the commander.</description>
       <range>0</range>
       <soundCast>Message_PositiveEvent</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <AbilityTargetCategory>TargetSelf</AbilityTargetCategory>
       <TargetAoEProperties>
         <targetClass>Pawn</targetClass>
@@ -510,7 +510,7 @@ Commands do not affect the commander.</description>
       <range>0</range>
       <soundCast>Message_PositiveEvent</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <AbilityTargetCategory>TargetSelf</AbilityTargetCategory>
       <TargetAoEProperties>
         <targetClass>Pawn</targetClass>
@@ -558,7 +558,7 @@ Commands do not affect the commander.</description>
       <range>0</range>
       <soundCast>Message_PositiveEvent</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <AbilityTargetCategory>TargetSelf</AbilityTargetCategory>
       <TargetAoEProperties>
         <targetClass>Pawn</targetClass>
@@ -606,7 +606,7 @@ Commands do not affect the commander.</description>
       <range>0</range>
       <soundCast>Message_PositiveEvent</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <AbilityTargetCategory>TargetSelf</AbilityTargetCategory>
       <TargetAoEProperties>
         <targetClass>Pawn</targetClass>
@@ -654,7 +654,7 @@ Commands do not affect the commander.</description>
       <range>0</range>
       <soundCast>Message_PositiveEvent</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <AbilityTargetCategory>TargetSelf</AbilityTargetCategory>
       <TargetAoEProperties>
         <targetClass>Pawn</targetClass>

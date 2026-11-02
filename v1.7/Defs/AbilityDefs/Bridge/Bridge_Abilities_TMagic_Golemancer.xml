@@ -28,7 +28,7 @@ Golems may be crafted from their respective workbenches after the appropriate re
       <soundCast>Message_PositiveEvent</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
       <AlwaysHits>true</AlwaysHits>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <AbilityTargetCategory>TargetSelf</AbilityTargetCategory>
       <targetParams>
         <canTargetPawns>true</canTargetPawns>
@@ -66,7 +66,7 @@ To apply runes, select the pawn you wish to inscribe and create the rune carving
       <soundCast>Message_PositiveEvent</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
       <AlwaysHits>true</AlwaysHits>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <targetParams>
         <canTargetPawns>true</canTargetPawns>
         <canTargetBuildings>false</canTargetBuildings>
@@ -99,7 +99,7 @@ To apply runes, select the pawn you wish to inscribe and create the rune carving
       <soundCast>Message_PositiveEvent</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
       <AlwaysHits>true</AlwaysHits>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <targetParams>
         <canTargetPawns>true</canTargetPawns>
         <canTargetBuildings>false</canTargetBuildings>
@@ -134,7 +134,7 @@ Brands are a semi-permanent form of magic typically created using some form of m
       <soundCast>TM_Vibration</soundCast>
       <soundCastTail>GunTail_Medium</soundCastTail>
       <muzzleFlashScale>2</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <isViolent>false</isViolent>
       <targetParams>
         <canTargetPawns>true</canTargetPawns>
@@ -170,7 +170,7 @@ Brands are a semi-permanent form of magic typically created using some form of m
       <soundCast>TM_Vibration</soundCast>
       <soundCastTail>GunTail_Medium</soundCastTail>
       <muzzleFlashScale>2</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <isViolent>false</isViolent>
       <targetParams>
         <canTargetPawns>true</canTargetPawns>
@@ -206,7 +206,7 @@ Brands are a semi-permanent form of magic typically created using some form of m
       <soundCast>TM_Vibration</soundCast>
       <soundCastTail>GunTail_Medium</soundCastTail>
       <muzzleFlashScale>2</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <isViolent>false</isViolent>
       <targetParams>
         <canTargetPawns>true</canTargetPawns>
@@ -242,7 +242,7 @@ Brands are a semi-permanent form of magic typically created using some form of m
       <soundCast>TM_Vibration</soundCast>
       <soundCastTail>GunTail_Medium</soundCastTail>
       <muzzleFlashScale>2</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <isViolent>false</isViolent>
       <targetParams>
         <canTargetPawns>true</canTargetPawns>
@@ -278,7 +278,7 @@ Brands are a semi-permanent form of magic typically created using some form of m
       <soundCast>TM_Vibration</soundCast>
       <soundCastTail>GunTail_Medium</soundCastTail>
       <muzzleFlashScale>2</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <isViolent>false</isViolent>
       <targetParams>
         <canTargetPawns>true</canTargetPawns>
@@ -314,7 +314,7 @@ Brands are a semi-permanent form of magic typically created using some form of m
       <soundCast>TM_Vibration</soundCast>
       <soundCastTail>GunTail_Medium</soundCastTail>
       <muzzleFlashScale>2</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <isViolent>false</isViolent>
       <targetParams>
         <canTargetPawns>true</canTargetPawns>
@@ -348,7 +348,7 @@ Brands are a semi-permanent form of magic typically created using some form of m
       <soundCast>TM_Gong</soundCast>
       <muzzleFlashScale>10</muzzleFlashScale>
       <AlwaysHits>true</AlwaysHits>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <AbilityTargetCategory>TargetSelf</AbilityTargetCategory>
       <targetParams>
         <canTargetPawns>true</canTargetPawns>
@@ -382,7 +382,7 @@ Brands are a semi-permanent form of magic typically created using some form of m
       <soundCast>Message_PositiveEvent</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
       <AlwaysHits>true</AlwaysHits>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <AbilityTargetCategory>TargetSelf</AbilityTargetCategory>
       <targetParams>
         <canTargetPawns>true</canTargetPawns>
@@ -416,7 +416,7 @@ Brands are a semi-permanent form of magic typically created using some form of m
       <soundCast>Message_PositiveEvent</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
       <AlwaysHits>true</AlwaysHits>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <AbilityTargetCategory>TargetSelf</AbilityTargetCategory>
       <targetParams>
         <canTargetPawns>true</canTargetPawns>
@@ -449,7 +449,7 @@ Brands are a semi-permanent form of magic typically created using some form of m
       <soundCast>TM_Vibration</soundCast>
       <soundCastTail>GunTail_Medium</soundCastTail>
       <muzzleFlashScale>5</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <isViolent>false</isViolent>
       <requiresLineOfSight>false</requiresLineOfSight>
       <targetParams>
@@ -484,7 +484,7 @@ Brands are a semi-permanent form of magic typically created using some form of m
       <soundCast>TM_Gong</soundCast>
       <muzzleFlashScale>10</muzzleFlashScale>
       <AlwaysHits>true</AlwaysHits>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <AbilityTargetCategory>TargetSelf</AbilityTargetCategory>
       <targetParams>
         <canTargetPawns>true</canTargetPawns>

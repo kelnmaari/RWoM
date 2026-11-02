@@ -34,7 +34,7 @@ Requires 40 mana to maintain and reduces mana regeneration by 30%; cast again to
       <soundCastTail>GunTail_Medium</soundCastTail>
       <muzzleFlashScale>20</muzzleFlashScale>
       <AlwaysHits>true</AlwaysHits>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <isViolent>false</isViolent>
       <AbilityTargetCategory>TargetSelf</AbilityTargetCategory>
       <targetParams>
@@ -79,7 +79,7 @@ Requires 40 mana to maintain and reduces mana regeneration by 30%; cast again to
       <soundCastTail>GunTail_Medium</soundCastTail>
       <muzzleFlashScale>20</muzzleFlashScale>
       <AlwaysHits>true</AlwaysHits>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <isViolent>false</isViolent>
       <AbilityTargetCategory>TargetSelf</AbilityTargetCategory>
       <targetParams>
@@ -124,7 +124,7 @@ Requires 40 mana to maintain and reduces mana regeneration by 30%; cast again to
       <soundCastTail>GunTail_Medium</soundCastTail>
       <muzzleFlashScale>20</muzzleFlashScale>
       <AlwaysHits>true</AlwaysHits>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <isViolent>false</isViolent>
       <AbilityTargetCategory>TargetSelf</AbilityTargetCategory>
       <targetParams>
@@ -169,7 +169,7 @@ Requires 40 mana to maintain and reduces mana regeneration by 30%; cast again to
       <soundCastTail>GunTail_Medium</soundCastTail>
       <muzzleFlashScale>20</muzzleFlashScale>
       <AlwaysHits>true</AlwaysHits>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <isViolent>false</isViolent>
       <AbilityTargetCategory>TargetSelf</AbilityTargetCategory>
       <targetParams>
@@ -202,7 +202,7 @@ Requires 40 mana to maintain and reduces mana regeneration by 30%; cast again to
       <range>12</range>
       <soundCast>Message_PositiveEvent</soundCast>
       <muzzleFlashScale>30</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <AbilityTargetCategory>TargetThing</AbilityTargetCategory>
       <targetParams>
         <canTargetPawns>true</canTargetPawns>
@@ -235,7 +235,7 @@ Absorbs up to 100 damage.</description>
       <range>0</range>
       <soundCast>Message_PositiveEvent</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <AbilityTargetCategory>TargetSelf</AbilityTargetCategory>
       <targetParams>
         <canTargetPawns>true</canTargetPawns>
@@ -276,7 +276,7 @@ Reduces recharge to 30s.</description>
       <range>0</range>
       <soundCast>Message_PositiveEvent</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <AbilityTargetCategory>TargetSelf</AbilityTargetCategory>
       <targetParams>
         <canTargetPawns>true</canTargetPawns>
@@ -317,7 +317,7 @@ Reduces recharge to 27s.</description>
       <range>0</range>
       <soundCast>Message_PositiveEvent</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <AbilityTargetCategory>TargetSelf</AbilityTargetCategory>
       <targetParams>
         <canTargetPawns>true</canTargetPawns>
@@ -358,7 +358,7 @@ Reduces recharge to 25s.</description>
       <range>0</range>
       <soundCast>Message_PositiveEvent</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <AbilityTargetCategory>TargetSelf</AbilityTargetCategory>
       <targetParams>
         <canTargetPawns>true</canTargetPawns>
@@ -402,7 +402,7 @@ Reduces recharge to 25s.</description>
       <ticksBetweenBurstShots>1</ticksBetweenBurstShots>
       <soundCast>DropPod_Leaving</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
     </verbProperties>
   </AbilityDef>
   <AbilityDef Class="TorannMagic.TMBridgeAbilityDef" ParentName="TMBridgeAbilityBase">
@@ -427,7 +427,7 @@ Reduces recharge to 25s.</description>
       <range>0</range>
       <soundCast>InfernoCannon_Fire</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <AbilityTargetCategory>TargetSelf</AbilityTargetCategory>
       <targetParams>
         <canTargetPawns>true</canTargetPawns>
@@ -464,7 +464,7 @@ Reduces recharge to 25s.</description>
       <ticksBetweenBurstShots>1</ticksBetweenBurstShots>
       <soundCast>TM_Gong</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
     </verbProperties>
   </AbilityDef>
 </Defs>

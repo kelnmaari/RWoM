@@ -22,7 +22,7 @@
       <range>0</range>
       <soundCast>Message_PositiveEvent</soundCast>
       <muzzleFlashScale>10</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <AbilityTargetCategory>TargetSelf</AbilityTargetCategory>
       <targetParams>
         <canTargetPawns>true</canTargetPawns>
@@ -58,7 +58,7 @@ Has a low chance to disrupt the mental state of any pawn. Can be resisted.</desc
       <range>40</range>
       <soundCast>TM_Gong</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <AbilityTargetCategory>TargetAoE</AbilityTargetCategory>
       <TargetAoEProperties>
         <targetClass>Pawn</targetClass>
@@ -100,7 +100,7 @@ Mind Over Body is a passive buff that improves consciousness, moving, manipulati
       <range>0</range>
       <soundCast>Message_PositiveEvent</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <AbilityTargetCategory>TargetSelf</AbilityTargetCategory>
       <targetParams>
         <canTargetPawns>true</canTargetPawns>
@@ -134,7 +134,7 @@ Any physical or mental ailments must be purged before meditation can generate Ch
       <range>0</range>
       <soundCast>Message_PositiveEvent</soundCast>
       <muzzleFlashScale>10</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <AbilityTargetCategory>TargetSelf</AbilityTargetCategory>
       <targetParams>
         <canTargetPawns>true</canTargetPawns>
@@ -207,7 +207,7 @@ Passive ability (10 stamina): performs a round-house kick that strikes multiple 
       <range>20</range>
       <soundCast>TM_AirWoosh</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <AbilityTargetCategory>TargetLocation</AbilityTargetCategory>
       <targetParams>
         <canTargetPawns>true</canTargetPawns>
@@ -245,7 +245,7 @@ Passive ability (10 stamina): performs a round-house kick that strikes multiple 
       <ticksBetweenBurstShots>1</ticksBetweenBurstShots>
       <soundCast>MeleeHit_Metal_Sharp</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
     </verbProperties>
   </AbilityDef>
 </Defs>

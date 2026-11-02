@@ -35,7 +35,7 @@ Requires 40 mana to maintain and reduces mana regeneration by 30%; cast again to
       <soundCastTail>GunTail_Medium</soundCastTail>
       <muzzleFlashScale>20</muzzleFlashScale>
       <AlwaysHits>true</AlwaysHits>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <isViolent>false</isViolent>
       <AbilityTargetCategory>TargetSelf</AbilityTargetCategory>
       <targetParams>
@@ -81,7 +81,7 @@ Requires 40 mana to maintain and reduces mana regeneration by 30%; cast again to
       <soundCastTail>GunTail_Medium</soundCastTail>
       <muzzleFlashScale>20</muzzleFlashScale>
       <AlwaysHits>true</AlwaysHits>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <isViolent>false</isViolent>
       <AbilityTargetCategory>TargetSelf</AbilityTargetCategory>
       <targetParams>
@@ -127,7 +127,7 @@ Requires 40 mana to maintain and reduces mana regeneration by 30%; cast again to
       <soundCastTail>GunTail_Medium</soundCastTail>
       <muzzleFlashScale>20</muzzleFlashScale>
       <AlwaysHits>true</AlwaysHits>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <isViolent>false</isViolent>
       <AbilityTargetCategory>TargetSelf</AbilityTargetCategory>
       <targetParams>
@@ -173,7 +173,7 @@ Requires 40 mana to maintain and reduces mana regeneration by 30%; cast again to
       <soundCastTail>GunTail_Medium</soundCastTail>
       <muzzleFlashScale>20</muzzleFlashScale>
       <AlwaysHits>true</AlwaysHits>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <isViolent>false</isViolent>
       <AbilityTargetCategory>TargetSelf</AbilityTargetCategory>
       <targetParams>
@@ -361,7 +361,7 @@ Shots: 3</description>
       <soundCastTail>GunTail_Medium</soundCastTail>
       <muzzleFlashScale>20</muzzleFlashScale>
       <AlwaysHits>false</AlwaysHits>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <targetParams>
         <canTargetPawns>true</canTargetPawns>
         <canTargetBuildings>true</canTargetBuildings>
@@ -391,7 +391,7 @@ Shots: 3</description>
       <range>42</range>
       <soundCast>Shot_ChargeRifle</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <isViolent>true</isViolent>
       <burstShotCount>1</burstShotCount>
       <forcedMissRadius>1.5</forcedMissRadius>
@@ -437,7 +437,7 @@ Shots: 3</description>
       <ticksBetweenBurstShots>1</ticksBetweenBurstShots>
       <soundCast>Message_PositiveEvent</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
     </verbProperties>
   </AbilityDef>
   <AbilityDef Class="TorannMagic.TMBridgeAbilityDef" ParentName="TMBridgeAbilityBase">

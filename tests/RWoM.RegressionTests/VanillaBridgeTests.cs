@@ -31,6 +31,7 @@ internal static class VanillaBridgeTests
         yield return new("VanillaBridge.OldSaveConversion", OldSaveConversion);
         yield return new("VanillaBridge.TrackerSave", TrackerSave);
         yield return new("VanillaBridge.SinglePlayerJob", SinglePlayerJob);
+        yield return new("VanillaBridge.BloodSacrificeIdleAndQueue", BloodSacrificeIdleAndQueue);
     }
 
     // Old saves carry no knowledge comp; loading must inject it into every
@@ -220,6 +221,7 @@ internal static class VanillaBridgeTests
                 Check.Equal(true, !string.IsNullOrEmpty((string)verbProps.Attribute("Class")),
                     "verb properties class on " + defName);
                 Check.NotNull(verbProps.Element("verbClass"), "verb class on " + defName);
+                Check.Equal(true, (bool?)verbProps.Element("isPrimary") ?? true, "tracker needs a primary verb on " + defName);
                 Check.Equal(true, defName.StartsWith("TM_Bridge_"), "defName convention on " + defName);
                 defs++;
             }
@@ -297,6 +299,26 @@ internal static class VanillaBridgeTests
     {
         public bool Blocked;
         public override bool GizmoDisabled(out string reason) { reason = ""; return Blocked; }
+    }
+
+    private static void BloodSacrificeIdleAndQueue(RuntimeFixture f)
+    {
+        var xml = System.Xml.Linq.XDocument.Load(Path.Combine(f.Repository, "v1.7", "Defs", "AbilityDefs",
+            "Bridge", "Bridge_Abilities_TMagic_BloodMage.xml"));
+        var row = xml.Root!.Elements("AbilityDef").Single(e => (string?)e.Element("spellId") == "rwom.tm_bloodgift");
+        var props = row.Element("verbProperties")!;
+        var def = BridgeDef(row.Element("defName")!.Value, "rwom.tm_bloodgift");
+        def.verbProperties.verbClass = typeof(TMBridgeAbility).Assembly.GetType(props.Element("verbClass")!.Value, true)!;
+        def.verbProperties.isPrimary = (bool?)props.Element("isPrimary") ?? def.verbProperties.isPrimary;
+        var pawn = BridgePawn();
+        pawn.jobs = new Verse.AI.Pawn_JobTracker(pawn);
+        var job = new Verse.AI.Job(new JobDef { defName = "OrdinaryWork" });
+        pawn.jobs.jobQueue.EnqueueLast(job);
+        var ability = (TMBridgeAbility)AbilityUtility.MakeAbility(def, pawn);
+        Check.Equal(false, ability.Casting, "idle Blood Sacrifice must be drawable");
+        Check.Equal(true, ability.CanQueueCast, "ordinary work without a verb must not reserve Blood Sacrifice");
+        job.verbToUse = ability.verb;
+        Check.Equal(false, ability.CanQueueCast, "an actual queued bridge verb still blocks a duplicate");
     }
 
     private static void SinglePlayerJob(RuntimeFixture f)

@@ -39,7 +39,7 @@ Pain:		-20%</description>
         <maxTargets>5</maxTargets>
         <range>5</range>
       </TargetAoEProperties>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <isViolent>false</isViolent>
       <targetParams>
         <canTargetPawns>true</canTargetPawns>
@@ -94,7 +94,7 @@ Pain:		-20%</description>
         <maxTargets>6</maxTargets>
         <range>6</range>
       </TargetAoEProperties>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <isViolent>false</isViolent>
       <targetParams>
         <canTargetPawns>true</canTargetPawns>
@@ -149,7 +149,7 @@ Pain:		-30%</description>
         <maxTargets>8</maxTargets>
         <range>8</range>
       </TargetAoEProperties>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <isViolent>false</isViolent>
       <targetParams>
         <canTargetPawns>true</canTargetPawns>
@@ -204,7 +204,7 @@ Pain:		-40%</description>
         <maxTargets>10</maxTargets>
         <range>15</range>
       </TargetAoEProperties>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <isViolent>false</isViolent>
       <targetParams>
         <canTargetPawns>true</canTargetPawns>
@@ -244,7 +244,7 @@ Pain:		-40%</description>
       <soundCastTail>GunTail_Medium</soundCastTail>
       <muzzleFlashScale>20</muzzleFlashScale>
       <AlwaysHits>true</AlwaysHits>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <isViolent>true</isViolent>
       <targetParams>
         <canTargetPawns>true</canTargetPawns>
@@ -311,7 +311,7 @@ Pain:		-40%</description>
       <soundCast>ThrowGrenade</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
       <AlwaysHits>true</AlwaysHits>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <targetParams>
         <canTargetPawns>true</canTargetPawns>
         <canTargetBuildings>true</canTargetBuildings>

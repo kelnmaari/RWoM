@@ -63,7 +63,7 @@ Use of Conviction will destroy the orb.</description>
       <ticksBetweenBurstShots>1</ticksBetweenBurstShots>
       <soundCast>Message_PositiveEvent</soundCast>
       <muzzleFlashScale>0</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
     </verbProperties>
   </AbilityDef>
 </Defs>

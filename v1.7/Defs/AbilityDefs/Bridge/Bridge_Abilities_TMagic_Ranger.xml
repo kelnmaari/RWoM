@@ -35,7 +35,7 @@ Tame and train animal +12%, butchering speed +20%, smelting and construction spe
       <range>0</range>
       <soundCast>Message_PositiveEvent</soundCast>
       <muzzleFlashScale>10</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <AbilityTargetCategory>TargetSelf</AbilityTargetCategory>
       <targetParams>
         <canTargetPawns>true</canTargetPawns>
@@ -72,7 +72,7 @@ Level 3: Hearing and Sight +80%, Breathing +25%, Blood filtration +10%, +80% bow
       <range>0</range>
       <soundCast>Message_PositiveEvent</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <AbilityTargetCategory>TargetSelf</AbilityTargetCategory>
       <targetParams>
         <canTargetPawns>true</canTargetPawns>
@@ -111,7 +111,7 @@ Enemies caught in the poison will take 1-8 poison damage every 0.66 seconds. Poi
       <ticksBetweenBurstShots>1</ticksBetweenBurstShots>
       <soundCast>MeleeHit_Metal_Sharp</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
     </verbProperties>
   </AbilityDef>
   <AbilityDef Class="TorannMagic.TMBridgeAbilityDef" ParentName="TMBridgeAbilityBase">
@@ -146,7 +146,7 @@ A bond can be removed by using this ability on a bonded creature.</description>
       <ticksBetweenBurstShots>1</ticksBetweenBurstShots>
       <soundCast>MeleeHit_Metal_Sharp</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
     </verbProperties>
   </AbilityDef>
   <AbilityDef Class="TorannMagic.TMBridgeAbilityDef" ParentName="TMBridgeAbilityBase">

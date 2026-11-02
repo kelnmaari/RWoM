@@ -24,7 +24,7 @@
       <soundCast>ThrowGrenade</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
       <AlwaysHits>true</AlwaysHits>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <targetParams>
         <canTargetPawns>false</canTargetPawns>
         <canTargetBuildings>false</canTargetBuildings>
@@ -57,7 +57,7 @@
       <soundCast>Message_PositiveEvent</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
       <AlwaysHits>true</AlwaysHits>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <AbilityTargetCategory>TargetSelf</AbilityTargetCategory>
       <targetParams>
         <canTargetPawns>true</canTargetPawns>
@@ -91,7 +91,7 @@
       <soundCast>ThrowGrenade</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
       <AlwaysHits>true</AlwaysHits>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <targetParams>
         <canTargetPawns>false</canTargetPawns>
         <canTargetBuildings>false</canTargetBuildings>
@@ -124,7 +124,7 @@
       <soundCast>Message_PositiveEvent</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
       <AlwaysHits>true</AlwaysHits>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <AbilityTargetCategory>TargetSelf</AbilityTargetCategory>
       <targetParams>
         <canTargetPawns>true</canTargetPawns>
@@ -158,7 +158,7 @@
       <soundCast>ThrowGrenade</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
       <AlwaysHits>true</AlwaysHits>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <targetParams>
         <canTargetPawns>false</canTargetPawns>
         <canTargetBuildings>false</canTargetBuildings>
@@ -191,7 +191,7 @@
       <soundCast>Message_PositiveEvent</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
       <AlwaysHits>true</AlwaysHits>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <AbilityTargetCategory>TargetSelf</AbilityTargetCategory>
       <targetParams>
         <canTargetPawns>true</canTargetPawns>
@@ -225,7 +225,7 @@
       <soundCast>ThrowGrenade</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
       <AlwaysHits>true</AlwaysHits>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <targetParams>
         <canTargetPawns>false</canTargetPawns>
         <canTargetBuildings>false</canTargetBuildings>
@@ -258,7 +258,7 @@
       <soundCast>Message_PositiveEvent</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
       <AlwaysHits>true</AlwaysHits>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <AbilityTargetCategory>TargetSelf</AbilityTargetCategory>
       <targetParams>
         <canTargetPawns>true</canTargetPawns>
@@ -292,7 +292,7 @@
       <soundCast>ThrowGrenade</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
       <AlwaysHits>true</AlwaysHits>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <targetParams>
         <canTargetPawns>false</canTargetPawns>
         <canTargetBuildings>false</canTargetBuildings>
@@ -325,7 +325,7 @@
       <soundCast>ThrowGrenade</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
       <AlwaysHits>true</AlwaysHits>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <targetParams>
         <canTargetPawns>false</canTargetPawns>
         <canTargetBuildings>false</canTargetBuildings>
@@ -358,7 +358,7 @@
       <soundCast>Power_OnSmall</soundCast>
       <muzzleFlashScale>200</muzzleFlashScale>
       <AlwaysHits>true</AlwaysHits>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <targetParams>
         <canTargetPawns>false</canTargetPawns>
         <canTargetBuildings>false</canTargetBuildings>
@@ -392,7 +392,7 @@
       <soundCastTail>GunTail_Medium</soundCastTail>
       <muzzleFlashScale>4</muzzleFlashScale>
       <AlwaysHits>true</AlwaysHits>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <isViolent>false</isViolent>
       <targetParams>
         <canTargetPawns>true</canTargetPawns>
@@ -427,7 +427,7 @@
       <soundCastTail>GunTail_Medium</soundCastTail>
       <muzzleFlashScale>4</muzzleFlashScale>
       <AlwaysHits>true</AlwaysHits>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <isViolent>false</isViolent>
       <targetParams>
         <canTargetPawns>true</canTargetPawns>
@@ -462,7 +462,7 @@
       <soundCastTail>GunTail_Medium</soundCastTail>
       <muzzleFlashScale>4</muzzleFlashScale>
       <AlwaysHits>true</AlwaysHits>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <isViolent>false</isViolent>
       <targetParams>
         <canTargetPawns>true</canTargetPawns>
@@ -603,7 +603,7 @@ Casting the spell when a barrier is active will remove the barrier. Can be used 
       <soundCast>ThrowGrenade</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
       <AlwaysHits>true</AlwaysHits>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <targetParams>
         <canTargetPawns>false</canTargetPawns>
         <canTargetBuildings>false</canTargetBuildings>
@@ -640,7 +640,7 @@ Casting the spell when a barrier is active will remove the barrier. Can be used 
       <ticksBetweenBurstShots>1</ticksBetweenBurstShots>
       <soundCast>TM_AirWoosh</soundCast>
       <muzzleFlashScale>0</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
     </verbProperties>
   </AbilityDef>
   <AbilityDef Class="TorannMagic.TMBridgeAbilityDef" ParentName="TMBridgeAbilityBase">
@@ -915,7 +915,7 @@ AoE effects are only applied when the primary target is not a friendly pawn. Fri
       <soundCast>TM_Vibration</soundCast>
       <soundCastTail>GunTail_Medium</soundCastTail>
       <muzzleFlashScale>20</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <isViolent>false</isViolent>
       <AbilityTargetCategory>TargetAoE</AbilityTargetCategory>
       <TargetAoEProperties>
@@ -961,7 +961,7 @@ AoE effects are only applied when the primary target is not a friendly pawn. Fri
       <ticksBetweenBurstShots>1</ticksBetweenBurstShots>
       <soundCast>TM_AirWoosh</soundCast>
       <muzzleFlashScale>0</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
     </verbProperties>
   </AbilityDef>
   <AbilityDef Class="TorannMagic.TMBridgeAbilityDef" ParentName="TMBridgeAbilityBase">
@@ -991,7 +991,7 @@ AoE effects are only applied when the primary target is not a friendly pawn. Fri
       <ticksBetweenBurstShots>1</ticksBetweenBurstShots>
       <soundCast>TM_Vibration</soundCast>
       <muzzleFlashScale>0</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
     </verbProperties>
   </AbilityDef>
   <AbilityDef Class="TorannMagic.TMBridgeAbilityDef" ParentName="TMBridgeAbilityBase">
@@ -1017,7 +1017,7 @@ Arcane Bolt is inefficient because of the unrefined nature of the spell, but it 
       <range>35</range>
       <soundCast>TM_AirWooshLow</soundCast>
       <muzzleFlashScale>4</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <isViolent>true</isViolent>
       <burstShotCount>15</burstShotCount>
       <ticksBetweenBurstShots>1</ticksBetweenBurstShots>
@@ -1120,7 +1120,7 @@ Autocast only triggers when the target has 80% or greater chance of being downed
       <range>70</range>
       <soundCast>MeleeHit_Metal_Sharp</soundCast>
       <muzzleFlashScale>0</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <isViolent>true</isViolent>
       <burstShotCount>1</burstShotCount>
       <ticksBetweenBurstShots>1</ticksBetweenBurstShots>
@@ -1156,7 +1156,7 @@ Autocast only triggers when the target has 80% or greater chance of being downed
       <soundCast>Message_PositiveEvent</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
       <AlwaysHits>true</AlwaysHits>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <AbilityTargetCategory>TargetSelf</AbilityTargetCategory>
       <targetParams>
         <canTargetPawns>true</canTargetPawns>
@@ -1222,7 +1222,7 @@ Autocast only triggers when the target has 80% or greater chance of being downed
       <range>60</range>
       <soundCast>TM_VibrationLow</soundCast>
       <muzzleFlashScale>4</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <isViolent>false</isViolent>
       <burstShotCount>1</burstShotCount>
       <ticksBetweenBurstShots>1</ticksBetweenBurstShots>
@@ -1262,7 +1262,7 @@ Magelight can be dispelled by using this ability on the caster.</description>
       <soundCast>ThrowGrenade</soundCast>
       <muzzleFlashScale>40</muzzleFlashScale>
       <AlwaysHits>true</AlwaysHits>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <AbilityTargetCategory>TargetSelf</AbilityTargetCategory>
       <targetParams>
         <canTargetPawns>true</canTargetPawns>
@@ -1295,7 +1295,7 @@ Magelight can be dispelled by using this ability on the caster.</description>
       <range>50</range>
       <soundCast>TM_Vibration</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <targetParams>
         <canTargetPawns>true</canTargetPawns>
         <canTargetBuildings>false</canTargetBuildings>
@@ -1331,7 +1331,7 @@ This attack only works when the weapon equipped is not normally consumed after u
       <range>30</range>
       <soundCast>TM_Vibration</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <burstShotCount>5</burstShotCount>
       <ticksBetweenBurstShots>12</ticksBetweenBurstShots>
       <targetParams>
@@ -1366,7 +1366,7 @@ This attack only works when the weapon equipped is not normally consumed after u
       <soundCast>TM_Vibration</soundCast>
       <soundCastTail>GunTail_Medium</soundCastTail>
       <muzzleFlashScale>25</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <isViolent>false</isViolent>
       <AbilityTargetCategory>TargetAoE</AbilityTargetCategory>
       <TargetAoEProperties>
@@ -1409,7 +1409,7 @@ This attack only works when the weapon equipped is not normally consumed after u
       <soundCast>TM_Vibration</soundCast>
       <soundCastTail>GunTail_Medium</soundCastTail>
       <muzzleFlashScale>25</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <isViolent>false</isViolent>
       <AbilityTargetCategory>TargetAoE</AbilityTargetCategory>
       <TargetAoEProperties>
@@ -1454,7 +1454,7 @@ Effects include dizziness, nausea, vision and hearing loss, vomiting, inability 
       <soundCast>TM_Vibration</soundCast>
       <soundCastTail>GunTail_Medium</soundCastTail>
       <muzzleFlashScale>2</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <isViolent>true</isViolent>
       <targetParams>
         <canTargetPawns>true</canTargetPawns>
@@ -1488,7 +1488,7 @@ Effects include dizziness, nausea, vision and hearing loss, vomiting, inability 
       <soundCast>TM_Vibration</soundCast>
       <soundCastTail>GunTail_Medium</soundCastTail>
       <muzzleFlashScale>5</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <isViolent>false</isViolent>
       <AbilityTargetCategory>TargetSelf</AbilityTargetCategory>
       <targetParams>
@@ -1523,7 +1523,7 @@ Effects include dizziness, nausea, vision and hearing loss, vomiting, inability 
       <soundCast>TM_Vibration</soundCast>
       <soundCastTail>GunTail_Medium</soundCastTail>
       <muzzleFlashScale>5</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <isViolent>false</isViolent>
       <AbilityTargetCategory>TargetAoE</AbilityTargetCategory>
       <TargetAoEProperties>
@@ -1569,7 +1569,7 @@ Effects include dizziness, nausea, vision and hearing loss, vomiting, inability 
       <ticksBetweenBurstShots>1</ticksBetweenBurstShots>
       <soundCast>Message_PositiveEvent</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
     </verbProperties>
   </AbilityDef>
 </Defs>

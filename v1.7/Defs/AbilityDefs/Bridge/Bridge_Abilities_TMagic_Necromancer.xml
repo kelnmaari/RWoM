@@ -63,7 +63,7 @@ There is no limit to the number of undead a necromancer may control, however, wh
       <soundCast>Message_PositiveEvent</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
       <AlwaysHits>true</AlwaysHits>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <AbilityTargetCategory>TargetAoE</AbilityTargetCategory>
       <TargetAoEProperties>
         <targetClass>Pawn</targetClass>

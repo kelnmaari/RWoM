@@ -30,7 +30,7 @@ This ability reduces mana regeneration by 50%.</description>
       <range>0</range>
       <soundCast>TM_VibrationLow</soundCast>
       <muzzleFlashScale>10</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <AbilityTargetCategory>TargetSelf</AbilityTargetCategory>
       <targetParams>
         <canTargetPawns>true</canTargetPawns>
@@ -65,7 +65,7 @@ Alter Fate is most effective against environmental conditions. This ability can 
       <soundCast>TM_Gong</soundCast>
       <soundCastTail>TM_Thunder_OffMap</soundCastTail>
       <muzzleFlashScale>30</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <AbilityTargetCategory>TargetSelf</AbilityTargetCategory>
       <targetParams>
         <canTargetPawns>true</canTargetPawns>
@@ -188,7 +188,7 @@ Cast time: 1s</description>
       <soundCast>TM_Vibration</soundCast>
       <soundCastTail>GunTail_Medium</soundCastTail>
       <muzzleFlashScale>20</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <isViolent>false</isViolent>
       <targetParams>
         <canTargetPawns>true</canTargetPawns>
@@ -225,7 +225,7 @@ Cast time: .8s</description>
       <soundCast>TM_Vibration</soundCast>
       <soundCastTail>GunTail_Medium</soundCastTail>
       <muzzleFlashScale>20</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <isViolent>false</isViolent>
       <targetParams>
         <canTargetPawns>true</canTargetPawns>
@@ -262,7 +262,7 @@ Cast time: .6s</description>
       <soundCast>TM_Vibration</soundCast>
       <soundCastTail>GunTail_Medium</soundCastTail>
       <muzzleFlashScale>20</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <isViolent>false</isViolent>
       <targetParams>
         <canTargetPawns>true</canTargetPawns>
@@ -299,7 +299,7 @@ Cast time: .5s</description>
       <soundCast>TM_Vibration</soundCast>
       <soundCastTail>GunTail_Medium</soundCastTail>
       <muzzleFlashScale>20</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <isViolent>false</isViolent>
       <targetParams>
         <canTargetPawns>true</canTargetPawns>
@@ -337,7 +337,7 @@ To maintain physical cohesion during a recall, the caster will retain all condit
       <range>0</range>
       <soundCast>TM_Vibration</soundCast>
       <muzzleFlashScale>30</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <AbilityTargetCategory>TargetSelf</AbilityTargetCategory>
       <targetParams>
         <canTargetPawns>true</canTargetPawns>
@@ -369,7 +369,7 @@ To maintain physical cohesion during a recall, the caster will retain all condit
       <range>0</range>
       <soundCast>TM_Vibration</soundCast>
       <muzzleFlashScale>30</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <AbilityTargetCategory>TargetSelf</AbilityTargetCategory>
       <targetParams>
         <canTargetPawns>true</canTargetPawns>

@@ -25,7 +25,7 @@ Disguise will not fool any pawn that already sees the faceless as a threat.</des
       <range>0</range>
       <soundCast>TM_VibrationLow</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <AbilityTargetCategory>TargetSelf</AbilityTargetCategory>
       <targetParams>
         <canTargetPawns>true</canTargetPawns>
@@ -58,7 +58,7 @@ Disguise will not fool any pawn that already sees the faceless as a threat.</des
       <range>50</range>
       <soundCast>TM_Gong</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <targetParams>
         <canTargetPawns>true</canTargetPawns>
         <canTargetBuildings>false</canTargetBuildings>
@@ -89,7 +89,7 @@ Disguise will not fool any pawn that already sees the faceless as a threat.</des
       <range>0</range>
       <soundCast>TM_Vibration</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <AbilityTargetCategory>TargetSelf</AbilityTargetCategory>
       <targetParams>
         <canTargetPawns>true</canTargetPawns>
@@ -130,7 +130,7 @@ Cooldown: 15</description>
       <ticksBetweenBurstShots>1</ticksBetweenBurstShots>
       <soundCast>TM_AirWoosh</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
     </verbProperties>
   </AbilityDef>
   <AbilityDef Class="TorannMagic.TMBridgeAbilityDef" ParentName="TMBridgeAbilityBase">
@@ -164,7 +164,7 @@ Cooldown: 13</description>
       <ticksBetweenBurstShots>1</ticksBetweenBurstShots>
       <soundCast>TM_AirWoosh</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
     </verbProperties>
   </AbilityDef>
   <AbilityDef Class="TorannMagic.TMBridgeAbilityDef" ParentName="TMBridgeAbilityBase">
@@ -198,7 +198,7 @@ Cooldown: 11</description>
       <ticksBetweenBurstShots>1</ticksBetweenBurstShots>
       <soundCast>TM_AirWoosh</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
     </verbProperties>
   </AbilityDef>
   <AbilityDef Class="TorannMagic.TMBridgeAbilityDef" ParentName="TMBridgeAbilityBase">
@@ -233,7 +233,7 @@ Cooldown: 9</description>
       <ticksBetweenBurstShots>1</ticksBetweenBurstShots>
       <soundCast>TM_AirWoosh</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
     </verbProperties>
   </AbilityDef>
   <AbilityDef Class="TorannMagic.TMBridgeAbilityDef" ParentName="TMBridgeAbilityBase">
@@ -267,7 +267,7 @@ Only creatures with a human-like mind capable of self-doubt can be possessed.</d
       <ticksBetweenBurstShots>1</ticksBetweenBurstShots>
       <soundCast>TM_Vibration</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
     </verbProperties>
   </AbilityDef>
 </Defs>

@@ -23,7 +23,7 @@
       <range>25</range>
       <soundCast>Message_PositiveEvent</soundCast>
       <muzzleFlashScale>30</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <AbilityTargetCategory>TargetThing</AbilityTargetCategory>
       <targetParams>
         <canTargetPawns>true</canTargetPawns>
@@ -55,7 +55,7 @@
       <range>16</range>
       <soundCast>Message_PositiveEvent</soundCast>
       <muzzleFlashScale>30</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <AbilityTargetCategory>TargetThing</AbilityTargetCategory>
       <targetParams>
         <canTargetPawns>true</canTargetPawns>
@@ -91,7 +91,7 @@ Range: 30</description>
       <soundCast>Message_PositiveEvent</soundCast>
       <soundCastTail>GunTail_Medium</soundCastTail>
       <muzzleFlashScale>4</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <isViolent>false</isViolent>
       <targetParams>
         <canTargetPawns>true</canTargetPawns>
@@ -127,7 +127,7 @@ Range: 35</description>
       <soundCast>Message_PositiveEvent</soundCast>
       <soundCastTail>GunTail_Medium</soundCastTail>
       <muzzleFlashScale>4</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <isViolent>false</isViolent>
       <targetParams>
         <canTargetPawns>true</canTargetPawns>
@@ -163,7 +163,7 @@ Range: 40</description>
       <soundCast>Message_PositiveEvent</soundCast>
       <soundCastTail>GunTail_Medium</soundCastTail>
       <muzzleFlashScale>4</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <isViolent>false</isViolent>
       <targetParams>
         <canTargetPawns>true</canTargetPawns>
@@ -199,7 +199,7 @@ Range: 45</description>
       <soundCast>Message_PositiveEvent</soundCast>
       <soundCastTail>GunTail_Medium</soundCastTail>
       <muzzleFlashScale>4</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <isViolent>false</isViolent>
       <targetParams>
         <canTargetPawns>true</canTargetPawns>
@@ -238,7 +238,7 @@ Pain:		-40%</description>
       <soundCast>Message_PositiveEvent</soundCast>
       <soundCastTail>GunTail_Medium</soundCastTail>
       <muzzleFlashScale>20</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <isViolent>false</isViolent>
       <targetParams>
         <canTargetPawns>true</canTargetPawns>
@@ -283,7 +283,7 @@ Pain:		-50%</description>
       <soundCast>Message_PositiveEvent</soundCast>
       <soundCastTail>GunTail_Medium</soundCastTail>
       <muzzleFlashScale>20</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <isViolent>false</isViolent>
       <targetParams>
         <canTargetPawns>true</canTargetPawns>
@@ -328,7 +328,7 @@ Pain:		-60%</description>
       <soundCast>Message_PositiveEvent</soundCast>
       <soundCastTail>GunTail_Medium</soundCastTail>
       <muzzleFlashScale>20</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <isViolent>false</isViolent>
       <targetParams>
         <canTargetPawns>true</canTargetPawns>
@@ -373,7 +373,7 @@ Pain:		-70%</description>
       <soundCast>Message_PositiveEvent</soundCast>
       <soundCastTail>GunTail_Medium</soundCastTail>
       <muzzleFlashScale>20</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <isViolent>false</isViolent>
       <targetParams>
         <canTargetPawns>true</canTargetPawns>
@@ -411,7 +411,7 @@ Pain:		-70%</description>
       <range>6</range>
       <soundCast>Message_PositiveEvent</soundCast>
       <muzzleFlashScale>30</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <AlwaysHits>true</AlwaysHits>
       <requireLineOfSight>false</requireLineOfSight>
       <AbilityTargetCategory>TargetLocation</AbilityTargetCategory>

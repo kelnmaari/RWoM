@@ -21,7 +21,7 @@
       <range>38</range>
       <soundCast>Shot_ChargeRifle</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <isViolent>true</isViolent>
       <burstShotCount>1</burstShotCount>
       <forcedMissRadius>1.5</forcedMissRadius>
@@ -61,7 +61,7 @@
       <range>32</range>
       <soundCast>ThrowMolotovCocktail</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <isViolent>true</isViolent>
       <burstShotCount>1</burstShotCount>
       <AlwaysHits>true</AlwaysHits>

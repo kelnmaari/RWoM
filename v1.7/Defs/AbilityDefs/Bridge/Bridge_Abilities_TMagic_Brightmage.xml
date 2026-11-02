@@ -223,7 +223,7 @@ Count: 16</description>
       <ticksBetweenBurstShots>12</ticksBetweenBurstShots>
       <soundCast>TM_SoftExplosion</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <isViolent>false</isViolent>
       <AbilityTargetCategory>TargetAoE</AbilityTargetCategory>
       <TargetAoEProperties>

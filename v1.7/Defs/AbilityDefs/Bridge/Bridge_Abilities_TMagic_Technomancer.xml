@@ -26,7 +26,7 @@ Drafted: uses an internal focus-LED to fire micro lasers at the technomancers ta
       <range>0</range>
       <soundCast>Message_PositiveEvent</soundCast>
       <muzzleFlashScale>10</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <AbilityTargetCategory>TargetSelf</AbilityTargetCategory>
       <targetParams>
         <canTargetPawns>true</canTargetPawns>
@@ -59,7 +59,7 @@ The Mark-IV will automatically miniaturize itself when it takes critical damage 
       <warmupTime>2</warmupTime>
       <SecondsToRecharge>600</SecondsToRecharge>
       <range>18</range>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <AbilityTargetCategory>TargetLocation</AbilityTargetCategory>
       <targetParams>
         <canTargetPawns>false</canTargetPawns>
@@ -96,7 +96,7 @@ To create a techno weapon: target a weapon on the ground. Targeted weapon must b
       <range>10</range>
       <soundCast>Message_PositiveEvent</soundCast>
       <muzzleFlashScale>10</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <AbilityTargetCategory>TargetLocation</AbilityTargetCategory>
       <targetParams>
         <canTargetPawns>false</canTargetPawns>
@@ -132,7 +132,7 @@ When the nanites burn out, they will form platelets to cauterize and stop bleedi
       <range>0</range>
       <soundCast>Message_PositiveEvent</soundCast>
       <muzzleFlashScale>1</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <AbilityTargetCategory>TargetSelf</AbilityTargetCategory>
       <targetParams>
         <canTargetPawns>true</canTargetPawns>

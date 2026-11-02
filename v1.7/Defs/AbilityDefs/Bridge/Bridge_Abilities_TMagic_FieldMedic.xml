@@ -31,7 +31,7 @@ The Field Medic can train to convert his equipment back into common medicine</de
       <range>2</range>
       <soundCast>TM_VibrationLow</soundCast>
       <muzzleFlashScale>10</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <targetParams>
         <canTargetPawns>false</canTargetPawns>
         <canTargetBuildings>false</canTargetBuildings>
@@ -64,7 +64,7 @@ The Field Medic gains increased base movement speed, tending speed and tending q
       <range>0</range>
       <soundCast>TM_VibrationLow</soundCast>
       <muzzleFlashScale>1</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <AbilityTargetCategory>TargetSelf</AbilityTargetCategory>
       <targetParams>
         <canTargetPawns>true</canTargetPawns>
@@ -103,7 +103,7 @@ The Field Medic gains increased base movement speed, tending speed and tending q
       <range>1</range>
       <AlwaysHits>true</AlwaysHits>
       <muzzleFlashScale>1</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <AbilityTargetCategory>TargetThing</AbilityTargetCategory>
       <targetParams>
         <canTargetPawns>true</canTargetPawns>
@@ -156,7 +156,7 @@ The effects are always positive but may vary.</description>
       <range>10</range>
       <AlwaysHits>true</AlwaysHits>
       <muzzleFlashScale>20</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <AbilityTargetCategory>TargetThing</AbilityTargetCategory>
       <targetParams>
         <canTargetPawns>true</canTargetPawns>

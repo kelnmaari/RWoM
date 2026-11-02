@@ -27,7 +27,7 @@ Super Soldiers with a specialized pistol equipped gain a unique "double tap" tal
       <range>0</range>
       <soundCast>Message_PositiveEvent</soundCast>
       <muzzleFlashScale>0</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <AbilityTargetCategory>TargetSelf</AbilityTargetCategory>
       <targetParams>
         <canTargetPawns>true</canTargetPawns>
@@ -94,7 +94,7 @@ Weapon specializations apply automatically when a Super Soldier equips a weapon 
       <range>0</range>
       <soundCast>Message_PositiveEvent</soundCast>
       <muzzleFlashScale>0</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <AbilityTargetCategory>TargetSelf</AbilityTargetCategory>
       <targetParams>
         <canTargetPawns>true</canTargetPawns>
@@ -161,7 +161,7 @@ Weapon specializations apply automatically when a Super Soldier equips a weapon 
       <ticksBetweenBurstShots>1</ticksBetweenBurstShots>
       <soundCast>Shot_IncendiaryLauncher</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
     </verbProperties>
   </AbilityDef>
   <AbilityDef Class="TorannMagic.TMBridgeAbilityDef" ParentName="TMBridgeAbilityBase">
@@ -189,7 +189,7 @@ Weapon specializations apply automatically when a Super Soldier equips a weapon 
       <range>0</range>
       <soundCast>Message_PositiveEvent</soundCast>
       <muzzleFlashScale>0</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <AbilityTargetCategory>TargetSelf</AbilityTargetCategory>
       <targetParams>
         <canTargetPawns>true</canTargetPawns>
@@ -286,7 +286,7 @@ Weapon specializations apply automatically when a Super Soldier equips a weapon 
       <ticksBetweenBurstShots>1</ticksBetweenBurstShots>
       <soundCast>MeleeHit_Metal_Sharp</soundCast>
       <muzzleFlashScale>6</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
     </verbProperties>
   </AbilityDef>
   <AbilityDef Class="TorannMagic.TMBridgeAbilityDef" ParentName="TMBridgeAbilityBase">
@@ -316,7 +316,7 @@ Weapon specializations apply automatically when a Super Soldier equips a weapon 
       <ticksBetweenBurstShots>1</ticksBetweenBurstShots>
       <soundCast>MeleeHit_Metal_Sharp</soundCast>
       <muzzleFlashScale>6</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
     </verbProperties>
   </AbilityDef>
   <AbilityDef Class="TorannMagic.TMBridgeAbilityDef" ParentName="TMBridgeAbilityBase">

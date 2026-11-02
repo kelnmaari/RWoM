@@ -28,7 +28,7 @@
       <ticksBetweenBurstShots>1</ticksBetweenBurstShots>
       <soundCast>TM_VibrationLow</soundCast>
       <muzzleFlashScale>0</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
     </verbProperties>
   </AbilityDef>
   <AbilityDef Class="TorannMagic.TMBridgeAbilityDef" ParentName="TMBridgeAbilityBase">
@@ -58,7 +58,7 @@
       <ticksBetweenBurstShots>1</ticksBetweenBurstShots>
       <soundCast>TM_VibrationLow</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
     </verbProperties>
   </AbilityDef>
   <AbilityDef Class="TorannMagic.TMBridgeAbilityDef" ParentName="TMBridgeAbilityBase">

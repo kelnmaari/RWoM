@@ -24,7 +24,7 @@
       <soundCast>Message_PositiveEvent</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
       <AlwaysHits>true</AlwaysHits>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <AbilityTargetCategory>TargetSelf</AbilityTargetCategory>
       <targetParams>
         <canTargetPawns>true</canTargetPawns>
@@ -58,7 +58,7 @@
       <soundCast>Message_PositiveEvent</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
       <AlwaysHits>true</AlwaysHits>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <targetParams>
         <canTargetPawns>false</canTargetPawns>
         <canTargetBuildings>false</canTargetBuildings>
@@ -91,7 +91,7 @@
       <soundCast>Message_PositiveEvent</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
       <AlwaysHits>true</AlwaysHits>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <targetParams>
         <canTargetPawns>false</canTargetPawns>
         <canTargetBuildings>false</canTargetBuildings>
@@ -124,7 +124,7 @@
       <soundCast>Message_PositiveEvent</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
       <AlwaysHits>true</AlwaysHits>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <targetParams>
         <canTargetPawns>false</canTargetPawns>
         <canTargetBuildings>false</canTargetBuildings>
@@ -193,7 +193,7 @@ An enraged pawn gains increased movement and manipulation, increased pain resist
       <soundCast>TM_Vibration</soundCast>
       <soundCastTail>GunTail_Medium</soundCastTail>
       <muzzleFlashScale>20</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <isViolent>false</isViolent>
       <requiresLineOfSight>false</requiresLineOfSight>
       <targetParams>
@@ -232,7 +232,7 @@ Cast time: 1s</description>
       <soundCast>TM_Vibration</soundCast>
       <soundCastTail>GunTail_Medium</soundCastTail>
       <muzzleFlashScale>20</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <isViolent>false</isViolent>
       <AbilityTargetCategory>TargetAoE</AbilityTargetCategory>
       <TargetAoEProperties>
@@ -279,7 +279,7 @@ Cast time: .8s</description>
       <soundCast>TM_Vibration</soundCast>
       <soundCastTail>GunTail_Medium</soundCastTail>
       <muzzleFlashScale>20</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <isViolent>false</isViolent>
       <AbilityTargetCategory>TargetAoE</AbilityTargetCategory>
       <TargetAoEProperties>
@@ -326,7 +326,7 @@ Cast time: .7s</description>
       <soundCast>TM_Vibration</soundCast>
       <soundCastTail>GunTail_Medium</soundCastTail>
       <muzzleFlashScale>20</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <isViolent>false</isViolent>
       <AbilityTargetCategory>TargetAoE</AbilityTargetCategory>
       <TargetAoEProperties>
@@ -373,7 +373,7 @@ Cast time: .6s</description>
       <soundCast>TM_Vibration</soundCast>
       <soundCastTail>GunTail_Medium</soundCastTail>
       <muzzleFlashScale>20</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <isViolent>false</isViolent>
       <AbilityTargetCategory>TargetAoE</AbilityTargetCategory>
       <TargetAoEProperties>
@@ -415,7 +415,7 @@ Cast time: .6s</description>
       <soundCast>TM_Vibration</soundCast>
       <soundCastTail>GunTail_Medium</soundCastTail>
       <muzzleFlashScale>5</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <isViolent>true</isViolent>
       <AbilityTargetCategory>TargetSelf</AbilityTargetCategory>
       <targetParams>
@@ -449,7 +449,7 @@ Cast time: .6s</description>
       <soundCast>TM_Vibration</soundCast>
       <soundCastTail>GunTail_Medium</soundCastTail>
       <muzzleFlashScale>10</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <isViolent>false</isViolent>
       <AbilityTargetCategory>TargetSelf</AbilityTargetCategory>
       <targetParams>
@@ -483,7 +483,7 @@ Cast time: .6s</description>
       <soundCast>TM_Vibration</soundCast>
       <soundCastTail>GunTail_Medium</soundCastTail>
       <muzzleFlashScale>10</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <isViolent>false</isViolent>
       <AbilityTargetCategory>TargetSelf</AbilityTargetCategory>
       <targetParams>
@@ -522,7 +522,7 @@ Cooldown: 120s</description>
       <soundCastTail>GunTail_Heavy</soundCastTail>
       <muzzleFlashScale>2</muzzleFlashScale>
       <AlwaysHits>true</AlwaysHits>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <isViolent>true</isViolent>
       <targetParams>
         <canTargetItems>false</canTargetItems>
@@ -561,7 +561,7 @@ Cooldown: 110s</description>
       <soundCastTail>GunTail_Heavy</soundCastTail>
       <muzzleFlashScale>2</muzzleFlashScale>
       <AlwaysHits>true</AlwaysHits>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <isViolent>true</isViolent>
       <targetParams>
         <canTargetItems>false</canTargetItems>
@@ -600,7 +600,7 @@ Cooldown: 100s</description>
       <soundCastTail>GunTail_Heavy</soundCastTail>
       <muzzleFlashScale>2</muzzleFlashScale>
       <AlwaysHits>true</AlwaysHits>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <isViolent>true</isViolent>
       <targetParams>
         <canTargetItems>false</canTargetItems>
@@ -639,7 +639,7 @@ Cooldown: 90s</description>
       <soundCastTail>GunTail_Heavy</soundCastTail>
       <muzzleFlashScale>2</muzzleFlashScale>
       <AlwaysHits>true</AlwaysHits>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <isViolent>true</isViolent>
       <targetParams>
         <canTargetItems>false</canTargetItems>
@@ -682,7 +682,7 @@ Once determined, a guardian spirit type remains the same, however, this can be f
       <soundCastTail>TM_VibrationLow</soundCastTail>
       <muzzleFlashScale>8</muzzleFlashScale>
       <AlwaysHits>true</AlwaysHits>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <isViolent>false</isViolent>
       <targetParams>
         <canTargetItems>false</canTargetItems>
@@ -717,7 +717,7 @@ Once determined, a guardian spirit type remains the same, however, this can be f
       <soundCast>TM_Gong</soundCast>
       <muzzleFlashScale>10</muzzleFlashScale>
       <AlwaysHits>true</AlwaysHits>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <AbilityTargetCategory>TargetSelf</AbilityTargetCategory>
       <targetParams>
         <canTargetPawns>true</canTargetPawns>

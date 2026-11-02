@@ -714,7 +714,7 @@ The summoning is initiated when a Succubus anchors the physical offering and is 
       <soundCastTail>GunTail_Medium</soundCastTail>
       <muzzleFlashScale>4</muzzleFlashScale>
       <AlwaysHits>true</AlwaysHits>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <isViolent>false</isViolent>
       <AbilityTargetCategory>TargetSelf</AbilityTargetCategory>
       <targetParams>

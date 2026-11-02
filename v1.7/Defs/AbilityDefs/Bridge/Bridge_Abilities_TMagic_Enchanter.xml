@@ -26,7 +26,7 @@ Using this ability while the enchantment is active will dispel the enchantment. 
       <range>0</range>
       <soundCast>TM_VibrationLow</soundCast>
       <muzzleFlashScale>30</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <AbilityTargetCategory>TargetSelf</AbilityTargetCategory>
       <targetParams>
         <canTargetPawns>true</canTargetPawns>
@@ -60,7 +60,7 @@ Using this ability while the enchantment is active will dispel the enchantment. 
       <range>0</range>
       <soundCast>TM_VibrationLow</soundCast>
       <muzzleFlashScale>30</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <AbilityTargetCategory>TargetSelf</AbilityTargetCategory>
       <targetParams>
         <canTargetPawns>true</canTargetPawns>
@@ -172,7 +172,7 @@ This ability is used on raw resources such as stone chunks, steel, or silver - s
       <soundCast>Message_PositiveEvent</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
       <AlwaysHits>true</AlwaysHits>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <AbilityTargetCategory>TargetSelf</AbilityTargetCategory>
       <targetParams>
         <canTargetPawns>true</canTargetPawns>
@@ -296,7 +296,7 @@ Cast time: 3s</description>
       <soundCast>TM_Vibration</soundCast>
       <soundCastTail>GunTail_Medium</soundCastTail>
       <muzzleFlashScale>20</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <isViolent>false</isViolent>
       <AbilityTargetCategory>TargetAoE</AbilityTargetCategory>
       <TargetAoEProperties>
@@ -349,7 +349,7 @@ Cast time: 2.8s</description>
       <soundCast>TM_Vibration</soundCast>
       <soundCastTail>GunTail_Medium</soundCastTail>
       <muzzleFlashScale>20</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <isViolent>false</isViolent>
       <AbilityTargetCategory>TargetAoE</AbilityTargetCategory>
       <TargetAoEProperties>
@@ -402,7 +402,7 @@ Cast time: 2.6s</description>
       <soundCast>TM_Vibration</soundCast>
       <soundCastTail>GunTail_Medium</soundCastTail>
       <muzzleFlashScale>20</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <isViolent>false</isViolent>
       <AbilityTargetCategory>TargetAoE</AbilityTargetCategory>
       <TargetAoEProperties>
@@ -455,7 +455,7 @@ Cast time: 2.4s</description>
       <soundCast>TM_Vibration</soundCast>
       <soundCastTail>GunTail_Medium</soundCastTail>
       <muzzleFlashScale>20</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <isViolent>false</isViolent>
       <AbilityTargetCategory>TargetAoE</AbilityTargetCategory>
       <TargetAoEProperties>
@@ -498,7 +498,7 @@ Shapeshifting is not without minor side effects; shapeshifting into an animal wi
       <range>0</range>
       <soundCast>TM_VibrationLow</soundCast>
       <muzzleFlashScale>30</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <AbilityTargetCategory>TargetSelf</AbilityTargetCategory>
       <targetParams>
         <canTargetPawns>true</canTargetPawns>
@@ -534,7 +534,7 @@ Dire wolves are unique animals with a special connection to magic. While in dire
       <range>0</range>
       <soundCast>TM_VibrationLow</soundCast>
       <muzzleFlashScale>30</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <AbilityTargetCategory>TargetSelf</AbilityTargetCategory>
       <targetParams>
         <canTargetPawns>true</canTargetPawns>

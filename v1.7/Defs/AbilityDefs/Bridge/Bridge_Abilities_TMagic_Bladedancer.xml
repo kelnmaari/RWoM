@@ -28,7 +28,7 @@ Legendary Bladedancer: Speed +0.4c/s, MBT -10%, Hit chance +15%, Dodge +20%, Sho
       <range>0</range>
       <soundCast>Message_PositiveEvent</soundCast>
       <muzzleFlashScale>10</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <AbilityTargetCategory>TargetSelf</AbilityTargetCategory>
       <targetParams>
         <canTargetPawns>true</canTargetPawns>
@@ -65,7 +65,7 @@ Level 3: Moving +25%, Manipulation +25%, Breathing +15%, Blood pumping +10%, Blo
       <range>0</range>
       <soundCast>Message_PositiveEvent</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
       <AbilityTargetCategory>TargetSelf</AbilityTargetCategory>
       <targetParams>
         <canTargetPawns>true</canTargetPawns>
@@ -102,7 +102,7 @@ Level 3: Moving +25%, Manipulation +25%, Breathing +15%, Blood pumping +10%, Blo
       <ticksBetweenBurstShots>1</ticksBetweenBurstShots>
       <soundCast>MeleeHit_Metal_Sharp</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
     </verbProperties>
   </AbilityDef>
   <AbilityDef Class="TorannMagic.TMBridgeAbilityDef" ParentName="TMBridgeAbilityBase">
@@ -132,7 +132,7 @@ Level 3: Moving +25%, Manipulation +25%, Breathing +15%, Blood pumping +10%, Blo
       <ticksBetweenBurstShots>1</ticksBetweenBurstShots>
       <soundCast>MeleeHit_Metal_Sharp</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
     </verbProperties>
   </AbilityDef>
   <AbilityDef Class="TorannMagic.TMBridgeAbilityDef" ParentName="TMBridgeAbilityBase">
@@ -167,7 +167,7 @@ Range: 30</description>
       <ticksBetweenBurstShots>1</ticksBetweenBurstShots>
       <soundCast>MeleeHit_Metal_Sharp</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
     </verbProperties>
   </AbilityDef>
   <AbilityDef Class="TorannMagic.TMBridgeAbilityDef" ParentName="TMBridgeAbilityBase">
@@ -202,7 +202,7 @@ Range: 35</description>
       <ticksBetweenBurstShots>1</ticksBetweenBurstShots>
       <soundCast>MeleeHit_Metal_Sharp</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
     </verbProperties>
   </AbilityDef>
   <AbilityDef Class="TorannMagic.TMBridgeAbilityDef" ParentName="TMBridgeAbilityBase">
@@ -237,7 +237,7 @@ Range: 40</description>
       <ticksBetweenBurstShots>1</ticksBetweenBurstShots>
       <soundCast>MeleeHit_Metal_Sharp</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
     </verbProperties>
   </AbilityDef>
   <AbilityDef Class="TorannMagic.TMBridgeAbilityDef" ParentName="TMBridgeAbilityBase">
@@ -272,7 +272,7 @@ Range: 45</description>
       <ticksBetweenBurstShots>1</ticksBetweenBurstShots>
       <soundCast>MeleeHit_Metal_Sharp</soundCast>
       <muzzleFlashScale>20</muzzleFlashScale>
-      <isPrimary>false</isPrimary>
+      <isPrimary>true</isPrimary>
     </verbProperties>
   </AbilityDef>
 </Defs>
