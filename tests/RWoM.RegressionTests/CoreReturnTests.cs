@@ -39,7 +39,7 @@ internal static partial class TeleportSpiritTests
         Check.Equal(true,CoreReturnUtility.TryReturn(core,[w.Caster],out var why),"first cycle return "+why);
         Check.Equal(true,core.CanMark(second),"CanMark accepts the unbound colonist");
         var reason=(string)typeof(CompCoreReturn).GetMethod("MarkBlockReason",Flags)!.Invoke(core,[second])!;
-        Check.Null(reason,"an awake moving colonist has no mark block reason");
+        Check.Equal(true, reason == null, "an awake moving colonist has no mark block reason");
         var mark=CompCoreReturn.FindMark(w.Caster);
         Check.Equal(true,mark!=null,"the returned pawn keeps its recall mark by design");
     }

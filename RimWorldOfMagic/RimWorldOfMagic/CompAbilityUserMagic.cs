@@ -4328,14 +4328,15 @@ namespace TorannMagic
                                         if (magicPower != null && magicPower.learned && magicPower.autocast)
                                         {
                                             ability = this.AbilityData.Powers.FirstOrDefault((PawnAbility x) => x.Def == TorannMagicDefOf.TM_Purify);
-                                            MagicPowerSkill ver = this.MagicData.MagicPowerSkill_Purify.FirstOrDefault((MagicPowerSkill x) => x.label == "TM_Purify_ver");
                                             AutoCast.HealPermanentSpell.Evaluate(this, TorannMagicDefOf.TM_Purify, ability, magicPower, out castSuccess);
                                             if (castSuccess) goto AutoCastExit;
+                                            // Ф1: a missing skill-label entry resolves to level 0 instead of NRE-ing the loop.
+                                            int verLevel = SpellSanitizer.SkillLevelOrDefault(this.MagicData.MagicPowerSkill_Purify, "TM_Purify_ver");
                                             List<string> afflictionList = new List<string>();
                                             afflictionList.Clear();
                                             foreach(TMDefs.TM_CategoryHediff chd in HediffCategoryList.Named("TM_Category_Hediffs").ailments)
                                             {
-                                                if(chd.requiredSkillName == "TM_Purify_ver" && chd.requiredSkillLevel <= ver.level)
+                                                if(chd.requiredSkillName == "TM_Purify_ver" && chd.requiredSkillLevel <= verLevel)
                                                 {
                                                     afflictionList.Add(chd.hediffDefname);
                                                 }
@@ -4357,7 +4358,7 @@ namespace TorannMagic
                                             //    afflictionList.Add("Carcinoma");
                                             //    afflictionList.Add("ChemicalDamageSevere");
                                             //}
-                                            //if (ver.level >= 3)
+                                            //if (verLevel >= 3)
                                             //{
                                             //    afflictionList.Add("Alzheimers");
                                             //    afflictionList.Add("Dementia");
@@ -4383,12 +4384,12 @@ namespace TorannMagic
                                             //}
                                             foreach (TMDefs.TM_CategoryHediff chd in HediffCategoryList.Named("TM_Category_Hediffs").addictions)
                                             {
-                                                if (chd.requiredSkillName == "TM_Purify_ver" && chd.requiredSkillLevel <= ver.level)
+                                                if (chd.requiredSkillName == "TM_Purify_ver" && chd.requiredSkillLevel <= verLevel)
                                                 {
                                                     addictionList.Add(chd.hediffDefname);
                                                 }
                                             }
-                                            if (ver.level >= 3)
+                                            if (verLevel >= 3)
                                             {
                                                 IEnumerable<ChemicalDef> enumerable = from def in DefDatabase<ChemicalDef>.AllDefs
                                                                                       where (true)
