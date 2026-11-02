@@ -147,6 +147,15 @@ namespace TorannMagic.ClassProgression
     {
         static ClassProgressionBootstrap()
         {
+            // AbilityKnowledgeComp: injected for ALL humanlike pawns — the knowledge
+            // store serves both classic and progression pawns.
+            foreach (var def in DefDatabase<ThingDef>.AllDefsListForReading)
+            {
+                if (def?.race == null || !def.race.Humanlike) continue;
+                if (def.comps == null) def.comps = new List<CompProperties>();
+                if (!def.comps.Any(p => p?.compClass == typeof(TorannMagic.AbilityKnowledgeComp)))
+                    def.comps.Add(new CompProperties { compClass = typeof(TorannMagic.AbilityKnowledgeComp) });
+            }
             // Beta progression kill switch: without the comp no pawn can hold
             // progression state, and every ClassIdentity predicate falls back to the
             // classic trait checks.
