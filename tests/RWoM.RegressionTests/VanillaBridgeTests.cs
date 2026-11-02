@@ -30,6 +30,7 @@ internal static class VanillaBridgeTests
         yield return new("VanillaBridge.GizmoDisabledReflectsResources", GizmoDisabledReflectsResources);
         yield return new("VanillaBridge.OldSaveConversion", OldSaveConversion);
         yield return new("VanillaBridge.TrackerSave", TrackerSave);
+        yield return new("VanillaBridge.OwnerAutocastCommandAtEveryRank", OwnerAutocastCommandAtEveryRank);
         yield return new("VanillaBridge.SinglePlayerJob", SinglePlayerJob);
         yield return new("VanillaBridge.BloodSacrificeIdleAndQueue", BloodSacrificeIdleAndQueue);
     }
@@ -319,6 +320,46 @@ internal static class VanillaBridgeTests
         Check.Equal(true, ability.CanQueueCast, "ordinary work without a verb must not reserve Blood Sacrifice");
         job.verbToUse = ability.verb;
         Check.Equal(false, ability.CanQueueCast, "an actual queued bridge verb still blocks a duplicate");
+    }
+
+    private sealed class GizmoDef : TMAbilityDef
+    {
+        public override string GetDescription() => "Test spell";
+    }
+
+    private sealed class GizmoOwner : AbilityUser.PawnAbility
+    {
+        public override bool CanCastPowerCheck(global::AbilityUser.AbilityContext context, out string reason)
+        { reason = ""; return true; }
+    }
+
+    private static void OwnerAutocastCommandAtEveryRank(RuntimeFixture f)
+    {
+        EnsureCoreLoaded(f);
+        var parent = System.Xml.Linq.XDocument.Load(Path.Combine(f.Repository, "v1.7", "Defs", "AbilityDefs",
+            "Bridge", "Abilities_Bridge_Heal.xml")).Root!.Elements().Single(e => (string?)e.Attribute("Name") == "TMBridgeAbilityBase");
+        Check.Equal(false, (bool?)parent.Element("disableGizmoWhileUndrafted") ?? true, "no blanket draft gate");
+        Check.Equal(false, (bool?)parent.Element("casterMustBeCapableOfViolence") ?? true, "owner decides whether spell is violent");
+        var pawn = BridgePawn();
+        var user = pawn.TryGetComp<CompAbilityUserMagic>();
+        foreach (var suffix in new[] { "", "_II" })
+        {
+            var original = (GizmoDef)RuntimeHelpers.GetUninitializedObject(typeof(GizmoDef));
+            original.defName = "TM_AutocastButtonProbe" + suffix;
+            original.label = "test spell";
+            original.MainVerb = new AbilityUser.VerbProperties_Ability { verbClass = typeof(AbilityUser.Verb_UseAbility) };
+            CoreBridge.RegisterSpell(original);
+            var bridge = BridgeDef("TM_Bridge_Autocastbuttonprobe" + suffix, SpellIds.Of(original));
+            GiveOwner(pawn, bridge);
+            var owner = new GizmoOwner { Def = original, AbilityUser = user };
+            user.AbilityData.Powers.Clear();
+            user.AbilityData.Powers.Add(owner);
+            user.AbilityData.AllPowers = null;
+            var ability = new BridgeAdmissionProbe { pawn = pawn, def = bridge };
+            var cmd = (AbilityUser.Command_PawnAbility)ability.GetGizmos().Single();
+            Check.Same(owner, cmd.pawnAbility, "autocast toggle receives live owner at rank " + suffix);
+            Check.Same(owner.Verb, cmd.verb, "manual targeting uses same verb");
+        }
     }
 
     private static void SinglePlayerJob(RuntimeFixture f)

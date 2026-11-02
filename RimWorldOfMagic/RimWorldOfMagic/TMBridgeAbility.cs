@@ -2,7 +2,6 @@ using System;
 using AbilityUser;
 using RimWorld;
 using System.Collections.Generic;
-using UnityEngine;
 using Verse;
 
 namespace TorannMagic
@@ -47,25 +46,11 @@ namespace TorannMagic
         {
             var owner = Companion;
             if (owner == null || !VanillaBridgeGizmoVisibilityPatch.VisibleThroughTracker(owner)) yield break;
-            gizmo ??= new BridgeCommand(this, pawn);
-            yield return gizmo;
-        }
-
-        // A vanilla command remains visible to the tracker and integrations. Use the
-        // owner's targeting UI for self, local, world and multi-stage spells.
-        private sealed class BridgeCommand : Command_Ability
-        {
-            private readonly TMBridgeAbility bridge;
-            public BridgeCommand(TMBridgeAbility bridge, Pawn pawn) : base(bridge, pawn)
-                => this.bridge = bridge;
-
-            public override void ProcessInput(Event ev)
-            {
-                if (!bridge.GizmoDisabled(out _)) bridge.Companion?.GetGizmo().ProcessInput(ev);
-            }
-
-            public override void GizmoUpdateOnMouseover()
-                => bridge.Companion?.GetGizmo().GizmoUpdateOnMouseover();
+            // RWoM adds its autocast control to Command_PawnAbility. Use the
+            // same owner command before and after the tracker synchronizes a rank.
+            var command = owner.GetGizmo();
+            if (!command.Disabled && GizmoDisabled(out string reason)) command.Disable(reason);
+            yield return command;
         }
 
         public override bool GizmoDisabled(out string reason)
