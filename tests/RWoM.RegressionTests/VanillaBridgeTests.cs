@@ -20,6 +20,41 @@ internal static class VanillaBridgeTests
         yield return new("VanillaBridge.CompanionVerbWiring", CompanionVerbWiring);
         yield return new("VanillaBridge.TrackerGainAndLookup", TrackerGainAndLookup);
         yield return new("VanillaBridge.SleepingDefDegrades", SleepingDefDegrades);
+        yield return new("VanillaBridge.SyncGrantsFromKnowledge", SyncGrantsFromKnowledge);
+    }
+
+    // RED 5: the sync grants the bridge ability for a learned knowledge entry,
+    // idempotently, and skips unlearned or sleeping entries.
+    private static void SyncGrantsFromKnowledge(RuntimeFixture f)
+    {
+        EnsureCoreLoaded(f);
+        var original = Original("TM_Heal");
+        CoreBridge.RegisterSpell(original);
+        var bridge = BridgeDef("TM_Bridge_Heal", "rwom.tm_heal"); // matches the defName convention
+        DefDatabase<RimWorld.AbilityDef>.Clear();
+        DefDatabase<RimWorld.AbilityDef>.Add(bridge);
+        try
+        {
+            var pawn = BridgePawn();
+            pawn.abilities = new Pawn_AbilityTracker(pawn); // the Pawn ctor leaves this to spawn
+            var knowledge = new AbilityKnowledgeComp { parent = pawn };
+            pawn.AllComps.Add(knowledge);
+
+            VanillaBridgeSync.Sync(pawn);
+            Check.Equal(true, pawn.abilities.GetAbility(bridge) == null, "unlearned knowledge grants nothing");
+
+            var entry = knowledge.GetOrCreate("rwom.tm_heal", 0);
+            entry.learned = true;
+            VanillaBridgeSync.Sync(pawn);
+            Check.NotNull(pawn.abilities.GetAbility(bridge), "learned knowledge grants the bridge ability");
+
+            VanillaBridgeSync.Sync(pawn);
+            Check.Equal(1, pawn.abilities.abilities.Count, "sync is idempotent");
+        }
+        finally
+        {
+            DefDatabase<RimWorld.AbilityDef>.Clear();
+        }
     }
 
     private static void EnsureCoreLoaded(RuntimeFixture f)

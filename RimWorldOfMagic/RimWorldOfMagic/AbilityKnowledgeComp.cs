@@ -105,6 +105,10 @@ namespace TorannMagic
             // One-shot legacy import: runs on the first CompTick after spawn,
             // when all other comps have loaded their data.
             ImportLegacy();
+            // Ф5 spike: keep the vanilla tracker in sync with the knowledge
+            // store (bridge pilot family) on the autocast cadence.
+            if (parent is Pawn pawn && pawn.IsHashIntervalTick(180))
+                VanillaBridgeSync.Sync(pawn);
         }
     }
 }
