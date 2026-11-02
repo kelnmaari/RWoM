@@ -112,6 +112,40 @@ namespace TorannMagic.AutoCast
             TorannMagic.AbilityKnowledgeComp knowledge)
             => powers.Where(power => EnabledForAutocast(power, knowledge));
 
+        // Ф4 step 5: AI cast gate. Only the learned flag applies to AI (the
+        // player autocast toggle does not); no entry falls back to legacy.
+        public static bool EnabledForAICast(MagicPower power, TorannMagic.AbilityKnowledgeComp knowledge)
+            => KnowledgeLearnedAllows(power?.abilityDef, power?.learned ?? false, knowledge);
+
+        public static bool EnabledForAICast(MightPower power, TorannMagic.AbilityKnowledgeComp knowledge)
+            => KnowledgeLearnedAllows(power?.abilityDef, power?.learned ?? false, knowledge);
+
+        // AI dispatch source: the raw valid-power list (no legacy learned
+        // prefilter — the store overrides it in both directions).
+        public static IEnumerable<MagicPower> AIPowers(IEnumerable<MagicPower> powers,
+            TorannMagic.AbilityKnowledgeComp knowledge)
+            => powers.Where(power => EnabledForAICast(power, knowledge));
+
+        public static IEnumerable<MagicPower> AIPowers(MagicData data, TorannMagic.AbilityKnowledgeComp knowledge)
+            => AIPowers(data.AllMagicPowers.Where(power => power != null && power.TMabilityDefs != null &&
+                power.abilityDef is TMAbilityDef def && !TM_AutocastDefaults.IsManualOnly(def)).Distinct(), knowledge);
+
+        public static IEnumerable<MightPower> AIPowers(MightData data, TorannMagic.AbilityKnowledgeComp knowledge)
+            => AIPowers(data.AllMightPowers.Where(power => power != null && power.TMabilityDefs != null &&
+                power.abilityDef is TMAbilityDef def && !TM_AutocastDefaults.IsManualOnly(def)).Distinct(), knowledge);
+
+        public static IEnumerable<MightPower> AIPowers(IEnumerable<MightPower> powers,
+            TorannMagic.AbilityKnowledgeComp knowledge)
+            => powers.Where(power => EnabledForAICast(power, knowledge));
+
+        private static bool KnowledgeLearnedAllows(AbilityUser.AbilityDef def, bool legacyLearned,
+            TorannMagic.AbilityKnowledgeComp knowledge)
+        {
+            if (def == null) return false;
+            SpellKnowledge entry = knowledge?.Find(TorannMagic.SpellIds.Of(def));
+            return entry == null ? legacyLearned : entry.learned;
+        }
+
         public static bool EnabledForAutocast(MagicPower power, TorannMagic.AbilityKnowledgeComp knowledge)
             => KnowledgeAllows(power?.abilityDef, power?.learned ?? false, power?.autocast ?? false, knowledge);
 

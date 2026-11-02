@@ -3644,12 +3644,14 @@ namespace TorannMagic
             if (ModOptions.Settings.Instance.AICasting && this.Pawn.jobs != null && this.Pawn.CurJob != null && this.Pawn.CurJob.def != TorannMagicDefOf.TMCastAbilityVerb && this.Pawn.CurJob.def != TorannMagicDefOf.TMCastAbilitySelf && this.Pawn.CurJob.def != JobDefOf.Ingest && this.Pawn.CurJob.def != JobDefOf.ManTurret && this.Pawn.GetPosture() == PawnPosture.Standing)
             {
                 //Log.Message("pawn " + this.Pawn.LabelShort + " current job is " + this.Pawn.CurJob.def.defName);
+                // Ф4 step 5: knowledge store gates AI casting (learned flag only).
+                TorannMagic.AbilityKnowledgeComp knowledge = this.Pawn.TryGetComp<TorannMagic.AbilityKnowledgeComp>();
                 bool castSuccess = false;
                 if (this.Stamina != null && this.Stamina.CurLevelPercentage >= ModOptions.Settings.Instance.autocastMinThreshold)
                 {
-                    foreach (MightPower mp in AutoCast.AutocastPolicy.MightPowers(this.MightData))
+                    foreach (MightPower mp in AutoCast.AutocastPolicy.AIPowers(this.MightData, knowledge))
                     {
-                        if (mp.learned && mp.autocasting != null && mp.autocasting.mightUser && mp.autocasting.AIUsable)
+                        if (AutoCast.AutocastPolicy.EnabledForAICast(mp, knowledge) && mp.autocasting != null && mp.autocasting.mightUser && mp.autocasting.AIUsable)
                         {
                             //try
                             //{ 

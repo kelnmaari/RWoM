@@ -4984,15 +4984,17 @@ namespace TorannMagic
         {
             if (AutoCast.TM_ExternalCastOwnership.IsCasting(this.Pawn)) return;
             if (!AutoCast.TM_AutocastCombat.TryGetCombatOpponent(this.Pawn, out _)) return;
-            if (ModOptions.Settings.Instance.AICasting && this.Pawn.jobs != null && this.Pawn.CurJob != null && this.Pawn.CurJob.def != TorannMagicDefOf.TMCastAbilityVerb && this.Pawn.CurJob.def != TorannMagicDefOf.TMCastAbilitySelf && 
+            if (ModOptions.Settings.Instance.AICasting && this.Pawn.jobs != null && this.Pawn.CurJob != null && this.Pawn.CurJob.def != TorannMagicDefOf.TMCastAbilityVerb && this.Pawn.CurJob.def != TorannMagicDefOf.TMCastAbilitySelf &&
                 this.Pawn.CurJob.def != JobDefOf.Ingest && this.Pawn.CurJob.def != JobDefOf.ManTurret && this.Pawn.GetPosture() == PawnPosture.Standing)
             {
+                // Ф4 step 5: knowledge store gates AI casting (learned flag only).
+                TorannMagic.AbilityKnowledgeComp knowledge = this.Pawn.TryGetComp<TorannMagic.AbilityKnowledgeComp>();
                 bool castSuccess = false;
                 if (this.Mana != null && this.Mana.CurLevelPercentage >= ModOptions.Settings.Instance.autocastMinThreshold)
                 {
-                    foreach (MagicPower mp in AutoCast.AutocastPolicy.MagicPowers(this.MagicData))
+                    foreach (MagicPower mp in AutoCast.AutocastPolicy.AIPowers(this.MagicData, knowledge))
                     {
-                        if (mp.learned && mp.autocasting != null && mp.autocasting.magicUser && mp.autocasting.AIUsable)
+                        if (AutoCast.AutocastPolicy.EnabledForAICast(mp, knowledge) && mp.autocasting != null && mp.autocasting.magicUser && mp.autocasting.AIUsable)
                         {                            
                             //try
                             //{                             
