@@ -34,7 +34,7 @@
 		</targetParams>
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_wanderercraft</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -79,7 +79,7 @@ See skills for more details.</description>
 		</targetParams>
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_cantrips</spellId>
 <domain>Magic</domain>
 <tier>0</tier>

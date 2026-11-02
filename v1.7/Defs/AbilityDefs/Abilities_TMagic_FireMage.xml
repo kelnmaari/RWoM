@@ -19,13 +19,6 @@
 			<explosionRadius>18</explosionRadius>
 			<postExplosionSpawnChance>1</postExplosionSpawnChance>
         </projectile>
-    <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.buff_rayofhope</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
 	
 	<TorannMagic.TMAbilityDef ParentName="BaseMagicAbility">
@@ -79,7 +72,7 @@ Requires 40 mana to maintain and reduces mana regeneration by 30%; cast again to
 			</targetParams>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_rayofhope</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -138,7 +131,7 @@ Requires 40 mana to maintain and reduces mana regeneration by 30%; cast again to
 			</targetParams>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_rayofhope_i</spellId>
 <domain>Magic</domain>
 <tier>1</tier>
@@ -197,7 +190,7 @@ Requires 40 mana to maintain and reduces mana regeneration by 30%; cast again to
 			</targetParams>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_rayofhope_ii</spellId>
 <domain>Magic</domain>
 <tier>2</tier>
@@ -256,7 +249,7 @@ Requires 40 mana to maintain and reduces mana regeneration by 30%; cast again to
 			</targetParams>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_rayofhope_iii</spellId>
 <domain>Magic</domain>
 <tier>3</tier>
@@ -284,13 +277,6 @@ Requires 40 mana to maintain and reduces mana regeneration by 30%; cast again to
       <damageAmountBase>16</damageAmountBase>
       <speed>80</speed>
     </projectile>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.projectile_firebolt</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
  <TorannMagic.TMAbilityDef ParentName="BaseMagicAbility">
@@ -329,7 +315,7 @@ Requires 40 mana to maintain and reduces mana regeneration by 30%; cast again to
     </MainVerb>
 
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_firebolt</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -357,13 +343,6 @@ Requires 40 mana to maintain and reduces mana regeneration by 30%; cast again to
 			<explosionRadius>3.6</explosionRadius>
 			<postExplosionSpawnChance>1</postExplosionSpawnChance>
         </projectile>
-    <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.projectile_fireball</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
 
     <TorannMagic.TMAbilityDef ParentName="BaseMagicAbility">
@@ -402,7 +381,7 @@ Requires 40 mana to maintain and reduces mana regeneration by 30%; cast again to
             </targetParams>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_fireball</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -429,13 +408,6 @@ Requires 40 mana to maintain and reduces mana regeneration by 30%; cast again to
 		<damageAmountBase>36</damageAmountBase>
 		<speed>200</speed>
    </projectile>
- <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.projectile_fireclaw</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
 
  <TorannMagic.TMAbilityDef ParentName="BaseMagicAbility">
@@ -473,7 +445,7 @@ Requires 40 mana to maintain and reduces mana regeneration by 30%; cast again to
         </targetParams>
     </MainVerb>
  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_fireclaw</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -502,13 +474,6 @@ Requires 40 mana to maintain and reduces mana regeneration by 30%; cast again to
             <speed>9999</speed>
 			<postExplosionSpawnChance>1</postExplosionSpawnChance>
         </projectile>
-    <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.projectile_firestorm</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
 
     <TorannMagic.TMAbilityDef ParentName="BaseMagicAbility">
@@ -548,7 +513,7 @@ Requires 40 mana to maintain and reduces mana regeneration by 30%; cast again to
             </targetParams>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_firestorm</spellId>
 <domain>Magic</domain>
 <tier>0</tier>

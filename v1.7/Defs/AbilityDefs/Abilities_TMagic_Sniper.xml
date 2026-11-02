@@ -16,13 +16,6 @@
 		<damageAmountBase>0</damageAmountBase>
 		<speed>100</speed>
    </projectile>
- <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.projectile_sniperfocus</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
  
  <TorannMagic.TMAbilityDef ParentName="BaseMightAbility">
@@ -63,7 +56,7 @@ Legendary Sniper: Speed +0.25c/s, Aiming Delay -30%, Shooting Acc. +8%, Research
 		</targetParams>
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_sniperfocus</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -87,13 +80,6 @@ Legendary Sniper: Speed +0.25c/s, Aiming Delay -30%, Shooting Acc. +8%, Research
 		<damageAmountBase>5</damageAmountBase>
 		<speed>60</speed>
    </projectile>
- <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.projectile_headshot</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
  
  <TorannMagic.TMAbilityDef ParentName="BaseMightAbility">
@@ -130,7 +116,7 @@ Legendary Sniper: Speed +0.25c/s, Aiming Delay -30%, Shooting Acc. +8%, Research
 		</targetParams>
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_headshot</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -154,13 +140,6 @@ Legendary Sniper: Speed +0.25c/s, Aiming Delay -30%, Shooting Acc. +8%, Research
 		<damageAmountBase>6</damageAmountBase>
 		<speed>65</speed>
    </projectile>
- <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.projectile_disablingshot</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
  
  <TorannMagic.TMAbilityDef ParentName="BaseMightAbility">
@@ -200,7 +179,7 @@ Recharge 45s</description>
 		</targetParams>
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_disablingshot</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -245,7 +224,7 @@ Recharge 43s</description>
 		</targetParams>
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_disablingshot_i</spellId>
 <domain>Magic</domain>
 <tier>1</tier>
@@ -290,7 +269,7 @@ Recharge 41s</description>
 		</targetParams>
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_disablingshot_ii</spellId>
 <domain>Magic</domain>
 <tier>2</tier>
@@ -335,7 +314,7 @@ Recharge 40s</description>
 		</targetParams>
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_disablingshot_iii</spellId>
 <domain>Magic</domain>
 <tier>3</tier>
@@ -358,13 +337,6 @@ Recharge 40s</description>
       <damageAmountBase>6</damageAmountBase>
       <speed>50</speed>
     </projectile>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.projectile_antiarmor</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
  <TorannMagic.TMAbilityDef ParentName="BaseMightAbility">
@@ -401,7 +373,7 @@ Recharge 40s</description>
 		</targetParams>
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_antiarmor</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -445,7 +417,7 @@ The shadow slayer cloaking field is a long duration form of invisibility. Unlike
 		</targetParams>
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_shadowslayer</spellId>
 <domain>Magic</domain>
 <tier>0</tier>

@@ -17,13 +17,6 @@
 		<damageAmountBase>0</damageAmountBase>
 		<speed>100</speed>
    </projectile>
- <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_gladiator_sprint</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
  
  <TorannMagic.TMAbilityDef ParentName="BaseMightAbility">
@@ -63,7 +56,7 @@
 
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_sprint</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -111,7 +104,7 @@ Deactivating sprint instantly returns 20 stamina and applies 5s of +20% energy r
 
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_sprint_i</spellId>
 <domain>Magic</domain>
 <tier>1</tier>
@@ -159,7 +152,7 @@ Deactivating sprint instantly returns 35 stamina and applies 8s of +30% energy r
 
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_sprint_ii</spellId>
 <domain>Magic</domain>
 <tier>2</tier>
@@ -207,7 +200,7 @@ Deactivating sprint instantly returns 40 stamina and applies 10s of +40% energy 
 
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_sprint_iii</spellId>
 <domain>Magic</domain>
 <tier>3</tier>
@@ -234,13 +227,6 @@ Deactivating sprint instantly returns 40 stamina and applies 10s of +40% energy 
 		<damageAmountBase>0</damageAmountBase>
 		<speed>100</speed>
    </projectile>
- <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_gladiator_fortitude</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
  
  <TorannMagic.TMAbilityDef ParentName="BaseMightAbility">
@@ -284,7 +270,7 @@ Base mitigation: 5</description>
         </hediffsToApply>
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_fortitude</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -314,13 +300,6 @@ Base mitigation: 5</description>
         <postFiringFinalIntensity>10</postFiringFinalIntensity>
         <preFiringDuration>30</preFiringDuration>
         <postFiringDuration>10</postFiringDuration>
-    <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.projectile_grapple</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
 
  <TorannMagic.TMAbilityDef ParentName="BaseMightAbility">
@@ -357,7 +336,7 @@ Range: 15</description>
             <isPrimary>false</isPrimary>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_grapple</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -397,7 +376,7 @@ Range: 17</description>
             <isPrimary>false</isPrimary>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_grapple_i</spellId>
 <domain>Magic</domain>
 <tier>1</tier>
@@ -438,7 +417,7 @@ Range: 20</description>
             <isPrimary>false</isPrimary>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_grapple_ii</spellId>
 <domain>Magic</domain>
 <tier>2</tier>
@@ -479,7 +458,7 @@ Range: 23</description>
             <isPrimary>false</isPrimary>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_grapple_iii</spellId>
 <domain>Magic</domain>
 <tier>3</tier>
@@ -511,13 +490,6 @@ Range: 23</description>
         <postFiringFinalIntensity>0</postFiringFinalIntensity>
         <preFiringDuration>20</preFiringDuration>
         <postFiringDuration>80</postFiringDuration>
-    <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.projectile_cleave</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
 
  <TorannMagic.TMAbilityDef ParentName="BaseMightAbility">
@@ -552,7 +524,7 @@ Range: 23</description>
             <isPrimary>false</isPrimary>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_cleave</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -578,13 +550,6 @@ Range: 23</description>
 			<damageAmountBase>0</damageAmountBase>
 			<speed>250</speed>
 	   </projectile>
-	<modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.flyingobject_whirlwind</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
 			
 	<ThingDef ParentName="BaseBullet" Class="AbilityUser.ProjectileDef_Ability">
@@ -602,13 +567,6 @@ Range: 23</description>
             <damageAmountBase>0</damageAmountBase>
             <speed>50</speed>
         </projectile>
-    <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.projectile_whirlwind</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
 
  <TorannMagic.TMAbilityDef ParentName="BaseMightAbility">
@@ -639,7 +597,7 @@ Range: 23</description>
             <isPrimary>false</isPrimary>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_whirlwind</spellId>
 <domain>Magic</domain>
 <tier>0</tier>

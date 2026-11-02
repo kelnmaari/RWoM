@@ -177,7 +177,9 @@ namespace TorannMagic.AutoCast
             if (power?.abilityDef == null) return;
             TorannMagic.AbilityKnowledgeComp knowledge = pawn?.TryGetComp<TorannMagic.AbilityKnowledgeComp>();
             if (knowledge == null) return;
-            knowledge.GetOrCreate(TorannMagic.SpellIds.Of(power.abilityDef), power.level).autocast = power.autocast;
+            var entry = knowledge.GetOrCreate(SpellIds.Of(power.abilityDef), power.level);
+            entry.learned = power.learned;
+            entry.autocast = power.autocast;
         }
 
         private static void SyncAutocast(Pawn pawn, MightPower power)
@@ -185,7 +187,9 @@ namespace TorannMagic.AutoCast
             if (power?.abilityDef == null) return;
             TorannMagic.AbilityKnowledgeComp knowledge = pawn?.TryGetComp<TorannMagic.AbilityKnowledgeComp>();
             if (knowledge == null) return;
-            knowledge.GetOrCreate(TorannMagic.SpellIds.Of(power.abilityDef), power.level).autocast = power.autocast;
+            var entry = knowledge.GetOrCreate(SpellIds.Of(power.abilityDef), power.level);
+            entry.learned = power.learned;
+            entry.autocast = power.autocast;
         }
 
         public static bool EnabledForAutocast(MagicPower power, TorannMagic.AbilityKnowledgeComp knowledge)

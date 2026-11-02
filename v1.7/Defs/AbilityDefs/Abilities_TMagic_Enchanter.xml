@@ -42,7 +42,7 @@ Using this ability while the enchantment is active will dispel the enchantment. 
 		</targetParams>
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_enchantedbody</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -90,7 +90,7 @@ Using this ability while the enchantment is active will dispel the enchantment. 
 		</targetParams>
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_enchantedaura</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -139,7 +139,7 @@ Check skill descriptions for additional details.</description>
             </targetParams>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_transmutate</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -190,7 +190,7 @@ This ability is used on raw resources such as stone chunks, steel, or silver - s
             </targetParams>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_enchanterstone</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -232,7 +232,7 @@ This ability is used on raw resources such as stone chunks, steel, or silver - s
         </targetParams>
     </MainVerb>
  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_dismissenchanterstones</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -286,7 +286,7 @@ The enchantment will only remain active as long as the pawn holds the enchanted 
             </targetParams>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_enchantweapon</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -330,7 +330,7 @@ The enchantment will only remain active as long as the pawn holds the enchanted 
             </targetParams>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_dispelenchantweapon</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -396,7 +396,7 @@ Cast time: 3s</description>
             </targetParams>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_polymorph</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -458,7 +458,7 @@ Cast time: 2.8s</description>
             </targetParams>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_polymorph_i</spellId>
 <domain>Magic</domain>
 <tier>1</tier>
@@ -520,7 +520,7 @@ Cast time: 2.6s</description>
             </targetParams>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_polymorph_ii</spellId>
 <domain>Magic</domain>
 <tier>2</tier>
@@ -582,7 +582,7 @@ Cast time: 2.4s</description>
             </targetParams>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_polymorph_iii</spellId>
 <domain>Magic</domain>
 <tier>3</tier>
@@ -627,7 +627,7 @@ Shapeshifting is not without minor side effects; shapeshifting into an animal wi
 		</targetParams>
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_shapeshift</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -674,7 +674,7 @@ Dire wolves are unique animals with a special connection to magic. While in dire
 		</targetParams>
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_shapeshiftdw</spellId>
 <domain>Magic</domain>
 <tier>0</tier>

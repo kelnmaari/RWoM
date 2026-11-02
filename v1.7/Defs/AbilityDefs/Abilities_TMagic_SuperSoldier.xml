@@ -40,7 +40,7 @@ Super Soldiers with a specialized pistol equipped gain a unique "double tap" tal
 		</targetParams>
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_pistolspec</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -85,7 +85,7 @@ Super Soldiers with a specialized pistol equipped gain a unique "double tap" tal
 		</targetParams>
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_pistolwhip</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -131,7 +131,7 @@ Weapon specializations apply automatically when a Super Soldier equips a weapon 
 		</targetParams>
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_riflespec</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -172,7 +172,7 @@ Weapon specializations apply automatically when a Super Soldier equips a weapon 
             <isPrimary>true</isPrimary>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_suppressingfire</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -198,13 +198,6 @@ Weapon specializations apply automatically when a Super Soldier equips a weapon 
 			<postExplosionSpawnChance>1</postExplosionSpawnChance>
             <speed>35</speed>
         </projectile>
-    <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.projectile_mk203gl</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
 	
 	
@@ -239,7 +232,7 @@ Weapon specializations apply automatically when a Super Soldier equips a weapon 
             <isPrimary>false</isPrimary>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_mk203gl</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -285,7 +278,7 @@ Weapon specializations apply automatically when a Super Soldier equips a weapon 
 		</targetParams>
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_shotgunspec</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -308,13 +301,6 @@ Weapon specializations apply automatically when a Super Soldier equips a weapon 
       <damageAmountBase>6</damageAmountBase>
       <speed>50</speed>
     </projectile>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.projectile_buckshot</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
   <TorannMagic.TMAbilityDef ParentName="BaseMightAbility">
@@ -348,7 +334,7 @@ Weapon specializations apply automatically when a Super Soldier equips a weapon 
             <isPrimary>true</isPrimary>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_buckshot</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -376,13 +362,6 @@ Weapon specializations apply automatically when a Super Soldier equips a weapon 
 			<postExplosionSpawnChance>1</postExplosionSpawnChance>
             <speed>20</speed>
         </projectile>
-    <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.projectile_breachingcharge</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
 	
 	  <TorannMagic.TMAbilityDef ParentName="BaseMightAbility">
@@ -416,7 +395,7 @@ Weapon specializations apply automatically when a Super Soldier equips a weapon 
             <isPrimary>true</isPrimary>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_breachingcharge</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -458,7 +437,7 @@ Weapon specializations apply automatically when a Super Soldier equips a weapon 
             <isPrimary>false</isPrimary>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_cqc</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -499,7 +478,7 @@ Weapon specializations apply automatically when a Super Soldier equips a weapon 
             <isPrimary>false</isPrimary>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_firstaid</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -540,7 +519,7 @@ Weapon specializations apply automatically when a Super Soldier equips a weapon 
             <isPrimary>true</isPrimary>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_60mmmortar</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -587,222 +566,82 @@ Weapon specializations apply automatically when a Super Soldier equips a weapon 
         <cooldownTime>1</cooldownTime>
       </li>
     </tools>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_pistolspec_base0</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
   <ThingDef ParentName="TM_PistolSpec_Base">
     <defName>TM_PistolSpec_Base1</defName>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_pistolspec_base1</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
     <ThingDef ParentName="TM_PistolSpec_Base">
     <defName>TM_PistolSpec_Base2</defName>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_pistolspec_base2</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
     <ThingDef ParentName="TM_PistolSpec_Base">
     <defName>TM_PistolSpec_Base3</defName>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_pistolspec_base3</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
     <ThingDef ParentName="TM_PistolSpec_Base">
     <defName>TM_PistolSpec_Base4</defName>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_pistolspec_base4</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
     <ThingDef ParentName="TM_PistolSpec_Base">
     <defName>TM_PistolSpec_Base5</defName>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_pistolspec_base5</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
   <ThingDef ParentName="TM_PistolSpec_Base">
     <defName>TM_PistolSpec_Base6</defName>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_pistolspec_base6</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
   <ThingDef ParentName="TM_PistolSpec_Base">
     <defName>TM_PistolSpec_Base7</defName>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_pistolspec_base7</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
   <ThingDef ParentName="TM_PistolSpec_Base">
     <defName>TM_PistolSpec_Base8</defName>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_pistolspec_base8</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
   <ThingDef ParentName="TM_PistolSpec_Base">
     <defName>TM_PistolSpec_Base9</defName>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_pistolspec_base9</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
   <ThingDef ParentName="TM_PistolSpec_Base">
     <defName>TM_PistolSpec_Base10</defName>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_pistolspec_base10</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
   <ThingDef ParentName="TM_PistolSpec_Base">
     <defName>TM_PistolSpec_Base11</defName>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_pistolspec_base11</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
     <ThingDef ParentName="TM_PistolSpec_Base">
     <defName>TM_PistolSpec_Base12</defName>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_pistolspec_base12</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
     <ThingDef ParentName="TM_PistolSpec_Base">
     <defName>TM_PistolSpec_Base13</defName>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_pistolspec_base13</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
     <ThingDef ParentName="TM_PistolSpec_Base">
     <defName>TM_PistolSpec_Base14</defName>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_pistolspec_base14</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
     <ThingDef ParentName="TM_PistolSpec_Base">
     <defName>TM_PistolSpec_Base15</defName>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_pistolspec_base15</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
   <ThingDef ParentName="TM_PistolSpec_Base">
     <defName>TM_PistolSpec_Base16</defName>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_pistolspec_base16</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
   <ThingDef ParentName="TM_PistolSpec_Base">
     <defName>TM_PistolSpec_Base17</defName>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_pistolspec_base17</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
   <ThingDef ParentName="TM_PistolSpec_Base">
     <defName>TM_PistolSpec_Base18</defName>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_pistolspec_base18</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
   <ThingDef ParentName="TM_PistolSpec_Base">
     <defName>TM_PistolSpec_Base19</defName>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_pistolspec_base19</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
   
@@ -844,222 +683,82 @@ Weapon specializations apply automatically when a Super Soldier equips a weapon 
         <cooldownTime>1</cooldownTime>
       </li>
     </tools>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_riflespec_base0</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
   <ThingDef ParentName="TM_RifleSpec_Base">
     <defName>TM_RifleSpec_Base1</defName>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_riflespec_base1</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
     <ThingDef ParentName="TM_RifleSpec_Base">
     <defName>TM_RifleSpec_Base2</defName>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_riflespec_base2</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
     <ThingDef ParentName="TM_RifleSpec_Base">
     <defName>TM_RifleSpec_Base3</defName>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_riflespec_base3</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
     <ThingDef ParentName="TM_RifleSpec_Base">
     <defName>TM_RifleSpec_Base4</defName>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_riflespec_base4</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
     <ThingDef ParentName="TM_RifleSpec_Base">
     <defName>TM_RifleSpec_Base5</defName>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_riflespec_base5</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
   <ThingDef ParentName="TM_RifleSpec_Base">
     <defName>TM_RifleSpec_Base6</defName>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_riflespec_base6</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
   <ThingDef ParentName="TM_RifleSpec_Base">
     <defName>TM_RifleSpec_Base7</defName>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_riflespec_base7</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
   <ThingDef ParentName="TM_RifleSpec_Base">
     <defName>TM_RifleSpec_Base8</defName>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_riflespec_base8</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
   <ThingDef ParentName="TM_RifleSpec_Base">
     <defName>TM_RifleSpec_Base9</defName>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_riflespec_base9</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
   <ThingDef ParentName="TM_RifleSpec_Base">
     <defName>TM_RifleSpec_Base10</defName>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_riflespec_base10</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
   <ThingDef ParentName="TM_RifleSpec_Base">
     <defName>TM_RifleSpec_Base11</defName>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_riflespec_base11</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
     <ThingDef ParentName="TM_RifleSpec_Base">
     <defName>TM_RifleSpec_Base12</defName>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_riflespec_base12</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
     <ThingDef ParentName="TM_RifleSpec_Base">
     <defName>TM_RifleSpec_Base13</defName>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_riflespec_base13</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
     <ThingDef ParentName="TM_RifleSpec_Base">
     <defName>TM_RifleSpec_Base14</defName>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_riflespec_base14</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
     <ThingDef ParentName="TM_RifleSpec_Base">
     <defName>TM_RifleSpec_Base15</defName>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_riflespec_base15</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
   <ThingDef ParentName="TM_RifleSpec_Base">
     <defName>TM_RifleSpec_Base16</defName>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_riflespec_base16</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
   <ThingDef ParentName="TM_RifleSpec_Base">
     <defName>TM_RifleSpec_Base17</defName>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_riflespec_base17</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
   <ThingDef ParentName="TM_RifleSpec_Base">
     <defName>TM_RifleSpec_Base18</defName>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_riflespec_base18</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
   <ThingDef ParentName="TM_RifleSpec_Base">
     <defName>TM_RifleSpec_Base19</defName>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_riflespec_base19</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
   
@@ -1101,222 +800,82 @@ Weapon specializations apply automatically when a Super Soldier equips a weapon 
         <cooldownTime>1</cooldownTime>
       </li>
     </tools>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_shotgunspec_base0</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
   <ThingDef ParentName="TM_ShotgunSpec_Base">
     <defName>TM_ShotgunSpec_Base1</defName>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_shotgunspec_base1</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
     <ThingDef ParentName="TM_ShotgunSpec_Base">
     <defName>TM_ShotgunSpec_Base2</defName>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_shotgunspec_base2</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
     <ThingDef ParentName="TM_ShotgunSpec_Base">
     <defName>TM_ShotgunSpec_Base3</defName>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_shotgunspec_base3</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
     <ThingDef ParentName="TM_ShotgunSpec_Base">
     <defName>TM_ShotgunSpec_Base4</defName>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_shotgunspec_base4</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
     <ThingDef ParentName="TM_ShotgunSpec_Base">
     <defName>TM_ShotgunSpec_Base5</defName>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_shotgunspec_base5</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
   <ThingDef ParentName="TM_ShotgunSpec_Base">
     <defName>TM_ShotgunSpec_Base6</defName>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_shotgunspec_base6</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
   <ThingDef ParentName="TM_ShotgunSpec_Base">
     <defName>TM_ShotgunSpec_Base7</defName>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_shotgunspec_base7</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
   <ThingDef ParentName="TM_ShotgunSpec_Base">
     <defName>TM_ShotgunSpec_Base8</defName>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_shotgunspec_base8</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
   <ThingDef ParentName="TM_ShotgunSpec_Base">
     <defName>TM_ShotgunSpec_Base9</defName>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_shotgunspec_base9</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
   <ThingDef ParentName="TM_ShotgunSpec_Base">
     <defName>TM_ShotgunSpec_Base10</defName>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_shotgunspec_base10</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
   <ThingDef ParentName="TM_ShotgunSpec_Base">
     <defName>TM_ShotgunSpec_Base11</defName>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_shotgunspec_base11</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
     <ThingDef ParentName="TM_ShotgunSpec_Base">
     <defName>TM_ShotgunSpec_Base12</defName>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_shotgunspec_base12</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
     <ThingDef ParentName="TM_ShotgunSpec_Base">
     <defName>TM_ShotgunSpec_Base13</defName>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_shotgunspec_base13</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
     <ThingDef ParentName="TM_ShotgunSpec_Base">
     <defName>TM_ShotgunSpec_Base14</defName>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_shotgunspec_base14</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
     <ThingDef ParentName="TM_ShotgunSpec_Base">
     <defName>TM_ShotgunSpec_Base15</defName>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_shotgunspec_base15</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
   <ThingDef ParentName="TM_ShotgunSpec_Base">
     <defName>TM_ShotgunSpec_Base16</defName>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_shotgunspec_base16</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
   <ThingDef ParentName="TM_ShotgunSpec_Base">
     <defName>TM_ShotgunSpec_Base17</defName>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_shotgunspec_base17</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
   <ThingDef ParentName="TM_ShotgunSpec_Base">
     <defName>TM_ShotgunSpec_Base18</defName>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_shotgunspec_base18</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
   <ThingDef ParentName="TM_ShotgunSpec_Base">
     <defName>TM_ShotgunSpec_Base19</defName>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_shotgunspec_base19</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
 </Defs>

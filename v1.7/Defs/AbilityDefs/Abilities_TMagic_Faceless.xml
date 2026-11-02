@@ -17,13 +17,6 @@
 		<damageAmountBase>0</damageAmountBase>
 		<speed>999</speed>
    </projectile>
- <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_faceless_projectile</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
  
  
@@ -64,7 +57,7 @@ Disguise will not fool any pawn that already sees the faceless as a threat.</des
 		</targetParams>
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_disguise</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -109,7 +102,7 @@ Disguise will not fool any pawn that already sees the faceless as a threat.</des
 		</targetParams>
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_mimic</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -154,7 +147,7 @@ Disguise will not fool any pawn that already sees the faceless as a threat.</des
 		</targetParams>
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_reversal</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -200,7 +193,7 @@ Cooldown: 15</description>
             <isPrimary>false</isPrimary>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_transpose</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -243,7 +236,7 @@ Cooldown: 13</description>
             <isPrimary>false</isPrimary>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_transpose_i</spellId>
 <domain>Magic</domain>
 <tier>1</tier>
@@ -286,7 +279,7 @@ Cooldown: 11</description>
             <isPrimary>false</isPrimary>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_transpose_ii</spellId>
 <domain>Magic</domain>
 <tier>2</tier>
@@ -330,7 +323,7 @@ Cooldown: 9</description>
             <isPrimary>false</isPrimary>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_transpose_iii</spellId>
 <domain>Magic</domain>
 <tier>3</tier>
@@ -356,13 +349,6 @@ Cooldown: 9</description>
 		<damageAmountBase>0</damageAmountBase>
 		<speed>999</speed>
    </projectile>
- <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.projectile_possess</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
 
  <TorannMagic.TMAbilityDef ParentName="BaseMightAbility">
@@ -399,7 +385,7 @@ Only creatures with a human-like mind capable of self-doubt can be possessed.</d
             <isPrimary>false</isPrimary>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_possess</spellId>
 <domain>Magic</domain>
 <tier>0</tier>

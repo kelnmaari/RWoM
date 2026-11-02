@@ -43,7 +43,7 @@ Golems may be crafted from their respective workbenches after the appropriate re
 		</targetParams>
     </MainVerb>
  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_golemancy</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -94,7 +94,7 @@ To apply runes, select the pawn you wish to inscribe and create the rune carving
         </targetParams>
     </MainVerb>
  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_runecarving</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -142,7 +142,7 @@ To apply runes, select the pawn you wish to inscribe and create the rune carving
         </targetParams>
     </MainVerb>
  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_branding</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -189,7 +189,7 @@ Brands are a semi-permanent form of magic typically created using some form of m
             </targetParams>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_siphonbrand</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -236,7 +236,7 @@ Brands are a semi-permanent form of magic typically created using some form of m
             </targetParams>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_fitnessbrand</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -283,7 +283,7 @@ Brands are a semi-permanent form of magic typically created using some form of m
             </targetParams>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_emotionbrand</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -330,7 +330,7 @@ Brands are a semi-permanent form of magic typically created using some form of m
             </targetParams>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_vitalitybrand</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -377,7 +377,7 @@ Brands are a semi-permanent form of magic typically created using some form of m
             </targetParams>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_protectionbrand</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -424,7 +424,7 @@ Brands are a semi-permanent form of magic typically created using some form of m
             </targetParams>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_awarenessbrand</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -466,7 +466,7 @@ Brands are a semi-permanent form of magic typically created using some form of m
         </targetParams>
     </MainVerb>
  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_dispelbranding</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -514,7 +514,7 @@ Brands are a semi-permanent form of magic typically created using some form of m
         </targetParams>
     </MainVerb>
  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_sigilsurge</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -562,7 +562,7 @@ Brands are a semi-permanent form of magic typically created using some form of m
         </targetParams>
     </MainVerb>
  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_sigildrain</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -584,13 +584,6 @@ Brands are a semi-permanent form of magic typically created using some form of m
 			<flyOverhead>true</flyOverhead>
 			<speed>30</speed>
 	   </projectile>
-	<modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.flyingobject_livingwall</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
    
 	<TorannMagic.TMAbilityDef ParentName="BaseMagicAbility">
@@ -632,7 +625,7 @@ Brands are a semi-permanent form of magic typically created using some form of m
             </targetParams>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_livingwall</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -674,7 +667,7 @@ Brands are a semi-permanent form of magic typically created using some form of m
         </targetParams>
     </MainVerb>
  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_dispellivingwall</spellId>
 <domain>Magic</domain>
 <tier>0</tier>

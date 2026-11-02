@@ -16,13 +16,6 @@
             <damageAmountBase>0</damageAmountBase>
             <speed>999</speed>
         </projectile>
-    <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.projectile_warlock</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
 	
 		
@@ -67,7 +60,7 @@ Succubi and Warlocks form distinct types of soul bonds - warlocks bonds are ment
             </targetParams>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_soulbond</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -113,7 +106,7 @@ Succubi and Warlocks form distinct types of soul bonds - warlocks bonds are ment
             </targetParams>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_shadowcall</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -158,7 +151,7 @@ Succubi and Warlocks form distinct types of soul bonds - warlocks bonds are ment
             </targetParams>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_shadowstep</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -184,13 +177,6 @@ Succubi and Warlocks form distinct types of soul bonds - warlocks bonds are ment
 			<explosionRadius>2</explosionRadius>
 			<postExplosionSpawnChance>1</postExplosionSpawnChance>
         </projectile>
-    <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.projectile_shadowbolt</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
 	
 	<ThingDef ParentName="BaseBullet" Name="FlyingObject_ShadowBolt">
@@ -209,13 +195,6 @@ Succubi and Warlocks form distinct types of soul bonds - warlocks bonds are ment
 			<explosionRadius>2</explosionRadius>
 			<postExplosionSpawnChance>1</postExplosionSpawnChance>
 	   </projectile>
-	<modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.flyingobject_shadowbolt</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
 	
     <TorannMagic.TMAbilityDef ParentName="BaseMagicAbility">
@@ -259,7 +238,7 @@ Range: 40</description>
             </targetParams>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_shadowbolt</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -308,7 +287,7 @@ Range: 45</description>
             </targetParams>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_shadowbolt_i</spellId>
 <domain>Magic</domain>
 <tier>1</tier>
@@ -357,7 +336,7 @@ Range: 50</description>
             </targetParams>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_shadowbolt_ii</spellId>
 <domain>Magic</domain>
 <tier>2</tier>
@@ -406,7 +385,7 @@ Range: 55</description>
             </targetParams>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_shadowbolt_iii</spellId>
 <domain>Magic</domain>
 <tier>3</tier>
@@ -454,7 +433,7 @@ Warlocks and Succubi dominate their foes in different ways. Warlocks will attemp
             </targetParams>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_dominate</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -480,13 +459,6 @@ Warlocks and Succubi dominate their foes in different ways. Warlocks will attemp
 			<explosionRadius>5</explosionRadius>
 			<postExplosionSpawnChance>1</postExplosionSpawnChance>
         </projectile>
-    <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.projectile_attraction</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
 	
     <TorannMagic.TMAbilityDef ParentName="BaseMagicAbility">
@@ -529,7 +501,7 @@ Cooldown: 60</description>
             </targetParams>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_attraction</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -577,7 +549,7 @@ Cooldown: 55</description>
             </targetParams>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_attraction_i</spellId>
 <domain>Magic</domain>
 <tier>1</tier>
@@ -625,7 +597,7 @@ Cooldown: 50</description>
             </targetParams>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_attraction_ii</spellId>
 <domain>Magic</domain>
 <tier>2</tier>
@@ -673,7 +645,7 @@ Cooldown: 45</description>
             </targetParams>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_attraction_iii</spellId>
 <domain>Magic</domain>
 <tier>3</tier>
@@ -699,13 +671,6 @@ Cooldown: 45</description>
 			<explosionRadius>5</explosionRadius>
 			<postExplosionSpawnChance>1</postExplosionSpawnChance>
         </projectile>
-    <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.projectile_repulsion</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
 	
 	<ThingDef ParentName="BaseBullet" Class="AbilityUser.ProjectileDef_Ability">
@@ -724,13 +689,6 @@ Cooldown: 45</description>
 			<explosionRadius>6</explosionRadius>
 			<postExplosionSpawnChance>1</postExplosionSpawnChance>
         </projectile>
-    <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.projectile_repulsion_i</spellId>
-<domain>Magic</domain>
-<tier>1</tier>
-</li>
-</modExtensions>
 </ThingDef>
 	
 	<ThingDef ParentName="BaseBullet" Class="AbilityUser.ProjectileDef_Ability">
@@ -749,13 +707,6 @@ Cooldown: 45</description>
 			<explosionRadius>7</explosionRadius>
 			<postExplosionSpawnChance>1</postExplosionSpawnChance>
         </projectile>
-    <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.projectile_repulsion_ii</spellId>
-<domain>Magic</domain>
-<tier>2</tier>
-</li>
-</modExtensions>
 </ThingDef>
 	
 	<ThingDef ParentName="BaseBullet" Class="AbilityUser.ProjectileDef_Ability">
@@ -774,13 +725,6 @@ Cooldown: 45</description>
 			<explosionRadius>8</explosionRadius>
 			<postExplosionSpawnChance>1</postExplosionSpawnChance>
         </projectile>
-    <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.projectile_repulsion_iii</spellId>
-<domain>Magic</domain>
-<tier>3</tier>
-</li>
-</modExtensions>
 </ThingDef>
 	
     <TorannMagic.TMAbilityDef ParentName="BaseMagicAbility">
@@ -825,7 +769,7 @@ Radius: 5</description>
             </targetParams>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_repulsion</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -875,7 +819,7 @@ Radius: 6</description>
             </targetParams>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_repulsion_i</spellId>
 <domain>Magic</domain>
 <tier>1</tier>
@@ -925,7 +869,7 @@ Radius: 7</description>
             </targetParams>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_repulsion_ii</spellId>
 <domain>Magic</domain>
 <tier>2</tier>
@@ -975,7 +919,7 @@ Radius: 8</description>
             </targetParams>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_repulsion_iii</spellId>
 <domain>Magic</domain>
 <tier>3</tier>
@@ -1001,13 +945,6 @@ Radius: 8</description>
 			<explosionRadius>5</explosionRadius>
 			<postExplosionSpawnChance>1</postExplosionSpawnChance>
         </projectile>
-    <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.projectile_scorn</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
 	
     <TorannMagic.TMAbilityDef ParentName="BaseMagicAbility">
@@ -1050,7 +987,7 @@ A succubus will retain her partial demon form for a short period after using thi
             </targetParams>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_scorn</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -1075,13 +1012,6 @@ A succubus will retain her partial demon form for a short period after using thi
 			<explosionRadius>5</explosionRadius>
 			<postExplosionSpawnChance>1</postExplosionSpawnChance>
         </projectile>
-    <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.projectile_psychicshock</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
 	
     <TorannMagic.TMAbilityDef ParentName="BaseMagicAbility">
@@ -1124,7 +1054,7 @@ The Warlock who will use the minds of others to propagate the psychic wave. The 
             </targetParams>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_psychicshock</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -1148,13 +1078,6 @@ The Warlock who will use the minds of others to propagate the psychic wave. The 
             <damageAmountBase>0</damageAmountBase>
             <speed>999</speed>
         </projectile>
-    <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.projectile_summondemon</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
 	
     <TorannMagic.TMAbilityDef ParentName="BaseMagicAbility">
@@ -1195,7 +1118,7 @@ The summoning is initiated when a Succubus anchors the physical offering and is 
             </targetParams>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_summondemon</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -1217,13 +1140,6 @@ The summoning is initiated when a Succubus anchors the physical offering and is 
 			<damageAmountBase>0</damageAmountBase>
 			<speed>40</speed>
 	   </projectile>
-	<modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.flyingobject_demonflight</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
 	
 	<ThingDef ParentName="FlyingObject_Advanced">
@@ -1233,13 +1149,6 @@ The summoning is initiated when a Succubus anchors the physical offering and is 
 			<texPath>Spells/meteor2</texPath>
 			<graphicClass>Graphic_Single</graphicClass>
 		</graphicData>
-	<modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.flyingobject_demonbolt</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
 
 </Defs>

@@ -46,7 +46,7 @@ The Field Medic can train to convert his equipment back into common medicine</de
             </targetParams>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_medicalsupply</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -98,7 +98,7 @@ The Field Medic gains increased base movement speed, tending speed and tending q
             </hediffsToApply>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_emergency</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -151,7 +151,7 @@ The Field Medic gains increased base movement speed, tending speed and tending q
             </hediffsToApply>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_medigel</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -212,7 +212,7 @@ The effects are always positive but may vary.</description>
             </targetParams>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_combatdrugs</spellId>
 <domain>Magic</domain>
 <tier>0</tier>

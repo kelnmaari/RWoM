@@ -42,10 +42,8 @@ namespace TorannMagic
         {
             Scan();
             if (_register == null || def == null || def.defName == null) return;
-            _register.Invoke(null, new object[] { SpellIds.Of(def), def });
-            object extension = FindExtension(def);
-            if (extension == null) return;
-            string id = (string)extension.GetType().GetField("spellId")?.GetValue(extension);
+            _register.Invoke(null, new object[] { SpellIds.Convention(def), def });
+            string id = DeclaredId(def);
             if (id != null) _register.Invoke(null, new object[] { id, def });
         }
 
@@ -60,6 +58,13 @@ namespace TorannMagic
             bool ok = _tryResolve.Invoke(null, args) is bool result && result;
             def = args[1] as Def;
             return ok;
+        }
+
+        internal static string DeclaredId(Def def)
+        {
+            object extension = FindExtension(def);
+            string id = extension?.GetType().GetField("spellId")?.GetValue(extension) as string;
+            return string.IsNullOrEmpty(id) ? null : id;
         }
 
         private static object FindExtension(Def def)

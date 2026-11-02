@@ -40,13 +40,6 @@
 		<max>5</max>
 	  </ticksToImpactRange>
     </skyfaller>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_lightpodleaving</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
   <ThingDef ParentName="TM_SkyfallerBase">
@@ -77,13 +70,6 @@
 		<max>45</max>
 	  </ticksToImpactRange>
     </skyfaller>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_lightpodincoming</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
   <ThingDef>
@@ -109,13 +95,6 @@
       <Flammability>0</Flammability>
     </statBases>
     <selectable>false</selectable>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_activelightpod</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
   <ThingDef ParentName="TM_SkyfallerBase">
@@ -139,13 +118,6 @@
 	  <movementType>Accelerate</movementType>
 	  <cameraShake>2</cameraShake>
     </skyfaller>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_firestorm_large</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
     <ThingDef ParentName="TM_SkyfallerBase">
@@ -171,13 +143,6 @@
 	  <cameraShake>1</cameraShake>
       
     </skyfaller>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_firestorm_small</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
   <ThingDef ParentName="TM_SkyfallerBase">
@@ -201,13 +166,6 @@
 	  <movementType>Accelerate</movementType>
 	  <cameraShake>0</cameraShake>
     </skyfaller>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_firestorm_tiny</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
   <ThingDef ParentName="TM_SkyfallerBase">
@@ -231,13 +189,6 @@
 	  
 	  <cameraShake>0</cameraShake>
     </skyfaller>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_blizzard_tiny</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
   <ThingDef ParentName="TM_SkyfallerBase">
@@ -261,13 +212,6 @@
 	  
 	  <cameraShake>0</cameraShake>
     </skyfaller>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_blizzard_small</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
   <ThingDef ParentName="TM_SkyfallerBase">
@@ -291,13 +235,6 @@
 	  
 	  <cameraShake>1</cameraShake>
     </skyfaller>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_blizzard_large</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
     <ThingDef ParentName="TM_SkyfallerBase">
@@ -321,13 +258,6 @@
 	  <movementType>ConstantSpeed</movementType>
 	  <cameraShake>0</cameraShake>
     </skyfaller>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_arrowstorm</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
   
@@ -354,13 +284,6 @@
 </ticksToImpactRange>
 	  <rotateGraphicTowardsDirection>true</rotateGraphicTowardsDirection>
     </skyfaller>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_scornleaving</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
   <ThingDef ParentName="TM_SkyfallerBase">
@@ -380,13 +303,6 @@
 	  <movementType>ConstantSpeed</movementType>
 	  <cameraShake>1</cameraShake>
     </skyfaller>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_scornincoming</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
   <ThingDef ParentName="SkyfallerBase">
@@ -406,13 +322,6 @@
       <rotateGraphicTowardsDirection>true</rotateGraphicTowardsDirection>
       <speed>.6</speed>
     </skyfaller>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_meteorite</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
   <ThingDef ParentName="SkyfallerBase">
@@ -432,13 +341,6 @@
       <rotateGraphicTowardsDirection>true</rotateGraphicTowardsDirection>
       <speed>.7</speed>
     </skyfaller>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_meteorite_i</spellId>
-<domain>Magic</domain>
-<tier>1</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
   <ThingDef ParentName="SkyfallerBase">
@@ -458,13 +360,6 @@
       <rotateGraphicTowardsDirection>true</rotateGraphicTowardsDirection>
       <speed>.8</speed>
     </skyfaller>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_meteorite_ii</spellId>
-<domain>Magic</domain>
-<tier>2</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
   <ThingDef ParentName="SkyfallerBase">
@@ -484,13 +379,6 @@
       <rotateGraphicTowardsDirection>true</rotateGraphicTowardsDirection>
       <speed>.9</speed>
     </skyfaller>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_meteorite_iii</spellId>
-<domain>Magic</domain>
-<tier>3</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
   <ThingDef ParentName="TM_SkyfallerBase">
@@ -515,13 +403,6 @@
 	  
 	  <cameraShake>0</cameraShake>
     </skyfaller>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_hail</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
 
 

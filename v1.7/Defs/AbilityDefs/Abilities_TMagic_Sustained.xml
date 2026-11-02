@@ -15,13 +15,6 @@
 		<damageAmountBase>0</damageAmountBase>
 		<speed>100</speed>
    </projectile>
- <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.projectile_sustained</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
 
 
@@ -60,7 +53,7 @@
 		</targetParams>
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_gearrepair</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -104,7 +97,7 @@
 		</targetParams>
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_innerhealing</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -148,7 +141,7 @@
 		</targetParams>
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_heavyblow</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -192,7 +185,7 @@
 		</targetParams>
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_strongback</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -237,7 +230,7 @@
 		</targetParams>
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_thickskin</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -281,7 +274,7 @@
 		</targetParams>
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_fightersfocus</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -337,7 +330,7 @@ This ability actively consumes stamina, and will automatically cancel once the c
 		</targetParams>
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_burningfury</spellId>
 <domain>Magic</domain>
 <tier>0</tier>

@@ -39,7 +39,7 @@ A blood mage will slowly lose blood magic power when they are no longer bleeding
 		</targetParams>
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_bloodgift</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -65,13 +65,6 @@ A blood mage will slowly lose blood magic power when they are no longer bleeding
 			<explosionRadius>3</explosionRadius>
 			<postExplosionSpawnChance>1</postExplosionSpawnChance>
         </projectile>
-    <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.projectile_igniteblood</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
 
 	 <TorannMagic.TMAbilityDef ParentName="BaseMagicAbility">
@@ -109,7 +102,7 @@ A blood mage will slowly lose blood magic power when they are no longer bleeding
             </targetParams>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_igniteblood</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -160,7 +153,7 @@ The transfer and healing rate is increased for both caster and victim depending 
             </targetParams>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_bloodforblood</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -209,7 +202,7 @@ Blood mages cannot form a blood shield on themselves.</description>
             </targetParams>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_bloodshield</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -269,7 +262,7 @@ Cast Time: 1.5s</description>
             </targetParams>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_rend</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -327,7 +320,7 @@ Cast Time: 1.3s</description>
             </targetParams>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_rend_i</spellId>
 <domain>Magic</domain>
 <tier>1</tier>
@@ -385,7 +378,7 @@ Cast Time: 1.1s</description>
             </targetParams>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_rend_ii</spellId>
 <domain>Magic</domain>
 <tier>2</tier>
@@ -443,7 +436,7 @@ Cast Time: 1s</description>
             </targetParams>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_rend_iii</spellId>
 <domain>Magic</domain>
 <tier>3</tier>
@@ -470,13 +463,6 @@ Cast Time: 1s</description>
 			<explosionRadius>6</explosionRadius>
 			<postExplosionSpawnChance>1</postExplosionSpawnChance>
         </projectile>
-    <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.projectile_bloodmoon</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
 	
 	<ThingDef ParentName="BaseBullet" Class="AbilityUser.ProjectileDef_Ability">
@@ -496,13 +482,6 @@ Cast Time: 1s</description>
 			<explosionRadius>7</explosionRadius>
 			<postExplosionSpawnChance>1</postExplosionSpawnChance>
         </projectile>
-    <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.projectile_bloodmoon_i</spellId>
-<domain>Magic</domain>
-<tier>1</tier>
-</li>
-</modExtensions>
 </ThingDef>
 	
 	<ThingDef ParentName="BaseBullet" Class="AbilityUser.ProjectileDef_Ability">
@@ -522,13 +501,6 @@ Cast Time: 1s</description>
 			<explosionRadius>8</explosionRadius>
 			<postExplosionSpawnChance>1</postExplosionSpawnChance>
         </projectile>
-    <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.projectile_bloodmoon_ii</spellId>
-<domain>Magic</domain>
-<tier>2</tier>
-</li>
-</modExtensions>
 </ThingDef>
 	
 	<ThingDef ParentName="BaseBullet" Class="AbilityUser.ProjectileDef_Ability">
@@ -548,13 +520,6 @@ Cast Time: 1s</description>
 			<explosionRadius>9</explosionRadius>
 			<postExplosionSpawnChance>1</postExplosionSpawnChance>
         </projectile>
-    <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.projectile_bloodmoon_iii</spellId>
-<domain>Magic</domain>
-<tier>3</tier>
-</li>
-</modExtensions>
 </ThingDef>
 
     <TorannMagic.TMAbilityDef ParentName="BaseMagicAbility">
@@ -594,7 +559,7 @@ Cast Time: 1s</description>
             </targetParams>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_bloodmoon</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -638,7 +603,7 @@ Cast Time: 1s</description>
             </targetParams>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_bloodmoon_i</spellId>
 <domain>Magic</domain>
 <tier>1</tier>
@@ -682,7 +647,7 @@ Cast Time: 1s</description>
             </targetParams>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_bloodmoon_ii</spellId>
 <domain>Magic</domain>
 <tier>2</tier>
@@ -726,7 +691,7 @@ Cast Time: 1s</description>
             </targetParams>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_bloodmoon_iii</spellId>
 <domain>Magic</domain>
 <tier>3</tier>

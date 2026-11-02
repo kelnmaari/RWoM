@@ -28,13 +28,6 @@
 			<damageDef>Burn</damageDef>
 			<damageAmountBase>10</damageAmountBase>
 		</projectile>
-	<modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.projectile_tm_bittechlaser</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
  
   <ThingDef Name="BaseBitGrenadeProjectile" Abstract="True">
@@ -68,13 +61,6 @@
 			<damageAmountBase>14</damageAmountBase>
 			<explosionDelay>50</explosionDelay>
 		</projectile>
-	<modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.projectile_tmfraggrenade</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
 	
 	<ThingDef ParentName="BaseBitGrenadeProjectile">
@@ -91,13 +77,6 @@
 			<damageAmountBase>26</damageAmountBase>
 			<explosionDelay>60</explosionDelay>
 		</projectile>
-	<modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.projectile_tmempgrenade</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
  
   
@@ -138,7 +117,7 @@ Drafted: uses an internal focus-LED to fire micro lasers at the technomancers ta
 		</targetParams>
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_technobit</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -163,13 +142,6 @@ Drafted: uses an internal focus-LED to fire micro lasers at the technomancers ta
 		<damageAmountBase>0</damageAmountBase>
 		<speed>15</speed>
    </projectile>
- <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.projectile_technoturret</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
  
  <TorannMagic.TMAbilityDef ParentName="BaseMagicAbility">
@@ -206,7 +178,7 @@ The Mark-IV will automatically miniaturize itself when it takes critical damage 
 		</targetParams>
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_technoturret</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -234,13 +206,6 @@ The Mark-IV will automatically miniaturize itself when it takes critical damage 
 	  <preExplosionSpawnChance>1</preExplosionSpawnChance>
 	  <armorPenetrationBase>.9</armorPenetrationBase>
     </projectile>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.bullet_es_fire</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
     <ThingDef ParentName="BaseBullet">
@@ -257,13 +222,6 @@ The Mark-IV will automatically miniaturize itself when it takes critical damage 
       <stoppingPower>.8</stoppingPower>
       <speed>60</speed>
     </projectile>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.bullet_es_ice</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
     <ThingDef ParentName="BaseBullet">
@@ -280,13 +238,6 @@ The Mark-IV will automatically miniaturize itself when it takes critical damage 
       <stoppingPower>2</stoppingPower>
       <speed>110</speed>
     </projectile>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.bullet_es_lit</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
  <TorannMagic.TMAbilityDef ParentName="BaseMagicAbility">
@@ -326,7 +277,7 @@ To create a techno weapon: target a weapon on the ground. Targeted weapon must b
 		</targetParams>
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_technoweapon</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -370,7 +321,7 @@ When the nanites burn out, they will form platelets to cauterize and stop bleedi
 		</targetParams>
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_nanostimulant</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -419,7 +370,7 @@ The amount of kinetic energy involved in a deflection is determined by the amoun
             </targetParams>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_technoshield</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -446,13 +397,6 @@ The amount of kinetic energy involved in a deflection is determined by the amoun
 		<explosionRadius>5</explosionRadius>
 		<preExplosionSpawnChance>1</preExplosionSpawnChance>
    </projectile>
- <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.projectile_sabotage</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
  
     <TorannMagic.TMAbilityDef ParentName="BaseMagicAbility">
@@ -496,7 +440,7 @@ Can be applied to: batteries, power generators, turrets, robots, androids, and m
             </targetParams>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_sabotage</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -547,7 +491,7 @@ Can be applied to: power generators, turrets, robots, androids, and mechanoids.<
             </targetParams>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_overdrive</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -573,13 +517,6 @@ Can be applied to: power generators, turrets, robots, androids, and mechanoids.<
 		<explosionRadius>3.3</explosionRadius>
 		<postExplosionSpawnChance>1</postExplosionSpawnChance>
    </projectile>
- <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.projectile_orbitalstrike</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
  
    <ThingDef ParentName="BaseBullet" Class="AbilityUser.ProjectileDef_Ability">
@@ -598,13 +535,6 @@ Can be applied to: power generators, turrets, robots, androids, and mechanoids.<
 		<explosionRadius>4.2</explosionRadius>
 		<postExplosionSpawnChance>1</postExplosionSpawnChance>
    </projectile>
- <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.projectile_orbitalstrike_i</spellId>
-<domain>Magic</domain>
-<tier>1</tier>
-</li>
-</modExtensions>
 </ThingDef>
  
    <ThingDef ParentName="BaseBullet" Class="AbilityUser.ProjectileDef_Ability">
@@ -623,13 +553,6 @@ Can be applied to: power generators, turrets, robots, androids, and mechanoids.<
 		<explosionRadius>5</explosionRadius>
 		<postExplosionSpawnChance>1</postExplosionSpawnChance>
    </projectile>
- <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.projectile_orbitalstrike_ii</spellId>
-<domain>Magic</domain>
-<tier>2</tier>
-</li>
-</modExtensions>
 </ThingDef>
  
    <ThingDef ParentName="BaseBullet" Class="AbilityUser.ProjectileDef_Ability">
@@ -648,13 +571,6 @@ Can be applied to: power generators, turrets, robots, androids, and mechanoids.<
 		<explosionRadius>5.6</explosionRadius>
 		<postExplosionSpawnChance>1</postExplosionSpawnChance>
    </projectile>
- <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.projectile_orbitalstrike_iii</spellId>
-<domain>Magic</domain>
-<tier>3</tier>
-</li>
-</modExtensions>
 </ThingDef>
 
     <TorannMagic.TMAbilityDef ParentName="BaseMagicAbility">
@@ -698,7 +614,7 @@ Radius: 2.5</description>
             </targetParams>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_orbitalstrike</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -746,7 +662,7 @@ Radius: 4.2</description>
             </targetParams>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_orbitalstrike_i</spellId>
 <domain>Magic</domain>
 <tier>1</tier>
@@ -794,7 +710,7 @@ Radius: 5.0</description>
             </targetParams>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_orbitalstrike_ii</spellId>
 <domain>Magic</domain>
 <tier>2</tier>
@@ -842,7 +758,7 @@ Radius: 5.6</description>
             </targetParams>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_orbitalstrike_iii</spellId>
 <domain>Magic</domain>
 <tier>3</tier>
@@ -888,112 +804,42 @@ Radius: 5.6</description>
         <cooldownTime>2</cooldownTime>
       </li>
     </tools>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_technoweapon_base0</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
   <ThingDef ParentName="TM_TW_Base">
     <defName>TM_TechnoWeapon_Base1</defName>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_technoweapon_base1</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
     <ThingDef ParentName="TM_TW_Base">
     <defName>TM_TechnoWeapon_Base2</defName>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_technoweapon_base2</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
     <ThingDef ParentName="TM_TW_Base">
     <defName>TM_TechnoWeapon_Base3</defName>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_technoweapon_base3</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
     <ThingDef ParentName="TM_TW_Base">
     <defName>TM_TechnoWeapon_Base4</defName>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_technoweapon_base4</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
     <ThingDef ParentName="TM_TW_Base">
     <defName>TM_TechnoWeapon_Base5</defName>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_technoweapon_base5</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
   <ThingDef ParentName="TM_TW_Base">
     <defName>TM_TechnoWeapon_Base6</defName>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_technoweapon_base6</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
   <ThingDef ParentName="TM_TW_Base">
     <defName>TM_TechnoWeapon_Base7</defName>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_technoweapon_base7</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
   <ThingDef ParentName="TM_TW_Base">
     <defName>TM_TechnoWeapon_Base8</defName>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_technoweapon_base8</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
   <ThingDef ParentName="TM_TW_Base">
     <defName>TM_TechnoWeapon_Base9</defName>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_technoweapon_base9</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
  
 </Defs>

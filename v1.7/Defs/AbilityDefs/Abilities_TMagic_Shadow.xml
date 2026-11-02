@@ -37,7 +37,7 @@
             <isPrimary>false</isPrimary>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_shadowwalk</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -63,13 +63,6 @@
             <damageAmountBase>0</damageAmountBase>
             <speed>999</speed>
         </projectile>
-    <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.projectile_shadowstrike</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
 
 	<TorannMagic.TMAbilityDef ParentName="BaseMightAbility">
@@ -104,7 +97,7 @@
             <isPrimary>false</isPrimary>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_shadowstrike</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -152,7 +145,7 @@ This ability requires 30 stamina to maintain and reduces stamina regeneration by
             <isPrimary>true</isPrimary>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_nightshade</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -195,7 +188,7 @@ This ability requires 30 stamina to maintain and reduces stamina regeneration by
             <isPrimary>true</isPrimary>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_veilofshadows</spellId>
 <domain>Magic</domain>
 <tier>0</tier>

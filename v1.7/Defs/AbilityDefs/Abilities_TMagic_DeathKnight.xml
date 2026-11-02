@@ -43,7 +43,7 @@ All of these functions are enhanced as hate levels grow and must have a sufficie
 		</targetParams>
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_shroud</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -67,13 +67,6 @@ All of these functions are enhanced as hate levels grow and must have a sufficie
 		<damageAmountBase>0</damageAmountBase>
 		<speed>999</speed>
    </projectile>
- <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.projectile_waveoffear</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
  
  <TorannMagic.TMAbilityDef ParentName="BaseMightAbility">
@@ -111,7 +104,7 @@ Hate is not required to use this ability, but it's effective range is greatly in
 		</targetParams>
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_waveoffear</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -135,13 +128,6 @@ Hate is not required to use this ability, but it's effective range is greatly in
             <damageAmountBase>12</damageAmountBase>
             <speed>50</speed>
         </projectile>
-    <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.projectile_spite</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>	
 	
     <TorannMagic.TMAbilityDef ParentName="BaseMightAbility">
@@ -183,7 +169,7 @@ Range: 21</description>
             </targetParams>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_spite</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -231,7 +217,7 @@ Range: 24</description>
             </targetParams>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_spite_i</spellId>
 <domain>Magic</domain>
 <tier>1</tier>
@@ -279,7 +265,7 @@ Range: 27</description>
             </targetParams>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_spite_ii</spellId>
 <domain>Magic</domain>
 <tier>2</tier>
@@ -327,7 +313,7 @@ Range: 30</description>
             </targetParams>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_spite_iii</spellId>
 <domain>Magic</domain>
 <tier>3</tier>
@@ -370,7 +356,7 @@ Range: 30</description>
 		</targetParams>
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_lifesteal</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -397,13 +383,6 @@ Range: 30</description>
 			<postExplosionSpawnChance>1</postExplosionSpawnChance>
             <speed>999</speed>
         </projectile>
-    <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.projectile_graveblade</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
 	
 	<ThingDef ParentName="BaseBullet" Class="AbilityUser.ProjectileDef_Ability">
@@ -423,13 +402,6 @@ Range: 30</description>
 			<postExplosionSpawnChance>1</postExplosionSpawnChance>
             <speed>999</speed>
         </projectile>
-    <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.projectile_graveblade_i</spellId>
-<domain>Magic</domain>
-<tier>1</tier>
-</li>
-</modExtensions>
 </ThingDef>
 	
 	<ThingDef ParentName="BaseBullet" Class="AbilityUser.ProjectileDef_Ability">
@@ -449,13 +421,6 @@ Range: 30</description>
 			<postExplosionSpawnChance>1</postExplosionSpawnChance>
             <speed>999</speed>
         </projectile>
-    <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.projectile_graveblade_ii</spellId>
-<domain>Magic</domain>
-<tier>2</tier>
-</li>
-</modExtensions>
 </ThingDef>
 	
     <ThingDef ParentName="BaseBullet" Class="AbilityUser.ProjectileDef_Ability">
@@ -475,13 +440,6 @@ Range: 30</description>
 			<postExplosionSpawnChance>1</postExplosionSpawnChance>
             <speed>999</speed>
         </projectile>
-    <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.projectile_graveblade_iii</spellId>
-<domain>Magic</domain>
-<tier>3</tier>
-</li>
-</modExtensions>
 </ThingDef>
 
 	<TorannMagic.TMAbilityDef ParentName="BaseMightAbility">
@@ -519,7 +477,7 @@ Radius: 3.0</description>
             <isPrimary>false</isPrimary>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_graveblade</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -562,7 +520,7 @@ Radius: 3.4</description>
             <isPrimary>false</isPrimary>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_graveblade_i</spellId>
 <domain>Magic</domain>
 <tier>1</tier>
@@ -605,7 +563,7 @@ Radius: 3.8</description>
             <isPrimary>false</isPrimary>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_graveblade_ii</spellId>
 <domain>Magic</domain>
 <tier>2</tier>
@@ -648,7 +606,7 @@ Radius: 4.2</description>
             <isPrimary>false</isPrimary>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_graveblade_iii</spellId>
 <domain>Magic</domain>
 <tier>3</tier>

@@ -15,13 +15,6 @@
 			<damageAmountBase>0</damageAmountBase>
 			<speed>75</speed>
 	   </projectile>
-	<modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.flyingobject_psionicleap</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
   <ThingDef ParentName="BaseBullet" Class="AbilityUser.ProjectileDef_Ability">
@@ -38,13 +31,6 @@
 		<damageAmountBase>0</damageAmountBase>
 		<speed>999</speed>
    </projectile>
- <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_psionic_projectile</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
  
  
@@ -83,7 +69,7 @@ A well trained psionic is able to achieve incredible physical feats using a blen
 		</targetParams>
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_psionicaugmentation</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -109,13 +95,6 @@ A well trained psionic is able to achieve incredible physical feats using a blen
 		<explosionRadius>2.8</explosionRadius>
 		<postExplosionSpawnChance>1</postExplosionSpawnChance>
    </projectile>
- <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_projectile_psionicbarrier</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
  
  <TorannMagic.TMAbilityDef ParentName="BaseMightAbility">
@@ -152,7 +131,7 @@ This ability requires 2 points to level.</description>
 		</targetParams>
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_psionicbarrier</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -193,7 +172,7 @@ This barrier can be projected to a designation location.</description>
 		</targetParams>
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_psionicbarrier_projected</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -222,13 +201,6 @@ This barrier can be projected to a designation location.</description>
 		<explosionRadius>2</explosionRadius>
 		<postExplosionSpawnChance>1</postExplosionSpawnChance>
    </projectile>
- <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_projectile_psionicblast</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
 
  <TorannMagic.TMAbilityDef ParentName="BaseMightAbility">
@@ -266,7 +238,7 @@ Range:		28</description>
             <isPrimary>true</isPrimary>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_psionicblast</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -309,7 +281,7 @@ Range:		34</description>
             <isPrimary>true</isPrimary>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_psionicblast_i</spellId>
 <domain>Magic</domain>
 <tier>1</tier>
@@ -352,7 +324,7 @@ Range:		40</description>
             <isPrimary>true</isPrimary>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_psionicblast_ii</spellId>
 <domain>Magic</domain>
 <tier>2</tier>
@@ -395,7 +367,7 @@ Range:		46</description>
             <isPrimary>true</isPrimary>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_psionicblast_iii</spellId>
 <domain>Magic</domain>
 <tier>3</tier>
@@ -421,13 +393,6 @@ Range:		46</description>
 			<damageAmountBase>8</damageAmountBase>
 			<speed>25</speed>
 	   </projectile>
-	<modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.flyingobject_psionicdash</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
 	 
   <ThingDef ParentName="BaseBullet" Class="AbilityUser.ProjectileDef_Ability">
@@ -444,13 +409,6 @@ Range:		46</description>
 		<damageAmountBase>8</damageAmountBase>
 		<speed>25</speed>
    </projectile>
- <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.projectile_psionicdash</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
  
  <TorannMagic.TMAbilityDef ParentName="BaseMightAbility">
@@ -486,7 +444,7 @@ Range:		46</description>
 		</targetParams>
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_psionicdash</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -513,13 +471,6 @@ Range:		46</description>
 			<explosionRadius>7</explosionRadius>
 			<postExplosionSpawnChance>1</postExplosionSpawnChance>
 	   </projectile>
-	<modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.flyingobject_psionicstorm</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
 			
 	<ThingDef ParentName="BaseBullet" Class="AbilityUser.ProjectileDef_Ability">
@@ -539,13 +490,6 @@ Range:		46</description>
 			<explosionRadius>7</explosionRadius>
 			<postExplosionSpawnChance>1</postExplosionSpawnChance>
         </projectile>
-    <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.projectile_psionicstorm</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
 
  <TorannMagic.TMAbilityDef ParentName="BaseMightAbility">
@@ -575,7 +519,7 @@ Range:		46</description>
             <isPrimary>false</isPrimary>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_psionicstorm</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -599,13 +543,6 @@ Range:		46</description>
 			<explosionRadius>7</explosionRadius>
 			<postExplosionSpawnChance>1</postExplosionSpawnChance>
 	   </projectile>
-	<modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.flyingobject_psistorm</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
 
 </Defs>

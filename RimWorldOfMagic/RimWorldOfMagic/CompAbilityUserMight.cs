@@ -189,6 +189,7 @@ namespace TorannMagic
         private ClassProgression.SpiritRuntimeClock spiritRuntimeClock = new ClassProgression.SpiritRuntimeClock();
 
         private MightData mightData = null;
+        internal MightData ExistingMightData => mightData;
         public MightData MightData
         {
             get
@@ -802,12 +803,14 @@ namespace TorannMagic
 
         public void LevelUpPower(MightPower power)
         {
+            var previous = power.abilityDef;
             foreach (AbilityUser.AbilityDef current in power.TMabilityDefs)
             {
                 base.RemovePawnAbility(current);
             }
             power.level++;
             base.AddPawnAbility(power.TMabilityDefs[power.level], true, -1f);
+            GrimoireKnowledge.ChangeTier(Pawn, previous, power.abilityDef, power.level, power.learned, power.autocast);
             this.UpdateAbilities();
         }
 
@@ -2763,7 +2766,7 @@ namespace TorannMagic
         {
             // Ф4 step 3: knowledge store gates the generic dispatch; sleeping
             // knowledge is reported once per pawn per day.
-            TorannMagic.AbilityKnowledgeComp knowledge = this.Pawn.TryGetComp<TorannMagic.AbilityKnowledgeComp>();
+            TorannMagic.AbilityKnowledgeComp knowledge = AbilityKnowledgeComp.ActiveFor(this.Pawn);
             KnowledgeDiagnostics.ReportSleeping(this.Pawn, knowledge);
             var legacyPowers = AutoCast.AutocastPolicy.LegacyMightPowers(this.MightData).ToList();
             bool hasLearnedPowers = legacyPowers.Any(power => power.learned);
@@ -2784,7 +2787,7 @@ namespace TorannMagic
                         //Log.Message("checking custom power " + mp.abilityDef.defName);
                         if (AutoCast.AutocastPolicy.EnabledForAutocast(mp, knowledge) && mp.autocasting != null && mp.autocasting.mightUser && mp.autocasting.undrafted)
                         {
-                            TMAbilityDef tmad = mp.TMabilityDefs[mp.level] as TMAbilityDef; // issues with index?
+                            if (mp.abilityDef is not TMAbilityDef tmad) continue;
                             //Log.Message("checking autocast for ability " + tmad.defName);
                             bool canUseWithEquippedWeapon = true;
                             bool canUseIfViolentAbility = this.Pawn.story.DisabledWorkTagsBackstoryAndTraits.HasFlag(WorkTags.Violent) ? !tmad.MainVerb.isViolent : true;
@@ -3189,7 +3192,7 @@ namespace TorannMagic
                         {
                             //try
                             //{ 
-                            TMAbilityDef tmad = mp.TMabilityDefs[mp.level] as TMAbilityDef; // issues with index?
+                            if (mp.abilityDef is not TMAbilityDef tmad) continue;
                             bool canUseWithEquippedWeapon = true;
                             bool canUseIfViolentAbility = this.Pawn.story.DisabledWorkTagsBackstoryAndTraits.HasFlag(WorkTags.Violent) ? !tmad.MainVerb.isViolent : true;
                             if (!TM_Calc.HasResourcesForAbility(this.Pawn, tmad))
@@ -3645,7 +3648,7 @@ namespace TorannMagic
             {
                 //Log.Message("pawn " + this.Pawn.LabelShort + " current job is " + this.Pawn.CurJob.def.defName);
                 // Ф4 step 5: knowledge store gates AI casting (learned flag only).
-                TorannMagic.AbilityKnowledgeComp knowledge = this.Pawn.TryGetComp<TorannMagic.AbilityKnowledgeComp>();
+                TorannMagic.AbilityKnowledgeComp knowledge = AbilityKnowledgeComp.ActiveFor(this.Pawn);
                 bool castSuccess = false;
                 if (this.Stamina != null && this.Stamina.CurLevelPercentage >= ModOptions.Settings.Instance.autocastMinThreshold)
                 {
@@ -3655,7 +3658,7 @@ namespace TorannMagic
                         {
                             //try
                             //{ 
-                            TMAbilityDef tmad = mp.TMabilityDefs[mp.level] as TMAbilityDef; // issues with index?
+                            if (mp.abilityDef is not TMAbilityDef tmad) continue;
                             bool canUseWithEquippedWeapon = true;
                             bool canUseIfViolentAbility = this.Pawn.story.DisabledWorkTagsBackstoryAndTraits.HasFlag(WorkTags.Violent) ? !tmad.MainVerb.isViolent : true;
                             if (!TM_Calc.HasResourcesForAbility(this.Pawn, tmad))

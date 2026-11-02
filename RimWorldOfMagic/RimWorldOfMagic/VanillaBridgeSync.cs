@@ -19,17 +19,59 @@ namespace TorannMagic
         private static readonly Dictionary<string, TMBridgeAbilityDef> BridgeDefs =
             new Dictionary<string, TMBridgeAbilityDef>();
 
+        // Old saves carry no knowledge comp; injecting it at load converts the
+        // pawn to the new format in place — the comp's first tick imports
+        // legacy knowledge and the sync grants the bridges.
+        public static void InjectKnowledgeComp(Pawn pawn)
+        {
+            if (pawn?.def?.race?.Humanlike != true) return;
+            var comps = pawn.AllComps;
+            // Verse returns a shared empty list for pawns whose comps have not been initialized.
+            if (comps.Count == 0 || pawn.TryGetComp<AbilityKnowledgeComp>() != null) return;
+            var properties = pawn.def.comps?.Find(p => p?.compClass == typeof(AbilityKnowledgeComp));
+            if (properties == null) return;
+            var knowledge = new AbilityKnowledgeComp { parent = pawn };
+            knowledge.Initialize(properties);
+            comps.Add(knowledge);
+        }
+
+        // Runs on Game.FinalizeInit (every save load and new game): converts
+        // every existing humanlike pawn — world pawns and map pawns.
+        public static void ConvertExistingPawns(Game game)
+        {
+            var worldPawns = game?.World?.worldPawns?.AllPawnsAliveOrDead;
+            if (worldPawns != null)
+            {
+                foreach (Pawn pawn in worldPawns) InjectKnowledgeComp(pawn);
+            }
+            var maps = game?.Maps;
+            if (maps == null) return;
+            foreach (Map map in maps)
+            {
+                var pawns = map?.mapPawns?.AllPawns;
+                if (pawns == null) continue;
+                foreach (Pawn pawn in pawns) InjectKnowledgeComp(pawn);
+            }
+        }
+
         public static void Sync(Pawn pawn)
         {
             if (pawn?.abilities == null) return;
             AbilityKnowledgeComp knowledge = pawn.TryGetComp<AbilityKnowledgeComp>();
             if (knowledge == null) return;
+            var abilities = pawn.abilities.abilities;
+            for (int i = abilities.Count - 1; i >= 0; i--)
+            {
+                if (abilities[i]?.def is TMBridgeAbilityDef old &&
+                    (knowledge.Find(old.spellId)?.learned != true || old.Original == null))
+                    pawn.abilities.RemoveAbility(old);
+            }
             foreach (SpellKnowledge entry in knowledge.Spells)
             {
                 if (entry == null || !entry.learned || string.IsNullOrEmpty(entry.spellId)) continue;
                 if (!FamilyEnabled(entry.spellId)) continue;
                 TMBridgeAbilityDef bridge = BridgeDef(entry.spellId);
-                if (bridge == null) continue;
+                if (bridge?.Original == null) continue;
                 if (pawn.abilities.GetAbility(bridge) != null) continue;
                 pawn.abilities.GainAbility(bridge);
             }
@@ -44,7 +86,7 @@ namespace TorannMagic
             if (spellId == null) return false;
             foreach (string prefix in EnabledFamilyPrefixes)
             {
-                if (!spellId.StartsWith(prefix)) continue;
+                if (!spellId.StartsWith(prefix, System.StringComparison.Ordinal)) continue;
                 if (spellId.Length == prefix.Length) return true;
                 if (prefix.EndsWith("_") || prefix.EndsWith(".")) return true;
                 if (spellId[prefix.Length] == '_') return true;
@@ -63,7 +105,7 @@ namespace TorannMagic
             if (!FamilyEnabled(spellId)) return false;
             TMBridgeAbilityDef bridge = BridgeDef(spellId);
             if (bridge == null) return false;
-            return pawn?.abilities?.GetAbility(bridge) != null;
+            return pawn?.abilities?.GetAbility(bridge) is TMBridgeAbility ability && ability.Companion != null;
         }
 
         private static TMBridgeAbilityDef BridgeDef(string spellId)

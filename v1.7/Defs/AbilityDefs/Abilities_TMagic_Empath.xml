@@ -39,7 +39,7 @@
 		</targetParams>
     </MainVerb>
  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_empathy</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -90,7 +90,7 @@
         </targetParams>
     </MainVerb>
  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_mindkiller</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -140,7 +140,7 @@
         </targetParams>
     </MainVerb>
  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_suppressiveaura</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -193,7 +193,7 @@
         </targetParams>
     </MainVerb>
  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_harvestpassion</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -241,7 +241,7 @@
         </targetParams>
     </MainVerb>
  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_incitepassion</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -291,7 +291,7 @@
         </targetParams>
     </MainVerb>
  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_symbiosis</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -341,7 +341,7 @@
         </targetParams>
     </MainVerb>
  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_fadeemotions</spellId>
 <domain>Magic</domain>
 <tier>0</tier>

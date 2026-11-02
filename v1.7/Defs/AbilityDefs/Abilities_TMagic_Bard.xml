@@ -17,13 +17,6 @@
 		<damageAmountBase>0</damageAmountBase>
 		<speed>999</speed>
    </projectile>
- <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_projectile_bard</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
  
  
@@ -73,7 +66,7 @@ Pain threshold -15%, carrying capacity -20, work speed -15%</description>
 		</targetParams>
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_bardtraining</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -120,7 +113,7 @@ Activating the ability casts a net over the colony and allows the bard to detect
 		</targetParams>
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_entertain</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -163,7 +156,7 @@ Activating the ability casts a net over the colony and allows the bard to detect
             </targetParams>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_inspire</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -217,7 +210,7 @@ Activating the ability casts a net over the colony and allows the bard to detect
             </targetParams>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_lullaby</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -268,7 +261,7 @@ Activating the ability casts a net over the colony and allows the bard to detect
             </targetParams>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_lullaby_i</spellId>
 <domain>Magic</domain>
 <tier>1</tier>
@@ -319,7 +312,7 @@ Activating the ability casts a net over the colony and allows the bard to detect
             </targetParams>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_lullaby_ii</spellId>
 <domain>Magic</domain>
 <tier>2</tier>
@@ -370,7 +363,7 @@ Activating the ability casts a net over the colony and allows the bard to detect
             </targetParams>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_lullaby_iii</spellId>
 <domain>Magic</domain>
 <tier>3</tier>
@@ -419,7 +412,7 @@ Use the skill to activate or deactivate the ability.</description>
 		</targetParams>
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_battlehymn</spellId>
 <domain>Magic</domain>
 <tier>0</tier>

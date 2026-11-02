@@ -1,20 +1,16 @@
 using System;
 using AbilityUser;
 using RimWorld;
-using Verse.AI;
+using System.Collections.Generic;
+using UnityEngine;
 using Verse;
 
 namespace TorannMagic
 {
-    // Ф5 spike: a vanilla Ability that stands in for an RWoM spell. The bridge
-    // contributes the vanilla surfaces (tracker storage, gizmo grid, AI
-    // lookups, cooldown ticking); execution stays on the proven JecsLite path
-    // through a transient companion PawnAbility rebuilt from the knowledge
-    // store + defs. The companion is never scribed — it is pure runtime cache.
+    // Vanilla tracker entry for an RWoM ability. The active JecsLite owner
+    // owns the verb, targeting, costs and cooldown throughout its lifetime.
     public class TMBridgeAbility : Ability
     {
-        private PawnAbility companion;
-
         public TMBridgeAbility()
         {
         }
@@ -29,18 +25,47 @@ namespace TorannMagic
         {
             get
             {
-                if (companion == null)
+                var bridge = def as TMBridgeAbilityDef;
+                var original = bridge?.Original;
+                if (original == null || pawn?.TryGetComp<AbilityKnowledgeComp>()?.Find(bridge.spellId)?.learned != true)
+                    return null;
+                foreach (ThingComp comp in pawn.AllComps)
                 {
-                    TMAbilityDef original = ((TMBridgeAbilityDef)def).Original;
-                    CompAbilityUser abilityUser = pawn?.GetCompAbilityUser();
-                    if (original == null || abilityUser == null)
+                    if (comp is CompAbilityUserTMBase user)
                     {
-                        return null;
+                        var powers = user.AbilityData?.AllPowers;
+                        if (powers == null) continue;
+                        foreach (var power in powers)
+                            if (power?.Def == original) return power;
                     }
-                    companion = new PawnAbility { Def = original, AbilityUser = abilityUser };
                 }
-                return companion;
+                return null;
             }
+        }
+
+        public override IEnumerable<Command> GetGizmos()
+        {
+            var owner = Companion;
+            if (owner == null || !VanillaBridgeGizmoVisibilityPatch.VisibleThroughTracker(owner)) yield break;
+            gizmo ??= new BridgeCommand(this, pawn);
+            yield return gizmo;
+        }
+
+        // A vanilla command remains visible to the tracker and integrations. Use the
+        // owner's targeting UI for self, local, world and multi-stage spells.
+        private sealed class BridgeCommand : Command_Ability
+        {
+            private readonly TMBridgeAbility bridge;
+            public BridgeCommand(TMBridgeAbility bridge, Pawn pawn) : base(bridge, pawn)
+                => this.bridge = bridge;
+
+            public override void ProcessInput(Event ev)
+            {
+                if (!bridge.GizmoDisabled(out _)) bridge.Companion?.GetGizmo().ProcessInput(ev);
+            }
+
+            public override void GizmoUpdateOnMouseover()
+                => bridge.Companion?.GetGizmo().GizmoUpdateOnMouseover();
         }
 
         public override bool GizmoDisabled(out string reason)
@@ -59,6 +84,11 @@ namespace TorannMagic
                     reason = "TM_SleepingSpellsDesc".Translate();
                     return true;
                 }
+                if (owner.Verb == null || !pawn.Spawned)
+                {
+                    reason = "TM_SleepingSpellsDesc".Translate();
+                    return true;
+                }
                 if (!owner.CanCastPowerCheck(AbilityContext.Player, out string why))
                 {
                     reason = why;
@@ -68,8 +98,8 @@ namespace TorannMagic
             }
             catch (Exception)
             {
-                reason = null;
-                return false;
+                reason = "TM_SleepingSpellsDesc".Translate();
+                return true;
             }
         }
 
@@ -90,24 +120,13 @@ namespace TorannMagic
 
         public override bool Activate(LocalTargetInfo target, LocalTargetInfo dest)
         {
-            PawnAbility owner = Companion;
-            if (owner == null)
-            {
-                return false;
-            }
-            return owner.UseAbility(AbilityContext.Player, target) != null;
+            return !GizmoDisabled(out _) && Companion.UseAbility(AbilityContext.Player, target) != null;
         }
 
         public override void QueueCastingJob(LocalTargetInfo target, LocalTargetInfo destination)
         {
-            // Vanilla queueing routes through the same JecsLite owner so the
-            // job pipeline, warmup and resources stay identical to manual casts.
-            PawnAbility owner = Companion;
-            Job job = owner?.UseAbility(AbilityContext.Player, target);
-            if (job != null)
-            {
-                pawn.jobs.TryTakeOrderedJob(job, JobTag.Misc);
-            }
+            Activate(target, destination);
         }
+
     }
 }

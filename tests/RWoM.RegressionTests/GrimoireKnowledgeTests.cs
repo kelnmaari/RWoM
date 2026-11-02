@@ -73,6 +73,13 @@ internal static class GrimoireKnowledgeTests
         GrimoireKnowledge.SyncEntry(pawn, null, 0, true);
         GrimoireKnowledge.SyncRank(pawn, def, "TM_grimsynca_pwr", 4);
         Check.Equal(4, knowledge.GetSkillRank(SpellIds.Of(def), 0), "null-def sync is a no-op for ranks");
+        var next = (TMAbilityDef)RuntimeHelpers.GetUninitializedObject(typeof(TMAbilityDef));
+        next.defName = "TM_GrimSyncA_III";
+        GrimoireKnowledge.ChangeTier(pawn, def, next, 3, true, true);
+        Check.Equal(true, knowledge.Find(SpellIds.Of(def)) == null, "obsolete tier retired");
+        var upgraded = knowledge.Find(SpellIds.Of(next));
+        Check.Equal(true, upgraded.autocast && upgraded.learned, "new tier keeps the toggles");
+        Check.Equal(4, upgraded.pwr, "new tier keeps the rank");
     }
 
     // RED 1: convention ids read as spell names; unknown shapes come back sane.

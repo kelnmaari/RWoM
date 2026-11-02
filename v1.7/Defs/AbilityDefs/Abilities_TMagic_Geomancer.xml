@@ -16,13 +16,6 @@
             <damageAmountBase>0</damageAmountBase>
             <speed>999</speed>
         </projectile>
-    <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.projectile_geomancer</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
 	
 		
@@ -67,7 +60,7 @@ Applying stoneskin to a target that already has stoneskin will remove all charge
             </targetParams>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_stoneskin</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -109,7 +102,7 @@ Applying stoneskin to a target that already has stoneskin will remove all charge
         </targetParams>
     </MainVerb>
  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_dispelstoneskin</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -136,13 +129,6 @@ Applying stoneskin to a target that already has stoneskin will remove all charge
 			<explosionRadius>3</explosionRadius>
 			<postExplosionSpawnChance>1</postExplosionSpawnChance>
         </projectile>
-    <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.projectile_encase</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
 	
 	<ThingDef ParentName="BaseBullet" Class="AbilityUser.ProjectileDef_Ability">
@@ -162,13 +148,6 @@ Applying stoneskin to a target that already has stoneskin will remove all charge
 			<explosionRadius>4</explosionRadius>
 			<postExplosionSpawnChance>1</postExplosionSpawnChance>
         </projectile>
-    <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.projectile_encase_i</spellId>
-<domain>Magic</domain>
-<tier>1</tier>
-</li>
-</modExtensions>
 </ThingDef>
 	
 	<ThingDef ParentName="BaseBullet" Class="AbilityUser.ProjectileDef_Ability">
@@ -188,13 +167,6 @@ Applying stoneskin to a target that already has stoneskin will remove all charge
 			<explosionRadius>5</explosionRadius>
 			<postExplosionSpawnChance>1</postExplosionSpawnChance>
         </projectile>
-    <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.projectile_encase_ii</spellId>
-<domain>Magic</domain>
-<tier>2</tier>
-</li>
-</modExtensions>
 </ThingDef>
 	
 	<ThingDef ParentName="BaseBullet" Class="AbilityUser.ProjectileDef_Ability">
@@ -214,13 +186,6 @@ Applying stoneskin to a target that already has stoneskin will remove all charge
 			<explosionRadius>6</explosionRadius>
 			<postExplosionSpawnChance>1</postExplosionSpawnChance>
         </projectile>
-    <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.projectile_encase_iii</spellId>
-<domain>Magic</domain>
-<tier>3</tier>
-</li>
-</modExtensions>
 </ThingDef>
 
     <TorannMagic.TMAbilityDef ParentName="BaseMagicAbility">
@@ -264,7 +229,7 @@ Cast time: 1.5s</description>
             </targetParams>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_encase</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -312,7 +277,7 @@ Cast time: 1.3s</description>
             </targetParams>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_encase_i</spellId>
 <domain>Magic</domain>
 <tier>1</tier>
@@ -360,7 +325,7 @@ Cast time: 1.1s</description>
             </targetParams>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_encase_ii</spellId>
 <domain>Magic</domain>
 <tier>2</tier>
@@ -408,7 +373,7 @@ Cast time: 1.0s</description>
             </targetParams>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_encase_iii</spellId>
 <domain>Magic</domain>
 <tier>3</tier>
@@ -459,7 +424,7 @@ In exchange for their efforts, earth sprites expect a steady and substantial sup
             </targetParams>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_earthsprites</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -501,7 +466,7 @@ In exchange for their efforts, earth sprites expect a steady and substantial sup
         </targetParams>
     </MainVerb>
  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_dismissearthsprites</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -527,13 +492,6 @@ In exchange for their efforts, earth sprites expect a steady and substantial sup
 			<explosionRadius>4</explosionRadius>
 			<postExplosionSpawnChance>1</postExplosionSpawnChance>
         </projectile>
-    <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.projectile_earthernhammer</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
 	
     <TorannMagic.TMAbilityDef ParentName="BaseMagicAbility">
@@ -575,7 +533,7 @@ The first, and every third stone after, will always be subterranean unless there
             </targetParams>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_earthernhammer</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -600,13 +558,6 @@ The first, and every third stone after, will always be subterranean unless there
             <damageAmountBase>0</damageAmountBase>
             <speed>999</speed>
         </projectile>
-    <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.projectile_sentinel</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
 	
     <TorannMagic.TMAbilityDef ParentName="BaseMagicAbility">
@@ -650,7 +601,7 @@ Using this ability on a dormant sentinel will dismiss the sentinel. Each sentine
             </targetParams>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_sentinel</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -692,7 +643,7 @@ Using this ability on a dormant sentinel will dismiss the sentinel. Each sentine
         </targetParams>
     </MainVerb>
  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_shattersentinel</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -752,7 +703,7 @@ Cast time: 5s</description>
             </targetParams>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_meteor</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -811,7 +762,7 @@ Cast time: 4.6s</description>
             </targetParams>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_meteor_i</spellId>
 <domain>Magic</domain>
 <tier>1</tier>
@@ -870,7 +821,7 @@ Cast time: 4.2s</description>
             </targetParams>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_meteor_ii</spellId>
 <domain>Magic</domain>
 <tier>2</tier>
@@ -929,7 +880,7 @@ Cast time: 3.8s</description>
             </targetParams>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_meteor_iii</spellId>
 <domain>Magic</domain>
 <tier>3</tier>

@@ -16,13 +16,6 @@
 		<damageAmountBase>0</damageAmountBase>
 		<speed>100</speed>
    </projectile>
- <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.projectile_bladefocus</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
  
  <TorannMagic.TMAbilityDef ParentName="BaseMightAbility">
@@ -63,7 +56,7 @@ Legendary Bladedancer: Speed +0.4c/s, MBT -10%, Hit chance +15%, Dodge +20%, Sho
 		</targetParams>
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_bladefocus</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -87,13 +80,6 @@ Legendary Bladedancer: Speed +0.4c/s, MBT -10%, Hit chance +15%, Dodge +20%, Sho
 		<damageAmountBase>0</damageAmountBase>
 		<speed>100</speed>
    </projectile>
- <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.projectile_bladeart</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
  
  <TorannMagic.TMAbilityDef ParentName="BaseMightAbility">
@@ -134,7 +120,7 @@ Level 3: Moving +25%, Manipulation +25%, Breathing +15%, Blood pumping +10%, Blo
 		</targetParams>
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_bladeart</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -165,13 +151,6 @@ Level 3: Moving +25%, Manipulation +25%, Breathing +15%, Blood pumping +10%, Blo
         <postFiringFinalIntensity>0</postFiringFinalIntensity>
         <preFiringDuration>20</preFiringDuration>
         <postFiringDuration>80</postFiringDuration>
-    <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.projectile_bladespin</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
 
 	<TorannMagic.TMAbilityDef ParentName="BaseMightAbility">
@@ -206,7 +185,7 @@ Level 3: Moving +25%, Manipulation +25%, Breathing +15%, Blood pumping +10%, Blo
             <isPrimary>false</isPrimary>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_bladespin</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -236,13 +215,6 @@ Level 3: Moving +25%, Manipulation +25%, Breathing +15%, Blood pumping +10%, Blo
         <postFiringFinalIntensity>0</postFiringFinalIntensity>
         <preFiringDuration>20</preFiringDuration>
         <postFiringDuration>80</postFiringDuration>
-    <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.projectile_seismicslash</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
 
 	<TorannMagic.TMAbilityDef ParentName="BaseMightAbility">
@@ -277,7 +249,7 @@ Level 3: Moving +25%, Manipulation +25%, Breathing +15%, Blood pumping +10%, Blo
             <isPrimary>false</isPrimary>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_seismicslash</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -301,13 +273,6 @@ Level 3: Moving +25%, Manipulation +25%, Breathing +15%, Blood pumping +10%, Blo
             <damageAmountBase>0</damageAmountBase>
             <speed>400</speed>
         </projectile>
-    <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.projectile_phasestrike</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
 
 	<TorannMagic.TMAbilityDef ParentName="BaseMightAbility">
@@ -347,7 +312,7 @@ Range: 30</description>
             <isPrimary>false</isPrimary>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_phasestrike</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -392,7 +357,7 @@ Range: 35</description>
             <isPrimary>false</isPrimary>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_phasestrike_i</spellId>
 <domain>Magic</domain>
 <tier>1</tier>
@@ -437,7 +402,7 @@ Range: 40</description>
             <isPrimary>false</isPrimary>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_phasestrike_ii</spellId>
 <domain>Magic</domain>
 <tier>2</tier>
@@ -482,7 +447,7 @@ Range: 45</description>
             <isPrimary>false</isPrimary>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_phasestrike_iii</spellId>
 <domain>Magic</domain>
 <tier>3</tier>

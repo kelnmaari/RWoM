@@ -28,6 +28,44 @@ internal static class VanillaBridgeTests
         yield return new("VanillaBridge.AllFamiliesEnabled", AllFamiliesEnabled);
         yield return new("VanillaBridge.LegacyGizmoHiddenForEnabled", LegacyGizmoHiddenForEnabled);
         yield return new("VanillaBridge.GizmoDisabledReflectsResources", GizmoDisabledReflectsResources);
+        yield return new("VanillaBridge.OldSaveConversion", OldSaveConversion);
+        yield return new("VanillaBridge.TrackerSave", TrackerSave);
+        yield return new("VanillaBridge.SinglePlayerJob", SinglePlayerJob);
+    }
+
+    // Old saves carry no knowledge comp; loading must inject it into every
+    // humanlike pawn (idempotently) so the import + bridge grant migrate the
+    // save to the new format in place. Non-humanlike pawns are skipped.
+    private static void OldSaveConversion(RuntimeFixture _)
+    {
+        var pawn = BridgePawn(); // no knowledge comp yet
+        Check.Equal(true, pawn.TryGetComp<AbilityKnowledgeComp>() == null, "fresh pawn starts without the comp");
+
+        VanillaBridgeSync.InjectKnowledgeComp(pawn);
+        Check.NotNull(pawn.TryGetComp<AbilityKnowledgeComp>(), "injection adds the knowledge comp");
+
+        var before = pawn.AllComps.Count;
+        VanillaBridgeSync.InjectKnowledgeComp(pawn);
+        Check.Equal(before, pawn.AllComps.Count, "injection is idempotent");
+
+        var animal = BridgePawn();
+        animal.def.race.intelligence = Intelligence.Animal;
+        VanillaBridgeSync.InjectKnowledgeComp(animal);
+        Check.Equal(true, animal.TryGetComp<AbilityKnowledgeComp>() == null, "animal stays outside the migration");
+        var game = (Game)RuntimeHelpers.GetUninitializedObject(typeof(Game));
+        VanillaBridgeSync.ConvertExistingPawns(null);
+        VanillaBridgeSync.ConvertExistingPawns(game);
+        typeof(Game).GetField("maps", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(game,
+            new List<Map> { null, (Map)RuntimeHelpers.GetUninitializedObject(typeof(Map)) });
+        game.World = (World)RuntimeHelpers.GetUninitializedObject(typeof(World));
+        game.World.worldPawns = new WorldPawns();
+        var oldWorldPawn = BridgePawn();
+        game.World.worldPawns.AllPawnsDead.Add(oldWorldPawn);
+        VanillaBridgeSync.ConvertExistingPawns(game);
+        VanillaBridgeSync.ConvertExistingPawns(game);
+        var added = oldWorldPawn.AllComps.OfType<AbilityKnowledgeComp>().Single();
+        Check.Same(oldWorldPawn, added.parent, "existing world pawn gains exactly one initialized comp");
+        Check.Same(oldWorldPawn.def.comps[0], added.props, "uses the registered comp properties");
     }
 
     // Generated bridge defs carry the original's icon so the vanilla gizmo
@@ -75,6 +113,7 @@ internal static class VanillaBridgeTests
             Check.Equal(false, VanillaBridgeSync.ShouldHideLegacyGizmo(pawn, def),
                 "a pawn without the granted bridge keeps its classic gizmo");
 
+            GiveOwner(pawn, bridge);
             pawn.abilities.GainAbility(bridge);
             Check.Equal(true, VanillaBridgeSync.ShouldHideLegacyGizmo(pawn, def),
                 "a pawn holding the granted bridge hides the classic gizmo");
@@ -105,8 +144,9 @@ internal static class VanillaBridgeTests
         var knowledge = new AbilityKnowledgeComp { parent = pawn };
         pawn.AllComps.Add(knowledge);
 
+        var current = GiveOwner(pawn, def);
         var ability = (TMBridgeAbility)AbilityUtility.MakeAbility(def, pawn);
-        Check.NotNull(ability.Companion, "companion built for the disabled-state check");
+        Check.Same(current, ability.Companion, "companion built for the disabled-state check");
         bool disabled = false;
         try
         {
@@ -116,7 +156,8 @@ internal static class VanillaBridgeTests
         {
             throw new InvalidOperationException("GizmoDisabled must tolerate ambient state: " + ex.Message, ex);
         }
-        Check.Equal(true, disabled || !disabled, "gizmo disabled-state evaluated without throwing");
+        Check.Equal(true, disabled, "unspawned pawn cannot cast");
+        RuntimeLog.Clear(); // This fixture has no language pack for the disabled reason.
         Check.Equal(false, ability.AICanTargetNow(pawn), "bridges are excluded from vanilla AI targeting");
     }
 
@@ -157,6 +198,7 @@ internal static class VanillaBridgeTests
         Check.Equal(true, files.Length > 10, "generated bridge files present");
 
         var seen = new HashSet<string>();
+        var bridgeIds = new HashSet<string>(StringComparer.Ordinal);
         int defs = 0;
         foreach (string file in files)
         {
@@ -170,7 +212,7 @@ internal static class VanillaBridgeTests
                 Check.Equal(true, !string.IsNullOrEmpty(defName) && seen.Add(defName),
                     "unique non-empty defName " + defName);
                 if (el.Attribute("Abstract") != null) continue; // the shared base
-                Check.NotNull(el.Element("spellId"), "spellId on " + defName);
+                Check.Equal(true, bridgeIds.Add((string)el.Element("spellId")!), "unique bridge spellId on " + defName);
                 var verbProps = el.Element("verbProperties");
                 Check.NotNull(verbProps, "verbProperties on " + defName);
                 // Subclasses of VerbProperties_Ability carry family config — the copy
@@ -182,6 +224,22 @@ internal static class VanillaBridgeTests
                 defs++;
             }
         }
+        var casterIds = new HashSet<string>(StringComparer.Ordinal);
+        var registered = new HashSet<string>(StringComparer.Ordinal);
+        foreach (string path in Directory.EnumerateFiles(Path.Combine(f.Repository, "v1.7", "Defs"), "*.xml", SearchOption.AllDirectories))
+        {
+            foreach (var def in System.Xml.Linq.XDocument.Load(path).Root!.Elements())
+            foreach (var ext in def.Element("modExtensions")?.Elements("li") ?? Enumerable.Empty<System.Xml.Linq.XElement>())
+            {
+                if ((string?)ext.Attribute("Class") != "TorannMagic.Core.SpellIdentityExtension") continue;
+                var spellId = ext.Element("spellId")!.Value;
+                Check.Equal("huginn.rwom.core", (string?)ext.Attribute("MayRequire"), "optional core on " + spellId);
+                Check.Equal(true, registered.Add(spellId), "duplicate registry identity " + spellId);
+                Check.Equal(true, def.Name.LocalName.EndsWith("AbilityDef", StringComparison.Ordinal), "non-ability claiming " + spellId);
+                if (def.Name.LocalName == "TorannMagic.TMAbilityDef") casterIds.Add(spellId);
+            }
+        }
+        Check.Equal(true, bridgeIds.SetEquals(casterIds), "each RWoM spell has exactly one bridge");
         Check.Equal(true, defs > 400, "generated bridge def count covers the ability tree: " + defs);
     }
 
@@ -212,11 +270,83 @@ internal static class VanillaBridgeTests
 
             VanillaBridgeSync.Sync(pawn);
             Check.Equal(1, pawn.abilities.abilities.Count, "sync is idempotent");
+            entry.learned = false;
+            VanillaBridgeSync.Sync(pawn);
+            Check.Equal(true, pawn.abilities.GetAbility(bridge) == null, "unlearning revokes the bridge");
         }
         finally
         {
             DefDatabase<RimWorld.AbilityDef>.Clear();
         }
+    }
+
+    // The owner submits player orders inside UseAbility. A second submission
+    // here would touch pawn.jobs (deliberately absent on this fixture).
+    private sealed class CountingOwner : AbilityUser.PawnAbility
+    {
+        public int Calls;
+        public override Verse.AI.Job UseAbility(AbilityUser.AbilityContext context, LocalTargetInfo target)
+        {
+            Check.Equal(global::AbilityUser.AbilityContext.Player, context, "manual cast context");
+            Calls++;
+            return new Verse.AI.Job();
+        }
+    }
+
+    private sealed class BridgeAdmissionProbe : TMBridgeAbility
+    {
+        public bool Blocked;
+        public override bool GizmoDisabled(out string reason) { reason = ""; return Blocked; }
+    }
+
+    private static void SinglePlayerJob(RuntimeFixture f)
+    {
+        EnsureCoreLoaded(f);
+        var original = Original("TM_OnePlayerJob");
+        CoreBridge.RegisterSpell(original);
+        var bridge = BridgeDef("TM_Bridge_Oneplayerjob", SpellIds.Of(original));
+        var pawn = BridgePawn();
+        GiveOwner(pawn, bridge);
+        var user = pawn.TryGetComp<CompAbilityUserMagic>();
+        var owner = new CountingOwner { AbilityUser = user, Def = original };
+        user.AbilityData.Powers[0] = owner;
+        user.AbilityData.AllPowers = null;
+        var ability = new BridgeAdmissionProbe { pawn = pawn, def = bridge };
+        ability.QueueCastingJob(pawn, LocalTargetInfo.Invalid);
+        Check.Equal(1, owner.Calls, "queue submits exactly one player order");
+        ability.Blocked = true;
+        ability.QueueCastingJob(pawn, LocalTargetInfo.Invalid);
+        Check.Equal(false, ability.Activate(pawn, LocalTargetInfo.Invalid), "blocked admission rejects direct activation too");
+        Check.Equal(1, owner.Calls, "no extra order on rejection");
+    }
+
+    private static void TrackerSave(RuntimeFixture f)
+    {
+        var tracker = new Pawn_AbilityTracker(BridgePawn());
+        var bridge = BridgeDef("TM_Bridge_SaveProbe", "rwom.tm_saveprobe");
+        tracker.GainAbility(bridge);
+        var nativeDef = BridgeDef("Native_SaveProbe", "unused");
+        nativeDef.abilityClass = typeof(Ability);
+        tracker.GainAbility(nativeDef);
+        var type = Assembly.Load("0Harmony").GetType("HarmonyLib.Harmony")!;
+        const string id = "rwom.test.bridge.tracker-save";
+        var harmony = Activator.CreateInstance(type, id)!;
+        var path = Path.Combine(f.WorkingDirectory, "tracker.xml");
+        try
+        {
+            var patch = typeof(VanillaBridgeSync).Assembly.GetType("TorannMagic.VanillaBridgeTrackerSavePatch")!;
+            var processor = type.GetMethod("CreateClassProcessor")!.Invoke(harmony, [patch])!;
+            processor.GetType().GetMethod("Patch")!.Invoke(processor, null);
+            Scribe.saver.InitSaving(path, "tracker");
+            tracker.ExposeData();
+            Scribe.saver.FinalizeSaving();
+        }
+        finally { Scribe.ForceStop(); type.GetMethod("UnpatchAll")!.Invoke(harmony, [id]); }
+        var xml = System.Xml.Linq.XDocument.Load(path);
+        var defs = xml.Descendants("def").Select(x => x.Value).ToList();
+        Check.Equal(true, defs.Contains(nativeDef.defName), "native tracker ability is saved");
+        Check.Equal(false, defs.Contains(bridge.defName), "transient bridge is omitted");
+        Check.Equal(2, tracker.abilities.Count, "save does not mutate live abilities");
     }
 
     private static void EnsureCoreLoaded(RuntimeFixture f)
@@ -249,6 +379,17 @@ internal static class VanillaBridgeTests
         return def;
     }
 
+    private static AbilityUser.PawnAbility GiveOwner(Pawn pawn, TMBridgeAbilityDef bridge)
+    {
+        var user = pawn.TryGetComp<CompAbilityUserMagic>();
+        var owner = new AbilityUser.PawnAbility { Def = bridge.Original, AbilityUser = user };
+        user.AbilityData.Powers.Add(owner);
+        user.AbilityData.AllPowers = null;
+        VanillaBridgeSync.InjectKnowledgeComp(pawn);
+        pawn.TryGetComp<AbilityKnowledgeComp>().GetOrCreate(bridge.spellId, 0).learned = true;
+        return owner;
+    }
+
     private static Pawn BridgePawn()
     {
         if (Current.Game == null)
@@ -261,6 +402,7 @@ internal static class VanillaBridgeTests
         }
         var pawnDef = (ThingDef)RuntimeHelpers.GetUninitializedObject(typeof(ThingDef));
         pawnDef.defName = "Regression_BridgeHuman";
+        pawnDef.comps = new List<CompProperties> { new CompProperties { compClass = typeof(AbilityKnowledgeComp) } };
         pawnDef.race = new RaceProperties { intelligence = Intelligence.Humanlike };
         var pawn = new Pawn { def = pawnDef };
         // The companion PawnAbility binds to the pawn's CompAbilityUser
@@ -281,9 +423,9 @@ internal static class VanillaBridgeTests
     private static void DefResolvesOriginal(RuntimeFixture f)
     {
         EnsureCoreLoaded(f);
-        var original = Original("TM_Heal");
-        CoreBridge.RegisterSpell(original); // convention id rwom.tm_heal
-        var def = BridgeDef("TM_Bridge_Heal", "rwom.tm_heal");
+        var original = Original("TM_ResolutionProbe");
+        CoreBridge.RegisterSpell(original);
+        var def = BridgeDef("TM_Bridge_Resolutionprobe", "rwom.tm_resolutionprobe");
         Check.Same(original, def.Original, "bridge def resolves the original TMAbilityDef");
 
         var defMissing = BridgeDef("TM_Bridge_Lost", "rwom.tm_removed");
@@ -298,10 +440,11 @@ internal static class VanillaBridgeTests
         CoreBridge.RegisterSpell(Original("TM_Heal"));
         var def = BridgeDef("TM_Bridge_Heal2", "rwom.tm_heal");
         var pawn = BridgePawn();
+        var realOwner = GiveOwner(pawn, def);
         var ability = (TMBridgeAbility)AbilityUtility.MakeAbility(def, pawn);
         Check.NotNull(ability, "MakeAbility constructs the bridge ability");
         var companion = ability.Companion;
-        Check.NotNull(companion, "companion PawnAbility exists");
+        Check.Same(realOwner, companion, "targeting and cooldown use the live owner");
         Check.Same(def.Original, companion.Def, "companion wraps the original def");
         var verb = companion.Verb;
         Check.NotNull(verb, "companion verb initialized");

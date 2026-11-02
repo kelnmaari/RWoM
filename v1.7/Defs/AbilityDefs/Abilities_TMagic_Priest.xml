@@ -17,13 +17,6 @@
 		<damageAmountBase>0</damageAmountBase>
 		<speed>999</speed>
    </projectile>
- <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_projectile_priest</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
  
  
@@ -63,7 +56,7 @@
 		</targetParams>
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_advancedheal</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -106,7 +99,7 @@
 		</targetParams>
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_purify</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -132,13 +125,6 @@
 		<explosionRadius>3</explosionRadius>
 		<postExplosionSpawnChance>1</postExplosionSpawnChance>
    </projectile>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_projectile_healingcircle</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
     <ThingDef ParentName="BaseBullet" Class="AbilityUser.ProjectileDef_Ability">
@@ -157,13 +143,6 @@
 		<explosionRadius>4</explosionRadius>
 		<postExplosionSpawnChance>1</postExplosionSpawnChance>
    </projectile>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_projectile_healingcircle_i</spellId>
-<domain>Magic</domain>
-<tier>1</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
     <ThingDef ParentName="BaseBullet" Class="AbilityUser.ProjectileDef_Ability">
@@ -182,13 +161,6 @@
 		<explosionRadius>5.5</explosionRadius>
 		<postExplosionSpawnChance>1</postExplosionSpawnChance>
    </projectile>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_projectile_healingcircle_ii</spellId>
-<domain>Magic</domain>
-<tier>2</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
     <ThingDef ParentName="BaseBullet" Class="AbilityUser.ProjectileDef_Ability">
@@ -207,13 +179,6 @@
 		<explosionRadius>7</explosionRadius>
 		<postExplosionSpawnChance>1</postExplosionSpawnChance>
    </projectile>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_projectile_healingcircle_iii</spellId>
-<domain>Magic</domain>
-<tier>3</tier>
-</li>
-</modExtensions>
 </ThingDef>
  
   <TorannMagic.TMAbilityDef ParentName="BaseMagicAbility">
@@ -254,7 +219,7 @@ Range: 30</description>
             </targetParams>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_healingcircle</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -299,7 +264,7 @@ Range: 35</description>
             </targetParams>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_healingcircle_i</spellId>
 <domain>Magic</domain>
 <tier>1</tier>
@@ -344,7 +309,7 @@ Range: 40</description>
             </targetParams>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_healingcircle_ii</spellId>
 <domain>Magic</domain>
 <tier>2</tier>
@@ -389,7 +354,7 @@ Range: 45</description>
             </targetParams>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_healingcircle_iii</spellId>
 <domain>Magic</domain>
 <tier>3</tier>
@@ -446,7 +411,7 @@ Pain:		-40%</description>
 			</hediffsToApply>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_bestowmight</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -500,7 +465,7 @@ Pain:		-50%</description>
 			</hediffsToApply>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_bestowmight_i</spellId>
 <domain>Magic</domain>
 <tier>1</tier>
@@ -554,7 +519,7 @@ Pain:		-60%</description>
 			</hediffsToApply>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_bestowmight_ii</spellId>
 <domain>Magic</domain>
 <tier>2</tier>
@@ -608,7 +573,7 @@ Pain:		-70%</description>
 			</hediffsToApply>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_bestowmight_iii</spellId>
 <domain>Magic</domain>
 <tier>3</tier>
@@ -632,13 +597,6 @@ Pain:		-70%</description>
 		<damageAmountBase>0</damageAmountBase>
 		<speed>999</speed>
    </projectile>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.projectile_resurrection</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
 	 
  <TorannMagic.TMAbilityDef ParentName="BaseMagicAbility">
@@ -677,7 +635,7 @@ Pain:		-70%</description>
 		</targetParams>
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_resurrection</spellId>
 <domain>Magic</domain>
 <tier>0</tier>

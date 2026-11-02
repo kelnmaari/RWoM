@@ -39,7 +39,7 @@
 		</targetParams>
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_provisioneraura</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -85,7 +85,7 @@
 		</targetParams>
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_taskmasteraura</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -131,7 +131,7 @@
 		</targetParams>
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_commanderaura</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -190,7 +190,7 @@ Commands do not affect the commander.</description>
 		</targetParams>
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_stayalert</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -247,7 +247,7 @@ Commands do not affect the commander.</description>
 		</targetParams>
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_stayalert_i</spellId>
 <domain>Magic</domain>
 <tier>1</tier>
@@ -304,7 +304,7 @@ Commands do not affect the commander.</description>
 		</targetParams>
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_stayalert_ii</spellId>
 <domain>Magic</domain>
 <tier>2</tier>
@@ -361,7 +361,7 @@ Commands do not affect the commander.</description>
 		</targetParams>
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_stayalert_iii</spellId>
 <domain>Magic</domain>
 <tier>3</tier>
@@ -420,7 +420,7 @@ Commands do not affect the commander.</description>
 		</targetParams>
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_moveout</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -477,7 +477,7 @@ Commands do not affect the commander.</description>
 		</targetParams>
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_moveout_i</spellId>
 <domain>Magic</domain>
 <tier>1</tier>
@@ -534,7 +534,7 @@ Commands do not affect the commander.</description>
 		</targetParams>
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_moveout_ii</spellId>
 <domain>Magic</domain>
 <tier>2</tier>
@@ -591,7 +591,7 @@ Commands do not affect the commander.</description>
 		</targetParams>
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_moveout_iii</spellId>
 <domain>Magic</domain>
 <tier>3</tier>
@@ -651,7 +651,7 @@ Commands do not affect the commander.</description>
 		</targetParams>
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_holdtheline</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -708,7 +708,7 @@ Commands do not affect the commander.</description>
 		</targetParams>
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_holdtheline_i</spellId>
 <domain>Magic</domain>
 <tier>1</tier>
@@ -765,7 +765,7 @@ Commands do not affect the commander.</description>
 		</targetParams>
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_holdtheline_ii</spellId>
 <domain>Magic</domain>
 <tier>2</tier>
@@ -822,7 +822,7 @@ Commands do not affect the commander.</description>
 		</targetParams>
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_holdtheline_iii</spellId>
 <domain>Magic</domain>
 <tier>3</tier>

@@ -1,12 +1,18 @@
+using System.Runtime.CompilerServices;
+using Verse;
+
 namespace TorannMagic
 {
-    // Single source of the stable spellId convention: "rwom." + lower-case
-    // defName. The legacy import, the autocast gate and the registry
-    // registrations all use this form until defs declare explicit
-    // SpellIdentityExtension spellIds in XML (Ф2 item 2).
     public static class SpellIds
     {
-        public static string Of(Verse.Def def)
-            => def?.defName == null ? null : "rwom." + def.defName.ToLower();
+        private static readonly ConditionalWeakTable<Def, string> Ids = new();
+
+        public static string Of(Def def)
+            => def?.defName == null ? null : Ids.GetValue(def, Resolve);
+
+        private static string Resolve(Def def)
+            => CoreBridge.DeclaredId(def) ?? Convention(def);
+
+        internal static string Convention(Def def) => "rwom." + def.defName.ToLowerInvariant();
     }
 }

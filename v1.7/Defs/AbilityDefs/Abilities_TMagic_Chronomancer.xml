@@ -45,7 +45,7 @@ This ability reduces mana regeneration by 50%.</description>
 		</targetParams>
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_prediction</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -90,7 +90,7 @@ Alter Fate is most effective against environmental conditions. This ability can 
 		</targetParams>
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_alterfate</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -117,13 +117,6 @@ Alter Fate is most effective against environmental conditions. This ability can 
 			<explosionRadius>3</explosionRadius>
 			<postExplosionSpawnChance>1</postExplosionSpawnChance>
         </projectile>
-    <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.projectile_acceleratetime</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
 	
     <TorannMagic.TMAbilityDef ParentName="BaseMagicAbility">
@@ -171,7 +164,7 @@ When used on friendly pawns, there is no area of effect, only the primary target
             </targetParams>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_acceleratetime</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -225,7 +218,7 @@ Reverse Time can be dispelled/countered with Accelerate Time.</description>
             </targetParams>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_reversetime</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -251,13 +244,6 @@ Reverse Time can be dispelled/countered with Accelerate Time.</description>
 			<explosionRadius>3</explosionRadius>
 			<postExplosionSpawnChance>1</postExplosionSpawnChance>
         </projectile>
-    <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.projectile_chronostaticfield</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
 	
 	<ThingDef ParentName="BaseBullet" Class="AbilityUser.ProjectileDef_Ability">
@@ -276,13 +262,6 @@ Reverse Time can be dispelled/countered with Accelerate Time.</description>
 			<explosionRadius>3.5</explosionRadius>
 			<postExplosionSpawnChance>1</postExplosionSpawnChance>
         </projectile>
-    <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.projectile_chronostaticfield_i</spellId>
-<domain>Magic</domain>
-<tier>1</tier>
-</li>
-</modExtensions>
 </ThingDef>
 	
 	<ThingDef ParentName="BaseBullet" Class="AbilityUser.ProjectileDef_Ability">
@@ -301,13 +280,6 @@ Reverse Time can be dispelled/countered with Accelerate Time.</description>
 			<explosionRadius>4</explosionRadius>
 			<postExplosionSpawnChance>1</postExplosionSpawnChance>
         </projectile>
-    <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.projectile_chronostaticfield_ii</spellId>
-<domain>Magic</domain>
-<tier>2</tier>
-</li>
-</modExtensions>
 </ThingDef>
 	
 	<ThingDef ParentName="BaseBullet" Class="AbilityUser.ProjectileDef_Ability">
@@ -326,13 +298,6 @@ Reverse Time can be dispelled/countered with Accelerate Time.</description>
 			<explosionRadius>4.5</explosionRadius>
 			<postExplosionSpawnChance>1</postExplosionSpawnChance>
         </projectile>
-    <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.projectile_chronostaticfield_iii</spellId>
-<domain>Magic</domain>
-<tier>3</tier>
-</li>
-</modExtensions>
 </ThingDef>
 	
 	<ThingDef ParentName="BaseBullet" Name="FlyingObject_TimeDelay">
@@ -349,13 +314,6 @@ Reverse Time can be dispelled/countered with Accelerate Time.</description>
 			<damageAmountBase>0</damageAmountBase>
 			<speed>0</speed>
 	   </projectile>
-	<modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.flyingobject_timedelay</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
    
 	<TorannMagic.TMAbilityDef ParentName="BaseMagicAbility">
@@ -397,7 +355,7 @@ Cast time: 1s</description>
             </targetParams>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_chronostaticfield</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -443,7 +401,7 @@ Cast time: .8s</description>
             </targetParams>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_chronostaticfield_i</spellId>
 <domain>Magic</domain>
 <tier>1</tier>
@@ -489,7 +447,7 @@ Cast time: .6s</description>
             </targetParams>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_chronostaticfield_ii</spellId>
 <domain>Magic</domain>
 <tier>2</tier>
@@ -535,7 +493,7 @@ Cast time: .5s</description>
             </targetParams>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_chronostaticfield_iii</spellId>
 <domain>Magic</domain>
 <tier>3</tier>
@@ -583,7 +541,7 @@ To maintain physical cohesion during a recall, the caster will retain all condit
 		</targetParams>
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_timemark</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -632,7 +590,7 @@ To maintain physical cohesion during a recall, the caster will retain all condit
 		</targetParams>
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_recall</spellId>
 <domain>Magic</domain>
 <tier>0</tier>

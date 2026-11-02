@@ -37,7 +37,7 @@ namespace TorannMagic
         // Learned entries whose def fails to resolve (removed or renamed spell).
         // Never throws; the list is recomputed per frame (knowledge lists are small).
         public static List<SpellKnowledge> SleepingSpells(Pawn pawn)
-            => SleepingSpells(pawn?.TryGetComp<AbilityKnowledgeComp>());
+            => SleepingSpells(AbilityKnowledgeComp.ActiveFor(pawn));
 
         public static List<SpellKnowledge> SleepingSpells(AbilityKnowledgeComp knowledge)
         {
@@ -54,6 +54,26 @@ namespace TorannMagic
         // Ф4 step 4 stage 2: grimoire writes (learn / level-up) mirror into the
         // knowledge store so it stays a complete mirror after the one-shot
         // import — the same dual-write contract as the autocast toggles.
+        public static void ChangeTier(Pawn pawn, Def previous, Def current, int tier, bool learned, bool autocast)
+        {
+            var knowledge = pawn?.TryGetComp<AbilityKnowledgeComp>();
+            if (knowledge == null || current == null) return;
+            var oldId = SpellIds.Of(previous);
+            var id = SpellIds.Of(current);
+            var old = knowledge.Find(oldId);
+            var next = knowledge.GetOrCreate(id, tier);
+            next.tier = tier;
+            next.learned = learned;
+            next.autocast = autocast;
+            if (old != null && old != next)
+            {
+                next.pwr = old.pwr;
+                next.eff = old.eff;
+                next.ver = old.ver;
+                knowledge.Remove(oldId);
+            }
+        }
+
         public static void SyncEntry(Pawn pawn, Verse.Def def, int tier, bool learned)
         {
             AbilityKnowledgeComp knowledge = pawn?.TryGetComp<AbilityKnowledgeComp>();

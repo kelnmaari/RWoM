@@ -10,13 +10,13 @@ namespace TorannMagic
     public static class KnowledgeDiagnostics
     {
         private const int ReportIntervalTicks = 60000;
-        private static readonly Dictionary<int, int> LastReportTick = new Dictionary<int, int>();
 
         public static void ReportSleeping(Pawn pawn, AbilityKnowledgeComp knowledge)
         {
             if (pawn == null || knowledge == null) return;
-            int now = Find.TickManager?.TicksGame ?? 0;
-            if (LastReportTick.TryGetValue(pawn.thingIDNumber, out int last) && now - last < ReportIntervalTicks) return;
+            int now = Current.Game?.tickManager?.TicksGame ?? 0;
+            if (now < knowledge.NextDiagnosticTick) return;
+            knowledge.NextDiagnosticTick = now + ReportIntervalTicks;
             int sleeping = 0;
             foreach (SpellKnowledge spell in knowledge.Spells)
             {
@@ -25,7 +25,6 @@ namespace TorannMagic
             }
             if (sleeping > 0)
             {
-                LastReportTick[pawn.thingIDNumber] = now;
                 // LabelShortCap walks race/kind data a generated or exotic pawn
                 // may not have — this is a per-tick path and must never throw.
                 string label = pawn.kindDef == null ? "Pawn" + pawn.thingIDNumber : pawn.LabelShortCap;

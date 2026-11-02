@@ -41,7 +41,7 @@ namespace TorannMagic
 
         private void SetMaxLevel()
         {
-            this.maxLevel = this.TMabilityDefs.Count - 1;
+            this.maxLevel = (this.TMabilityDefs?.Count ?? 0) - 1;
         }
 
         public AbilityDef abilityDescDef

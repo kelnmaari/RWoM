@@ -52,7 +52,7 @@ Requires 40 mana to maintain and reduces mana regeneration by 30%; cast again to
 			</targetParams>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_p_rayofhope</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -109,7 +109,7 @@ Requires 40 mana to maintain and reduces mana regeneration by 30%; cast again to
 			</targetParams>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_p_rayofhope_i</spellId>
 <domain>Magic</domain>
 <tier>1</tier>
@@ -166,7 +166,7 @@ Requires 40 mana to maintain and reduces mana regeneration by 30%; cast again to
 			</targetParams>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_p_rayofhope_ii</spellId>
 <domain>Magic</domain>
 <tier>2</tier>
@@ -223,7 +223,7 @@ Requires 40 mana to maintain and reduces mana regeneration by 30%; cast again to
 			</targetParams>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_p_rayofhope_iii</spellId>
 <domain>Magic</domain>
 <tier>3</tier>
@@ -250,13 +250,6 @@ Requires 40 mana to maintain and reduces mana regeneration by 30%; cast again to
 		<speed>999</speed>
    </projectile>
    <HealFailChance>0.0</HealFailChance>
- <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_paladin_heal</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
  
  
@@ -296,7 +289,7 @@ Requires 40 mana to maintain and reduces mana regeneration by 30%; cast again to
 		</targetParams>
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_heal</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -322,13 +315,6 @@ Requires 40 mana to maintain and reduces mana regeneration by 30%; cast again to
 		<damageAmountBase>0</damageAmountBase>
 		<speed>100</speed>
    </projectile>
- <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_paladin_shield</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
  
  <TorannMagic.TMAbilityDef ParentName="BaseMagicAbility">
@@ -374,7 +360,7 @@ Absorbs up to 100 damage.</description>
         </hediffsToApply>
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_shield</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -425,7 +411,7 @@ Reduces recharge to 30s.</description>
         </hediffsToApply>
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_shield_i</spellId>
 <domain>Magic</domain>
 <tier>1</tier>
@@ -476,7 +462,7 @@ Reduces recharge to 27s.</description>
         </hediffsToApply>
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_shield_ii</spellId>
 <domain>Magic</domain>
 <tier>2</tier>
@@ -527,7 +513,7 @@ Reduces recharge to 25s.</description>
         </hediffsToApply>
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_shield_iii</spellId>
 <domain>Magic</domain>
 <tier>3</tier>
@@ -553,13 +539,6 @@ Reduces recharge to 25s.</description>
 			<damageAmountBase>0</damageAmountBase>
 			<speed>250</speed>
 	   </projectile>
-	<modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.flyingobject_valiantcharge</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
 			
 	<ThingDef ParentName="BaseBullet" Class="AbilityUser.ProjectileDef_Ability">
@@ -577,13 +556,6 @@ Reduces recharge to 25s.</description>
             <damageAmountBase>0</damageAmountBase>
             <speed>70</speed>
         </projectile>
-    <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.projectile_valiantcharge</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
 
  <TorannMagic.TMAbilityDef ParentName="BaseMagicAbility">
@@ -618,7 +590,7 @@ Reduces recharge to 25s.</description>
             <isPrimary>false</isPrimary>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_valiantcharge</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -642,13 +614,6 @@ Reduces recharge to 25s.</description>
 		<damageAmountBase>10</damageAmountBase>
 		<speed>100</speed>
    </projectile>
- <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.tm_paladin_overwhelm</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
  
  <TorannMagic.TMAbilityDef ParentName="BaseMagicAbility">
@@ -685,7 +650,7 @@ Reduces recharge to 25s.</description>
 		</targetParams>
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_overwhelm</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -711,13 +676,6 @@ Reduces recharge to 25s.</description>
 		<explosionRadius>6</explosionRadius>
 		<postExplosionSpawnChance>1</postExplosionSpawnChance>
    </projectile>
- <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.projectile_holywrath</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
  
     <TorannMagic.TMAbilityDef ParentName="BaseMagicAbility">
@@ -752,7 +710,7 @@ Reduces recharge to 25s.</description>
             <isPrimary>false</isPrimary>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_holywrath</spellId>
 <domain>Magic</domain>
 <tier>0</tier>

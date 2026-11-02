@@ -18,13 +18,6 @@
             <damageAmountBase>0</damageAmountBase>
             <speed>999</speed>
         </projectile>
-    <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.projectile_spiritpossession</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
 	
  <TorannMagic.TMAbilityDef ParentName="BaseMagicAbility">
@@ -64,7 +57,7 @@
 		</targetParams>
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_spiritpossession</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -110,7 +103,7 @@
 		</targetParams>
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_spiritdrain</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -137,13 +130,6 @@
 			<explosionRadius>6</explosionRadius>
 			<postExplosionSpawnChance>1</postExplosionSpawnChance>
         </projectile>
-    <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.projectile_distortspirit</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
 	
  <TorannMagic.TMAbilityDef ParentName="BaseMagicAbility">
@@ -186,7 +172,7 @@ Recharge: 60s</description>
 		</targetParams>
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_distortspirit</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -235,7 +221,7 @@ Recharge: 45s</description>
 		</targetParams>
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_distortspirit_i</spellId>
 <domain>Magic</domain>
 <tier>1</tier>
@@ -284,7 +270,7 @@ Recharge: 30s</description>
 		</targetParams>
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_distortspirit_ii</spellId>
 <domain>Magic</domain>
 <tier>2</tier>
@@ -333,7 +319,7 @@ Recharge: 20s</description>
 		</targetParams>
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_distortspirit_iii</spellId>
 <domain>Magic</domain>
 <tier>3</tier>
@@ -360,13 +346,6 @@ Recharge: 20s</description>
 			<explosionRadius>5</explosionRadius>
 			<postExplosionSpawnChance>1</postExplosionSpawnChance>
         </projectile>
-    <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.projectile_summonspiritanimals</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
 	
  <TorannMagic.TMAbilityDef ParentName="BaseMagicAbility">
@@ -405,7 +384,7 @@ Recharge: 20s</description>
 		</targetParams>
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_summonspiritanimalmass</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -454,7 +433,7 @@ Cooldown: 45s</description>
 		</targetParams>
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_spiritrally</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -503,7 +482,7 @@ Cooldown: 30s</description>
 		</targetParams>
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_spiritrally_i</spellId>
 <domain>Magic</domain>
 <tier>1</tier>
@@ -552,7 +531,7 @@ Cooldown: 20s</description>
 		</targetParams>
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_spiritrally_ii</spellId>
 <domain>Magic</domain>
 <tier>2</tier>
@@ -601,7 +580,7 @@ Cooldown: 15s</description>
 		</targetParams>
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_spiritrally_iii</spellId>
 <domain>Magic</domain>
 <tier>3</tier>
@@ -628,13 +607,6 @@ Cooldown: 15s</description>
 			<explosionRadius>4</explosionRadius>
 			<postExplosionSpawnChance>1</postExplosionSpawnChance>
         </projectile>
-    <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.projectile_spiritstorm</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
 	
 	<ThingDef ParentName="BaseBullet" Name="FlyingObject_SpiritStorm">
@@ -652,13 +624,6 @@ Cooldown: 15s</description>
 			<speed>8</speed>
 			<explosionRadius>4</explosionRadius>
 	   </projectile>
-	<modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.flyingobject_spiritstorm</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
 	
  <TorannMagic.TMAbilityDef ParentName="BaseMagicAbility">
@@ -708,7 +673,7 @@ Cooldown: 15s</description>
 		</targetParams>
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_spiritstorm</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -753,7 +718,7 @@ Cooldown: 15s</description>
 		</targetParams>
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_controlspiritstorm</spellId>
 <domain>Magic</domain>
 <tier>0</tier>

@@ -18,13 +18,6 @@
       <damageAmountBase>18</damageAmountBase>
       <speed>60</speed>
     </projectile>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.projectile_elemental_icebolt</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
  <TorannMagic.TMAbilityDef ParentName="BaseMagicAbility">
@@ -67,7 +60,7 @@
     </MainVerb>
 
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_elemental_icebolt</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -94,13 +87,6 @@
       <damageAmountBase>14</damageAmountBase>
       <speed>65</speed>
     </projectile>
-  <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.projectile_elemental_firebolt</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
   
  <TorannMagic.TMAbilityDef ParentName="BaseMagicAbility">
@@ -136,7 +122,7 @@
     </MainVerb>
 
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_elemental_firebolt</spellId>
 <domain>Magic</domain>
 <tier>0</tier>

@@ -166,6 +166,9 @@ internal static class AbilityKnowledgeTests
             Scribe.saver.FinalizeSaving();
         }
         finally { Scribe.ForceStop(); }
+        var node = System.Xml.Linq.XDocument.Load(path).Descendants("TM_abilityKnowledge").Single();
+        Check.Equal(AbilityKnowledgeComp.CurrentSchemaVersion, (int)node.Element("schemaVersion")!,
+            "native comp writes its schema even at the current version");
         KnowledgeWrap loaded = null!;
         try
         {
@@ -181,7 +184,7 @@ internal static class AbilityKnowledgeTests
 
     public sealed class KnowledgeWrap : IExposable
     {
-        public AbilityKnowledgeComp Comp;
-        public void ExposeData() => Scribe_Deep.Look(ref Comp, "comp");
+        public AbilityKnowledgeComp Comp = new();
+        public void ExposeData() => Comp.PostExposeData();
     }
 }

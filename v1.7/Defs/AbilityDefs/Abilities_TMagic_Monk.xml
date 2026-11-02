@@ -39,7 +39,7 @@
 		</targetParams>
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_chi</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -92,7 +92,7 @@ Has a low chance to disrupt the mental state of any pawn. Can be resisted.</desc
 		</targetParams>
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_chiburst</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -137,7 +137,7 @@ Mind Over Body is a passive buff that improves consciousness, moving, manipulati
 		</targetParams>
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_mindoverbody</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -180,7 +180,7 @@ Any physical or mental ailments must be purged before meditation can generate Ch
 		</targetParams>
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_meditate</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -228,7 +228,7 @@ Passive ability (8 stamina): deliver multiple hits against an opponent; attacks 
 		</targetParams>
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_tigerstrike</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -252,13 +252,6 @@ Passive ability (8 stamina): deliver multiple hits against an opponent; attacks 
 			<damageAmountBase>0</damageAmountBase>
 			<speed>40</speed>
 	   </projectile>
-	<modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.flyingobject_dragonstrike</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
 	 
   <ThingDef ParentName="BaseBullet" Class="AbilityUser.ProjectileDef_Ability">
@@ -275,13 +268,6 @@ Passive ability (8 stamina): deliver multiple hits against an opponent; attacks 
 		<damageAmountBase>0</damageAmountBase>
 		<speed>40</speed>
    </projectile>
- <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.projectile_dragonstrike</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
  
  <TorannMagic.TMAbilityDef ParentName="BaseMightAbility">
@@ -322,7 +308,7 @@ Passive ability (10 stamina): performs a round-house kick that strikes multiple 
 		</targetParams>
     </MainVerb>
   <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_dragonstrike</spellId>
 <domain>Magic</domain>
 <tier>0</tier>
@@ -346,13 +332,6 @@ Passive ability (10 stamina): performs a round-house kick that strikes multiple 
             <damageAmountBase>0</damageAmountBase>
             <speed>999</speed>
         </projectile>
-    <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
-<spellId>rwom.projectile_thunderstrike</spellId>
-<domain>Magic</domain>
-<tier>0</tier>
-</li>
-</modExtensions>
 </ThingDef>
 
 	<TorannMagic.TMAbilityDef ParentName="BaseMightAbility">
@@ -387,7 +366,7 @@ Passive ability (10 stamina): performs a round-house kick that strikes multiple 
             <isPrimary>false</isPrimary>
         </MainVerb>
     <modExtensions>
-<li Class="TorannMagic.Core.SpellIdentityExtension">
+<li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_thunderstrike</spellId>
 <domain>Magic</domain>
 <tier>0</tier>

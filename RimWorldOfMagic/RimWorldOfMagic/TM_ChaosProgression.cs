@@ -97,6 +97,11 @@ namespace TorannMagic
             }
             comp.AbilityData.Powers.RemoveAll(a => a != null && remove.Contains(a.Def));
             comp.AbilityData.AllPowers = null;
+            var knowledge = comp.Pawn?.TryGetComp<AbilityKnowledgeComp>();
+            if (knowledge != null)
+                foreach (var def in remove)
+                    if (def != null && !data.AllMagicPowers.Any(p => p?.learned == true && p.abilityDef == def))
+                        knowledge.Remove(SpellIds.Of(def));
             data.MagicAbilityPoints += refund;
             comp.UpdateAbilities();
         }
