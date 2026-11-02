@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Globalization;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -88,6 +88,7 @@ internal static class AutocastTests
         yield return new("Autocast.FailedUndraftedHealStandaloneConsumedOnce", f => FailedDedicatedOnce(f, true, false, drafted: false));
         yield return new("Autocast.FailedSummonMinionCustomConsumedOnce", f => FailedDedicatedOnce(f, false, true, drafted: false, summon: true));
         yield return new("Autocast.FailedSummonMinionStandaloneConsumedOnce", f => FailedDedicatedOnce(f, false, false, drafted: false, summon: true));
+        yield return new("Autocast.DedicatedFamilyHonorsKnowledgeGate", f => DedicatedKnowledgeGate(f, drafted: false));
         yield return new("Autocast.ChaosMageUnlearnedSummonMinionKeepsLearnedGate", f => FailedDedicatedOnce(f, false, false, drafted: false, chaos: true, summon: true));
         yield return new("Autocast.CustomOwnersCoverAllReservedFamilies", ReservedOwners);
         yield return new("Autocast.CureDiseaseRejectsInjury", f => CureTarget(f, "Cut", 0, false, injury: true));
@@ -420,8 +421,72 @@ internal static class AutocastTests
         }
     }
 
+    private static void InvokeRoute(System.Reflection.MethodInfo route, CompAbilityUserMagic comp)
+    {
+        try { route.Invoke(comp, null); }
+        catch (System.Reflection.TargetInvocationException ex)
+        {
+            throw new InvalidOperationException("Scheduler failure: " + ex.InnerException, ex.InnerException);
+        }
+    }
+
     private static int dedicatedAttempts;
     private static void ObserveDedicated() => dedicatedAttempts++;
+    // Ф4 remainder: the dedicated class evaluators (heal/purify/summon/...)
+    // gate through the knowledge store like the generic loops — the store
+    // overrides the legacy learned/autocast flags in both directions.
+    private static void DedicatedKnowledgeGate(RuntimeFixture fixture, bool drafted)
+    {
+        var caster = NewPawn();
+        var comp = MagicComp(caster);
+        var def = fixture.AddAbility("TM_Heal");
+        def.manaCost = 2f; // reject inside the real evaluator, before target lookup
+        TorannMagicDefOf.TM_Heal = def;
+        var saved = new MagicPower([def]) { learned = true, autocast = true };
+        comp.spell_Heal = true; // non-Paladin standalone compatibility route
+        comp.MagicData.magicPowerP.Add(saved);
+        var knowledge = new AbilityKnowledgeComp { parent = caster };
+        caster.AllComps.Add(knowledge);
+        var entry = knowledge.GetOrCreate(TorannMagic.SpellIds.Of(def), 0);
+        entry.learned = true;
+        entry.autocast = false;
+        caster.drafter = new Pawn_DraftController(caster);
+        SetField(caster.drafter, "draftedInt", drafted);
+        caster.drafter.FireAtWill = true;
+        caster.equipment = new Pawn_EquipmentTracker(caster);
+        SetField(caster.jobs, "curJob", new Job { def = new JobDef { defName = "Regression_Work" } });
+        var ability = BoundaryAbility(comp, def);
+        comp.AbilityData.Powers.Add(ability);
+        var route = typeof(CompAbilityUserMagic).GetMethod("ResolvePlayerAutocastPowers", BindingFlags.Instance | BindingFlags.NonPublic)!;
+        var harmonyAssembly = Assembly.Load("0Harmony");
+        var harmonyType = harmonyAssembly.GetType("HarmonyLib.Harmony")!;
+        var harmonyMethod = harmonyAssembly.GetType("HarmonyLib.HarmonyMethod")!;
+        var harmony = Activator.CreateInstance(harmonyType, "rwom.regression.knowledge")!;
+        var evaluator = typeof(HealSpell).GetMethod("Evaluate")!;
+        var observer = Activator.CreateInstance(harmonyMethod, typeof(AutocastTests).GetMethod(nameof(ObserveDedicated), BindingFlags.Static | BindingFlags.NonPublic)!)!;
+        var patch = harmonyType.GetMethods().Single(m => m.Name == "Patch" && m.GetParameters().Length == 5);
+        patch.Invoke(harmony, [evaluator, observer, null, null, null]);
+        try
+        {
+            // The store says OFF while legacy says ON — the store wins.
+            dedicatedAttempts = 0;
+            InvokeRoute(route, comp);
+            Check.Equal(0, dedicatedAttempts, "knowledge autocast=false suppresses the dedicated family");
+
+            // The store says ON while legacy says OFF — the store wins.
+            saved.autocast = false;
+            entry.autocast = true;
+            dedicatedAttempts = 0;
+            InvokeRoute(route, comp);
+            Check.Equal(1, dedicatedAttempts, "knowledge autocast=true enables the dedicated family");
+            Check.Equal(0, ability.JobRequests, "failed evaluator never creates a job or falls back");
+        }
+        finally
+        {
+            harmonyType.GetMethod("UnpatchAll")!.Invoke(harmony, ["rwom.regression.knowledge"]);
+        }
+    }
+
 
     private static void CustomRegenerate(RuntimeFixture fixture)
     {

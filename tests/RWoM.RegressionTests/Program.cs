@@ -111,6 +111,11 @@ internal static class Program
         TorannMagic.ClassProgression.ClassProgressionFeature.Enabled = true;
         InstallProductionStatPatches();
         RuntimeFixture.Initialize();
+        // The game loads the optional core mod before any pawn ticks; mirror
+        // that here so CoreBridge's one-time assembly scan is deterministic
+        // regardless of test order.
+        string coreDll = Path.Combine(repo, "TorannMagic.Core", "Assemblies", "TorannMagic.Core.dll");
+        if (File.Exists(coreDll)) System.Reflection.Assembly.LoadFrom(coreDll);
         GrimoireTests.Initialize(repo);
         AutocastTests.Initialize(repo);
         DamageTests.Initialize();

@@ -26,7 +26,10 @@ namespace TorannMagic
             if (sleeping > 0)
             {
                 LastReportTick[pawn.thingIDNumber] = now;
-                Log.Message("[RWoM] " + pawn.LabelShortCap + ": " + sleeping
+                // LabelShortCap walks race/kind data a generated or exotic pawn
+                // may not have — this is a per-tick path and must never throw.
+                string label = pawn.kindDef == null ? "Pawn" + pawn.thingIDNumber : pawn.LabelShortCap;
+                Log.Message("[RWoM] " + label + ": " + sleeping
                     + " known spell(s) currently have no matching def (sleeping knowledge).");
             }
         }
