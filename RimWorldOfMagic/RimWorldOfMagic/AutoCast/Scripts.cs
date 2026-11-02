@@ -529,12 +529,16 @@ namespace TorannMagic.AutoCast
         public static void Evaluate(CompAbilityUserMagic casterComp, TMAbilityDef abilitydef, PawnAbility ability, MagicPower power, out bool success)
         {
             success = false;
+            // Ф1: a runtime wrapper lost to an update must not NRE the dispatcher.
+            if (ability == null || ability.Def == null) return;
             EvaluateMinSeverity(casterComp, abilitydef, ability, power, 0, out success);
         }
 
         public static void EvaluateMinSeverity(CompAbilityUserMagic casterComp, TMAbilityDef abilitydef, PawnAbility ability, MagicPower power, float minSeverity, out bool success)
         {
             success = false;
+            // Ф1: lost runtime wrapper guard (red bugs autocasting healing).
+            if (ability == null || ability.Def == null) return;
             if (casterComp.Mana.CurLevel >= casterComp.ActualManaCost(abilitydef) && ability.CooldownTicksLeft <= 0)
             {
                 Pawn caster = casterComp.Pawn;
@@ -601,12 +605,16 @@ namespace TorannMagic.AutoCast
         public static void Evaluate(CompAbilityUserMagic casterComp, TMAbilityDef abilitydef, PawnAbility ability, MagicPower power, out bool success)
         {
             success = false;
+            // Ф1: a runtime wrapper lost to an update must not NRE the dispatcher.
+            if (ability == null || ability.Def == null) return;
             EvaluateMinSeverity(casterComp, abilitydef, ability, power, 0, out success);
         }
 
         public static void EvaluateMinSeverity(CompAbilityUserMagic casterComp, TMAbilityDef abilitydef, PawnAbility ability, MagicPower power, float minSeverity, out bool success)
         {
             success = false;
+            // Ф1: lost runtime wrapper guard (red bugs autocasting healing).
+            if (ability == null || ability.Def == null) return;
             if (casterComp.Mana.CurLevel >= casterComp.ActualManaCost(abilitydef) && ability.CooldownTicksLeft <= 0)
             {
                 Pawn caster = casterComp.Pawn;

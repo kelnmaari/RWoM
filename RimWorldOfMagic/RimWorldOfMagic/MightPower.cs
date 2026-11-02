@@ -188,6 +188,8 @@ namespace TorannMagic
                 // old saves stored null for powers without legacy entries
                 this.autocasting = TMDefs.TM_AutocastDefaults.For(this.abilityDef as TMAbilityDef, true);
             }
+            // Ф1 sanitizer: purge null defs left by removed spell versions
+            SpellSanitizer.Sanitize(this);
         }
 
         public void LoadLegacyClassAutocast()

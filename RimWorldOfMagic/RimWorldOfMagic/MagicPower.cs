@@ -176,10 +176,16 @@ namespace TorannMagic
             Scribe_Values.Look<int>(ref this.ticksUntilNextCast, "ticksUntilNextCast", -1, false);
             Scribe_Collections.Look<AbilityDef>(ref this.TMabilityDefs, "TMabilityDefs", LookMode.Def, null);
             Scribe_Deep.Look<TMDefs.TM_Autocast>(ref this.autocasting, "autocasting", new object[0]);
-            if (Scribe.mode == LoadSaveMode.PostLoadInit && this.autocasting == null)
+            if (Scribe.mode == LoadSaveMode.PostLoadInit)
             {
                 // old saves stored null for powers without legacy entries
-                this.autocasting = TMDefs.TM_AutocastDefaults.For(this.abilityDef as TMAbilityDef, false);
+                if (this.autocasting == null)
+                {
+                    this.autocasting = TMDefs.TM_AutocastDefaults.For(this.abilityDef as TMAbilityDef, false);
+                }
+                // Ф1 sanitizer: spell defs removed by an update come back from the
+                // save as null entries — purge them before anything dereferences.
+                SpellSanitizer.Sanitize(this);
             }
         }
 
