@@ -2261,6 +2261,8 @@ DR: [5, 9, 13, 17, 20]%</TM_Golemancy_pwr_desc>
   <TM_ProgressionOpenGrimoireDesc>Открывает гримуар класса.</TM_ProgressionOpenGrimoireDesc>
   <TM_ProgressionEnrollMage>Стать магом (новая прогрессия)</TM_ProgressionEnrollMage>
   <TM_ProgressionEnrollMageDesc>Зачисление в экспериментальную новую систему прогрессии учеником мага.</TM_ProgressionEnrollMageDesc>
+  <TM_SleepingSpells>Неопределившиеся заклинания</TM_SleepingSpells>
+  <TM_SleepingSpellsDesc>Изученное заклинание, определение которого отсутствует в текущей версии. Пропускается автокастом и снова станет доступным, если заклинание вернётся.</TM_SleepingSpellsDesc>
   <TM_ProgressionBookUnavailable>Эта книга относится к новой системе прогрессии и не может быть использована без зачисления.</TM_ProgressionBookUnavailable>
   <TM_ProgressionStageLocked>Это заклинание закрыто ещё не достигнутой ступенью прогрессии.</TM_ProgressionStageLocked>
   <TM_ProgressionTrialDone>Испытание пройдено.</TM_ProgressionTrialDone>

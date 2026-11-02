@@ -124,11 +124,45 @@ namespace TorannMagic
                 {
                     y = DrawMightSection(view, y);
                 }
+
+                y = DrawSleepingSection(view, y);
             }
             finally
             {
                 Widgets.EndScrollView();
             }
+        }
+
+        // Ф4 step 4: knowledge entries whose def is gone render as grey cards;
+        // they wake up automatically if the def returns (or an XML spellId
+        // remaps them).
+        private float DrawSleepingSection(Rect view, float y)
+        {
+            List<SpellKnowledge> sleeping = GrimoireKnowledge.SleepingSpells(pawn);
+            if (sleeping.Count == 0)
+            {
+                return y;
+            }
+            Text.Font = GameFont.Medium;
+            Label(new Rect(0f, y, view.width, 26f), "TM_SleepingSpells".Translate().CapitalizeFirst(),
+                TextAnchor.MiddleLeft, TextGray);
+            y += 30f;
+            Text.Font = GameFont.Small;
+            foreach (SpellKnowledge spell in sleeping)
+            {
+                Rect card = new Rect(0f, y, view.width, 48f);
+                TorannMagic.Utils.TMIsekaiUI.Panel(card);
+                GUI.color = TextGray;
+                Label(new Rect(card.x + 10f, card.y + 6f, card.width - 20f, 22f),
+                    GrimoireKnowledge.DisplayName(spell.spellId), TextAnchor.MiddleLeft, TextGray);
+                Text.Font = GameFont.Tiny;
+                Label(new Rect(card.x + 10f, card.y + 28f, card.width - 20f, 16f),
+                    "TM_SleepingSpellsDesc".Translate(), TextAnchor.MiddleLeft, TextGray);
+                GUI.color = Color.white;
+                Text.Font = GameFont.Small;
+                y += card.height + 8f;
+            }
+            return y + 12f;
         }
 
         #region Magic

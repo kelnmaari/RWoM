@@ -2384,6 +2384,8 @@ Level 3: all 4 effects</TM_CombatDrugs_pwr_desc>
   <TM_ProgressionOpenGrimoireDesc>Open the class Grimoire.</TM_ProgressionOpenGrimoireDesc>
   <TM_ProgressionEnrollMage>Become a mage (new progression)</TM_ProgressionEnrollMage>
   <TM_ProgressionEnrollMageDesc>Enroll into the experimental new class progression as an apprentice mage.</TM_ProgressionEnrollMageDesc>
+  <TM_SleepingSpells>Unresolved spells</TM_SleepingSpells>
+  <TM_SleepingSpellsDesc>Known spell whose definition is missing from the current version. It is skipped by autocast and becomes usable again if the spell returns.</TM_SleepingSpellsDesc>
   <TM_ProgressionBookUnavailable>This book belongs to the new class progression and cannot be used without enrollment.</TM_ProgressionBookUnavailable>
   <TM_ProgressionStageLocked>This spell is locked behind a progression stage that has not been reached yet.</TM_ProgressionStageLocked>
   <TM_ProgressionTrialDone>Trial completed.</TM_ProgressionTrialDone>
