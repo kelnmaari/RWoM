@@ -7,6 +7,8 @@
     <spellId>rwom.tm_chaostradition</spellId>
     <iconPath>UI/ChaosTradition</iconPath>
     <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
+    <disableGizmoWhileUndrafted>false</disableGizmoWhileUndrafted>
+    <casterMustBeCapableOfViolence>false</casterMustBeCapableOfViolence>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
       <verbClass>TorannMagic.Verb_ChaosTradition</verbClass>
       <tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>

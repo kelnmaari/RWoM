@@ -12,6 +12,17 @@ internal static class ChaosProgressionTests
     const BindingFlags Flags = BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public;
     public static IEnumerable<TestCase> Cases()
     {
+        yield return new("ChaosProgression.PacifistCanRerollWhileUndrafted", f =>
+        {
+            var root = Path.Combine(f.Repository, "v1.7", "Defs", "AbilityDefs");
+            var bridge = System.Xml.Linq.XDocument.Load(Path.Combine(root, "Bridge", "Bridge_Abilities_TMagic_ChaosMage.xml"))
+                .Root!.Elements("AbilityDef").Single(e => (string?)e.Element("spellId") == "rwom.tm_chaostradition");
+            Check.Equal(false, (bool?)bridge.Element("disableGizmoWhileUndrafted") ?? true, "idle pawn can reroll");
+            Check.Equal(false, (bool?)bridge.Element("casterMustBeCapableOfViolence") ?? true, "pacifist can reroll");
+            var original = System.Xml.Linq.XDocument.Load(Path.Combine(root, "Abilities_TMagic_ChaosMage.xml"))
+                .Root!.Elements().Single(e => (string?)e.Element("defName") == "TM_ChaosTradition");
+            Check.Equal(false, (bool?)original.Element("MainVerb")?.Element("isViolent") ?? true, "live cast owner permits a pacifist");
+        });
         yield return new("ChaosProgression.RealTraditionCastRefundsWithoutSubtractingPermanentInvestment", f =>
         {
             var comp = Prepare(f); var data = comp.MagicData;
