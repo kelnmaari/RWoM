@@ -52,23 +52,36 @@ internal static class VanillaBridgeTests
         Check.Equal(false, VanillaBridgeSync.FamilyEnabled("rwom.custom.heal"), "foreign namespaces stay excluded");
     }
 
-    // Phase Б: our classic gizmo hides when the vanilla bridge provides one.
+    // Phase Б: our classic gizmo hides only when THIS pawn's vanilla tracker
+    // actually holds the bridge — an old save without the knowledge comp gets
+    // no bridges and must keep its classic gizmos (the fallback world).
     private static void LegacyGizmoHiddenForEnabled(RuntimeFixture f)
     {
         EnsureCoreLoaded(f);
         var def = Original("TM_HideGizmoA");
         CoreBridge.RegisterSpell(def);
-        Check.Equal(false, VanillaBridgeSync.ShouldHideLegacyGizmo(def), "no bridge def — classic gizmo stays");
+        Check.Equal(false, VanillaBridgeSync.ShouldHideLegacyGizmo(null, def), "no bridge def — classic gizmo stays");
 
         var bridge = BridgeDef("TM_Bridge_Hidegizmoa", "rwom.tm_hidegizmoa"); // matches the DisplayName convention
         DefDatabase<RimWorld.AbilityDef>.Clear();
         DefDatabase<RimWorld.AbilityDef>.Add(bridge);
         try
         {
-            Check.Equal(true, VanillaBridgeSync.ShouldHideLegacyGizmo(def), "enabled family with a bridge def hides the classic gizmo");
+            var pawn = BridgePawn();
+            pawn.abilities = new Pawn_AbilityTracker(pawn);
+
+            // Old-save shape: the bridge is NOT granted — the classic gizmo
+            // must stay visible even though the bridge def exists.
+            Check.Equal(false, VanillaBridgeSync.ShouldHideLegacyGizmo(pawn, def),
+                "a pawn without the granted bridge keeps its classic gizmo");
+
+            pawn.abilities.GainAbility(bridge);
+            Check.Equal(true, VanillaBridgeSync.ShouldHideLegacyGizmo(pawn, def),
+                "a pawn holding the granted bridge hides the classic gizmo");
+
             var other = Original("TM_HideGizmoB");
             CoreBridge.RegisterSpell(other);
-            Check.Equal(false, VanillaBridgeSync.ShouldHideLegacyGizmo(other), "spell without a bridge def keeps its classic gizmo");
+            Check.Equal(false, VanillaBridgeSync.ShouldHideLegacyGizmo(pawn, other), "spell without a bridge def keeps its classic gizmo");
         }
         finally
         {

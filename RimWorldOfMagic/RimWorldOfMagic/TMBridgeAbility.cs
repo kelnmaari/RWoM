@@ -80,6 +80,14 @@ namespace TorannMagic
             return false;
         }
 
+        // The bridge must not run the vanilla verb/warmup machinery — the cast
+        // path owns ticking through the companion's PawnAbility. Vanilla
+        // WarmupTick derefs job/verb state the bridge never sets (crashed on
+        // world pawns).
+        public override void AbilityTick()
+        {
+        }
+
         public override bool Activate(LocalTargetInfo target, LocalTargetInfo dest)
         {
             PawnAbility owner = Companion;

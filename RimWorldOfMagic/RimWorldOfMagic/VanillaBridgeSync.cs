@@ -52,14 +52,18 @@ namespace TorannMagic
             return false;
         }
 
-        // Phase Б: the classic gizmo hides when the vanilla tracker provides
-        // the bridge gizmo for this spell (family enabled + bridge def exists).
-        public static bool ShouldHideLegacyGizmo(TMAbilityDef def)
+        // Phase Б: the classic gizmo hides when THIS pawn's vanilla tracker
+        // actually holds the bridge ability (family enabled + bridge def +
+        // granted). A pawn without the grant — e.g. an old save whose comps
+        // predate the knowledge store — keeps its classic gizmos.
+        public static bool ShouldHideLegacyGizmo(Pawn pawn, TMAbilityDef def)
         {
             if (def == null) return false;
             string spellId = SpellIds.Of(def);
             if (!FamilyEnabled(spellId)) return false;
-            return BridgeDef(spellId) != null;
+            TMBridgeAbilityDef bridge = BridgeDef(spellId);
+            if (bridge == null) return false;
+            return pawn?.abilities?.GetAbility(bridge) != null;
         }
 
         private static TMBridgeAbilityDef BridgeDef(string spellId)

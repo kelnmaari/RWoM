@@ -14,7 +14,7 @@ namespace TorannMagic
         static void Postfix(PawnAbility __instance, ref bool __result)
         {
             if (!__result) return;
-            if (VanillaBridgeSync.ShouldHideLegacyGizmo(__instance.Def as TMAbilityDef))
+            if (VanillaBridgeSync.ShouldHideLegacyGizmo(__instance.AbilityUser?.Pawn, __instance.Def as TMAbilityDef))
             {
                 __result = false;
             }
