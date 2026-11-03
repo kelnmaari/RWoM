@@ -183,9 +183,9 @@ namespace TorannMagic
                 }
                 if (magicDef.requiredNeed != null)
                 {
-                    if (this.Pawn.needs != null && this.Pawn.needs.AllNeeds != null && this.Pawn.needs.TryGetNeed(this.magicDef.requiredNeed) != null)
+                    var nd = body.needs?.TryGetNeed(magicDef.requiredNeed);
+                    if (nd != null)
                     {
-                        Need nd = this.Pawn.needs.TryGetNeed(this.magicDef.requiredNeed);
                         if (nd is Need_Spirit spirit && ClassProgression.SpiritRebirthEnergy.Marked(this.Pawn))
                             spirit.SpendSpirit(ActualNeedCost(magicDef, this.MagicUser), deferCollapse: true);
                         else nd.CurLevel -= ActualNeedCost(magicDef, this.MagicUser);

@@ -1,0 +1,3 @@
+<Defs>
+  <JobDef><defName>TM_SpiritMindKiller</defName><driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass><reportString>releasing an empathic wail.</reportString></JobDef>
+</Defs>

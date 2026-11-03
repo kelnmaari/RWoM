@@ -83,6 +83,8 @@ internal static class EmpathTrialTests
     static void Mood(RuntimeFixture f)
     {
         using var w = new Fixture(f); var a = w.Ability();
+        var throughBody = typeof(EmpathTrials).GetMethod("CaptureMood", BindingFlags.NonPublic | BindingFlags.Static)!;
+        Check.Equal(true, throughBody.Invoke(null, [a, w.Target, w.Target]) == null, "a different caster without possession cannot credit the original");
         Check.Equal(true, EmpathTrials.CaptureMood(w.Ability(permanent: false), w.Target) == null, "nonpermanent copy/item runtime rejected");
         Check.Equal(false, EmpathTrials.CompleteMood(EmpathTrials.CaptureMood(a, w.Target)), "no mood delta rejected");
         Set(w.Target, "factionInt", w.Caster.Faction); Check.Equal(true, EmpathTrials.CaptureMood(a, w.Target) == null, "friendly fire excluded"); Set(w.Target, "factionInt", w.Enemy);

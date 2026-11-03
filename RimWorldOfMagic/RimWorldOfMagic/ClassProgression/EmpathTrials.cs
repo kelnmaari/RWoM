@@ -11,9 +11,9 @@ namespace TorannMagic.ClassProgression
         static MagicPower Owner(Pawn p, bool aura) => EmpathOwners.Resolve(Magic(p)?.MagicData)?.SingleOrDefault(x => x.learned && x.TMabilityDefs.Contains(aura ? TorannMagicDefOf.TM_SuppressiveAura : TorannMagicDefOf.TM_MindKiller));
         static bool Finite(float v) => !float.IsNaN(v) && !float.IsInfinity(v);
         static bool Caster(Pawn p) => p != null && !p.Dead && p.Spawned && p.Faction != null && p.story?.traits?.HasTrait(TorannMagicDefOf.Faceless) != true;
-        static DisciplineProgress Path(Pawn p, bool aura)
+        static DisciplineProgress Path(Pawn p, bool aura, Pawn body = null)
         {
-            if (!Caster(p) || !ClassIdentity.TryGetState(p, out var state) || (state.Vocation & Vocation.Mage) == 0
+            if (!Caster(body ?? p) || p == null || p.Dead || p.story?.traits?.HasTrait(TorannMagicDefOf.Faceless) == true || !ClassIdentity.TryGetState(p, out var state) || (state.Vocation & Vocation.Mage) == 0
                 || ClassIdentity.Profile("rwom.empath")?.domain != DisciplineDomain.Magic) return null;
             var path = state.Find("rwom.empath");
             return path?.Domain == DisciplineDomain.Magic && path.Stage == (aura ? InitiationStage.Adept : InitiationStage.Foundation)
@@ -26,7 +26,7 @@ namespace TorannMagic.ClassProgression
         static bool Enemy(Pawn c, Pawn p) => Target(c, p) && p.HostileTo(c) && (p.Faction == null ? p.InAggroMentalState : p.Faction != c.Faction && p.Faction.HostileTo(c.Faction));
         public sealed class MoodSnapshot
         {
-            internal Pawn caster, target;
+            internal Pawn caster, body, target;
             internal PawnAbility ability;
             internal Need_Mood mood;
             internal float before;
@@ -34,17 +34,21 @@ namespace TorannMagic.ClassProgression
             internal DisciplineProgress path;
             internal bool used;
         }
-        public static MoodSnapshot CaptureMood(PawnAbility ability, Pawn target)
+        public static MoodSnapshot CaptureMood(PawnAbility ability, Pawn target) => CaptureMood(ability,target,ability?.Pawn);
+
+        internal static MoodSnapshot CaptureMood(PawnAbility ability, Pawn target, Pawn body)
         {
-            var caster = ability?.Pawn; var path = Path(caster, false);
-            return path != null && Runtime(ability, false) && Enemy(caster, target) && Finite(target.needs.mood.CurLevel) && target.needs.mood.CurLevel > 0
-                ? new MoodSnapshot { caster = caster, target = target, ability = ability, mood = target.needs.mood, before = target.needs.mood.CurLevel, owner = Owner(caster, false), path = path } : null;
+            var caster = ability?.Pawn;
+            if (caster == null || SpiritRebirthCasting.SkillOwner(body,ability) != caster) return null;
+            var path = Path(caster, false, body);
+            return path != null && Runtime(ability, false) && Enemy(body, target) && Finite(target.needs.mood.CurLevel) && target.needs.mood.CurLevel > 0
+                ? new MoodSnapshot { caster = caster, body = body, target = target, ability = ability, mood = target.needs.mood, before = target.needs.mood.CurLevel, owner = Owner(caster, false), path = path } : null;
         }
         public static bool CompleteMood(MoodSnapshot s)
         {
             if (s == null || s.used) return false;
             s.used = true;
-            return Path(s.caster, false) == s.path && Owner(s.caster, false) == s.owner && Runtime(s.ability, false) && Enemy(s.caster, s.target)
+            return SpiritRebirthCasting.SkillOwner(s.body,s.ability) == s.caster && Path(s.caster, false, s.body) == s.path && Owner(s.caster, false) == s.owner && Runtime(s.ability, false) && Enemy(s.body, s.target)
                 && s.target.needs.mood == s.mood && Finite(s.mood.CurLevel) && s.mood.CurLevel >= 0 && s.mood.CurLevel < s.before && s.path.RecordCompletedTrial(FoundationTrialId);
         }
         public sealed class Activation
