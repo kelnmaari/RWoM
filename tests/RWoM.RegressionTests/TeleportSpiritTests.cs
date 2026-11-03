@@ -427,7 +427,8 @@ internal static partial class TeleportSpiritTests
             {
                 if (instruction.GetType().GetField("operand")!.GetValue(instruction) is not MethodBase called) continue;
                 yield return called;
-                if ((called.DeclaringType == typeof(TM_Teleport) || called.DeclaringType?.Name == "TM_TravelAutocast") && called.GetMethodBody() != null) pending.Push(called);
+                if ((called.DeclaringType == root.DeclaringType || called.DeclaringType == typeof(TM_Teleport) ||
+                    called.DeclaringType?.Name == "TM_TravelAutocast") && called.GetMethodBody() != null) pending.Push(called);
             }
         }
     }
