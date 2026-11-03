@@ -4,4 +4,5 @@
   <TM_SpiritFinishRitual>Completar el renacimiento interrumpido de {0}</TM_SpiritFinishRitual>
   <TM_SpiritRitualUnreachable>El nigromante necesita un cadáver, un círculo mayor, 300 de magicita y 50 de plata a su alcance.</TM_SpiritRitualUnreachable>
   <TM_SpiritRitualUnsafeEffect>{0} — no se puede separar {1} del cuerpo</TM_SpiritRitualUnsafeEffect>
+  <TM_SpiritRitualRenounceNecromancy>{0} renacerá como espíritu y renunciará para siempre a la clase de nigromante o liche y a sus hechizos. Conservará su nivel general, experiencia, puntos disponibles y habilidades normales. ¿Iniciar el ritual?</TM_SpiritRitualRenounceNecromancy>
 </LanguageData>

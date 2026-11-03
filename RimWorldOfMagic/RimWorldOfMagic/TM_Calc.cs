@@ -133,7 +133,9 @@ namespace TorannMagic
             return defName;
         }
 
-        public static bool IsUndead(Pawn pawn)
+        public static bool IsUndead(Pawn pawn) => IsUndead(pawn, false);
+
+        internal static bool IsUndead(Pawn pawn, bool ignoreLichForm)
         {
             if (pawn == null) return false;
 
@@ -142,7 +144,7 @@ namespace TorannMagic
             if (pawn.health?.hediffSet != null && pawn.health.hediffSet.hediffs.Any(hediff =>
                 hediff.def == TorannMagicDefOf.TM_UndeadAnimalHD
                 || hediff.def == TorannMagicDefOf.TM_UndeadHD
-                || hediff.def == TorannMagicDefOf.TM_LichHD
+                || (!ignoreLichForm && hediff.def == TorannMagicDefOf.TM_LichHD)
                 || hediff.def == TorannMagicDefOf.TM_UndeadStageHD
                 || hediff.def.defName.StartsWith("ROM_Vamp")
             ))

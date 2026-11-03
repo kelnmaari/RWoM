@@ -135,9 +135,12 @@ namespace TorannMagic.ClassProgression
                 }
         }
 
+        internal int NecromancyConsentJob = -1;
+
         public override void PostExposeData()
         {
             base.PostExposeData();
+            Scribe_Values.Look(ref NecromancyConsentJob, "TM_necromancyConsentJob", -1);
             if (Scribe.mode == LoadSaveMode.Saving && state == null && spiritRebirth == null && spiritRitual == null && tomeQuestAvailableAtTick == 0) return;
             Scribe_Deep.Look(ref state, "TM_classProgression");
             Scribe_Deep.Look(ref spiritRebirth, "TM_spiritRebirth");

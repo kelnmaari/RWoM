@@ -4,4 +4,5 @@
   <TM_SpiritFinishRitual>Завершити перерване переродження {0}</TM_SpiritFinishRitual>
   <TM_SpiritRitualUnreachable>Некроманту потрібні доступні тіло, велике коло, 300 магіциту та 50 срібла.</TM_SpiritRitualUnreachable>
   <TM_SpiritRitualUnsafeEffect>{0} — неможливо відокремити від тіла стан «{1}»</TM_SpiritRitualUnsafeEffect>
+  <TM_SpiritRitualRenounceNecromancy>{0} повернеться Духом і назавжди відмовиться від класу некроманта або ліча та його заклять. Загальний рівень, досвід, невитрачені очки та звичайні навички збережуться. Почати ритуал?</TM_SpiritRitualRenounceNecromancy>
 </LanguageData>

@@ -123,11 +123,12 @@ internal static class SpiritNativeResurrectionTests
             var relation = pawn.relations.DirectRelations.Single();
             var reciprocal = fixture.Other.relations.DirectRelations.Single();
             var progression = fixture.Comp; progression.BeginNewProgression(Vocation.WarriorMage);
-            progression.State.TryAddFoundation("rwom.necromancer", DisciplineDomain.Magic);
+            string formerClass = prepared == null ? "rwom.necromancer" : "rwom.priest";
+            progression.State.TryAddFoundation(formerClass, DisciplineDomain.Magic);
             var magic = fixture.Magic.MagicData; magic.MagicAbilityPoints = 17; magic.MagicUserXP = 1234;
-            var power = magic.MagicPowersN[0]; power.learned = true; power.level = 1;
+            var power = (prepared == null ? magic.MagicPowersN : magic.MagicPowersPR)[0]; power.learned = true; power.level = 1;
                         Hediff marker = cleanup
-                ? new Hediff_ClassDiscipline { pawn = pawn, Part = missingLimb, profileId = "rwom.necromancer", def = DefDatabase<HediffDef>.GetNamed("TM_ClassDiscipline") }
+                ? new Hediff_ClassDiscipline { pawn = pawn, Part = missingLimb, profileId = formerClass, def = DefDatabase<HediffDef>.GetNamed("TM_ClassDiscipline") }
                 : new IdentityHediff { pawn = pawn, def = new HediffDef { defName = "SpiritRetainedIdentity", everCurableByItem = false, keepOnBodyPartRestoration = true } };
             if (cleanup)
                 pawn.health.hediffSet.hediffs.AddRange(new Hediff[] {

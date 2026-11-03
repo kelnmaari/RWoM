@@ -4,4 +4,5 @@
   <TM_SpiritFinishRitual>Завершить прерванное перерождение {0}</TM_SpiritFinishRitual>
   <TM_SpiritRitualUnreachable>Некроманту нужны доступные тело, большой круг, 300 магицита и 50 серебра.</TM_SpiritRitualUnreachable>
   <TM_SpiritRitualUnsafeEffect>{0} — невозможно отделить от тела состояние «{1}»</TM_SpiritRitualUnsafeEffect>
+  <TM_SpiritRitualRenounceNecromancy>{0} вернётся Духом и навсегда откажется от класса некроманта или лича и его заклинаний. Общий уровень, опыт, свободные очки и обычные навыки сохранятся. Начать ритуал?</TM_SpiritRitualRenounceNecromancy>
 </LanguageData>

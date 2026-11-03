@@ -431,6 +431,7 @@ namespace TorannMagic
         public static TMAbilityDef TM_ConsumeCorpse_I;
         public static TMAbilityDef TM_ConsumeCorpse_II;
         public static TMAbilityDef TM_ConsumeCorpse_III;
+        public static TMAbilityDef TM_ConsumeCorpse_Mass;
         public static TMAbilityDef TM_CorpseExplosion;
         public static TMAbilityDef TM_CorpseExplosion_I;
         public static TMAbilityDef TM_CorpseExplosion_II;

@@ -38,6 +38,7 @@ namespace TorannMagic.ClassProgression
         private Map map;
         private List<Debit> debits = new List<Debit>();
         private bool attempted, converted, paid, completed, refundPending, recoveryRequired;
+        private bool renounceNecromancy;
         private static readonly HashSet<Pawn> inFlight = new HashSet<Pawn>();
         internal bool Attempted => attempted;
         internal bool Paid => paid;
@@ -71,6 +72,7 @@ namespace TorannMagic.ClassProgression
                 if (workTicks < SpiritRebirthRitualEligibility.RitualTicks || job == null || caster?.CurJob != job
                     || job.targetA.Thing != selectedCircle || caster.Position != selectedCircle?.InteractionCell
                     || SpiritRebirthRitualEligibility.Rejection(caster, selectedCircle, selectedCorpse, selectedOriginal) != SpiritRebirthRitualRejection.None
+                    || !SpiritNecromancyRenunciation.Allowed(job, selectedOriginal)
                     || !InventoryValid(selectedOriginal) || !InventoryValid(caster) || caster.carryTracker == null
                     || (caster.carryTracker.CarriedThing != null && caster.carryTracker.CarriedThing != selectedCorpse)
                     || !Reserved(caster, job, selectedCircle, 1) || !Reserved(caster, job, selectedCorpse, 1)
@@ -79,6 +81,7 @@ namespace TorannMagic.ClassProgression
 
                 var receipt = new SpiritRebirthRitualTransaction {
                     original = selectedOriginal, creator = caster, circle = selectedCircle,
+                    renounceNecromancy = SpiritNecromancyRenunciation.Required(selectedOriginal),
                     corpse = selectedCorpse, expectedJob = job, map = caster.Map,
                     debits = staged.Select(s => new Debit { source = s.thing, resource = s.thing.def, count = s.Count, sourceCell = s.thing.Position }).ToList()
                 };
@@ -138,6 +141,7 @@ namespace TorannMagic.ClassProgression
                     { refundPending = true; return; }
                 }
                 if (!EscrowIntact() || creator.CurJob != expectedJob
+                    || (SpiritNecromancyRenunciation.Required(original) && (!renounceNecromancy || !SpiritNecromancyRenunciation.Allowed(expectedJob, original)))
                     || SpiritRebirthRitualEligibility.Rejection(creator, circle, corpse, original) != SpiritRebirthRitualRejection.None
                     || !Reserved(creator, expectedJob, circle, 1) || !Reserved(creator, expectedJob, corpse, 1))
                 { refundPending = true; return; }
@@ -234,6 +238,7 @@ namespace TorannMagic.ClassProgression
                 // Payment commits conversion accounting, not gameplay release.
                 // Dormant remains until the full form/appearance pipeline exists.
                 if (!comp.EnsureSpiritRitualPending(this)) return SpiritRitualResult.RecoveryRequired;
+                if (renounceNecromancy) SpiritNecromancyRenunciation.Apply(original);
                 completed = true;
                 return SpiritRitualResult.ConvertedHeld;
             }
@@ -315,12 +320,13 @@ namespace TorannMagic.ClassProgression
         {
             ExposeReleaseData();
             Scribe_Values.Look(ref version, "version", 0);
-            Scribe_References.Look(ref original, "original"); Scribe_References.Look(ref creator, "creator");
+            Scribe_References.Look(ref original, "original", true); Scribe_References.Look(ref creator, "creator");
             Scribe_References.Look(ref circle, "circle"); Scribe_References.Look(ref corpse, "corpse");
             Scribe_References.Look(ref expectedJob, "job"); Scribe_References.Look(ref map, "map");
             Scribe_Collections.Look(ref debits, "debits", LookMode.Deep);
             Scribe_Values.Look(ref attempted, "attempted", false); Scribe_Values.Look(ref converted, "converted", false);
             Scribe_Values.Look(ref paid, "paid", false); Scribe_Values.Look(ref completed, "completed", false);
+            Scribe_Values.Look(ref renounceNecromancy, "renounceNecromancy");
             Scribe_Values.Look(ref refundPending, "refundPending", false); Scribe_Values.Look(ref recoveryRequired, "recoveryRequired", false);
         }
     }

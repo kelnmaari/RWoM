@@ -72,7 +72,7 @@ namespace TorannMagic.ClassProgression
                 || original.RaceProps?.Humanlike != true || !original.RaceProps.IsFlesh
                 || original.Faction != creator.Faction || !original.IsColonist)
                 return SpiritRebirthRitualRejection.CorpseNotDeadColonist;
-            if (TM_Calc.IsUndead(original)) return SpiritRebirthRitualRejection.CorpseUndead;
+            if (TM_Calc.IsUndead(original, SpiritNecromancyRenunciation.Required(original))) return SpiritRebirthRitualRejection.CorpseUndead;
             // Any existing marker, including unsupported versions, blocks repeat conversion.
             if (ClassIdentity.Component(original)?.SpiritRebirth != null)
                 return SpiritRebirthRitualRejection.CorpseAlreadyReborn;

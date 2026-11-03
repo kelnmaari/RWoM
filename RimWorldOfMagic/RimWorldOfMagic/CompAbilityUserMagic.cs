@@ -402,7 +402,7 @@ namespace TorannMagic
             get => powerModifier;
             set
             {
-                TM_MoteMaker.ThrowSiphonMote(Pawn.DrawPos, Pawn.Map, 1f);
+                if (Pawn.Spawned) TM_MoteMaker.ThrowSiphonMote(Pawn.DrawPos, Pawn.Map, 1f);
                 powerModifier = Mathf.Clamp(value, 0, maxPower);
 
                 if (powerModifier != 0 || powerEffecter == null) return;

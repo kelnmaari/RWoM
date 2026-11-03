@@ -35,12 +35,22 @@ namespace TorannMagic.ClassProgression
                         ? "TM_SpiritRitualUnsafeEffect".Translate(label, unsupported.def.LabelCap).ToString() : label.ToString(), null);
                     continue;
                 }
-                yield return new FloatMenuOption(label, () => {
+                var original = corpse.InnerPawn;
+                void Order(bool confirmed)
+                {
+                    if (corpse.InnerPawn != original) return;
                     var job = Create(creator,circle,corpse);
-                    if (job != null && SpiritRebirthHealthPlan.TryPrepare(corpse.InnerPawn,out _,out _) &&
+                    if (job != null && confirmed) SpiritNecromancyRenunciation.Confirm(job, original);
+                    if (job != null && SpiritRebirthHealthPlan.TryPrepare(original,out _,out _) &&
                         SpiritRebirthStaging.Discover(creator,job,circle,corpse) != null)
                         creator.jobs.TryTakeOrderedJob(job,JobTag.Misc);
                     else Messages.Message("TM_SpiritRitualUnreachable".Translate(), MessageTypeDefOf.RejectInput, false);
+                }
+                yield return new FloatMenuOption(label, () => {
+                    if (SpiritNecromancyRenunciation.Required(original))
+                        Find.WindowStack.Add(Dialog_MessageBox.CreateConfirmation(
+                            "TM_SpiritRitualRenounceNecromancy".Translate(original.LabelShortCap), () => Order(true)));
+                    else Order(false);
                 });
             }
         }

@@ -4,4 +4,5 @@
   <TM_SpiritFinishRitual>完成{0}中断的重生仪式</TM_SpiritFinishRitual>
   <TM_SpiritRitualUnreachable>死灵法师必须能到达遗体、大型法阵、300魔晶和50白银。</TM_SpiritRitualUnreachable>
   <TM_SpiritRitualUnsafeEffect>{0} — 无法将「{1}」与肉身分离</TM_SpiritRitualUnsafeEffect>
+  <TM_SpiritRitualRenounceNecromancy>{0} 将以灵体重生，永久放弃死灵法师或巫妖职业及其法术。总等级、经验、未用点数和普通技能将保留。开始仪式吗？</TM_SpiritRitualRenounceNecromancy>
 </LanguageData>

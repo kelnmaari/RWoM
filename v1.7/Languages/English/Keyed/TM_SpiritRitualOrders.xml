@@ -4,4 +4,5 @@
   <TM_SpiritFinishRitual>Complete the interrupted rebirth of {0}</TM_SpiritFinishRitual>
   <TM_SpiritRitualUnreachable>The necromancer needs a reachable corpse, large circle, 300 magicyte and 50 silver.</TM_SpiritRitualUnreachable>
   <TM_SpiritRitualUnsafeEffect>{0} — cannot separate {1} from the body</TM_SpiritRitualUnsafeEffect>
+  <TM_SpiritRitualRenounceNecromancy>{0} will return as a Spirit and permanently give up the Necromancer or Lich class and its spells. Their overall level, XP, unspent points and ordinary skills will be preserved. Proceed with the ritual?</TM_SpiritRitualRenounceNecromancy>
 </LanguageData>

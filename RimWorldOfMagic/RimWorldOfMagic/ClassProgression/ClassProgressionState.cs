@@ -33,6 +33,11 @@ namespace TorannMagic.ClassProgression
             this.vocation = vocation;
         }
 
+        internal void RenounceNecromancy()
+        {
+            if (disciplines.RemoveAll(path => path?.ClassId == "rwom.necromancer") > 0) revision++;
+        }
+
         public DisciplineProgress Find(string classId)
             => disciplines.Find(p => p != null && string.Equals(p.ClassId, classId, StringComparison.Ordinal));
 

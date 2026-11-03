@@ -78,6 +78,9 @@ namespace TorannMagic.ClassProgression
 
         private static bool IsKnownPhysical(Hediff effect)
         {
+            if (effect.def == TorannMagicDefOf.TM_LichHD && SpiritNecromancyRenunciation.Required(effect.pawn))
+                return effect.GetType() == typeof(HediffWithComps) && ((HediffWithComps)effect).comps?.All(c =>
+                    c is HediffComp_Lich || c is HediffComp_SeverityPerDay) == true;
             var type = effect.GetType();
             bool structural = type == typeof(Hediff_Injury) || type == typeof(Hediff_MissingPart)
                 || ((type == typeof(Hediff_AddedPart) || type == typeof(Hediff_Implant))

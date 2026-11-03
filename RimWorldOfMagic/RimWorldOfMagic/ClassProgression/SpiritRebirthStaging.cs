@@ -62,6 +62,7 @@ namespace TorannMagic.ClassProgression
             => pawn != null && job != null && job.targetA.Thing == circle && pawn.carryTracker != null
                 && pawn.carryTracker.CarriedThing == null && pawn.inventory?.innerContainer != null
                 && ReferenceEquals(pawn.inventory.innerContainer.Owner, pawn.inventory)
+                && SpiritNecromancyRenunciation.Allowed(job, corpse?.InnerPawn)
                 && SpiritRebirthRitualEligibility.Rejection(pawn, circle, corpse, corpse?.InnerPawn) == SpiritRebirthRitualRejection.None;
 
         internal static SpiritRebirthStaging Plan(Pawn pawn, Job job, Thing circle, Corpse corpse, List<Thing> magicyte, List<Thing> silver)
@@ -109,7 +110,8 @@ namespace TorannMagic.ClassProgression
 
         private bool ValidIdentity(Pawn pawn, Job job)
             => ReferenceEquals(pawn, creator) && ReferenceEquals(job, ownerJob)
-                && job?.targetA.Thing == circle && SpiritRebirthRitualEligibility.Rejection(pawn, circle, corpse, original) == SpiritRebirthRitualRejection.None;
+                && job?.targetA.Thing == circle && SpiritNecromancyRenunciation.Allowed(job, original)
+                && SpiritRebirthRitualEligibility.Rejection(pawn, circle, corpse, original) == SpiritRebirthRitualRejection.None;
         private bool ValidActor(Pawn pawn, Job job) => pawn != null && pawn.CurJob == job && ValidIdentity(pawn, job);
         internal static bool MapOwns(Thing thing, Map map)
             => thing != null && !thing.Destroyed && thing.Spawned && thing.Map == map
@@ -252,7 +254,7 @@ namespace TorannMagic.ClassProgression
 
         public void ExposeData()
         {
-            Scribe_References.Look(ref creator, "creator"); Scribe_References.Look(ref original, "original");
+            Scribe_References.Look(ref creator, "creator"); Scribe_References.Look(ref original, "original", true);
             Scribe_References.Look(ref circle, "circle"); Scribe_References.Look(ref corpse, "corpse"); Scribe_References.Look(ref ownerJob, "job");
             Scribe_Collections.Look(ref trips, "trips", LookMode.Deep);
         }

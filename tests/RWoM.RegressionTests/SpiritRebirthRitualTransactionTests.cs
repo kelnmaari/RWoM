@@ -14,6 +14,37 @@ internal static class SpiritRebirthRitualTransactionTests
     static readonly Type Transaction = typeof(SpiritRebirthState).Assembly.GetType("TorannMagic.ClassProgression.SpiritRebirthRitualTransaction", true)!;
     public static IEnumerable<TestCase> Cases()
     {
+        yield return new("SpiritRitualTransaction.NecromancerNeedsPersonalRenunciation", r => Run(r,c =>
+        {
+            var component = c.Original.GetComp<CompClassProgression>();
+            var path = new ClassProgressionState(Vocation.Mage);
+            Set(component,"state",path);
+            Check.Equal(true,path.TryAddFoundation("rwom.necromancer",DisciplineDomain.Magic),"seed native necromancer");
+            var data = c.Original.GetCompAbilityUserMagic().MagicData;
+            var power = data.MagicPowersN.First(p=>p.TMabilityDefs.Contains(TorannMagicDefOf.TM_RaiseUndead));
+            power.learned=true;
+            var priest=data.MagicPowersPR[0]; priest.learned=true; priest.level=2;
+            var magic=c.Original.GetCompAbilityUserMagic();
+            Set(magic,"powerModifier",2);
+            var servant=PawnWithComps(false,false).pawn; magic.supportedUndead.Add(servant);
+            int level=data.MagicUserLevel, xp=data.MagicUserXP, points=data.MagicAbilityPoints;
+            Check.Equal("Rejected",c.Execute(),"no explicit renunciation");
+            var policy = Transaction.Assembly.GetType("TorannMagic.ClassProgression.SpiritNecromancyRenunciation",true)!;
+            var confirm = policy.GetMethod("Confirm",BindingFlags.Static | BindingFlags.NonPublic)!;
+            confirm.Invoke(null,[c.Job,c.Creator]);
+            Check.Equal("Rejected",c.Execute(),"consent belonging to another pawn");
+            Check.Equal(true,c.Original.Dead && !c.Corpse.Destroyed && power.learned && path.Find("rwom.necromancer")!=null,"rejection preserves corpse and class");
+            confirm.Invoke(null,[c.Job,c.Original]);
+            Check.Equal("ConvertedHeld",c.Execute(),"consented original completes paid native conversion");
+            Check.Equal(true,path.Find("rwom.necromancer")==null && !power.learned,"only the renounced class is removed");
+            Check.Equal(true,priest.learned && priest.level==2,"unrelated paid spell untouched");
+            Check.Equal(0,magic.PowerModifier,"former lich charges cleared");
+            Check.Equal(true,magic.supportedUndead.Contains(servant),"existing summoned bond preserved");
+            Check.Equal(level,data.MagicUserLevel,"overall level preserved");
+            Check.Equal(xp,data.MagicUserXP,"overall XP preserved");
+            Check.Equal(points,data.MagicAbilityPoints,"available points preserved");
+            Check.Equal("ConvertedHeld",c.Execute(),"repeat completion is idempotent");
+        }));
         yield return new("SpiritRitualTransaction.NativeConversionPaymentAndDuplicate", r => Run(r, Success));
         yield return new("SpiritRitualTransaction.ExactJobReservationAndInterruptedWork", r => Run(r, Rejected));
         yield return new("SpiritRitualTransaction.ExceptionAfterDetachKeepsActualPawn", r => Run(r, ExceptionAfterDetach));
