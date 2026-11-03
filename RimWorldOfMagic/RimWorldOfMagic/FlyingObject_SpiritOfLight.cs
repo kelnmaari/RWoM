@@ -327,6 +327,20 @@ namespace TorannMagic
             Scribe_Values.Look<float>(ref this.lightEnergy, "lightEnergy", 0f, false);
             Scribe_Values.Look<IntVec3>(ref this.glowCenter, "glowCenter", default(IntVec3), false);
             Scribe_Values.Look<bool>(ref this.glowing, "glowing", false, false);
+            Scribe_Values.Look(ref shouldGlow, "TM_solWantsGlow", glowing, true);
+            Scribe_Values.Look(ref shouldDismiss, "TM_solWantsDismiss");
+            Scribe_Values.Look(ref speed, "TM_solSpeed", 9f);
+            Scribe_Values.Look(ref delayCount, "TM_solActionDelay");
+            Scribe_Values.Look(ref spinning, "TM_solSpin");
+            Scribe_Values.Look(ref curveVariance, "TM_solCurveVariance");
+            Scribe_Values.Look(ref destinationCurvePoint, "TM_solCurveIndex");
+            Scribe_Collections.Look(ref curvePoints, "TM_solCurvePoints", LookMode.Value);
+            if (Scribe.mode == LoadSaveMode.PostLoadInit)
+            {
+                if (curvePoints == null) curvePoints = new List<Vector3>();
+                if (curvePoints.Count == 0) curveVariance = 0f;
+                destinationCurvePoint = Mathf.Clamp(destinationCurvePoint, 0, Mathf.Max(0,curvePoints.Count - 1));
+            }
         }
 
         protected override void DrawAt(Vector3 drawLoc, bool flip = false)
@@ -463,7 +477,7 @@ namespace TorannMagic
             if (!pawn.DestroyedOrNull())
             {
                 CompAbilityUserMagic comp = pawn.GetCompAbilityUserMagic();
-                comp.SoL = null;
+                if (comp?.SoL == this) comp.SoL = null;
             }
             base.Destroy(mode);
         }

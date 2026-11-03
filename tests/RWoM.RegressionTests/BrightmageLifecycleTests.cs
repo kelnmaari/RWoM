@@ -229,6 +229,14 @@ internal static class BrightmageLifecycleTests
         var priorDefs = DefDatabase<ThingDef>.AllDefsListForReading.ToArray();
         DefDatabase<ThingDef>.Add(spirit.def);
         Set(spirit, "pawn", p.pawn); Set(spirit, "age", 240);
+        spirit.shouldDismiss = true;
+        spirit.shouldGlow = true;
+        spirit.spinning = true;
+        spirit.delayCount = 17;
+        var curve = new List<UnityEngine.Vector3>{new(3,0,8),new(4,0,8),new(5,0,9)};
+        Set(spirit,"curvePoints",curve);
+        Set(spirit,"destinationCurvePoint",1);
+        Set(spirit,"speed",18f);
         spirit.glowCenter = new IntVec3(12, 0, 14);
         string path = Path.Combine(runtime.WorkingDirectory, "bright-native-spirit.xml");
         try
@@ -250,6 +258,11 @@ internal static class BrightmageLifecycleTests
             Check.Equal(47f, loaded.LightEnergy, "native spirit energy saved");
             Check.Equal(SoLAction.Guarding, loaded.solAction, "native active action saved");
             Check.Equal(SoLAction.Glow, loaded.queuedAction, "native queued action saved");
+            Check.Equal(true,loaded.shouldDismiss && loaded.shouldGlow && loaded.spinning,"pending dismissal, lighting and spin survive");
+            Check.Equal(17,loaded.delayCount,"action delay survives");
+            Check.Equal(18f,(float)typeof(FlyingObject_SpiritOfLight).GetField("speed",Fields)!.GetValue(loaded)!,"current flight speed survives");
+            Check.Equal(1,(int)typeof(FlyingObject_SpiritOfLight).GetField("destinationCurvePoint",Fields)!.GetValue(loaded)!,"current curve segment survives");
+            Check.Equal(true,((List<UnityEngine.Vector3>)typeof(FlyingObject_SpiritOfLight).GetField("curvePoints",Fields)!.GetValue(loaded)!).SequenceEqual(curve),"exact trajectory survives");
             Check.Equal(240, (int)typeof(FlyingObject_SpiritOfLight).GetField("age", Fields)!.GetValue(loaded)!, "native age retained");
             p.magic.SoL = loaded; p.magic.spell_EqualizeLight = true;
             BrightmageLifecycle.Restore(p.magic); BrightmageLifecycle.Restore(p.magic);
@@ -257,6 +270,22 @@ internal static class BrightmageLifecycleTests
             Check.Equal(47f, loaded.LightEnergy, "loaded spirit not refilled or spent by maintenance");
             Check.Equal(SoLAction.Guarding, loaded.solAction, "loaded action not reset by maintenance");
             Check.Equal(1, Controls(p.magic), "loaded spirit repairs stale true control once");
+            var old = System.Xml.Linq.XDocument.Load(path);
+            foreach (var field in old.Descendants().Where(x=>x.Name.LocalName.StartsWith("TM_sol",StringComparison.Ordinal)).ToArray())
+                field.Remove();
+            var oldFile=Path.Combine(runtime.WorkingDirectory,"bright-native-spirit-old.xml");
+            old.Save(oldFile);
+            envelope=null!;
+            try
+            {
+                Scribe.loader.InitLoading(oldFile); Scribe_Deep.Look(ref envelope,"native");
+                var directory=(LoadedObjectDirectory)typeof(CrossRefHandler).GetField("loadedObjectDirectory",Fields)!.GetValue(Scribe.loader.crossRefs)!;
+                directory.RegisterLoaded(p.pawn); Scribe.loader.FinalizeLoading();
+            }
+            finally { Scribe.ForceStop(); }
+            Check.Equal(false,envelope.Spirit.shouldDismiss,"old save does not invent a dismissal");
+            Check.Equal(0,((List<UnityEngine.Vector3>)typeof(FlyingObject_SpiritOfLight).GetField("curvePoints",Fields)!.GetValue(envelope.Spirit)!).Count,"old save has a valid empty trajectory");
+            Check.Equal(47f,envelope.Spirit.LightEnergy,"old save keeps original energy");
         }
         finally
         {
