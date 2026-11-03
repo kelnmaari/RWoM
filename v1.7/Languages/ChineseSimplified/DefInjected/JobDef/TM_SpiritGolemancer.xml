@@ -8,4 +8,6 @@
   <TM_SpiritDispelBranding.reportString>正在驱散烙印。</TM_SpiritDispelBranding.reportString>
   <TM_SpiritSigilSurge.reportString>正在强化烙印。</TM_SpiritSigilSurge.reportString>
   <TM_SpiritSigilDrain.reportString>正在反转烙印。</TM_SpiritSigilDrain.reportString>
+  <TM_SpiritLivingWall.reportString>正在活化墙体。</TM_SpiritLivingWall.reportString>
+  <TM_SpiritDispelLivingWall.reportString>正在解除活墙附魔。</TM_SpiritDispelLivingWall.reportString>
 </LanguageData>

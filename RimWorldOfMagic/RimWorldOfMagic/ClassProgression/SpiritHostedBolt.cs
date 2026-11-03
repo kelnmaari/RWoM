@@ -109,6 +109,8 @@ namespace TorannMagic.ClassProgression
             ("TM_SpiritProtectionBrand", () => TorannMagicDefOf.TM_ProtectionBrand, typeof(Verb_BrandProtection)),
             ("TM_SpiritVitalityBrand", () => TorannMagicDefOf.TM_VitalityBrand, typeof(Verb_BrandVitality)),
             ("TM_SpiritSiphonBrand", () => TorannMagicDefOf.TM_SiphonBrand, typeof(Verb_BrandSiphon)),
+            ("TM_SpiritLivingWall", () => TorannMagicDefOf.TM_LivingWall, typeof(Verb_LivingWall)),
+            ("TM_SpiritDispelLivingWall", () => TorannMagicDefOf.TM_DispelLivingWall, typeof(Verb_DispelLivingWall)),
             ("TM_SpiritSigilSurge", () => TorannMagicDefOf.TM_SigilSurge, typeof(Verb_SigilSurge)),
             ("TM_SpiritSigilDrain", () => TorannMagicDefOf.TM_SigilDrain, typeof(Verb_SigilDrain)),
             ("TM_SpiritDispelBranding", () => TorannMagicDefOf.TM_DispelBranding, typeof(Verb_DispelBranding)),
@@ -262,6 +264,7 @@ namespace TorannMagic.ClassProgression
             }
             float cost = power.MagicUser.ActualManaCost(def);
             if (def == TorannMagicDefOf.TM_Recall && (!TM_Action.RecallMatches(body,power.MagicUser) || power.MagicUser.recallExpiration <= Verse.Find.TickManager.TicksGame)) return false;
+            if (def == TorannMagicDefOf.TM_DispelLivingWall && (power.MagicUser.livingWall?.Spawned != true || power.MagicUser.livingWall.CasterPawn != power.Pawn)) return false;
             if (def == TorannMagicDefOf.TM_DispelBranding && power.MagicUser.BrandPawns.Count == 0) return false;
             if (def == TorannMagicDefOf.TM_DispelEnchantWeapon && (power.MagicUser.weaponEnchants?.Count ?? 0) == 0) return false;
             if (def == TorannMagicDefOf.TM_DismissEnchanterStones && power.MagicUser.enchanterStones?.Any(s => !s.DestroyedOrNull()) != true) return false;
@@ -286,6 +289,7 @@ namespace TorannMagic.ClassProgression
                 (target.HasThing && target.Thing.Map != body.Map) ||
                 !power.magicDef.MainVerb.targetParams.CanTarget(target.ToTargetInfo(body.Map))) return false;
             if (power.magicDef == TorannMagicDefOf.TM_EnchantWeapon && target.Pawn?.equipment?.Primary?.def.IsMeleeWeapon != true) return false;
+            if (power.magicDef == TorannMagicDefOf.TM_LivingWall && Verb_LivingWall.Segment(body,target) == null) return false;
             if (power.magicDef == TorannMagicDefOf.TM_EnchanterStone && Verb_EnchanterStone.Source(body, power.Pawn, target) == null) return false;
             if (power.magicDef == TorannMagicDefOf.TM_Transmutate && Verb_Transmutate.Source(body, power.Pawn, target) == null) return false;
             if (power.magicDef == TorannMagicDefOf.TM_Sentinel && target.Cell.GetFirstBuilding(body.Map) is Building existing &&
@@ -354,6 +358,7 @@ namespace TorannMagic.ClassProgression
                 }
                 var order = JobMaker.MakeJob(job, target, soul);
                 if (def == TorannMagicDefOf.TM_EnchantWeapon) order.targetC = target.Pawn.equipment.Primary;
+                if (def == TorannMagicDefOf.TM_LivingWall) order.targetC = Verb_LivingWall.Segment(body,target);
                 if (def == TorannMagicDefOf.TM_EnchanterStone) order.targetC = Verb_EnchanterStone.Source(body, soul, target);
                 if (def == TorannMagicDefOf.TM_Transmutate) order.targetC = Verb_Transmutate.Source(body, soul, target);
                 void Submit() => body.jobs.TryTakeOrderedJob(order, JobTag.Misc);
@@ -395,7 +400,7 @@ namespace TorannMagic.ClassProgression
             var props = power.magicDef.MainVerb;
             var verb = PhysicalVerb(body, power);
             if (verb is Verb_EnchantWeapon && target.Pawn?.equipment?.Primary != body.CurJob?.targetC.Thing) return false;
-            if (verb is Verb_Transmutate || verb is Verb_EnchanterStone)
+            if (verb is Verb_Transmutate || verb is Verb_EnchanterStone || verb is Verb_LivingWall)
             {
                 var source = body.CurJob?.targetC.Thing;
                 if (source?.Spawned != true || source.Map != body.Map || source.Position != target.Cell) return false;
@@ -427,7 +432,7 @@ namespace TorannMagic.ClassProgression
             if (verb is Verb_SpiritTargetable direct && Families.Any(f => f.spell() == def && f.effect == props.verbClass))
             {
                 bool travel = Odyssey.ManualTravelSafety.IsTravel(power);
-                if (!travel && !(verb is Verb_EnchanterStone) && !(verb is Verb_Transmutate) && !(verb is Verb_SummonGuardianSpirit) && !(verb is Verb_SummonTotem) && !(verb is Verb_ReverseTime) && !(verb is Verb_EarthSprites) && !(verb is Verb_Summon) && !(verb is Verb_SummonSpiritWolves) && !(verb is Verb_RegrowLimb) && !(verb is ISpiritCorpseConsumer) && !(verb is Verb_Overdrive) && !(verb is Verb_TechnoWeapon) &&
+                if (!travel && !(verb is Verb_LivingWall) && !(verb is Verb_EnchanterStone) && !(verb is Verb_Transmutate) && !(verb is Verb_SummonGuardianSpirit) && !(verb is Verb_SummonTotem) && !(verb is Verb_ReverseTime) && !(verb is Verb_EarthSprites) && !(verb is Verb_Summon) && !(verb is Verb_SummonSpiritWolves) && !(verb is Verb_RegrowLimb) && !(verb is ISpiritCorpseConsumer) && !(verb is Verb_Overdrive) && !(verb is Verb_TechnoWeapon) &&
                     props.AbilityTargetCategory != AbilityTargetCategory.TargetAoE && !(target.Thing is Pawn { Dead: false }))
                     return false;
                 var soundPosition = new TargetInfo(body.Position, body.Map);

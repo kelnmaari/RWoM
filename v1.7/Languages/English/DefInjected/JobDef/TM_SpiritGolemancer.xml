@@ -8,4 +8,6 @@
   <TM_SpiritDispelBranding.reportString>dispelling brands.</TM_SpiritDispelBranding.reportString>
   <TM_SpiritSigilSurge.reportString>surging the brands.</TM_SpiritSigilSurge.reportString>
   <TM_SpiritSigilDrain.reportString>inverting the brands.</TM_SpiritSigilDrain.reportString>
+  <TM_SpiritLivingWall.reportString>animating a wall.</TM_SpiritLivingWall.reportString>
+  <TM_SpiritDispelLivingWall.reportString>dispelling a living wall.</TM_SpiritDispelLivingWall.reportString>
 </LanguageData>

@@ -92,6 +92,13 @@ namespace TorannMagic.ClassProgression
             else if (comp.AbilityData.Powers.Any(p => p?.Def == ability)) comp.RemovePawnAbility(ability);
         }
 
+        internal static void SyncWallControl(CompAbilityUserMagic comp)
+        {
+            if (comp == null) return;
+            if (comp.livingWall.DestroyedOrNull()) comp.livingWall = null;
+            SetControl(comp, TorannMagicDefOf.TM_DispelLivingWall, comp.livingWall != null && comp.livingWall.CasterPawn == comp.Pawn);
+        }
+
         public static bool Restore(CompAbilityUserMagic comp)
         {
             if (SpiritRebirthBodyEffects.SuppressFormerBodyEffects(comp?.Pawn)) return true;
@@ -109,9 +116,7 @@ namespace TorannMagic.ClassProgression
                 { pawns.RemoveAt(i); defs.RemoveAt(i); }
             }
             SetControl(comp, TorannMagicDefOf.TM_DispelBranding, pawns.Count > 0);
-            if (comp.livingWall != null && comp.livingWall.Destroyed) comp.livingWall = null;
-            SetControl(comp, TorannMagicDefOf.TM_DispelLivingWall,
-                comp.livingWall != null && comp.livingWall.CasterPawn == comp.Pawn);
+            SyncWallControl(comp);
             return true;
         }
 

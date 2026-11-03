@@ -8,4 +8,6 @@
   <TM_SpiritDispelBranding.reportString>disipando marcas.</TM_SpiritDispelBranding.reportString>
   <TM_SpiritSigilSurge.reportString>potenciando las marcas.</TM_SpiritSigilSurge.reportString>
   <TM_SpiritSigilDrain.reportString>invirtiendo las marcas.</TM_SpiritSigilDrain.reportString>
+  <TM_SpiritLivingWall.reportString>animando una pared.</TM_SpiritLivingWall.reportString>
+  <TM_SpiritDispelLivingWall.reportString>disipando una pared viva.</TM_SpiritDispelLivingWall.reportString>
 </LanguageData>

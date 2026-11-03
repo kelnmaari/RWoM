@@ -6602,7 +6602,7 @@ namespace TorannMagic
                 }
                 _mpRegenRateUpkeep += brandCost; 
             }
-            if(this.livingWall != null && livingWall.Spawned)
+            if (livingWall?.Spawned == true && livingWall.CasterPawn == Pawn)
             {
                 _maxMPUpkeep += (TorannMagicDefOf.TM_LivingWall.upkeepEnergyCost * (1f - (TorannMagicDefOf.TM_LivingWall.upkeepEfficiencyPercent * (applyOriginalBody ? this.MagicData.GetSkill_Efficiency(TorannMagicDefOf.TM_LivingWall).level : ClassProgression.SpiritRebirthRuntime.SavedRank(this.MagicData, TorannMagicDefOf.TM_LivingWall, "_eff")))));
             }
@@ -7073,6 +7073,8 @@ namespace TorannMagic
             {
                 TM_PawnTracker.ResolveMagicComp(this);
                 RecoverMissingProgression();
+                if (livingWall != null && ClassProgression.SpiritRebirthEnergy.Marked(Pawn))
+                    LongEventHandler.ExecuteWhenFinished(() => ClassProgression.GolemancerLifecycle.SyncWallControl(this));
                 if (brands?.Count > 0 && ClassProgression.SpiritRebirthEnergy.Marked(Pawn))
                     LongEventHandler.ExecuteWhenFinished(() => ClassProgression.GolemancerLifecycle.SyncBrandControl(this));
                 if (weaponEnchants?.Count > 0) LongEventHandler.ExecuteWhenFinished(SyncEnchantWeaponControl);

@@ -8,4 +8,6 @@
   <TM_SpiritDispelBranding.reportString>снимает клейма.</TM_SpiritDispelBranding.reportString>
   <TM_SpiritSigilSurge.reportString>усиливает клейма.</TM_SpiritSigilSurge.reportString>
   <TM_SpiritSigilDrain.reportString>обращает действие клейм.</TM_SpiritSigilDrain.reportString>
+  <TM_SpiritLivingWall.reportString>оживляет стену.</TM_SpiritLivingWall.reportString>
+  <TM_SpiritDispelLivingWall.reportString>снимает чары с живой стены.</TM_SpiritDispelLivingWall.reportString>
 </LanguageData>
