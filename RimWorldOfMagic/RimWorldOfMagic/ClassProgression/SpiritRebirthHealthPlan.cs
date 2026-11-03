@@ -97,12 +97,18 @@ namespace TorannMagic.ClassProgression
                 && component == typeof(Enchantment.HediffComp_Enchantment);
         }
 
+        private static readonly Dictionary<string, Type> physicalClassEffects = new Dictionary<string, Type> {
+            { "TM_BloodHD", typeof(HediffComp_Blood) }, { "TM_CrowInsightHD", typeof(HediffComp_CrowInsight) },
+            { "TM_EmpathHD", typeof(HediffComp_Empath) }, { "TM_SuppressiveAuraHD", typeof(HediffComp_SuppressiveAura) },
+            { "TM_EmotionSuppressionHD", typeof(HediffComp_SeverityPerDay) }, { "TM_HarvestPassionHD", typeof(HediffComp_HarvestPassion) },
+            { "TM_OutOfBodyHD", typeof(HediffComp_SymbiosisCaster) }, { "TM_SymbiosisHD", typeof(HediffComp_SymbiosisHost) }
+        };
+
         private static bool IsKnownPhysical(Hediff effect)
         {
-            if (effect.def.defName == "TM_BloodHD" || effect.def.defName == "TM_CrowInsightHD")
+            if (physicalClassEffects.TryGetValue(effect.def.defName, out var expected))
             {
                 var def = effect.def;
-                var expected = def.defName == "TM_BloodHD" ? typeof(HediffComp_Blood) : typeof(HediffComp_CrowInsight);
                 return ReferenceEquals(DefDatabase<HediffDef>.GetNamedSilentFail(def.defName), def) &&
                     def.hediffClass == typeof(HediffWithComps) && effect.GetType() == def.hediffClass &&
                     effect.Part == null && def.comps?.Count == 1 && def.comps[0]?.compClass == expected &&
@@ -133,7 +139,12 @@ namespace TorannMagic.ClassProgression
                 || !pawn.health.hediffSet.hediffs.SequenceEqual(original)
                 || physical.Any(h => h.pawn != pawn || !IsKnownPhysical(h))) return false;
             attempted = true;
-            foreach (var effect in physical) pawn.health.RemoveHediff(effect);
+            foreach (var effect in physical)
+            {
+                if (effect.def.defName == "TM_OutOfBodyHD") effect.TryGetComp<HediffComp_SymbiosisCaster>().RemoveHostHediff();
+                if (effect.def.defName == "TM_SymbiosisHD") effect.TryGetComp<HediffComp_SymbiosisHost>().RemoveSymbioteHediff();
+                pawn.health.RemoveHediff(effect);
+            }
             return original.Except(physical).All(h => pawn.health.hediffSet.hediffs.Contains(h))
                 && physical.All(h => !pawn.health.hediffSet.hediffs.Contains(h));
         }
