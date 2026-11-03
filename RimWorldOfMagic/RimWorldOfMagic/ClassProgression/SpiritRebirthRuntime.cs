@@ -18,7 +18,94 @@ namespace TorannMagic.ClassProgression
             lastTick = now;
             return true;
         }
-        public void ExposeData() => Scribe_Values.Look(ref lastTick, "lastTick", -1);
+        private Dictionary<string, int> remaining;
+        private Dictionary<string, int> pending;
+        private List<string> retainedMartial;
+        private List<string> pendingMartial;
+
+        private static TMAbilityDef LearnedMartial(MightData data, string name)
+        {
+            bool sprint = name == "TM_Sprint" || name == "TM_Sprint_I" || name == "TM_Sprint_II" || name == "TM_Sprint_III";
+            TMAbilityDef def = name == "TM_FirstAid" ? TorannMagicDefOf.TM_FirstAid :
+                name == "TM_PommelStrike" ? TorannMagicDefOf.TM_PommelStrike :
+                name == "TM_GearRepair" ? TorannMagicDefOf.TM_GearRepair :
+                name == "TM_InnerHealing" ? TorannMagicDefOf.TM_InnerHealing :
+                name == "TM_StrongBack" ? TorannMagicDefOf.TM_StrongBack :
+                name == "TM_HeavyBlow" ? TorannMagicDefOf.TM_HeavyBlow :
+                name == "TM_ThickSkin" ? TorannMagicDefOf.TM_ThickSkin :
+                name == "TM_FightersFocus" ? TorannMagicDefOf.TM_FightersFocus :
+                sprint ? DefDatabase<TMAbilityDef>.GetNamedSilentFail(name) : null;
+            if (def == null) return null;
+            var rows = name == "TM_FirstAid" ? data?.mightPowerSS : sprint ? data?.mightPowerG : data?.mightPowerStandalone;
+            return rows?.Count(p => p?.learned == true && p.TMabilityDefs?.Count > 0 &&
+                p.TMabilityDefs[Math.Max(0,Math.Min(p.level,p.TMabilityDefs.Count - 1))] == def) == 1 ? def : null;
+        }
+
+        internal static bool TracksCooldowns(Pawn pawn)
+        {
+            // Saves retain progression data even while the beta gameplay facade is disabled.
+            var progression = pawn?.AllComps?.OfType<CompClassProgression>().FirstOrDefault();
+            return progression?.SpiritRebirth != null || progression?.State?.Version == ClassProgressionState.CurrentVersion &&
+                progression.State.Vocation != Vocation.None;
+        }
+
+        internal void CaptureCooldowns(CompAbilityUser owner)
+        {
+            remaining = pending == null ? null : new Dictionary<string, int>(pending);
+            retainedMartial = pendingMartial;
+            if (owner is CompAbilityUserMight might && SpiritRebirthEnergy.Marked(might.Pawn))
+            {
+                var owned = owner.AbilityData.Powers.OfType<MightAbility>()
+                    .Where(power => ReferenceEquals(power.AbilityUser, owner) && power.Def != null &&
+                        LearnedMartial(might.ExistingMightData, power.Def.defName) == power.Def)
+                    .Select(power => power.Def.defName).Distinct().ToList();
+                retainedMartial = owned.Count > 0 ? owned : null;
+            }
+            foreach (var power in owner.AbilityData.Powers)
+            {
+                if (power?.Def == null || !ReferenceEquals(power.AbilityUser, owner) || power.CooldownTicksLeft <= 0) continue;
+                remaining ??= new Dictionary<string, int>();
+                remaining.TryGetValue(power.Def.defName, out int previous);
+                remaining[power.Def.defName] = Math.Max(previous, power.CooldownTicksLeft);
+            }
+        }
+
+        internal void RestoreCooldowns(CompAbilityUser owner)
+        {
+            // Restore only abilities actually present at save time and still backed by an exact learned native row.
+            if (pendingMartial != null && owner is CompAbilityUserMight might && might.ExistingMightData != null && SpiritRebirthEnergy.Marked(might.Pawn))
+            {
+                foreach (var name in pendingMartial)
+                {
+                    var def = LearnedMartial(might.ExistingMightData, name);
+                    if (def != null && !owner.AbilityData.Powers.Any(p => p?.Def == def))
+                        TM_ClassState.AddRuntimeAbility(owner, def);
+                }
+                pendingMartial = null;
+            }
+            if (pending == null) return;
+            foreach (var power in owner.AbilityData.Powers)
+            {
+                if (power?.Def == null || !ReferenceEquals(power.AbilityUser, owner) ||
+                    !pending.TryGetValue(power.Def.defName, out int ticks)) continue;
+                if (ticks > power.CooldownTicksLeft) power.CooldownTicksLeft = ticks;
+                pending.Remove(power.Def.defName);
+            }
+            if (pending.Count == 0) pending = null;
+        }
+        public void ExposeData()
+        {
+            Scribe_Values.Look(ref lastTick, "lastTick", -1);
+            Scribe_Collections.Look(ref remaining, "ownedCooldowns", LookMode.Value, LookMode.Value);
+            Scribe_Collections.Look(ref retainedMartial, "retainedMartial", LookMode.Value);
+            if (Scribe.mode == LoadSaveMode.PostLoadInit)
+            {
+                pending = remaining;
+                remaining = null;
+                pendingMartial = retainedMartial;
+                retainedMartial = null;
+            }
+        }
     }
 
     internal static class SpiritRebirthRuntime

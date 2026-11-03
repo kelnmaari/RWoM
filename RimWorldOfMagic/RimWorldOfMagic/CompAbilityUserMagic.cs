@@ -6872,9 +6872,18 @@ namespace TorannMagic
             }
         }
 
+        internal void RestoreSavedCooldowns()
+        {
+            if (SoL != null && ClassProgression.SpiritRebirthState.TryGet(Pawn,out var state) && state.HasValidHost(Pawn))
+                ClassProgression.BrightmageLifecycle.SynchronizeControl(this);
+            spiritRuntimeClock?.RestoreCooldowns(this);
+        }
+
         public override void PostExposeData()
         {
-            if (Scribe.mode != LoadSaveMode.Saving || ClassProgression.SpiritRebirthEnergy.Marked(Pawn))
+            if (Scribe.mode == LoadSaveMode.Saving && ClassProgression.SpiritRuntimeClock.TracksCooldowns(Pawn))
+                spiritRuntimeClock.CaptureCooldowns(this);
+            if (Scribe.mode != LoadSaveMode.Saving || ClassProgression.SpiritRuntimeClock.TracksCooldowns(Pawn))
                 Scribe_Deep.Look(ref spiritRuntimeClock, "TM_spiritMagicRuntimeClock");
             if (spiritRuntimeClock == null) spiritRuntimeClock = new ClassProgression.SpiritRuntimeClock();
             if (Scribe.mode != LoadSaveMode.Saving || ClassProgression.SpiritRebirthEnergy.Marked(Pawn))
@@ -8185,6 +8194,8 @@ namespace TorannMagic
                 }
                 this.UpdateAutocastDef();
                 this.InitializeSpell();
+                if (ClassProgression.SpiritRuntimeClock.TracksCooldowns(Pawn))
+                    LongEventHandler.ExecuteWhenFinished(RestoreSavedCooldowns);
                 //base.UpdateAbilities();
             }
         }
