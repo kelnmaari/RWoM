@@ -60,7 +60,7 @@ namespace TorannMagic.ClassProgression
 
         internal bool TryBeginHostLoss(Pawn original, Pawn deadHost, bool forced)
         {
-            if (!Registered || original == null || deadHost == null || !SpiritRebirthState.TryGet(original, out var state)) return false;
+            if (!Registered || original == null || deadHost == null || !SpiritRebirthState.TryGetStored(original, out var state)) return false;
             var existing = Find(original);
             if (existing != null)
             {
@@ -106,7 +106,7 @@ namespace TorannMagic.ClassProgression
         }
 
         private bool Retained(SpiritPendingHostCollapse receipt)
-            => receipt.OwnsOriginal || (OwnsStone(receipt) && SpiritRebirthState.TryGet(receipt.Original, out var state)
+            => receipt.OwnsOriginal || (OwnsStone(receipt) && SpiritRebirthState.TryGetStored(receipt.Original, out var state)
                 && state.HasValidStone(receipt.Original) && ReferenceEquals(state.Stone, receipt.Stone));
         private static int FindTick() => Verse.Find.TickManager?.TicksGame ?? 0;
         private void Warn(SpiritPendingHostCollapse receipt, Exception error)
@@ -126,7 +126,7 @@ namespace TorannMagic.ClassProgression
         private void Process(SpiritPendingHostCollapse receipt)
         {
             var pawn = receipt.Original; var stone = receipt.Stone;
-            if (!receipt.Registered || !SpiritRebirthState.TryGet(pawn, out var state)) return;
+            if (!receipt.Registered || !SpiritRebirthState.TryGetStored(pawn, out var state)) return;
             if (!OwnsStone(receipt))
             {
                 // A moved empty candidate is no longer ours. Only the already
@@ -167,7 +167,7 @@ namespace TorannMagic.ClassProgression
             var host = possession?.parent?.pawn;
             if (host == null || (!receipt.Forced && !host.Dead) || host.thingIDNumber != receipt.SourceHostId
                 || !ReferenceEquals(possession.SpiritPawn, pawn) || !source.Contains(pawn)
-                || !SpiritRebirthState.TryGet(pawn, out var state) || !state.CanEnterStone(pawn, host, host.Dead)) return;
+                || !SpiritRebirthState.TryGetStored(pawn, out var state) || !state.CanEnterStone(pawn, host, host.Dead)) return;
             try { source.Remove(pawn); contents.TryAdd(pawn, false); }
             finally
             {

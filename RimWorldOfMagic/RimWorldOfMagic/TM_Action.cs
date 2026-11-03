@@ -1035,6 +1035,8 @@ namespace TorannMagic
 
         public static void RemovePossession(Pawn p, IntVec3 loc, bool destroySpirit = false, bool hostKilled = false)
         {            
+            if (!ClassProgression.ClassProgressionFeature.Enabled &&
+                ClassProgression.SpiritRebirthState.IsPaused(Compatibility.TM_SpiritCommands.Possession(p)?.SpiritPawn)) return;
             if (ClassProgression.SpiritHostLoss.IsMarkedHost(p))
             {
                 // The Kill prefix is only a notification of intent. Wait for native death.

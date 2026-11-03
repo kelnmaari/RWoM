@@ -7,9 +7,9 @@ namespace TorannMagic.ClassProgression
     {
         // Only the exact pawn owned by the possession can identify a ritual Spirit.
         internal static bool IsMarkedHost(Pawn host)
-            => ClassProgressionFeature.Enabled && TorannMagicDefOf.TM_SpiritPossessionHD != null
+            => TorannMagicDefOf.TM_SpiritPossessionHD != null
                 && Compatibility.TM_SpiritCommands.Possession(host)?.SpiritPawn is Pawn spirit
-                && SpiritRebirthEnergy.Marked(spirit);
+                && SpiritRebirthState.TryGetStored(spirit,out _);
 
         internal static bool Secure(Pawn host, bool forced)
         {
@@ -50,7 +50,11 @@ namespace TorannMagic.ClassProgression
     {
         [HarmonyPriority(Priority.Last)]
         static bool Prefix(Pawn __instance)
-            => !__instance.Spawned || (!__instance.def.destroyable && !Thing.allowDestroyNonDestroyable)
-                || !SpiritHostLoss.IsMarkedHost(__instance) || SpiritHostLoss.Secure(__instance, true);
+        {
+            if (!__instance.def.destroyable && !Thing.allowDestroyNonDestroyable) return true;
+            if (SpiritSummonedHost.IsSummoned(__instance))
+                return (!ClassProgressionFeature.Enabled && !SpiritHostLoss.IsMarkedHost(__instance)) || SpiritSummonedHost.CanDismiss(__instance);
+            return !__instance.Spawned || !SpiritHostLoss.IsMarkedHost(__instance) || SpiritHostLoss.Secure(__instance, true);
+        }
     }
 }

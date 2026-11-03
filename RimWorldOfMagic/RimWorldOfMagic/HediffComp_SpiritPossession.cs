@@ -217,6 +217,7 @@ namespace TorannMagic
         public override void CompPostTick(ref float severityAdjustment)
         {
             var original = SpiritPawn;
+            if (ClassProgression.SpiritRebirthState.IsPaused(original)) return;
             if (ClassProgression.SpiritRebirthEnergy.Marked(original))
             {
                 if (ClassProgression.SpiritRebirthState.TryGet(original, out var state)

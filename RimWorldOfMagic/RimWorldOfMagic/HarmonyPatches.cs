@@ -306,14 +306,15 @@ namespace TorannMagic
             int skipped = 0;
             foreach (Type patchClass in patchClasses)
             {
-                // The beta progression ships its own patch set (trials, passives, spirit
-                // rebirth policy). With the feature disabled those patches must not be
-                // applied at all — the only exception is the chronomancer prediction
-                // scribe, which serializes ownership tokens for the CLASSIC prediction
-                // mechanic and is state-independent.
+                // Saved possessions and their death/holder callbacks must survive an opt-out.
+                // Combat, trials and all other progression hooks stay inactive.
                 if (!ClassProgression.ClassProgressionFeature.Enabled
                     && patchClass.Namespace == "TorannMagic.ClassProgression"
-                    && patchClass != typeof(ClassProgression.ChronomancerPredictionScribePatch))
+                    && patchClass != typeof(ClassProgression.ChronomancerPredictionScribePatch)
+                    && patchClass != typeof(ClassProgression.SpiritHostSetDeadPatch)
+                    && patchClass != typeof(ClassProgression.SpiritHostRemoveHediffPatch)
+                    && patchClass != typeof(ClassProgression.SpiritHostDestroyPatch)
+                    && patchClass != typeof(ClassProgression.SpiritCaravanHostLoss))
                 {
                     skipped++;
                     continue;

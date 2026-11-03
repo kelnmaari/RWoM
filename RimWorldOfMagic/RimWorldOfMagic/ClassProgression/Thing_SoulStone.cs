@@ -35,7 +35,7 @@ namespace TorannMagic.ClassProgression
 
         internal bool TryCapture(Pawn original, Pawn expectedHost, bool hostDied)
         {
-            if (Destroyed || contents.Count != 0 || !SpiritRebirthState.TryGet(original, out var state)
+            if (Destroyed || contents.Count != 0 || !SpiritRebirthState.TryGetStored(original, out var state)
                 || !state.CanEnterStone(original, expectedHost, hostDied)) return false;
 
             // In 1.7 a spawned Pawn also has a native map ThingOwner. It must

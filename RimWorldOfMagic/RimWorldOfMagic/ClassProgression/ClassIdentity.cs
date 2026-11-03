@@ -31,7 +31,11 @@ namespace TorannMagic.ClassProgression
         // also see editor-created and partially initialized pawns, so scan safely.
         public static CompClassProgression Component(Pawn pawn)
         {
-            if (!ClassProgressionFeature.Enabled) return null;
+            return ClassProgressionFeature.Enabled ? StoredComponent(pawn) : null;
+        }
+
+        internal static CompClassProgression StoredComponent(Pawn pawn)
+        {
             var comps = pawn?.AllComps;
             if (comps == null) return null;
             for (int i = 0; i < comps.Count; i++)

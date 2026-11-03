@@ -25,9 +25,13 @@ namespace TorannMagic.Compatibility
 
         public static bool CanLeaveBody(Pawn pawn)
         {
-            return pawn != null && pawn.Spawned && !pawn.Destroyed && pawn.Faction?.IsPlayer == true
-                && Find.Selector?.NumSelected == 1 && Find.Selector.SingleSelectedThing == pawn
-                && Possession(pawn) != null && !ClassProgression.SpiritHostLoss.IsMarkedHost(pawn);
+            if (pawn == null || !pawn.Spawned || pawn.Destroyed || Find.Selector?.NumSelected != 1 ||
+                Find.Selector.SingleSelectedThing != pawn || Possession(pawn) is not HediffComp_SpiritPossession link) return false;
+            var original = link.SpiritPawn;
+            if (ClassProgression.SpiritRebirthState.IsPaused(original)) return false;
+            if (ClassProgression.SpiritRebirthState.TryGet(original, out var state))
+                return original.Faction?.IsPlayer == true && state.CanVoluntarilyLeaveHost(original);
+            return pawn.Faction?.IsPlayer == true && !ClassProgression.SpiritHostLoss.IsMarkedHost(pawn);
         }
 
         public static void LeaveBody(Pawn pawn)

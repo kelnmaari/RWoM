@@ -28,10 +28,10 @@ namespace TorannMagic.ClassProgression
         private Map pendingDeathMap;
         private int pendingDeathId;
         internal bool HasPendingMapDeath(Pawn pawn)
-            => IsCurrent(pawn) && pendingDeathMap != null && pendingDeathId > 0
+            => IsStoredOwner(pawn) && pendingDeathMap != null && pendingDeathId > 0
                 && (form == SpiritRebirthForm.Possessed || form == SpiritRebirthForm.Dormant);
         internal bool MatchesPendingMapDeath(Pawn pawn, Map map, int id)
-            => IsCurrent(pawn) && id > 0 && pendingDeathId == id && ReferenceEquals(pendingDeathMap, map)
+            => IsStoredOwner(pawn) && id > 0 && pendingDeathId == id && ReferenceEquals(pendingDeathMap, map)
                 && (form == SpiritRebirthForm.Possessed || form == SpiritRebirthForm.Dormant);
         internal bool BeginPendingMapDeath(Pawn pawn, Pawn deadHost, SpiritPendingHostCollapse receipt)
         {
@@ -114,9 +114,21 @@ namespace TorannMagic.ClassProgression
             return true;
         }
 
+        // A disabled feature still owns the saved pawn. Classic possession must never
+        // tick, release or destroy that pawn as though it were a classic spirit.
+        internal static bool IsPaused(Pawn original) => !ClassProgressionFeature.Enabled &&
+            ClassIdentity.StoredComponent(original)?.SpiritRebirth != null;
+
         public static bool TryGet(Pawn pawn, out SpiritRebirthState state)
         {
-            state = ClassIdentity.Component(pawn)?.SpiritRebirth;
+            if (ClassProgressionFeature.Enabled) return TryGetStored(pawn,out state);
+            state = null;
+            return false;
+        }
+
+        internal static bool TryGetStored(Pawn pawn, out SpiritRebirthState state)
+        {
+            state = ClassIdentity.StoredComponent(pawn)?.SpiritRebirth;
             if (state != null && state.version == CurrentVersion && ReferenceEquals(state.original, pawn)
                 && pawn != null && !pawn.Destroyed && Enum.IsDefined(typeof(SpiritRebirthForm), state.form)) return true;
             state = null;
@@ -140,8 +152,9 @@ namespace TorannMagic.ClassProgression
         }
 
         private bool IsCurrent(Pawn pawn) => TryGet(pawn, out var current) && ReferenceEquals(current, this);
+        private bool IsStoredOwner(Pawn pawn) => TryGetStored(pawn,out var current) && ReferenceEquals(current,this);
         public bool HasValidHost(Pawn pawn) => IsCurrent(pawn) && form == SpiritRebirthForm.Possessed && Holds(host, pawn);
-        public bool HasValidStone(Pawn pawn) => IsCurrent(pawn) && form == SpiritRebirthForm.Stone && StoneHolds(stone, pawn);
+        public bool HasValidStone(Pawn pawn) => IsStoredOwner(pawn) && form == SpiritRebirthForm.Stone && StoneHolds(stone, pawn);
         private static bool StoneHolds(Thing_SoulStone candidate, Pawn pawn)
         {
             var holder = candidate?.GetDirectlyHeldThings();
@@ -180,7 +193,7 @@ namespace TorannMagic.ClassProgression
         // Callers must validate the depletion event; this is never voluntary exit.
         internal bool CanEnterStone(Pawn pawn, Pawn expectedHost, bool hostDied)
         {
-            if (!IsCurrent(pawn) || pawn.Dead) return false;
+            if (!IsStoredOwner(pawn) || pawn.Dead) return false;
             if (form == SpiritRebirthForm.Ethereal)
                 return !hostDied && expectedHost == null && host == null && SpiritRebirthFormPolicy.HasMapCustody(pawn);
             return form == SpiritRebirthForm.Possessed && ReferenceEquals(host, expectedHost) && host != null
@@ -191,7 +204,7 @@ namespace TorannMagic.ClassProgression
         // be in one native container; saved references alone confer no custody.
         internal bool TryEnterStone(Pawn pawn, Thing_SoulStone destination, Pawn expectedHost, bool hostDied)
         {
-            if (!IsCurrent(pawn) || !StoneHolds(destination, pawn)) return false;
+            if (!IsStoredOwner(pawn) || !StoneHolds(destination, pawn)) return false;
             if (form == SpiritRebirthForm.Ethereal)
             {
                 if (hostDied || expectedHost != null || host != null) return false;

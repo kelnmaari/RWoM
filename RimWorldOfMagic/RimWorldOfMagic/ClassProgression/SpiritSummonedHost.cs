@@ -31,6 +31,7 @@ namespace TorannMagic.ClassProgression
             var link = Compatibility.TM_SpiritCommands.Possession(host);
             var soul = link?.SpiritPawn;
             if (soul == null) return true;
+            if (SpiritRebirthState.IsPaused(soul)) return host.Map != null && SpiritHostLoss.Secure(host,true);
             var map = host.Map;
             if (map == null) return false;
             if (SpiritRebirthEnergy.Marked(soul)) return SpiritHostLoss.Secure(host, true);

@@ -17,10 +17,24 @@ namespace TorannMagic.ClassProgression
         private static readonly MethodInfo discard = typeof(WorldPawns).GetMethod("DiscardPawn",
             BindingFlags.Instance | BindingFlags.NonPublic, null, new[] { typeof(Pawn), typeof(bool) }, null);
 
+        // Only the caller already authorized by terminal map/caravan loss can finish a
+        // detached original after a native post-Destroy callback failed.
+        internal static SpiritTerminalLossResult TryDiscardOnTerminalLoss(Pawn original, ThingOwner owner)
+        {
+            try { return TryDiscard(original, owner); }
+            catch when (original.Destroyed && original.holdingOwner == null
+                && !owner.Contains(original) && !Find.WorldPawns.Contains(original)
+                && !Find.WorldPawns.IsBeingDiscarded(original))
+            {
+                if (!original.Discarded) discard.Invoke(Find.WorldPawns, new object[] { original, true });
+                return original.Discarded && !Find.WorldPawns.Contains(original)
+                    ? SpiritTerminalLossResult.Completed : SpiritTerminalLossResult.Unavailable;
+            }
+        }
         internal static SpiritTerminalLossResult TryDiscard(Pawn original, ThingOwner expectedOwner)
         {
             if (original == null || original.Dead || original.Destroyed || original.Discarded || original.Spawned
-                || !SpiritRebirthState.TryGet(original, out _)
+                || !SpiritRebirthState.TryGetStored(original, out _)
                 || expectedOwner?.Owner == null || !ReferenceEquals(original.holdingOwner, expectedOwner)
                 || !ReferenceEquals(expectedOwner.Owner.GetDirectlyHeldThings(), expectedOwner)
                 || !expectedOwner.Contains(original)) return SpiritTerminalLossResult.Rejected;

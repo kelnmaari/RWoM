@@ -582,6 +582,43 @@ internal static partial class SpiritMapCollapseTests
                 }
                 finally { TorannMagicDefOf.TM_SpiritPossessorHD = prior; host.AllComps.Remove(timed); host.AllComps.Add(native); TM_Calc.InvalidateCompCache(host); }
             }));
+        yield return new("SpiritMapCollapse.DisabledBetaSecuresCommittedHostDeath", r =>
+            SpiritRebirthRitualTransactionTests.Run(r,c => {
+                using var f=new Fixture(r,c);
+                var state=ClassIdentity.Component(c.Original).SpiritRebirth;
+                bool beta=ClassProgressionFeature.Enabled;
+                try
+                {
+                    ClassProgressionFeature.Enabled=false;
+                    c.Creator.health.SetDead();
+                    Production("SpiritHostSetDeadPatch").GetMethod("Postfix",BindingFlags.Static|BindingFlags.NonPublic)!
+                        .Invoke(null,[c.Creator,true]);
+                    var stone=Check.NotNull(state.Stone,"death while beta is off still secures the pawn");
+                    Check.Same(c.Original,stone.ContainedSpirit,"same soul in stone");
+                    Check.Equal(false,SpiritRebirthState.TryGet(c.Original,out _),"disabled gameplay facade remains unavailable");
+                }
+                finally { ClassProgressionFeature.Enabled=beta; }
+                Check.Equal(true,state.HasValidStone(c.Original),"reenabling recognizes the secured stone");
+            }));
+        yield return new("SpiritPossession.DisabledBetaKeepsRebornPawnHeld", r =>
+            SpiritRebirthRitualTransactionTests.Run(r,c => {
+                using var fixture=new Fixture(r,c);
+                var state=ClassIdentity.Component(c.Original).SpiritRebirth;
+                int recovery=state.RecoveryTicks;
+                bool active=ClassProgressionFeature.Enabled;
+                try
+                {
+                    ClassProgressionFeature.Enabled=false;
+                    float severity=0f;
+                    fixture.Possession.CompPostTick(ref severity);
+                    TM_Action.RemovePossession(c.Creator,c.Creator.Position,false);
+                    Check.Same(c.Original,fixture.Possession.SpiritPawn,"disabled beta retains the original instead of releasing a classic spirit");
+                    Check.Equal(recovery,state.RecoveryTicks,"paused possession cannot progress its clock");
+                    Check.Equal(false,SpiritRebirthState.TryGetPossessingSpirit(c.Creator,out _),"paused powers unavailable");
+                }
+                finally { ClassProgressionFeature.Enabled=active; }
+                Check.Equal(true,state.HasValidHost(c.Original),"re-enabled beta sees the same reciprocal holder");
+            }));
         yield return new("SpiritPossession.SummonedHostsRejectedEvenByDirectEntry", r =>
             SpiritRebirthRitualTransactionTests.Run(r, c =>
             {
