@@ -4,9 +4,20 @@ namespace TorannMagic.ClassProgression
 {
     public static class ShamanLifecycle
     {
+        internal static void GrantControls(CompAbilityUserMagic comp)
+        {
+            TM_ClassState.AddRuntimeAbility(comp,TorannMagicDefOf.TM_Hex_Pain);
+            TM_ClassState.AddRuntimeAbility(comp,TorannMagicDefOf.TM_Hex_MentalAssault);
+            TM_ClassState.AddRuntimeAbility(comp,TorannMagicDefOf.TM_Hex_CriticalFail);
+        }
+
+        internal static bool Control(AbilityUser.AbilityDef def) => def != null &&
+            (def == TorannMagicDefOf.TM_Hex_Pain || def == TorannMagicDefOf.TM_Hex_MentalAssault || def == TorannMagicDefOf.TM_Hex_CriticalFail);
+
         public static bool Restore(CompAbilityUserMagic comp)
         {
-            if (SpiritRebirthBodyEffects.SuppressFormerBodyEffects(comp?.Pawn)) return true;
+            if (SpiritRebirthBodyEffects.SuppressFormerBodyEffects(comp?.Pawn) &&
+                (!SpiritRebirthState.TryGet(comp.Pawn,out var soul) || !soul.HasValidHost(comp.Pawn) || soul.DepletionPending)) return true;
             if (comp?.Pawn == null || !ClassIdentity.TryGetState(comp.Pawn, out _)) return false;
             var controls = new[] { TorannMagicDefOf.TM_Hex_Pain, TorannMagicDefOf.TM_Hex_MentalAssault, TorannMagicDefOf.TM_Hex_CriticalFail };
             var owner = comp.MagicData.MagicPowersShaman.FirstOrDefault(p => p.TMabilityDefs.Contains(TorannMagicDefOf.TM_Hex));

@@ -471,28 +471,39 @@ namespace TorannMagic
             }
         }
 
+        private Dictionary<int,int> hexEffectIds;
+        internal void RegisterHexTarget(Pawn target)
+        {
+            var targets = HexedPawns;
+            var effect = target?.health?.hediffSet?.GetFirstHediffOfDef(TorannMagicDefOf.TM_HexHD);
+            if (effect == null) return;
+            if (!targets.Contains(target)) targets.Add(target);
+            (hexEffectIds ??= new Dictionary<int,int>())[target.thingIDNumber] = effect.loadID;
+        }
+
+        internal bool HasHexRecords => hexedPawns?.Count > 0;
         public List<Pawn> HexedPawns
         {
             get
             {
-                if(hexedPawns == null)
+                hexedPawns ??= new List<Pawn>();
+                for (int i = hexedPawns.Count - 1; i >= 0; i--)
                 {
-                    this.hexedPawns = new List<Pawn>();
-                    this.hexedPawns.Clear();
-                }
-                List<Pawn> validPawns = new List<Pawn>();
-                validPawns.Clear();
-                foreach (Pawn p in this.hexedPawns)
-                {
-                    if (p != null && !p.Destroyed && !p.Dead)
+                    var pawn = hexedPawns[i];
+                    var effect = pawn?.health?.hediffSet?.GetFirstHediffOfDef(TorannMagicDefOf.TM_HexHD);
+                    if (effect == null || pawn.Destroyed || pawn.Dead ||
+                        (hexEffectIds?.TryGetValue(pawn.thingIDNumber,out int id) == true && id != effect.loadID))
                     {
-                        if (p.health != null && p.health.hediffSet != null && p.health.hediffSet.HasHediff(TorannMagicDefOf.TM_HexHD))
-                        {
-                            validPawns.Add(p);
-                        }
+                        hexedPawns.RemoveAt(i);
+                        continue;
                     }
+                    // Saves from before individual effects were tracked have only the pawn list.
+                    (hexEffectIds ??= new Dictionary<int,int>())[pawn.thingIDNumber] = effect.loadID;
                 }
-                this.hexedPawns = validPawns;
+                if (hexedPawns.Count == 0) hexEffectIds = null;
+                else if (hexEffectIds.Count > hexedPawns.Count)
+                    foreach (var id in hexEffectIds.Keys.Where(id => !hexedPawns.Any(p => p.thingIDNumber == id)).ToArray())
+                        hexEffectIds.Remove(id);
                 return this.hexedPawns;
             }
         }
@@ -6189,7 +6200,7 @@ namespace TorannMagic
 
 
             if(!ClassProgression.ShamanLifecycle.Restore(this)
-                && HexedPawns != null && HexedPawns.Count <= 0 && previousHexedPawns > 0)
+                && (HasHexRecords || previousHexedPawns > 0))
             {
                 if (HexedPawns.Count > 0)
                 {
@@ -7029,6 +7040,7 @@ namespace TorannMagic
             Scribe_Collections.Look<Pawn>(ref this.weaponEnchants, "weaponEnchants", LookMode.Reference);
             Scribe_Collections.Look<Thing>(ref this.lightningTraps, "lightningTraps", LookMode.Reference);
             Scribe_Collections.Look<Pawn>(ref this.hexedPawns, "hexedPawns", LookMode.Reference);
+            Scribe_Collections.Look(ref hexEffectIds,"TM_hexEffectIds",LookMode.Value,LookMode.Value);
             Scribe_Values.Look<IntVec3>(ref this.earthSprites, "earthSprites", default(IntVec3), false);
             Scribe_Values.Look<int>(ref this.earthSpriteType, "earthSpriteType", 0, false);
             if (Scribe.mode == LoadSaveMode.LoadingVars)

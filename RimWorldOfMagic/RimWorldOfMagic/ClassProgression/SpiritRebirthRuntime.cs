@@ -168,6 +168,8 @@ namespace TorannMagic.ClassProgression
             SpiritHostedTechnoBit.Tick(comp);
             if (now % 60 == 0)
             {
+                if (comp.HasHexRecords || comp.AbilityData.Powers.Any(p => ShamanLifecycle.Control(p?.Def)))
+                    ShamanLifecycle.Restore(comp);
                 BrightmageLifecycle.TickHostedLight(pawn,now);
                 comp.SyncStoneskinControl();
                 comp.SyncEarthSpriteControl();

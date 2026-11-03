@@ -98,6 +98,13 @@ namespace TorannMagic.ClassProgression
             ("TM_SpiritSummonTotemEarth", () => TorannMagicDefOf.TM_SummonTotemEarth, typeof(Verb_SummonTotemEarth)),
             ("TM_SpiritSummonTotemLightning", () => TorannMagicDefOf.TM_SummonTotemLightning, typeof(Verb_SummonTotemLightning)),
             ("TM_SpiritSummonTotemHealing", () => TorannMagicDefOf.TM_SummonTotemHealing, typeof(Verb_SummonTotemHealing)),
+            ("TM_SpiritHex", () => TorannMagicDefOf.TM_Hex, typeof(Verb_Hex)),
+            ("TM_SpiritHex_I", () => TorannMagicDefOf.TM_Hex_I, typeof(Verb_Hex)),
+            ("TM_SpiritHex_II", () => TorannMagicDefOf.TM_Hex_II, typeof(Verb_Hex)),
+            ("TM_SpiritHex_III", () => TorannMagicDefOf.TM_Hex_III, typeof(Verb_Hex)),
+            ("TM_SpiritHex_Pain", () => TorannMagicDefOf.TM_Hex_Pain, typeof(Verb_Hex_Pain)),
+            ("TM_SpiritHex_CriticalFail", () => TorannMagicDefOf.TM_Hex_CriticalFail, typeof(Verb_Hex_CriticalFail)),
+            ("TM_SpiritHex_MentalAssault", () => TorannMagicDefOf.TM_Hex_MentalAssault, typeof(Verb_Hex_MentalAssault)),
             ("TM_SpiritEnrage", () => TorannMagicDefOf.TM_Enrage, typeof(Verb_Enrage)),
             ("TM_SpiritChainLightning", () => TorannMagicDefOf.TM_ChainLightning, typeof(Projectile_ChainLightning)),
             ("TM_SpiritTimeMark", () => TorannMagicDefOf.TM_TimeMark, typeof(Verb_TimeMark)),
@@ -231,6 +238,7 @@ namespace TorannMagic.ClassProgression
             }
             float cost = power.MagicUser.ActualManaCost(def);
             if (def == TorannMagicDefOf.TM_Recall && (!TM_Action.RecallMatches(body,power.MagicUser) || power.MagicUser.recallExpiration <= Verse.Find.TickManager.TicksGame)) return false;
+            if (ShamanLifecycle.Control(def) && !power.MagicUser.HexedPawns.Any(p => p.Spawned)) return false;
             if (def == TorannMagicDefOf.TM_AlterFate && !Verb_AlterFate.Available(body,power)) return false;
             if (def == TorannMagicDefOf.TM_ShatterSentinel && !power.MagicUser.summonedSentinels.Any(t => t?.Spawned == true)) return false;
             if (def == TorannMagicDefOf.TM_DismissEarthSprites && power.MagicUser.earthSpriteType == 0) return false;

@@ -5,4 +5,11 @@
   <TM_SpiritSummonTotemLightning.reportString>invocando un tótem de rayos.</TM_SpiritSummonTotemLightning.reportString>
   <TM_SpiritSummonTotemHealing.reportString>invocando un tótem de sanación.</TM_SpiritSummonTotemHealing.reportString>
   <TM_SpiritEnrage.reportString>provocando furia.</TM_SpiritEnrage.reportString>
+  <TM_SpiritHex.reportString>lanzando una maldición.</TM_SpiritHex.reportString>
+  <TM_SpiritHex_I.reportString>lanzando una maldición.</TM_SpiritHex_I.reportString>
+  <TM_SpiritHex_II.reportString>lanzando una maldición.</TM_SpiritHex_II.reportString>
+  <TM_SpiritHex_III.reportString>lanzando una maldición.</TM_SpiritHex_III.reportString>
+  <TM_SpiritHex_Pain.reportString>infligiendo dolor.</TM_SpiritHex_Pain.reportString>
+  <TM_SpiritHex_CriticalFail.reportString>invocando la desgracia.</TM_SpiritHex_CriticalFail.reportString>
+  <TM_SpiritHex_MentalAssault.reportString>atacando la mente.</TM_SpiritHex_MentalAssault.reportString>
 </LanguageData>

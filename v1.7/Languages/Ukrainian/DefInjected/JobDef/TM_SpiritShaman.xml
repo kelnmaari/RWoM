@@ -5,4 +5,11 @@
   <TM_SpiritSummonTotemLightning.reportString>прикликає тотем блискавки.</TM_SpiritSummonTotemLightning.reportString>
   <TM_SpiritSummonTotemHealing.reportString>прикликає тотем зцілення.</TM_SpiritSummonTotemHealing.reportString>
   <TM_SpiritEnrage.reportString>викликає лють.</TM_SpiritEnrage.reportString>
+  <TM_SpiritHex.reportString>накладає прокляття.</TM_SpiritHex.reportString>
+  <TM_SpiritHex_I.reportString>накладає прокляття.</TM_SpiritHex_I.reportString>
+  <TM_SpiritHex_II.reportString>накладає прокляття.</TM_SpiritHex_II.reportString>
+  <TM_SpiritHex_III.reportString>накладає прокляття.</TM_SpiritHex_III.reportString>
+  <TM_SpiritHex_Pain.reportString>завдає болю.</TM_SpiritHex_Pain.reportString>
+  <TM_SpiritHex_CriticalFail.reportString>накликає невдачу.</TM_SpiritHex_CriticalFail.reportString>
+  <TM_SpiritHex_MentalAssault.reportString>атакує розум.</TM_SpiritHex_MentalAssault.reportString>
 </LanguageData>

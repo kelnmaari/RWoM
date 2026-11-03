@@ -13,6 +13,19 @@ internal static class ShamanLifecycleTests
     const BindingFlags Fields = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
     public static IEnumerable<TestCase> Cases()
     {
+        yield return new("ShamanLifecycle.ReplacementHexNeverInheritsAnotherShamansCommand", runtime =>
+        {
+            using var f = new Fixture(runtime);
+            f.AddTarget();
+            var original = f.Target.health.hediffSet.hediffs.Single(h=>h.def==TorannMagicDefOf.TM_HexHD);
+            original.loadID=221;
+            Check.Same(f.Target,f.Magic.HexedPawns.Single(),"old saves bind to their live effect");
+            f.Target.health.hediffSet.hediffs.Remove(original);
+            f.Target.health.hediffSet.hediffs.Add(new Hediff { pawn=f.Target,def=original.def,loadID=222 });
+            Check.Equal(0,f.Magic.HexedPawns.Count,"foreign replacement does not restore this owner's command");
+            typeof(CompAbilityUserMagic).GetMethod("RegisterHexTarget",Fields)!.Invoke(f.Magic,[f.Target]);
+            Check.Same(f.Target,f.Magic.HexedPawns.Single(),"new successful application can acquire its own target again");
+        });
         yield return new("ShamanLifecycle.RankedInheritedHexControlsFollowRealTargets", HexControls);
         yield return new("ShamanLifecycle.NoOwnerOrTargetsNeverGrantPermanentHexChildren", Empty);
         yield return new("ShamanLifecycle.CopiedAndItemHexControlsRemainUntilActualTargetsEnd", TemporaryOwnership);
