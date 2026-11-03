@@ -19,7 +19,7 @@ namespace TorannMagic
         private int trapSpringDelay = 30;
         private bool trapSprung = false;
 
-        private Pawn trapPawn = new Pawn();
+        private Pawn trapPawn;
 
         public bool Armed => !trapSprung;
 
