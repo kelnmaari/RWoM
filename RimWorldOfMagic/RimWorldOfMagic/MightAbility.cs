@@ -13,6 +13,17 @@ namespace TorannMagic
     {
         public override Verse.AI.Job UseAbility(AbilityContext context, LocalTargetInfo target)
             => Odyssey.ManualTravelSafety.IsTravel(this) ? Odyssey.ManualTravelSafety.UseAbility(this, context, target) : base.UseAbility(context, target);
+
+        public override Verse.AI.Job GetJob(AbilityContext context, LocalTargetInfo target)
+        {
+            string order;
+            if (mightDef?.MainVerb?.verbClass == typeof(ClassProgression.Verb_GladiatorSweep)) order=ClassProgression.SpiritHostedMartial.Sweep;
+            else if (ClassProgression.SpiritHostedMartial.GrappleRank(mightDef)) order=ClassProgression.SpiritHostedMartial.Grapple;
+            else return base.GetJob(context,target);
+            var job = JobMaker.MakeJob(DefDatabase<JobDef>.GetNamed(order), Pawn, target);
+            job.playerForced = context == AbilityContext.Player;
+            return job;
+        }
         
 
         public int CastingTicks

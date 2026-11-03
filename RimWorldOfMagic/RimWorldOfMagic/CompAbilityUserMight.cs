@@ -123,6 +123,19 @@ namespace TorannMagic
             usePsionicMindAttackToggle = !usePsionicMindAttackToggle;
         }
 
+        internal Command_Toggle MakeCleaveCommand(Action action)
+        {
+            return new Command_Toggle
+            {
+                defaultLabel = (useCleaveToggle ? "TM_CleaveEnabled" : "TM_CleaveDisabled").Translate(),
+                defaultDesc = "TM_CleaveToggleDesc".Translate(),
+                Order = -90,
+                icon = ContentFinder<Texture2D>.Get(useCleaveToggle ? "UI/cleave" : "UI/cleavetoggle_off", true),
+                isActive = () => useCleaveToggle,
+                toggleAction = action
+            };
+        }
+
         public void ToggleCleave()
         {
             useCleaveToggle = !useCleaveToggle;
@@ -5394,23 +5407,7 @@ namespace TorannMagic
                 }
                 if(key == "cleave")
                 {
-                    String toggle = "cleave";
-                    String label = "TM_CleaveEnabled".Translate();
-                    String desc = "TM_CleaveToggleDesc".Translate();
-                    if (!this.useCleaveToggle)
-                    {
-                        toggle = "cleavetoggle_off";
-                        label = "TM_CleaveDisabled".Translate();
-                    }
-                    Command_Toggle itemCleave = new Command_Toggle
-                    {
-                        defaultLabel = label,
-                        defaultDesc = desc,
-                        Order = -90,
-                        icon = ContentFinder<Texture2D>.Get("UI/" + toggle, true),
-                        isActive = (() => this.useCleaveToggle),
-                        toggleAction = ToggleCleave
-                    };
+                    Command_Toggle itemCleave = MakeCleaveCommand(ToggleCleave);
                     gizmoCommands.Add(key, itemCleave);
                 }
                 if(key == "cqc")

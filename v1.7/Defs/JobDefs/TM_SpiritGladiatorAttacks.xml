@@ -1,0 +1,12 @@
+<Defs>
+  <JobDef>
+    <defName>TM_SpiritCastGladiatorSweep</defName>
+    <driverClass>TorannMagic.ClassProgression.JobDriver_SpiritHostedMartial</driverClass>
+    <reportString>sweeping at TargetB.</reportString>
+  </JobDef>
+  <JobDef>
+    <defName>TM_SpiritCastGrapple</defName>
+    <driverClass>TorannMagic.ClassProgression.JobDriver_SpiritHostedMartial</driverClass>
+    <reportString>grappling TargetB.</reportString>
+  </JobDef>
+</Defs>

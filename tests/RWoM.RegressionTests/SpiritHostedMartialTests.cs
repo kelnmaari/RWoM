@@ -115,6 +115,81 @@ internal static partial class SpiritMapCollapseTests
                     "the host can project the retained cloak without learning it itself");
             }));
 
+        yield return new("SpiritProjectedCast.Martial.GladiatorSweep.UsesLearnedSource", f =>
+            SpiritRebirthRitualTransactionTests.Run(f,c => {
+                using var held = new Fixture(f,c);
+                var def=f.AddAbility("TM_GladiatorSweep");
+                var source=c.Original.GetCompAbilityUserMight();
+                var power=new MightAbility(source){Def=def};
+                source.AbilityData.Powers.Add(power); source.AbilityData.AllPowers=null;
+                var find=Production("SpiritHostedMartial").GetMethod("Find",BindingFlags.Static|BindingFlags.NonPublic)!;
+                Check.Same(power,find.Invoke(null,[c.Creator,c.Original,"TM_SpiritCastGladiatorSweep"])!,
+                    "the original learned Reforged technique provides the host's melee order");
+            }));
+
+
+        foreach (var id in new[] { "TM_Grapple","TM_Grapple_I","TM_Grapple_II","TM_Grapple_III" })
+            yield return new("SpiritProjectedCast.Martial.Grapple."+id, f =>
+                SpiritRebirthRitualTransactionTests.Run(f,c => {
+                    using var held = new Fixture(f,c);
+                    var def=(TMAbilityDef)typeof(TorannMagicDefOf).GetField(id)!.GetValue(null)!;
+                    var source=c.Original.GetCompAbilityUserMight();
+                    var power=new MightAbility(source){Def=def};
+                    source.AbilityData.Powers.Add(power); source.AbilityData.AllPowers=null;
+                    var find=Production("SpiritHostedMartial").GetMethod("Find",BindingFlags.Static|BindingFlags.NonPublic)!;
+                    object? Held() => find.Invoke(null,[c.Creator,c.Original,"TM_SpiritCastGrapple"]);
+                    Check.Same(power,Held()!,"retained rank supplies its own grapple range and cooldown");
+                    var local=c.Creator.GetCompAbilityUserMight();
+                    local.AbilityData.Powers.Add(new MightAbility(local){Def=TorannMagicDefOf.TM_Grapple});
+                    local.AbilityData.AllPowers=null;
+                    Check.Equal(true,Held()==null,"one family command when the body already knows grapple");
+                }));
+
+        yield return new("SpiritProjectedCast.Martial.Grapple.RestoreRetainedRank",f =>
+            SpiritRebirthRitualTransactionTests.Run(f,c => {
+                using var held=new Fixture(f,c);
+                var state=new ClassProgressionState(Vocation.Warrior);
+                Set(c.Original.GetComp<CompClassProgression>(),"state",state);
+                state.TryAddFoundation("rwom.gladiator",DisciplineDomain.Might);
+                var might=c.Original.GetCompAbilityUserMight();
+                var row=might.MightData.MightPowersG.Single(r=>r.TMabilityDefs.Contains(TorannMagicDefOf.TM_Grapple_III));
+                var restore=typeof(JobDriver_GladiatorInitiation).GetMethod("Restore",BindingFlags.NonPublic|BindingFlags.Static)!;
+                void Refresh()=>restore.Invoke(null,[might]);
+                row.level=3;row.learned=false;Refresh();
+                Check.Equal(false,might.AbilityData.Powers.Any(p=>p.Def==TorannMagicDefOf.TM_Grapple_III),"no free rank for an unlearned row");
+                var rank=TorannMagicDefOf.TM_Grapple_III;
+                var before=rank.abilityClass;
+                try
+                {
+                    rank.abilityClass=typeof(MightAbility);
+                    row.learned=true;Refresh();
+                    var replay=might.AbilityData.Powers.Single(p=>p.Def==rank);
+                    replay.CooldownTicksLeft=72;Refresh();
+                    Check.Same(replay,might.AbilityData.Powers.Single(p=>p.Def==rank),"exact learned rank restored once");
+                    Check.Equal(72,replay.CooldownTicksLeft,"refresh preserves the cooldown");
+                }
+                finally { rank.abilityClass=before; }
+            }));
+
+        yield return new("SpiritProjectedCast.Martial.GladiatorCleave.PassiveOwnerPrecedence", f =>
+            SpiritRebirthRitualTransactionTests.Run(f,c => {
+                using var held=new Fixture(f,c);
+                var api=Production("GladiatorMastery").GetMethod("AutomaticSource",BindingFlags.NonPublic|BindingFlags.Static);
+                Check.NotNull(api,"native passive hit must resolve the owner before rolling");
+                void SelectCleave(Pawn p)
+                {
+                    var state=new ClassProgressionState(Vocation.Warrior);
+                    Set(p.GetComp<CompClassProgression>(),"state",state);
+                    state.TryAddFoundation("rwom.gladiator",DisciplineDomain.Might);
+                    Set(state.Find("rwom.gladiator"),"Attack",GladiatorAttack.Cleave);
+                }
+                SelectCleave(c.Original);
+                var local=c.Creator.GetCompAbilityUserMight();
+                object? Source() => api!.Invoke(null,[c.Creator,local]);
+                Check.Same(c.Original.GetCompAbilityUserMight(),Source()!,"retained passive uses the original's skill, toggle and resource");
+                SelectCleave(c.Creator);
+                Check.Same(local,Source()!,"a native host passive wins without stacking the soul's hit");
+            }));
         yield return new("SpiritProjectedCast.Martial.PommelStrike", f =>
             SpiritRebirthRitualTransactionTests.Run(f, c => {
                 using var possession = new Fixture(f,c);

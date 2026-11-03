@@ -5727,22 +5727,22 @@ namespace TorannMagic
                             {
                                 //Log.Message("checking class bonus damage");
                                 CompAbilityUserMight comp = instigator.GetCompAbilityUserMight();
-                                if ((instigator.story.traits.HasTrait(TorannMagicDefOf.Gladiator) || TM_ClassUtility.ClassHasAbility(TorannMagicDefOf.TM_Cleave, null, comp)) && instigator.equipment.Primary != null && instigator.equipment.Primary.def.IsMeleeWeapon)
+                                if (instigator.equipment?.Primary?.def.IsMeleeWeapon == true &&
+                                    ClassProgression.GladiatorMastery.AutomaticSource(instigator, comp) is CompAbilityUserMight cleave && cleave.Stamina != null)
                                 {
                                     float cleaveChance = Mathf.Min(instigator.equipment.Primary.def.BaseMass * .15f, .75f);
-                                    if (comp.useCleaveToggle && Rand.Chance(cleaveChance) && comp.Stamina.CurLevel >= comp.ActualStaminaCost(TorannMagicDefOf.TM_Cleave) && (___pawn.Position - instigator.Position).LengthHorizontal <= 1.6f)
+                                    if (cleave.useCleaveToggle && Rand.Chance(cleaveChance) && cleave.Stamina.CurLevel >= cleave.ActualStaminaCost(TorannMagicDefOf.TM_Cleave) && (___pawn.Position - instigator.Position).LengthHorizontal <= 1.6f)
                                     {
-                                        MightPowerSkill pwr = comp.MightData.MightPowerSkill_Cleave.FirstOrDefault((MightPowerSkill x) => x.label == "TM_Cleave_pwr");
-                                        MightPowerSkill str = comp.MightData.MightPowerSkill_global_strength.FirstOrDefault((MightPowerSkill x) => x.label == "TM_global_strength_pwr");
-                                        MightPowerSkill ver = comp.MightData.MightPowerSkill_Cleave.FirstOrDefault((MightPowerSkill x) => x.label == "TM_Cleave_ver");
+                                        MightPowerSkill pwr = cleave.MightData.MightPowerSkill_Cleave.FirstOrDefault((MightPowerSkill x) => x.label == "TM_Cleave_pwr");
+                                        MightPowerSkill ver = cleave.MightData.MightPowerSkill_Cleave.FirstOrDefault((MightPowerSkill x) => x.label == "TM_Cleave_ver");
                                         int dmgNum = Mathf.RoundToInt(dinfo.Amount * (TorannMagicDefOf.TM_Cleave.weaponDamageFactor + (.05f * pwr.level)));
                                         DamageInfo dinfo2 = new DamageInfo(TMDamageDefOf.DamageDefOf.TM_Cleave, dmgNum, 0, (float)-1, instigator, null, null, DamageInfo.SourceCategory.ThingOrUnknown);
                                         Verb_Cleave.ApplyCleaveDamage(dinfo2, instigator, ___pawn, ___pawn.Map, ver.level);
-                                        comp.Stamina.CurLevel -= comp.ActualStaminaCost(TorannMagicDefOf.TM_Cleave);
-                                        comp.MightUserXP += Rand.Range(10, 15);
+                                        cleave.Stamina.CurLevel -= cleave.ActualStaminaCost(TorannMagicDefOf.TM_Cleave);
+                                        cleave.MightUserXP += Rand.Range(10, 15);
                                     }
                                 }
-                                if (instigator.story.traits.HasTrait(TorannMagicDefOf.TM_SuperSoldier) || TM_ClassUtility.ClassHasAbility(TorannMagicDefOf.TM_CQC, null, comp))
+                                if (instigator.story.traits.HasTrait(TorannMagicDefOf.TM_SuperSoldier) || ClassProgression.SuperSoldierMartialPath.Cqc(instigator) || TM_ClassUtility.ClassHasAbility(TorannMagicDefOf.TM_CQC, null, comp))
                                 {
                                     if (comp != null && comp.useCQCToggle && comp.Stamina.CurLevel >= comp.ActualStaminaCost(TorannMagicDefOf.TM_CQC) && (___pawn.Position - instigator.Position).LengthHorizontal <= 1.6f)
                                     {
