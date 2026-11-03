@@ -11,4 +11,8 @@
   <TM_SpiritEarthernHammer.reportString>invocando el martillo de tierra.</TM_SpiritEarthernHammer.reportString>
   <TM_SpiritSentinel.reportString>invocando un centinela de piedra.</TM_SpiritSentinel.reportString>
   <TM_SpiritShatterSentinel.reportString>destrozando los centinelas de piedra.</TM_SpiritShatterSentinel.reportString>
+  <TM_SpiritMeteor.reportString>invocando un meteorito.</TM_SpiritMeteor.reportString>
+  <TM_SpiritMeteor_I.reportString>invocando un meteorito.</TM_SpiritMeteor_I.reportString>
+  <TM_SpiritMeteor_II.reportString>invocando un meteorito.</TM_SpiritMeteor_II.reportString>
+  <TM_SpiritMeteor_III.reportString>invocando un meteorito.</TM_SpiritMeteor_III.reportString>
 </LanguageData>

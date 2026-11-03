@@ -11,4 +11,8 @@
   <TM_SpiritEarthernHammer.reportString>casting earthen hammer.</TM_SpiritEarthernHammer.reportString>
   <TM_SpiritSentinel.reportString>summoning a stone sentinel.</TM_SpiritSentinel.reportString>
   <TM_SpiritShatterSentinel.reportString>shattering stone sentinels.</TM_SpiritShatterSentinel.reportString>
+  <TM_SpiritMeteor.reportString>calling down a meteorite.</TM_SpiritMeteor.reportString>
+  <TM_SpiritMeteor_I.reportString>calling down a meteorite.</TM_SpiritMeteor_I.reportString>
+  <TM_SpiritMeteor_II.reportString>calling down a meteorite.</TM_SpiritMeteor_II.reportString>
+  <TM_SpiritMeteor_III.reportString>calling down a meteorite.</TM_SpiritMeteor_III.reportString>
 </LanguageData>

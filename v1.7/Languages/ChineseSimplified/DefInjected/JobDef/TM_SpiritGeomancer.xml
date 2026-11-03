@@ -11,4 +11,8 @@
   <TM_SpiritEarthernHammer.reportString>正在施放大地之锤。</TM_SpiritEarthernHammer.reportString>
   <TM_SpiritSentinel.reportString>正在召唤石卫。</TM_SpiritSentinel.reportString>
   <TM_SpiritShatterSentinel.reportString>正在击碎石卫。</TM_SpiritShatterSentinel.reportString>
+  <TM_SpiritMeteor.reportString>正在召唤陨石。</TM_SpiritMeteor.reportString>
+  <TM_SpiritMeteor_I.reportString>正在召唤陨石。</TM_SpiritMeteor_I.reportString>
+  <TM_SpiritMeteor_II.reportString>正在召唤陨石。</TM_SpiritMeteor_II.reportString>
+  <TM_SpiritMeteor_III.reportString>正在召唤陨石。</TM_SpiritMeteor_III.reportString>
 </LanguageData>

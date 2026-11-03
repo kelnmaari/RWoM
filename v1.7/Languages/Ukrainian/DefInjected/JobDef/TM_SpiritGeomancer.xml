@@ -11,4 +11,8 @@
   <TM_SpiritEarthernHammer.reportString>прикликає кам’яний молот.</TM_SpiritEarthernHammer.reportString>
   <TM_SpiritSentinel.reportString>прикликає кам’яного вартового.</TM_SpiritSentinel.reportString>
   <TM_SpiritShatterSentinel.reportString>розбиває кам’яних вартових.</TM_SpiritShatterSentinel.reportString>
+  <TM_SpiritMeteor.reportString>прикликає метеорит.</TM_SpiritMeteor.reportString>
+  <TM_SpiritMeteor_I.reportString>прикликає метеорит.</TM_SpiritMeteor_I.reportString>
+  <TM_SpiritMeteor_II.reportString>прикликає метеорит.</TM_SpiritMeteor_II.reportString>
+  <TM_SpiritMeteor_III.reportString>прикликає метеорит.</TM_SpiritMeteor_III.reportString>
 </LanguageData>
