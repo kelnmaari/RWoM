@@ -30,10 +30,12 @@ namespace TorannMagic.ClassProgression
 
         internal static float StrikeDamage(Pawn body,Pawn owner)
         {
-            if(body==owner)return owner.GetCompAbilityUserMight().weaponDamage;
-            // An untrained host need not have a populated ability damage cache.
+            var source=owner.GetCompAbilityUserMight();
+            // An equipped melee weapon has a five-point floor. Until its first refresh
+            // after load the component still contains its initializer of one.
+            if (body==owner && source.weaponDamage>=5f) return source.weaponDamage;
             float weapon=body.equipment.Primary.GetStatValue(StatDefOf.MeleeWeapon_AverageDPS,false);
-            return Mathf.Max(5f,(weapon+body.GetStatValue(StatDefOf.MeleeDPS,false))*owner.GetCompAbilityUserMight().mightPwr);
+            return Mathf.Max(5f,(weapon+body.GetStatValue(StatDefOf.MeleeDPS,false))*source.mightPwr);
         }
 
         internal static bool Valid(Pawn body,MightAbility power,string order,LocalTargetInfo target)

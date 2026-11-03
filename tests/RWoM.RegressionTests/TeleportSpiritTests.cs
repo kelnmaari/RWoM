@@ -162,6 +162,21 @@ internal static partial class TeleportSpiritTests
             Check.Same(DamageDefOf.Stun, hit.Damage, "stun damage definition is unchanged");
             Check.Equal("Position,Notify,Stun", string.Join(",", w.Events), "move and notification precede secondary damage");
         }));
+        yield return new("BladeProjection.NativeMeleeDamageBeforeFirstRefresh", f => World(f,w =>
+        {
+            w.Verb("Verb_PhaseStrike",f);
+            var comp=w.Caster.GetCompAbilityUserMight();
+            comp.weaponDamage=1; // Field initializer restored before the first periodic update.
+            comp.mightPwr=2;
+            using var stats=new Patches();
+            stats.Prefix(typeof(StatExtension).GetMethod(nameof(StatExtension.GetStatValue),
+                [typeof(Thing),typeof(StatDef),typeof(bool),typeof(int)])!,nameof(BladeDps));
+            var strike=typeof(TM_Teleport).Assembly.GetType("TorannMagic.ClassProgression.BladeMartialCast",true)!
+                .GetMethod("StrikeDamage",Flags)!;
+            Check.Equal(30f,(float)strike.Invoke(null,[w.Caster,w.Caster])!,"loaded sword and pawn DPS use the trained multiplier");
+            comp.weaponDamage=50;
+            Check.Equal(50f,(float)strike.Invoke(null,[w.Caster,w.Caster])!,"existing initialized native damage remains in effect");
+        }));
         yield return new("TeleportSpirit.PhaseKeepsDestinationVictimAndDamageFormula", f => World(f, w =>
         {
             var verb = w.Verb("Verb_PhaseStrike", f); using var patches = w.MovementBoundaries();
@@ -414,6 +429,11 @@ internal static partial class TeleportSpiritTests
     static bool RemovePossession(Pawn p, IntVec3 loc, bool destroySpirit)
     {
         active!.ReleaseCalls++; active.ReleasedHost = p; active.ReleasedAt = loc; active.DestroySpirit = destroySpirit; return false;
+    }
+    static bool BladeDps(Thing thing, ref float __result)
+    {
+        __result=thing is Pawn ? 6 : 9;
+        return false;
     }
     static IEnumerable<MethodBase> Calls(MethodBase root)
     {
