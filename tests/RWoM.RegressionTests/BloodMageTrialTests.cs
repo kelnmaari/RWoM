@@ -13,6 +13,7 @@ internal static class BloodMageTrialTests
     static DamageDef Burn => (DamageDef)BurnField.GetValue(null)!;
     public static IEnumerable<TestCase> Cases()
     {
+        yield return new("BloodMageTrial.ShieldPendingLossSurvivesSave", SaveShield);
         yield return new("BloodMageTrial.ShieldActualDeltaLinkAndRecipients", Shield);
         yield return new("BloodMageTrial.ShieldFreshAndDrift", ShieldDrift);
         yield return new("BloodMageTrial.IgniteOwnedSourceDamageAndNestedScopes", Ignite);
@@ -216,6 +217,51 @@ internal static class BloodMageTrialTests
         try { w.Target.TakeDamage(new DamageInfo(Burn, 0, instigator: w.Caster)); } finally { BloodMageTrials.ExitExplosion(scope); }
         Check.Equal(7f, w.Path.BloodMageTrials.IgniteDamage, "actual native zero damage gives no credit");
     }
+    public sealed class ShieldEnvelope : IExposable
+    {
+        public static HediffComp_BloodShield current = null!;
+        public void ExposeData() => current.CompExposeData();
+    }
+
+    static void SaveShield(RuntimeFixture f)
+    {
+        using var w = new Fixture(f);
+        var ward = w.Ward(23f);
+        var before = (HediffComp_BloodShield)ward.comps[0];
+        before.linkedPawn = null;
+        Set(before, "initialized", true); Set(before, "lastSeverity", 40f);
+        Set(before, "initializeDelay", 2); Set(before,"removeNow",true);
+        var file = System.IO.Path.Combine(f.WorkingDirectory,"shield-pulse.xml");
+        try
+        {
+            ShieldEnvelope.current = before;
+            var envelope = new ShieldEnvelope();
+            try { Scribe.saver.InitSaving(file,"regression"); Scribe_Deep.Look(ref envelope,"ward"); Scribe.saver.FinalizeSaving(); }
+            finally { Scribe.ForceStop(); }
+            HediffComp_BloodShield Load()
+            {
+                ShieldEnvelope.current = new HediffComp_BloodShield { parent = ward };
+                ShieldEnvelope loaded = null!;
+                try { Scribe.loader.InitLoading(file); Scribe_Deep.Look(ref loaded,"ward"); Scribe.loader.FinalizeLoading(); }
+                finally { Scribe.ForceStop(); }
+                return ShieldEnvelope.current;
+            }
+            var restored = Load();
+            const BindingFlags fields = BindingFlags.Instance | BindingFlags.NonPublic;
+            float Baseline(HediffComp_BloodShield c) => (float)c.GetType().GetField("lastSeverity",fields)!.GetValue(c)!;
+            Check.Equal(17f,Baseline(restored)-ward.Severity,"shield loss awaiting healing survives loading");
+            Check.Equal(true,restored.CompShouldRemove,"a finished shield cannot resume healing after save");
+            var xml=System.Xml.Linq.XDocument.Load(file);
+            foreach(var field in new[]{"TM_bloodShieldLastSeverity","TM_bloodShieldDelay","TM_bloodShieldEnding"})
+                xml.Descendants(field).Single().Remove();
+            xml.Save(file);
+            restored=Load();
+            Check.Equal(ward.Severity,Baseline(restored),"an old save grants no speculative healing");
+            Check.Equal(false,restored.CompShouldRemove,"old live shield remains usable");
+        }
+        finally { ShieldEnvelope.current = null!; }
+    }
+
     static void Save(RuntimeFixture f)
     {
         using var w = new Fixture(f); using var hooks = new Hooks(); w.Adept(); var projectile = w.Launch(); var e = w.Explosion(projectile); w.Hit(e, 11);

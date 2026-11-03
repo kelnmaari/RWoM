@@ -38,6 +38,23 @@ internal static partial class SpiritMapCollapseTests
                 }
                 Check.Equal(true,find.Invoke(null,[body,body,def])==null,"physical body cannot impersonate the soul");
             }));
+        yield return new("BloodMageTrial.HostBloodUsesSoulRankAndBodyBleeding", r =>
+            SpiritRebirthRitualTransactionTests.Run(r,c => {
+                using var fixture = new Fixture(r,c);
+                var body=c.Creator;var soul=c.Original;
+                var magic=soul.GetCompAbilityUserMagic();var local=body.GetCompAbilityUserMagic();
+                magic.arcaneDmg=2.5f;local.arcaneDmg=.75f;
+                var gift=new MagicAbility(magic) { Def=TorannMagicDefOf.TM_BloodGift };
+                magic.AbilityData.Powers.Add(gift);magic.AbilityData.AllPowers=null;
+                var meter=new HediffWithComps { pawn=body, def=new HediffDef { defName="TM_BloodHD" } };
+                var blood=new HediffComp_Blood { parent=meter };meter.comps=[blood];
+                var initialize=typeof(HediffComp_Blood).GetMethod("Initialize",BindingFlags.Instance|BindingFlags.NonPublic)!;
+                initialize.Invoke(blood,null);
+                var dmg=typeof(HediffComp_Blood).GetField("arcaneDmg",BindingFlags.Instance|BindingFlags.NonPublic)!;
+                Check.Equal(2.5f,(float)dmg.GetValue(blood)!,"physical blood accrues with the original's potency");
+                Check.Equal(false,blood.CompShouldRemove,"non-blood-mage carrier holds physical blood");
+                Check.Same(body,meter.pawn,"blood remains on host");
+            }));
         yield return new("BardTrials.HostedSongsRequireOriginalOwnerAndAttachedBody", r =>
             SpiritRebirthRitualTransactionTests.Run(r, c => {
                 using var fixture = new Fixture(r,c);

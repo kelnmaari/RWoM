@@ -33,6 +33,11 @@ namespace TorannMagic
             Scribe_References.Look<Pawn>(ref linkedPawn, "linkedPawn", false);
             Scribe_Values.Look<int>(ref this.bloodshieldVer, "bloodshieldVer", 0, false);
             Scribe_Values.Look<bool>(ref this.initialized, "initialized", false, false);
+            Scribe_Values.Look(ref lastSeverity, "TM_bloodShieldLastSeverity", -1f);
+            Scribe_Values.Look(ref initializeDelay, "TM_bloodShieldDelay");
+            Scribe_Values.Look(ref removeNow, "TM_bloodShieldEnding");
+            if (Scribe.mode == LoadSaveMode.PostLoadInit && lastSeverity < 0f)
+                lastSeverity = parent.Severity;
         }
 
         public string labelCap
