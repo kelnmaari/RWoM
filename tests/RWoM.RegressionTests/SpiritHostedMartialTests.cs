@@ -202,6 +202,31 @@ internal static partial class SpiritMapCollapseTests
             bullet.projectile.explosionRadius=2;
             Check.Equal(true,Incoming(physical,weapon)==null,"exclude explosive ammunition");
         });
+        foreach(bool rescue in new[]{false,true})
+            yield return new(rescue?"PsionicProjection.RescueTrial":"PsionicProjection.RepairTrial",f=>
+                SpiritRebirthRitualTransactionTests.Run(f,c=>{
+                    using var held=new Fixture(f,c);
+                    var stage=rescue?InitiationStage.Adept:InitiationStage.Foundation;
+                    DisciplineProgress Enroll(Pawn pawn)
+                    {
+                        var state=new ClassProgressionState(Vocation.Warrior);Set(ClassIdentity.Component(pawn),"state",state);
+                        state.TryAddFoundation("rwom.psionic",DisciplineDomain.Might);
+                        var path=state.Find("rwom.psionic")!;Set(path,"stage",stage);return path;
+                    }
+                    var soul=Enroll(c.Original);
+                    var service=Production("PsionicMartialPath").GetMethod("Service",BindingFlags.NonPublic|BindingFlags.Static)!;
+                    void Record(int id)=>service.Invoke(null,[c.Creator,0f,rescue?0:id,rescue?id:0,false]);
+                    int goal=rescue?10:20;
+                    bool Done(DisciplineProgress p)=>p.CompletedTrials.Contains("rwom.psionic."+stage);
+                    for(int i=1;i<goal;i++)Record(i);
+                    Record(1);
+                    Check.Equal(false,Done(soul),"repeating a pawn or building cannot satisfy the trial");
+                    Record(goal);
+                    Check.Equal(true,Done(soul),"physical service must advance original Psionic");
+                    var host=Enroll(c.Creator);
+                    for(int i=1;i<=goal;i++)Record(i);
+                    Check.Equal(true,Done(host),"host's own path takes priority");
+                }));
         yield return new("FacelessProjection.ControlOwner",f=>SpiritRebirthRitualTransactionTests.Run(f,c=>{
             using var held=new Fixture(f,c);
             var comp=c.Original.GetCompAbilityUserMight();
