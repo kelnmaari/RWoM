@@ -85,6 +85,10 @@ namespace TorannMagic.ClassProgression
             ("TM_SpiritLullaby_II", () => TorannMagicDefOf.TM_Lullaby_II, typeof(Verb_Lullaby)),
             ("TM_SpiritLullaby_III", () => TorannMagicDefOf.TM_Lullaby_III, typeof(Verb_Lullaby)),
             ("TM_SpiritIgniteBlood", () => TorannMagicDefOf.TM_IgniteBlood, typeof(Projectile_IgniteBlood)),
+            ("TM_SpiritRend", () => TorannMagicDefOf.TM_Rend, typeof(Verb_Rend)),
+            ("TM_SpiritRend_I", () => TorannMagicDefOf.TM_Rend_I, typeof(Verb_Rend)),
+            ("TM_SpiritRend_II", () => TorannMagicDefOf.TM_Rend_II, typeof(Verb_Rend)),
+            ("TM_SpiritRend_III", () => TorannMagicDefOf.TM_Rend_III, typeof(Verb_Rend)),
             ("TM_SpiritBloodForBlood", () => TorannMagicDefOf.TM_BloodForBlood, typeof(Verb_BloodForBlood)),
             ("TM_SpiritBloodShield", () => TorannMagicDefOf.TM_BloodShield, typeof(Verb_BloodShield)),
             ("TM_SpiritBattleHymn", () => TorannMagicDefOf.TM_BattleHymn, typeof(Verb_BattleHymn)),
@@ -183,7 +187,7 @@ namespace TorannMagic.ClassProgression
                     def.MainVerb.verbClass == typeof(Verb_UseAbility_TrueBurst)) &&
                     f.effect == def.MainVerb.defaultProjectile?.thingClass &&
                     (typeof(Projectile_SpiritNativeAbility).IsAssignableFrom(f.effect) || typeof(Projectile_SpiritBolt).IsAssignableFrom(f.effect) || typeof(Projectile_SpiritRay).IsAssignableFrom(f.effect) || f.effect == typeof(Projectile_IgniteBlood) || SpiritHostedSummons.IsProjectile(f.effect))))) ||
-                (def.MainVerb.burstShotCount != 1 && !IsBurst(def)) || def.bloodCost != 0 && def != TorannMagicDefOf.TM_BloodShield && def != TorannMagicDefOf.TM_IgniteBlood && def != TorannMagicDefOf.TM_BloodForBlood || def.chiCost != 0 || def.requiredNeed != null ||
+                (def.MainVerb.burstShotCount != 1 && !IsBurst(def)) || def.bloodCost != 0 && def != TorannMagicDefOf.TM_BloodShield && def != TorannMagicDefOf.TM_IgniteBlood && def != TorannMagicDefOf.TM_BloodForBlood && def.MainVerb.verbClass != typeof(Verb_Rend) || def.chiCost != 0 || def.requiredNeed != null ||
                 def.requiredHediff != null || !def.consumeEnergy || power.MagicUser.Mana == null) return false;
             if (def.bloodCost != 0)
             {
