@@ -29,6 +29,23 @@ internal static class GrimoireKureTests
     public static IEnumerable<TestCase> Cases()
     {
         yield return new("GrimoireKure.DeclarationCoverage", DeclarationCoverage);
+        yield return new("GrimoireKure.StaminaPotionAddictionNeed", f =>
+        {
+            var source=new XmlDocument();source.Load(Path.Combine(f.Repository,"v1.7/Patches/KureStaminaPotion.xml"));
+            var op=DirectXmlToObject.ObjectFromXml<PatchOperation>(source.SelectSingleNode("/Patch/Operation")!,false);
+            var definitions=new XmlDocument();definitions.LoadXml("<Defs/>");
+            Check.Equal(true,op.Apply(definitions),"absent Kure is a no-op");
+            definitions.LoadXml("<Defs><HediffDef><defName>RFSStaminaPotionAddiction</defName><hediffClass>Hediff_Addiction</hediffClass></HediffDef></Defs>");
+            Check.Equal(true,op.Apply(definitions),"absent named need does not introduce unresolved references");
+            Check.Equal(0,definitions.GetElementsByTagName("chemicalNeed").Count,"partial installation untouched");
+            var need=definitions.CreateElement("NeedDef");need.InnerXml="<defName>RFSChemical_StaminaPotion</defName>";definitions.DocumentElement!.AppendChild(need);
+            Check.Equal(true,op.Apply(definitions),"authored chemical dependency linked");
+            Check.Equal("RFSChemical_StaminaPotion",definitions.SelectSingleNode("Defs/HediffDef/chemicalNeed")!.InnerText,"native need selection on load");
+            definitions.SelectSingleNode("Defs/HediffDef/chemicalNeed")!.InnerText="AnotherNeed";
+            Check.Equal(true,op.Apply(definitions),"other adapter's link remains authoritative");
+            Check.Equal("AnotherNeed",definitions.SelectSingleNode("Defs/HediffDef/chemicalNeed")!.InnerText,"existing reference preserved");
+            Check.Equal(1,definitions.GetElementsByTagName("chemicalNeed").Count,"idempotent patch");
+        });
         foreach (string id in KureClasses)
         {
             string name = id;
