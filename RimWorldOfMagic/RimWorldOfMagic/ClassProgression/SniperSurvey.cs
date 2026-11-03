@@ -124,36 +124,72 @@ namespace TorannMagic.ClassProgression
         protected abstract bool OwnsTechnique(DisciplineProgress path);
         protected abstract string RoundName { get; }
         private Verb_Shoot Weapon => CasterPawn?.equipment?.Primary?.TryGetComp<CompEquippable>()?.PrimaryVerb as Verb_Shoot;
+        internal bool HasCompatibleWeapon
+        {
+            get
+            {
+                var gun = Weapon;
+                var round = gun?.Projectile;
+                return gun?.GetType() == typeof(Verb_Shoot) && round?.thingClass == typeof(Bullet) && round.projectile?.explosionRadius <= 0;
+            }
+        }
         public override float EffectiveRange => Weapon?.EffectiveRange ?? 0f;
         public override bool CanHitTargetFrom(IntVec3 root, LocalTargetInfo target)
         {
             var pawn = CasterPawn;
             var gun = Weapon;
-            var bullet = gun?.Projectile;
-            return pawn?.Spawned == true && !pawn.Downed && OwnsTechnique(SniperSurvey.Path(pawn))
-                && gun != null && gun.GetType() == typeof(Verb_Shoot) && bullet?.thingClass == typeof(Bullet) && bullet.projectile?.explosionRadius <= 0
+            return pawn?.Spawned == true && !pawn.Downed && OwnsTechnique(SniperSurvey.Path(Ability?.Pawn ?? pawn))
+                && HasCompatibleWeapon
                 && target.Pawn is Pawn victim && victim.Spawned && victim.Map == pawn.Map && !victim.Dead && !victim.Downed
                 && !victim.IsPrisoner && victim.HostileTo(pawn) && gun.CanHitTargetFrom(root,target);
         }
-        protected override bool TryCastShot() => FireWeapon(currentTarget);
+        protected override bool TryCastShot() => FirePaidShot(currentTarget);
+
+        private bool FirePaidShot(LocalTargetInfo target)
+        {
+            if (!FireWeapon(target)) return false;
+            Odyssey.ManualTravelSafety.Settle(Ability);
+            return true;
+        }
+
+        public override void WarmupComplete()
+        {
+            base.WarmupComplete();
+            Verb_SniperShot.EndLaunchedShot(this);
+        }
 
         protected bool FireWeapon(LocalTargetInfo target)
         {
             if (CasterPawn == null || !CanHitTargetFrom(CasterPawn.Position, target)) return false;
             var gun = Weapon;
-            return new AimedWeaponVerb { roundName=RoundName, caster=CasterPawn, verbProps=gun.verbProps, verbTracker=gun.verbTracker }.Fire(target, gun.Projectile);
+            return new AimedWeaponVerb { roundName=RoundName, caster=CasterPawn, verbProps=gun.verbProps, verbTracker=gun.verbTracker }.Fire(target, gun.Projectile, Ability?.Pawn);
         }
+        internal static Verb_SniperBallisticShot FromHost(Pawn body, MightAbility power)
+        {
+            var props = power?.mightDef?.MainVerb;
+            Verb_SniperBallisticShot verb;
+            if (props?.verbClass == typeof(Verb_SniperAimedShot)) verb = new Verb_SniperAimedShot();
+            else if (props?.verbClass == typeof(Verb_SniperArmorFracture)) verb = new Verb_SniperArmorFracture();
+            else return null;
+            verb.caster = body;
+            verb.Ability = power;
+            verb.verbProps = props;
+            return verb;
+        }
+        internal bool FireFromHost(Pawn target) => FirePaidShot(target);
         private sealed class AimedWeaponVerb : Verb_Shoot
         {
             public string roundName;
             public override ThingDef Projectile => DefDatabase<ThingDef>.GetNamed(roundName);
-            internal bool Fire(LocalTargetInfo target,ThingDef round)
+            internal bool Fire(LocalTargetInfo target,ThingDef round, Pawn owner)
             {
                 currentTarget=target;
                 var before=SniperWeaponBullet.Source;
+                var previousOwner = SniperWeaponBullet.SourceOwner;
                 SniperWeaponBullet.Source=round;
+                SniperWeaponBullet.SourceOwner = owner != caster ? owner : null;
                 try { return TryCastShot(); }
-                finally { SniperWeaponBullet.Source=before; }
+                finally { SniperWeaponBullet.Source=before; SniperWeaponBullet.SourceOwner = previousOwner; }
             }
         }
     }
@@ -167,10 +203,19 @@ namespace TorannMagic.ClassProgression
     public abstract class SniperWeaponBullet : Bullet
     {
         [System.ThreadStatic] internal static ThingDef Source;
+        [System.ThreadStatic] internal static Pawn SourceOwner;
+        private Pawn projectedOwner;
+        protected Pawn TechniqueOwner(Thing shooter) => projectedOwner ?? shooter as Pawn;
+        public override void ExposeData()
+        {
+            base.ExposeData();
+            Scribe_References.Look(ref projectedOwner, "sniperTechniqueOwner");
+        }
         public override void PostMake()
         {
             // Map listers must register the real ammunition definition from the start.
             if (Source != null) def=Source;
+            projectedOwner = SourceOwner;
             base.PostMake();
         }
     }
@@ -182,7 +227,7 @@ namespace TorannMagic.ClassProgression
         public override void Launch(Thing launcher,Vector3 origin,LocalTargetInfo usedTarget,LocalTargetInfo intendedTarget,
             ProjectileHitFlags hitFlags,bool preventFriendlyFire=false,Thing equipment=null,ThingDef targetCoverDef=null)
         {
-            var percent = SniperTraining.DamagePercent(SniperTraining.Rank(launcher as Pawn, breach: false));
+            var percent = SniperTraining.DamagePercent(SniperTraining.Rank(TechniqueOwner(launcher), breach: false));
             shotDamage = Mathf.Max(1, Mathf.RoundToInt(def.projectile.GetDamageAmount(equipment) * percent / 100f));
             base.Launch(launcher,origin,usedTarget,intendedTarget,hitFlags,preventFriendlyFire,equipment,targetCoverDef);
         }

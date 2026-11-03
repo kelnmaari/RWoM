@@ -67,6 +67,54 @@ internal static partial class SpiritMapCollapseTests
                 Check.Equal(true,Find()==null,"local shot takes precedence without adding a duplicate");
             }));
 
+        foreach (string id in new[]{"TM_SniperAimedShot","TM_SniperArmorFracture"})
+        yield return new("SpiritProjectedCast.Martial.Reforged."+id,f =>
+            SpiritRebirthRitualTransactionTests.Run(f,c => {
+                using var held=new Fixture(f,c);
+                var def=DefDatabase<TMAbilityDef>.GetNamedSilentFail(id)??f.AddAbility(id);
+                var source=c.Original.GetCompAbilityUserMight();
+                var power=new MightAbility(source){Def=def};
+                source.AbilityData.Powers.Add(power);source.AbilityData.AllPowers=null;
+                string job=id=="TM_SniperAimedShot"?"TM_SpiritCastAimedShot":"TM_SpiritCastArmorFracture";
+                const string file = "TM_SpiritSniperBallistics.xml";
+                var xml = System.Xml.Linq.XDocument.Load(Path.Combine(f.Repository,"v1.7/Defs/JobDefs",file));
+                var order = xml.Root!.Elements().Single(e => (string?)e.Element("defName") == job);
+                Check.Equal(typeof(JobDriver_SpiritHostedMartial).FullName,(string?)order.Element("driverClass"),"order uses the targeted cast job");
+                foreach (var language in new[] {"English","Russian","Spanish","Portuguese","PortugueseBrazilian","Ukrainian","ChineseSimplified"})
+                {
+                    var translations = System.Xml.Linq.XDocument.Load(Path.Combine(f.Repository,"v1.7/Languages",language,"DefInjected/JobDef",file));
+                    Check.Equal(true,translations.Root!.Element(job+".reportString")?.Value.Contains("TargetB")==true,
+                        "translated report names the actual target in "+language);
+                }
+                var find=Production("SpiritHostedMartial").GetMethod("Find",BindingFlags.Static|BindingFlags.NonPublic)!;
+                Check.Same(power,find.Invoke(null,[c.Creator,c.Original,job])!,"borrowed weapon job resolves the exact discipline power");
+            }));
+
+        yield return new("SpiritProjectedCast.Martial.SniperOpening.UsesOriginalThreeShotJob", f =>
+            SpiritRebirthRitualTransactionTests.Run(f,c => {
+                using var held = new Fixture(f,c);
+                const string id = "TM_SniperSingleOpening";
+                var def = DefDatabase<TMAbilityDef>.GetNamedSilentFail(id) ?? f.AddAbility(id);
+                var source = c.Original.GetCompAbilityUserMight();
+                var power = new SniperOpeningAbility(source) { Def = def };
+                source.AbilityData.Powers.Add(power);
+                source.AbilityData.AllPowers = null;
+                var find = Production("SpiritHostedMartial").GetMethod("Find",BindingFlags.Static|BindingFlags.NonPublic)!;
+                Check.Same(power,find.Invoke(null,[c.Creator,c.Original,"TM_SniperSingleOpeningCast"])!,
+                    "only the original's learned ascension provides the three-shot job");
+            }));
+
+        yield return new("SpiritProjectedCast.Martial.ShadowSlayer.UsesOriginalCloak", f =>
+            SpiritRebirthRitualTransactionTests.Run(f,c => {
+                using var held = new Fixture(f,c);
+                var source = c.Original.GetCompAbilityUserMight();
+                var power = new MightAbility(source) { Def=TorannMagicDefOf.TM_ShadowSlayer };
+                source.AbilityData.Powers.Add(power); source.AbilityData.AllPowers=null;
+                var find=Production("SpiritHostedMartial").GetMethod("Find",BindingFlags.Static|BindingFlags.NonPublic)!;
+                Check.Same(power,find.Invoke(null,[c.Creator,c.Original,"TM_SpiritCastShadowSlayer"])!,
+                    "the host can project the retained cloak without learning it itself");
+            }));
+
         yield return new("SpiritProjectedCast.Martial.PommelStrike", f =>
             SpiritRebirthRitualTransactionTests.Run(f, c => {
                 using var possession = new Fixture(f,c);

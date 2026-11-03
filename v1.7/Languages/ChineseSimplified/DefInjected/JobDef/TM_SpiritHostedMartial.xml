@@ -12,4 +12,5 @@
   <TM_SpiritCastHeadshot.reportString>正在瞄准TargetB的头部。</TM_SpiritCastHeadshot.reportString>
   <TM_SpiritCastDisablingShot.reportString>正向TargetB发射致残弹。</TM_SpiritCastDisablingShot.reportString>
   <TM_SpiritCastAntiArmor.reportString>正向TargetB发射穿甲弹。</TM_SpiritCastAntiArmor.reportString>
+  <TM_SpiritCastShadowSlayer.reportString>正在激活暗影杀手的隐身力场。</TM_SpiritCastShadowSlayer.reportString>
 </LanguageData>

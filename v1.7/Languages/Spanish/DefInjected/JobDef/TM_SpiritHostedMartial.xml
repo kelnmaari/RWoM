@@ -12,4 +12,5 @@
   <TM_SpiritCastHeadshot.reportString>apuntando a la cabeza de TargetB.</TM_SpiritCastHeadshot.reportString>
   <TM_SpiritCastDisablingShot.reportString>disparando un tiro incapacitante a TargetB.</TM_SpiritCastDisablingShot.reportString>
   <TM_SpiritCastAntiArmor.reportString>disparando un tiro perforante a TargetB.</TM_SpiritCastAntiArmor.reportString>
+  <TM_SpiritCastShadowSlayer.reportString>activando el camuflaje del asesino sombrío.</TM_SpiritCastShadowSlayer.reportString>
 </LanguageData>

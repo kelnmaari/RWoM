@@ -2874,6 +2874,9 @@
 	<comps>
 	  <li>
         <compClass>TorannMagic.HediffComp_ShadowSlayerCloak</compClass>
+      </li>
+      <li>
+        <compClass>TorannMagic.ClassProgression.HediffComp_SpiritCastOrigin</compClass>
       </li>	
       <li Class="HediffCompProperties_Disappears">
         <showRemainingTime>True</showRemainingTime>

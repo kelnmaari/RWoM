@@ -12,4 +12,5 @@
   <TM_SpiritCastHeadshot.reportString>целится в голову TargetB.</TM_SpiritCastHeadshot.reportString>
   <TM_SpiritCastDisablingShot.reportString>стреляет в TargetB обездвиживающим выстрелом.</TM_SpiritCastDisablingShot.reportString>
   <TM_SpiritCastAntiArmor.reportString>стреляет в TargetB бронебойным выстрелом.</TM_SpiritCastAntiArmor.reportString>
+  <TM_SpiritCastShadowSlayer.reportString>активирует маскировку теневого убийцы.</TM_SpiritCastShadowSlayer.reportString>
 </LanguageData>

@@ -12,4 +12,5 @@
   <TM_SpiritCastHeadshot.reportString>aiming a headshot at TargetB.</TM_SpiritCastHeadshot.reportString>
   <TM_SpiritCastDisablingShot.reportString>firing a disabling shot at TargetB.</TM_SpiritCastDisablingShot.reportString>
   <TM_SpiritCastAntiArmor.reportString>firing an anti-armor shot at TargetB.</TM_SpiritCastAntiArmor.reportString>
+  <TM_SpiritCastShadowSlayer.reportString>activating the shadow slayer cloak.</TM_SpiritCastShadowSlayer.reportString>
 </LanguageData>

@@ -52,4 +52,5 @@
   <JobDef><defName>TM_SpiritCastHeadshot</defName><driverClass>TorannMagic.ClassProgression.JobDriver_SpiritHostedMartial</driverClass><reportString>aiming a headshot at TargetB.</reportString></JobDef>
   <JobDef><defName>TM_SpiritCastDisablingShot</defName><driverClass>TorannMagic.ClassProgression.JobDriver_SpiritHostedMartial</driverClass><reportString>firing a disabling shot at TargetB.</reportString></JobDef>
   <JobDef><defName>TM_SpiritCastAntiArmor</defName><driverClass>TorannMagic.ClassProgression.JobDriver_SpiritHostedMartial</driverClass><reportString>firing an anti-armor shot at TargetB.</reportString></JobDef>
+  <JobDef><defName>TM_SpiritCastShadowSlayer</defName><driverClass>TorannMagic.ClassProgression.JobDriver_SpiritHostedMartial</driverClass><reportString>activating the shadow slayer cloak.</reportString></JobDef>
 </Defs>

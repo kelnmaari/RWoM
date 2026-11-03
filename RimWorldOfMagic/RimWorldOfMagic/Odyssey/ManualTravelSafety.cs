@@ -46,8 +46,12 @@ namespace TorannMagic.Odyssey
         }
         public static bool TakePayment(PawnAbility ability)
         {
-            if (!Payments.TryGetValue(ability, out var payment) && ability is MightAbility sniper &&
-                sniper.mightDef?.MainVerb?.verbClass == typeof(Verb_SniperShot)) return false;
+            if (!Payments.TryGetValue(ability, out var payment) && ability is MightAbility sniper)
+            {
+                var verb = sniper.mightDef?.MainVerb?.verbClass;
+                if (verb == typeof(Verb_SniperShot) || verb == typeof(ClassProgression.Verb_SniperAimedShot) ||
+                    verb == typeof(ClassProgression.Verb_SniperArmorFracture)) return false;
+            }
             if (payment == null) return !IsTravel(ability) && !ClassProgression.DemonBondTravel.Applies(ability) && ability?.Def != TorannMagicDefOf.TM_Scorn && ability?.Def != TorannMagicDefOf.TM_SummonDemon && ability?.Def != TorannMagicDefOf.TM_FoldReality && ability?.Def != TorannMagicDefOf.TM_LightSkipGlobal;
             bool due = payment.Due; payment.Due = false; return due;
         }

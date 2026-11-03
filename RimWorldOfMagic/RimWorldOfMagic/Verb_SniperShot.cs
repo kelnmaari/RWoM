@@ -54,12 +54,17 @@ namespace TorannMagic
         public override void WarmupComplete()
         {
             base.WarmupComplete();
-            var body = CasterPawn;
-            if (body?.stances?.curStance is Stance_Cooldown stance && ReferenceEquals(stance.verb,this))
+            EndLaunchedShot(this);
+        }
+
+        internal static void EndLaunchedShot(Verb shot)
+        {
+            var body = shot.CasterPawn;
+            if (body?.stances?.curStance is Stance_Cooldown stance && ReferenceEquals(stance.verb,shot))
             {
                 // The paid projectile is already in flight. A saved transient verb cannot resume this job.
                 stance.verb = null;
-                if (body.jobs.curDriver is TMJobDriver_CastAbilityVerb && ReferenceEquals(body.CurJob?.verbToUse,this))
+                if (body.jobs.curDriver is TMJobDriver_CastAbilityVerb && ReferenceEquals(body.CurJob?.verbToUse,shot))
                 {
                     body.jobs.EndCurrentJob(JobCondition.Succeeded);
                     if (body.stances.curStance is Stance_Mobile && stance.ticksLeft > 0) body.stances.SetStance(stance);
