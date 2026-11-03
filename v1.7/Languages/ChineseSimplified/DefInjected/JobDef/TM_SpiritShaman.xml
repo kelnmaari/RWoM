@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LanguageData>
   <TM_SpiritChainLightning.reportString>正在施放连锁闪电。</TM_SpiritChainLightning.reportString>
+  <TM_SpiritSummonTotemEarth.reportString>正在召唤大地图腾。</TM_SpiritSummonTotemEarth.reportString>
+  <TM_SpiritSummonTotemLightning.reportString>正在召唤闪电图腾。</TM_SpiritSummonTotemLightning.reportString>
+  <TM_SpiritSummonTotemHealing.reportString>正在召唤治疗图腾。</TM_SpiritSummonTotemHealing.reportString>
 </LanguageData>

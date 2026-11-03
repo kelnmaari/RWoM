@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LanguageData>
   <TM_SpiritChainLightning.reportString>випускає ланцюгову блискавку.</TM_SpiritChainLightning.reportString>
+  <TM_SpiritSummonTotemEarth.reportString>прикликає тотем землі.</TM_SpiritSummonTotemEarth.reportString>
+  <TM_SpiritSummonTotemLightning.reportString>прикликає тотем блискавки.</TM_SpiritSummonTotemLightning.reportString>
+  <TM_SpiritSummonTotemHealing.reportString>прикликає тотем зцілення.</TM_SpiritSummonTotemHealing.reportString>
 </LanguageData>

@@ -113,6 +113,7 @@ internal static class ShamanTrialTests
     static void Save(RuntimeFixture f)
     {
         using var w = new Fixture(f); using var hooks = new Hooks(); var b = w.Totem(); w.Injury(); w.Heal(b, 3);
+        Set(b,"nextSearch",12345); Set(b,"initialized",true);
         var envelope = new Envelope { state = w.Progression.State, totem = b }; var file = Path.Combine(f.WorkingDirectory, "shaman-totem.xml");
         try { Scribe.saver.InitSaving(file, "trial"); Scribe_Deep.Look(ref envelope, "data"); Scribe.saver.FinalizeSaving(); } finally { Scribe.ForceStop(); }
         Envelope loaded = null!;
@@ -124,6 +125,7 @@ internal static class ShamanTrialTests
         }
         finally { Scribe.ForceStop(); }
         Check.Same(w.Caster, loaded.totem.trialCaster, "native building Scribe resolves exact original caster");
+        Check.Equal(12345, (int)typeof(Building_TMTotem_Healing).GetField("nextSearch",BindingFlags.Instance|BindingFlags.NonPublic)!.GetValue(loaded.totem)!, "load preserves the scheduled pulse");
         Set(w.Progression, "state", loaded.state); Set(loaded.totem, "mapIndexOrState", (sbyte)0);
         Check.Equal(3f, w.Path.ShamanTrials.Healing, "healing counter survives save"); w.Heal(loaded.totem, 5); Check.Equal(8f, w.Path.ShamanTrials.Healing, "saved source continues actual healing");
     }

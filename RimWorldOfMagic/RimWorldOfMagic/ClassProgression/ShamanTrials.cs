@@ -11,9 +11,14 @@ namespace TorannMagic.ClassProgression
         public const string FoundationTrialId = "rwom.shaman.foundation", MasteryTrialId = "rwom.shaman.mastery";
         static CompAbilityUserMagic Magic(Pawn pawn) => pawn?.AllComps.OfType<CompAbilityUserMagic>().FirstOrDefault();
         static MagicPower Owner(Pawn pawn, bool hex) => Magic(pawn)?.MagicData.MagicPowersShaman.FirstOrDefault(p => p.learned && p.TMabilityDefs.Contains(hex ? TorannMagicDefOf.TM_Hex : TorannMagicDefOf.TM_Totems));
+        static Pawn CastingBody(Pawn owner)
+        {
+            if (!SpiritRebirthState.TryGet(owner,out var state)) return owner?.Spawned == true ? owner : null;
+            return !state.DepletionPending && state.HasValidHost(owner) && state.Host.Spawned ? state.Host : null;
+        }
         static DisciplineProgress Owned(Pawn pawn, bool hex)
         {
-            if (pawn == null || pawn.Dead || !pawn.Spawned || pawn.Faction == null
+            if (pawn == null || pawn.Dead || CastingBody(pawn) == null || pawn.Faction == null
                 || pawn.story?.traits?.HasTrait(TorannMagicDefOf.Faceless) == true
                 || !ClassIdentity.TryGetState(pawn, out var state) || (state.Vocation & Vocation.Mage) == 0) return null;
             var path = state.Find("rwom.shaman");
@@ -24,7 +29,7 @@ namespace TorannMagic.ClassProgression
             && (hex ? ability.Def == Owner(caster, true)?.abilityDef : ability.Def == TorannMagicDefOf.TM_SummonTotemHealing)
             && ability.AbilityUser == Magic(caster) && Magic(caster)?.AbilityData.Powers.Any(p => ReferenceEquals(p, ability)) == true;
         static bool Finite(float value) => !float.IsNaN(value) && !float.IsInfinity(value);
-        static bool Living(Pawn caster, Pawn target) => target != null && !target.Dead && target.Spawned && target.Map == caster.Map
+        static bool Living(Pawn caster, Pawn target) => target != null && !target.Dead && target.Spawned && target.Map == CastingBody(caster)?.Map
             && !target.IsPrisoner && !target.IsSlave && !TM_Calc.IsUndead(target) && target.health?.hediffSet != null;
         static bool Ally(Pawn caster, Pawn target) => Living(caster, target) && target.Faction == caster.Faction;
         static bool Enemy(Pawn caster, Pawn target) => Living(caster, target) && target != caster && target.RaceProps?.IsFlesh == true && target.HostileTo(caster)
@@ -47,7 +52,7 @@ namespace TorannMagic.ClassProgression
         {
             if (snapshot == null || snapshot.used) return false;
             snapshot.used = true;
-            if (totem == null || !totem.Spawned || totem.def != TorannMagicDefOf.TM_HealingTotem || totem.Map != snapshot.caster.Map || totem.Faction != snapshot.caster.Faction
+            if (totem == null || !totem.Spawned || totem.def != TorannMagicDefOf.TM_HealingTotem || totem.Map != CastingBody(snapshot.caster)?.Map || totem.Faction != snapshot.caster.Faction
                 || Owned(snapshot.caster, false) != snapshot.path || Owner(snapshot.caster, false) != snapshot.owner || !RuntimeOwned(snapshot.ability, snapshot.caster, false)) return false;
             totem.trialCaster = snapshot.caster; totem.trialAbilityId = "TM_SummonTotemHealing"; totem.trialOwner = snapshot.owner;
             return true;
@@ -55,7 +60,7 @@ namespace TorannMagic.ClassProgression
         static bool Source(Building_TMTotem_Healing totem)
         {
             var caster = totem?.trialCaster;
-            return caster != null && totem.Spawned && totem.Map == caster.Map && totem.Faction == caster.Faction
+            return caster != null && totem.Spawned && totem.Map == CastingBody(caster)?.Map && totem.Faction == caster.Faction
                 && totem.def == TorannMagicDefOf.TM_HealingTotem && totem.trialAbilityId == "TM_SummonTotemHealing"
                 && (totem.trialOwner == null || totem.trialOwner == Owner(caster, false))
                 && Magic(caster)?.AbilityData.Powers.Any(a => RuntimeOwned(a, caster, false)) == true;

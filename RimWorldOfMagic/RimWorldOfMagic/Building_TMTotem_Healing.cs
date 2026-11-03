@@ -13,7 +13,7 @@ namespace TorannMagic
     {
 
         private int nextSearch = 0;
-        private float range = 40;
+        private float range => 20 + pwrVal;
         private bool initialized = false;
         public int pwrVal = 0;
         public int verVal = 0;
@@ -28,7 +28,6 @@ namespace TorannMagic
             if(!initialized)
             {
                 this.nextSearch = Find.TickManager.TicksGame + Rand.Range(30, 40);
-                this.range = 20 + pwrVal;
                 initialized = true;
             }
             else if(Find.TickManager.TicksGame >= this.nextSearch)
@@ -62,6 +61,8 @@ namespace TorannMagic
             Scribe_Values.Look<int>(ref this.verVal, "verVal", 0, false);
             Scribe_Values.Look<float>(ref this.arcanePwr, "arcanePwr", 1f, false);
             base.ExposeData();
+            Scribe_Values.Look(ref nextSearch,"TM_totemNextPulse");
+            Scribe_Values.Look(ref initialized,"TM_totemPulseStarted");
             Scribe_References.Look(ref trialCaster, "rwomShamanTrialCaster");
             Scribe_Values.Look(ref trialAbilityId, "rwomShamanTrialAbility");
         }

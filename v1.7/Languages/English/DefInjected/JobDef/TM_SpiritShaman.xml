@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LanguageData>
   <TM_SpiritChainLightning.reportString>casting chain lightning.</TM_SpiritChainLightning.reportString>
+  <TM_SpiritSummonTotemEarth.reportString>summoning an earth totem.</TM_SpiritSummonTotemEarth.reportString>
+  <TM_SpiritSummonTotemLightning.reportString>summoning a lightning totem.</TM_SpiritSummonTotemLightning.reportString>
+  <TM_SpiritSummonTotemHealing.reportString>summoning a healing totem.</TM_SpiritSummonTotemHealing.reportString>
 </LanguageData>

@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LanguageData>
   <TM_SpiritChainLightning.reportString>lançando um relâmpago em cadeia.</TM_SpiritChainLightning.reportString>
+  <TM_SpiritSummonTotemEarth.reportString>invocando um totem de terra.</TM_SpiritSummonTotemEarth.reportString>
+  <TM_SpiritSummonTotemLightning.reportString>invocando um totem de raios.</TM_SpiritSummonTotemLightning.reportString>
+  <TM_SpiritSummonTotemHealing.reportString>invocando um totem de cura.</TM_SpiritSummonTotemHealing.reportString>
 </LanguageData>
