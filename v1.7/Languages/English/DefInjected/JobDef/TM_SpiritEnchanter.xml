@@ -6,4 +6,8 @@
   <TM_SpiritDismissEnchanterStones.reportString>dismissing an enchanted stone.</TM_SpiritDismissEnchanterStones.reportString>
   <TM_SpiritEnchantWeapon.reportString>enchanting a weapon.</TM_SpiritEnchantWeapon.reportString>
   <TM_SpiritDispelEnchantWeapon.reportString>dispelling weapon enchantments.</TM_SpiritDispelEnchantWeapon.reportString>
+  <TM_SpiritPolymorph.reportString>casting polymorph.</TM_SpiritPolymorph.reportString>
+  <TM_SpiritPolymorph_I.reportString>casting polymorph.</TM_SpiritPolymorph_I.reportString>
+  <TM_SpiritPolymorph_II.reportString>casting polymorph.</TM_SpiritPolymorph_II.reportString>
+  <TM_SpiritPolymorph_III.reportString>casting polymorph.</TM_SpiritPolymorph_III.reportString>
 </LanguageData>

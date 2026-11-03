@@ -1247,30 +1247,15 @@ namespace TorannMagic
             }
             if (polymorphPawn.Faction != null && polymorphPawn.Faction != Faction.OfPlayer)
             {
-                Lord lord = null;
-                if (polymorphPawn.Map.mapPawns.SpawnedPawnsInFaction(faction).Any(p => p != polymorphPawn))
-                {
-                    Predicate<Thing> validator = t => t != polymorphPawn && ((Pawn)t).GetLord() != null;
-                    Pawn p2 = (Pawn)GenClosest.ClosestThing_Global(polymorphPawn.Position, polymorphPawn.Map.mapPawns.SpawnedPawnsInFaction(faction), 99999f, validator);
-                    lord = p2.GetLord();
-                }
+                var lord = original.GetLord();
                 if (lord == null)
                 {
-                    LordJob_DefendPoint lordJob = new LordJob_DefendPoint(polymorphPawn.Position);
-                    lord = LordMaker.MakeNewLord(faction, lordJob, original.Map);
+                    var neighbour = (Pawn)GenClosest.ClosestThing_Global(position,
+                        polymorphPawn.Map.mapPawns.SpawnedPawnsInFaction(faction), 99999f,
+                        t => t != polymorphPawn && ((Pawn)t).GetLord() != null);
+                    lord = neighbour?.GetLord() ?? LordMaker.MakeNewLord(faction, new LordJob_DefendPoint(position), original.Map);
                 }
-                try
-                {
-                    lord.AddPawn(polymorphPawn);
-                }
-                catch (NullReferenceException)
-                {
-                    if (lord != null)
-                    {
-                        LordJob_AssaultColony lordJob = new LordJob_AssaultColony(faction, false, false);
-                        LordMaker.MakeNewLord(faction, lordJob, original.Map);
-                    }
-                }
+                lord.AddPawn(polymorphPawn);
             }
             return polymorphPawn;
         }
@@ -1302,17 +1287,11 @@ namespace TorannMagic
 
         public static SpawnThings AssignRandomCreatureDef(SpawnThings spawnthing, int combatPowerMin, int combatPowerMax)
         {
-            IEnumerable<PawnKindDef> enumerable = from def in DefDatabase<PawnKindDef>.AllDefs
-                                                  where (def.combatPower >= combatPowerMin && def.combatPower <= combatPowerMax && def.race != null && def.race.race != null && def.race.race.thinkTreeMain.ToString() == "Animal")
-                                                  select def;
-
-            foreach (PawnKindDef current in enumerable)
-            {
-                //Log.Message("random creature includes " + current.defName + " race of " + current.race.defName);
-            }
-            PawnKindDef assignDef = enumerable.RandomElement();
-            spawnthing.kindDef = assignDef;
-            spawnthing.def = assignDef.race;
+            var kinds = DefDatabase<PawnKindDef>.AllDefs.Where(def => def.combatPower >= combatPowerMin &&
+                def.combatPower <= combatPowerMax && def.race?.race?.thinkTreeMain?.defName == "Animal");
+            if (!kinds.TryRandomElement(out var kind)) kind = PawnKindDef.Named("Rat");
+            spawnthing.kindDef = kind;
+            spawnthing.def = kind.race;
             return spawnthing;
         }
 

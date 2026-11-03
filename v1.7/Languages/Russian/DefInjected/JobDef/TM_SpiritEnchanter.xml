@@ -6,4 +6,8 @@
   <TM_SpiritDismissEnchanterStones.reportString>развеивает зачарованный камень.</TM_SpiritDismissEnchanterStones.reportString>
   <TM_SpiritEnchantWeapon.reportString>зачаровывает оружие.</TM_SpiritEnchantWeapon.reportString>
   <TM_SpiritDispelEnchantWeapon.reportString>снимает чары с оружия.</TM_SpiritDispelEnchantWeapon.reportString>
+  <TM_SpiritPolymorph.reportString>накладывает полиморф.</TM_SpiritPolymorph.reportString>
+  <TM_SpiritPolymorph_I.reportString>накладывает полиморф.</TM_SpiritPolymorph_I.reportString>
+  <TM_SpiritPolymorph_II.reportString>накладывает полиморф.</TM_SpiritPolymorph_II.reportString>
+  <TM_SpiritPolymorph_III.reportString>накладывает полиморф.</TM_SpiritPolymorph_III.reportString>
 </LanguageData>

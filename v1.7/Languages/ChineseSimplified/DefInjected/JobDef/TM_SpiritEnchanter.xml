@@ -6,4 +6,8 @@
   <TM_SpiritDismissEnchanterStones.reportString>正在消解附魔石。</TM_SpiritDismissEnchanterStones.reportString>
   <TM_SpiritEnchantWeapon.reportString>正在附魔武器。</TM_SpiritEnchantWeapon.reportString>
   <TM_SpiritDispelEnchantWeapon.reportString>正在驱散武器附魔。</TM_SpiritDispelEnchantWeapon.reportString>
+  <TM_SpiritPolymorph.reportString>正在施放变形术。</TM_SpiritPolymorph.reportString>
+  <TM_SpiritPolymorph_I.reportString>正在施放变形术。</TM_SpiritPolymorph_I.reportString>
+  <TM_SpiritPolymorph_II.reportString>正在施放变形术。</TM_SpiritPolymorph_II.reportString>
+  <TM_SpiritPolymorph_III.reportString>正在施放变形术。</TM_SpiritPolymorph_III.reportString>
 </LanguageData>

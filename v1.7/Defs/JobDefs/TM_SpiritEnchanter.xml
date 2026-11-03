@@ -6,4 +6,8 @@
   <JobDef><defName>TM_SpiritDismissEnchanterStones</defName><driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass><reportString>dismissing an enchanted stone.</reportString></JobDef>
   <JobDef><defName>TM_SpiritEnchantWeapon</defName><driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass><reportString>enchanting a weapon.</reportString></JobDef>
   <JobDef><defName>TM_SpiritDispelEnchantWeapon</defName><driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass><reportString>dispelling weapon enchantments.</reportString></JobDef>
+  <JobDef><defName>TM_SpiritPolymorph</defName><driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass><reportString>casting polymorph.</reportString></JobDef>
+  <JobDef><defName>TM_SpiritPolymorph_I</defName><driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass><reportString>casting polymorph.</reportString></JobDef>
+  <JobDef><defName>TM_SpiritPolymorph_II</defName><driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass><reportString>casting polymorph.</reportString></JobDef>
+  <JobDef><defName>TM_SpiritPolymorph_III</defName><driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass><reportString>casting polymorph.</reportString></JobDef>
 </Defs>

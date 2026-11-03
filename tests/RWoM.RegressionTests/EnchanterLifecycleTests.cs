@@ -17,6 +17,20 @@ internal static class EnchanterLifecycleTests
         yield return new("EnchanterLifecycle.EmptySavedStateDoesNotInventSustainedEffects", Empty);
         yield return new("EnchanterLifecycle.EnchantedWeaponNativeScribeKeepsBothSourceReferences", WeaponSave);
         yield return new("EnchanterLifecycle.PolymorphCancelPreservesOriginalIdentity", Cancel);
+        yield return new("EnchanterLifecycle.PolymorphEmptyAnimalRangeFallsBackToRat", r =>
+        {
+            var previous = DefDatabase<PawnKindDef>.AllDefsListForReading.ToArray();
+            try
+            {
+                DefDatabase<PawnKindDef>.Clear();
+                var rat = new PawnKindDef { defName="Rat", race=Item(0).def, combatPower=20 };
+                DefDatabase<PawnKindDef>.Add(rat);
+                var selected = TM_Action.AssignRandomCreatureDef(new AbilityUser.SpawnThings(),100,101);
+                Check.Same(rat,selected.kindDef,"unavailable power range falls back to vanilla kind");
+                Check.Same(rat.race,selected.def,"fallback race matches the generated kind");
+            }
+            finally { DefDatabase<PawnKindDef>.Clear(); foreach (var def in previous) DefDatabase<PawnKindDef>.Add(def); }
+        });
     }
 
     sealed class Fixture : IDisposable

@@ -6,4 +6,8 @@
   <TM_SpiritDismissEnchanterStones.reportString>розвіює зачарований камінь.</TM_SpiritDismissEnchanterStones.reportString>
   <TM_SpiritEnchantWeapon.reportString>зачаровує зброю.</TM_SpiritEnchantWeapon.reportString>
   <TM_SpiritDispelEnchantWeapon.reportString>знімає чари зі зброї.</TM_SpiritDispelEnchantWeapon.reportString>
+  <TM_SpiritPolymorph.reportString>накладає поліморф.</TM_SpiritPolymorph.reportString>
+  <TM_SpiritPolymorph_I.reportString>накладає поліморф.</TM_SpiritPolymorph_I.reportString>
+  <TM_SpiritPolymorph_II.reportString>накладає поліморф.</TM_SpiritPolymorph_II.reportString>
+  <TM_SpiritPolymorph_III.reportString>накладає поліморф.</TM_SpiritPolymorph_III.reportString>
 </LanguageData>

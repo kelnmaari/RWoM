@@ -6,4 +6,8 @@
   <TM_SpiritDismissEnchanterStones.reportString>dissipando uma pedra encantada.</TM_SpiritDismissEnchanterStones.reportString>
   <TM_SpiritEnchantWeapon.reportString>encantando uma arma.</TM_SpiritEnchantWeapon.reportString>
   <TM_SpiritDispelEnchantWeapon.reportString>dissipando encantamentos de armas.</TM_SpiritDispelEnchantWeapon.reportString>
+  <TM_SpiritPolymorph.reportString>lançando polimorfia.</TM_SpiritPolymorph.reportString>
+  <TM_SpiritPolymorph_I.reportString>lançando polimorfia.</TM_SpiritPolymorph_I.reportString>
+  <TM_SpiritPolymorph_II.reportString>lançando polimorfia.</TM_SpiritPolymorph_II.reportString>
+  <TM_SpiritPolymorph_III.reportString>lançando polimorfia.</TM_SpiritPolymorph_III.reportString>
 </LanguageData>
