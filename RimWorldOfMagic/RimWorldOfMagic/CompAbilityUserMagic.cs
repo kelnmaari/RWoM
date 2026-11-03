@@ -5236,6 +5236,15 @@ namespace TorannMagic
             }
         }
 
+        internal void AssignEarthSprites(Map map, IntVec3 cell, bool mining)
+        {
+            earthSpriteMap = map;
+            earthSprites = cell;
+            earthSpriteType = mining ? 1 : 2;
+            earthSpritesInArea = TM_Calc.GetSpriteArea(map)?[cell] == true;
+            nextEarthSpriteAction = Find.TickManager.TicksGame + (mining ? 300 : 20000);
+        }
+
         private void ResolveEarthSpriteAction()
         {
             MagicPowerSkill magicPowerSkill = this.MagicData.MagicPowerSkill_EarthSprites.FirstOrDefault((MagicPowerSkill x) => x.label == "TM_EarthSprites_pwr");
@@ -5280,13 +5289,15 @@ namespace TorannMagic
                     if (this.earthSpritesInArea)
                     {
                         //Log.Message("moving in area");
+                        Area spriteArea = TM_Calc.GetSpriteArea(earthSpriteMap);
                         List<IntVec3> spriteAreaCells = GenRadial.RadialCellsAround(oldEarthSpriteLoc, 6f, false).ToList();
                         spriteAreaCells.Shuffle();
                         for (int i = 0; i < spriteAreaCells.Count; i++)
                         {
                             IntVec3 intVec = spriteAreaCells[i];
+                            if (!intVec.InBounds(earthSpriteMap)) continue;
                             newMineSpot = intVec.GetFirstBuilding(this.earthSpriteMap);
-                            if (newMineSpot != null && !intVec.Fogged(earthSpriteMap) && TM_Calc.GetSpriteArea() != null && TM_Calc.GetSpriteArea().ActiveCells.Contains(intVec))
+                            if (newMineSpot != null && !intVec.Fogged(earthSpriteMap) && spriteArea?[intVec] == true)
                             {
                                 mineable = newMineSpot as Mineable;
                                 if (mineable != null)
@@ -5304,6 +5315,7 @@ namespace TorannMagic
                         for (int i = 0; i < 20; i++)
                         {
                             IntVec3 intVec = earthSprites + GenAdj.AdjacentCells.RandomElement();
+                            if (!intVec.InBounds(earthSpriteMap)) continue;
                             newMineSpot = intVec.GetFirstBuilding(this.earthSpriteMap);
                             if (newMineSpot != null)
                             {
@@ -5390,18 +5402,20 @@ namespace TorannMagic
                         if (this.earthSpritesInArea)
                         {
                             //Log.Message("moving in area");
+                            Area spriteArea = TM_Calc.GetSpriteArea(earthSpriteMap);
                             List<IntVec3> spriteAreaCells = GenRadial.RadialCellsAround(oldEarthSpriteLoc, 6f, false).ToList();
                             spriteAreaCells.Shuffle();
                             for (int i = 0; i < spriteAreaCells.Count; i++)
                             {
                                 IntVec3 intVec = spriteAreaCells[i];
+                                if (!intVec.InBounds(earthSpriteMap)) continue;
                                 terrain = intVec.GetTerrain(map);
                                 if (terrain.defName == "MarshyTerrain" || terrain.defName == "Mud" || terrain.defName == "Marsh" || terrain.defName == "WaterShallow" || terrain.defName == "Ice" ||
                             terrain.defName == "Sand" || terrain.defName == "Gravel" || terrain.defName == "Soil" || terrain.defName == "MossyTerrain" || terrain.defName == "SoftSand")
                                 {
                                     Building terrainHasBuilding = null;
                                     terrainHasBuilding = intVec.GetFirstBuilding(this.earthSpriteMap);
-                                    if (TM_Calc.GetSpriteArea() != null && TM_Calc.GetSpriteArea().ActiveCells.Contains(intVec)) //dont transform terrain underneath buildings
+                                    if (terrainHasBuilding == null && spriteArea?[intVec] == true) //dont transform terrain underneath buildings
                                     {
                                         //Log.Message("assigning");
                                         this.earthSprites = intVec;
@@ -5415,6 +5429,7 @@ namespace TorannMagic
                             for (int i = 0; i < 20; i++)
                             {
                                 IntVec3 intVec = earthSprites + GenAdj.AdjacentCells.RandomElement();
+                                if (!intVec.InBounds(earthSpriteMap)) continue;
                                 terrain = intVec.GetTerrain(map);
                                 if (terrain.defName == "MarshyTerrain" || terrain.defName == "Mud" || terrain.defName == "Marsh" || terrain.defName == "WaterShallow" || terrain.defName == "Ice" ||
                             terrain.defName == "Sand" || terrain.defName == "Gravel" || terrain.defName == "Soil" || terrain.defName == "MossyTerrain" || terrain.defName == "SoftSand")
@@ -6189,19 +6204,19 @@ namespace TorannMagic
                     ResolveEarthSpriteAction();
                 }
 
-                if (this.nextEarthSpriteMote < Find.TickManager.TicksGame)
+                if (this.earthSpriteType != 0 && earthSpriteMap != null && this.nextEarthSpriteMote < Find.TickManager.TicksGame)
                 {
                     this.nextEarthSpriteMote += Rand.Range(7, 12);
                     Vector3 shiftLoc = this.earthSprites.ToVector3Shifted();
                     shiftLoc.x += Rand.Range(-.3f, .3f);
                     shiftLoc.z += Rand.Range(-.3f, .3f);
-                    TM_MoteMaker.ThrowGenericMote(TorannMagicDefOf.Mote_Twinkle, shiftLoc, this.Pawn.Map, Rand.Range(.6f, 1.4f), .15f, Rand.Range(.2f, .5f), Rand.Range(.2f, .5f), Rand.Range(-100, 100), Rand.Range(0f, .3f), Rand.Range(0, 360), 0);
+                    TM_MoteMaker.ThrowGenericMote(TorannMagicDefOf.Mote_Twinkle, shiftLoc, earthSpriteMap, Rand.Range(.6f, 1.4f), .15f, Rand.Range(.2f, .5f), Rand.Range(.2f, .5f), Rand.Range(-100, 100), Rand.Range(0f, .3f), Rand.Range(0, 360), 0);
                     if(Rand.Chance(.3f))
                     {
                         shiftLoc = this.earthSprites.ToVector3Shifted();
                         shiftLoc.x += Rand.Range(-.3f, .3f);
                         shiftLoc.z += Rand.Range(-.3f, .3f);
-                        TM_MoteMaker.ThrowGenericMote(TorannMagicDefOf.Mote_GreenTwinkle, shiftLoc, this.Pawn.Map, Rand.Range(.6f, 1f), .15f, Rand.Range(.2f, .9f), Rand.Range(.5f, .9f), Rand.Range(-200, 200), Rand.Range(0f, .3f), Rand.Range(0, 360), 0);
+                        TM_MoteMaker.ThrowGenericMote(TorannMagicDefOf.Mote_GreenTwinkle, shiftLoc, earthSpriteMap, Rand.Range(.6f, 1f), .15f, Rand.Range(.2f, .9f), Rand.Range(.5f, .9f), Rand.Range(-200, 200), Rand.Range(0f, .3f), Rand.Range(0, 360), 0);
                     }
                 }
             }

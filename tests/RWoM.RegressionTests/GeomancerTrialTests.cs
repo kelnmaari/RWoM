@@ -10,6 +10,7 @@ internal static class GeomancerTrialTests
 {
     public static IEnumerable<TestCase> Cases()
     {
+        yield return new("GeomancerTrial.EarthSpritesRetargetAcrossMaps", SpriteRetarget);
         yield return new("GeomancerTrial.RecastingTransfersOneWardAndItsUpkeep", TransferUpkeep);
         yield return new("GeomancerTrial.DamagedStoneskinRetainsMaximumAfterLoad", WardSave);
         yield return new("GeomancerTrial.FreshWardOwnershipAndNoops", Ward);
@@ -54,6 +55,29 @@ internal static class GeomancerTrialTests
         }
         public void Adept() { Path.RecordCompletedTrial(GeomancerTrials.FoundationTrialId); Progression.State.TryAdvanceAfterTrial("rwom.geomancer", InitiationStage.Foundation, GeomancerTrials.FoundationTrialId); }
         public void Dispose() { GeomancerTrials.EndLaunch(null!); Current.Game = previous; DefDatabase<ClassDisciplineDef>.Clear(); foreach(var def in profiles) DefDatabase<ClassDisciplineDef>.Add(def); }
+    }
+    static void SpriteRetarget(RuntimeFixture f)
+    {
+        using var w = new Fixture(f);
+        var first = Find.Maps[0];
+        var second = Find.Maps[1];
+        foreach (var map in Find.Maps)
+        {
+            var manager = (AreaManager)RuntimeHelpers.GetUninitializedObject(typeof(AreaManager));
+            Set(manager, "areas", new List<Area>());
+            Set(map, "areaManager", manager);
+        }
+        var cell = new IntVec3(1,0,1);
+        var assign = typeof(CompAbilityUserMagic).GetMethod("AssignEarthSprites", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!;
+        assign.Invoke(w.Magic,new object[] { first,cell,true });
+        Check.Same(first,w.Magic.earthSpriteMap,"mining is anchored to its map");
+        Check.Equal(Find.TickManager.TicksGame + 300,w.Magic.nextEarthSpriteAction,"first mining tick");
+        w.Magic.earthSpritesInArea = true;
+        assign.Invoke(w.Magic,new object[] { second,cell,false });
+        Check.Same(second,w.Magic.earthSpriteMap,"new assignment follows its target map");
+        Check.Equal(false,w.Magic.earthSpritesInArea,"previous area does not follow the sprites");
+        Check.Equal(2,w.Magic.earthSpriteType,"terrain mode");
+        Check.Equal(Find.TickManager.TicksGame + 20000,w.Magic.nextEarthSpriteAction,"first terrain tick");
     }
     static void TransferUpkeep(RuntimeFixture f)
     {

@@ -62,15 +62,7 @@ namespace TorannMagic
                         var mineable = isBuilding as Mineable;
                         if (mineable != null)
                         {
-                            Area spriteArea = TM_Calc.GetSpriteArea();
-                            if(spriteArea != null && spriteArea.ActiveCells != null && spriteArea.ActiveCells.Contains(this.currentTarget.Cell))
-                            {
-                                comp.earthSpritesInArea = true;
-                            }
-                            comp.earthSprites = this.currentTarget.Cell;
-                            comp.earthSpriteType = 1;
-                            comp.earthSpriteMap = this.CasterPawn.Map;
-                            comp.nextEarthSpriteAction = Find.TickManager.TicksGame + 300;
+                            comp.AssignEarthSprites(CasterPawn.Map, currentTarget.Cell, mining: true);
                         }
                         else
                         {
@@ -83,15 +75,7 @@ namespace TorannMagic
                     else if (terrain != null && (terrain.defName == "MarshyTerrain" || terrain.defName == "Mud" || terrain.defName == "Marsh" || terrain.defName == "WaterShallow" || terrain.defName == "Ice" ||
                         terrain.defName == "Sand" || terrain.defName == "Gravel" || terrain.defName == "Soil" || terrain.defName == "MossyTerrain" || terrain.defName == "SoftSand"))
                     {
-                        Area spriteArea = TM_Calc.GetSpriteArea();
-                        if (spriteArea != null && spriteArea.ActiveCells != null && spriteArea.ActiveCells.Contains(this.currentTarget.Cell))
-                        {
-                            comp.earthSpritesInArea = true;
-                        }
-                        comp.earthSprites = this.currentTarget.Cell;
-                        comp.earthSpriteType = 2;
-                        comp.earthSpriteMap = this.CasterPawn.Map;
-                        comp.nextEarthSpriteAction = Find.TickManager.TicksGame + 20000;
+                        comp.AssignEarthSprites(CasterPawn.Map, currentTarget.Cell, mining: false);
                     }
                     else if(terrain != null && !terrain.defName.Contains("water") && !terrain.defName.Contains("Water"))
                     {
@@ -133,9 +117,10 @@ namespace TorannMagic
             for (int i = 0; i < cellList.Count; i++)
             {
                 IntVec3 cell = cellList[i];                
+                if (!cell.InBounds(CasterPawn.Map)) continue;
                 bldg = cell.GetFirstBuilding(this.CasterPawn.Map);
                 terrain = cell.GetTerrain(this.CasterPawn.Map);
-                if (cell.InBoundsWithNullCheck(this.CasterPawn.Map) && bldg == null && terrain == terrainDef)
+                if (bldg == null && terrain == terrainDef)
                 {
                     this.CasterPawn.Map.terrainGrid.SetTerrain(cell, TerrainDef.Named("Gravel"));
                     FleckMaker.ThrowSmoke(cell.ToVector3Shifted(), this.CasterPawn.Map, Rand.Range(.8f, 1.2f));
