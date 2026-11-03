@@ -188,114 +188,50 @@ namespace TorannMagic
             }
         }
 
+        internal static bool CanCopyTechnoWeapon(ThingDef def)
+        {
+            if (def?.IsRangedWeapon != true || def.Verbs.FirstOrDefault()?.verbClass == null ||
+                def.HasComp(typeof(CompTechnoWeaponCopy))) return false;
+            return ModOptions.Settings.Instance.unrestrictedWeaponCopy ||
+                (def.techLevel >= TechLevel.Industrial && def.Verbs[0].verbClass == typeof(Verb_Shoot));
+        }
+
         public static void DoAction_TechnoWeaponCopy(Pawn caster, Thing thing, ThingDef td = null, QualityCategory _qc = QualityCategory.Normal)
         {
-            CompAbilityUserMagic comp = caster.GetCompAbilityUserMagic();
-            
-            bool destroyThingAtEnd = false;
-            if (thing != null && comp != null)
+            if (thing != null) { TryCopyTechnoWeapon(caster,caster,thing); return; }
+            if (!CanCopyTechnoWeapon(td)) return;
+            var temporary = ThingMaker.MakeThing(td, td.MadeFromStuff ? GenStuff.DefaultStuffFor(td) : null);
+            try
             {
-                comp.technoWeaponThingDef = thing.def;
-                CompQuality cq = thing.TryGetComp<CompQuality>();
-                if (cq != null)
-                {
-                    comp.technoWeaponQC = cq.Quality;
-                }
+                temporary.TryGetComp<CompQuality>()?.SetQuality(_qc, ArtGenerationContext.Colony);
+                TryCopyTechnoWeapon(caster,caster,temporary);
             }
+            finally { temporary.Destroy(); }
+        }
 
-            if (thing == null && td != null)
+        internal static int TechnoWeaponRank(CompAbilityUserMagic magic) => magic.MagicData.MagicPowerSkill_TechnoWeapon
+            .FirstOrDefault(skill => skill.label == "TM_TechnoWeapon_pwr")?.level ?? 0;
+
+        internal static bool TryCopyTechnoWeapon(Pawn body, Pawn owner, Thing source)
+        {
+            var magic = owner?.GetCompAbilityUserMagic();
+            if (body?.Spawned != true || body.equipment == null || magic == null || !CanCopyTechnoWeapon(source?.def)) return false;
+            var weapon = (ThingWithComps)ThingMaker.MakeThing(ThingDef.Named("TM_TechnoWeapon_Base0"));
+            bool accepted = false;
+            try
             {
-                destroyThingAtEnd = true;
-                thing = ThingMaker.MakeThing(td);
-                CompQuality cq = thing.TryGetComp<CompQuality>();
-                if (cq != null)
-                {
-                    cq.SetQuality(_qc, ArtGenerationContext.Colony);
-                }
+                var quality = source.TryGetComp<CompQuality>()?.Quality ?? QualityCategory.Normal;
+                weapon.TryGetComp<CompQuality>()?.SetQuality(quality, ArtGenerationContext.Colony);
+                weapon.TryGetComp<CompTechnoWeaponCopy>().Capture(source, TechnoWeaponRank(magic));
+                if (!GenPlace.TryPlaceThing(weapon,body.Position,body.Map,ThingPlaceMode.Near) ||
+                    !body.jobs.TryTakeOrderedJob(JobMaker.MakeJob(JobDefOf.Equip,weapon), JobTag.ChangingApparel)) return false;
+                accepted = true;
+                magic.technoWeaponThing = source.Spawned ? source : null;
+                magic.technoWeaponThingDef = source.def;
+                magic.technoWeaponQC = quality;
+                return true;
             }
-
-
-            if (thing != null && thing.def != null && thing.def.IsRangedWeapon && (thing.def.techLevel >= TechLevel.Industrial || ModOptions.Settings.Instance.unrestrictedWeaponCopy) && (thing.def.Verbs.FirstOrDefault().verbClass.ToString() == "Verse.Verb_Shoot" || ModOptions.Settings.Instance.unrestrictedWeaponCopy))
-            {
-                int verVal = comp.MagicData.MagicPowerSkill_TechnoWeapon.FirstOrDefault((MagicPowerSkill x) => x.label == "TM_TechnoWeapon_ver").level;
-                int pwrVal = comp.MagicData.MagicPowerSkill_TechnoWeapon.FirstOrDefault((MagicPowerSkill x) => x.label == "TM_TechnoWeapon_pwr").level;
-                ThingDef newThingDef = new ThingDef();
-                ThingDef newProjectileDef = new ThingDef();
-                if (comp.technoWeaponDefNum != -1)
-                {
-                    newThingDef = ThingDef.Named("TM_TechnoWeapon_Base" + comp.technoWeaponDefNum.ToString());
-                }
-                else
-                {
-                    int highNum = 0;
-                    List<Pawn> mapPawns = caster.Map.mapPawns.AllPawns.ToList();
-                    for (int i = 0; i < mapPawns.Count; i++)
-                    {
-                        if (!mapPawns[i].DestroyedOrNull() && mapPawns[i].RaceProps.Humanlike)
-                        {
-                            if (comp.IsMagicUser)
-                            {
-                                if (comp.technoWeaponDefNum > highNum)
-                                {
-                                    highNum = comp.technoWeaponDefNum;
-                                }
-                            }
-                        }
-                    }
-                    if (ModOptions.Constants.GetTechnoWeaponCount() > highNum)
-                    {
-                        highNum = ModOptions.Constants.GetTechnoWeaponCount();
-                    }
-                    highNum++;
-                    newThingDef = ThingDef.Named("TM_TechnoWeapon_Base" + highNum.ToString());
-                    comp.technoWeaponDefNum = highNum;
-                    ModOptions.Constants.SetTechnoWeaponCount(highNum);
-                }
-                comp.technoWeaponThing = thing;
-                comp.technoWeaponThingDef = thing.def;
-                newThingDef.label = thing.def.label + " (modified)";
-                newThingDef.description = thing.def.description + "\n\nThis weapon has been modified by a Technomancer.";
-                newThingDef.graphicData.texPath = thing.def.graphicData.texPath;
-                newThingDef.soundInteract = thing.def.soundInteract;
-
-                newThingDef.SetStatBaseValue(StatDefOf.RangedWeapon_DamageMultiplier, 1f + (.02f * pwrVal));
-                newThingDef.SetStatBaseValue(StatDefOf.RangedWeapon_Cooldown, thing.GetStatValue(StatDefOf.RangedWeapon_Cooldown) * (1 - .02f * pwrVal));
-                newThingDef.SetStatBaseValue(StatDefOf.AccuracyTouch, thing.GetStatValue(StatDefOf.AccuracyTouch) * (1 + .01f * pwrVal));
-                newThingDef.SetStatBaseValue(StatDefOf.AccuracyShort, thing.GetStatValue(StatDefOf.AccuracyShort) * (1 + .01f * pwrVal));
-                newThingDef.SetStatBaseValue(StatDefOf.AccuracyMedium, thing.GetStatValue(StatDefOf.AccuracyMedium) * (1 + .01f * pwrVal));
-                newThingDef.SetStatBaseValue(StatDefOf.AccuracyLong, thing.GetStatValue(StatDefOf.AccuracyLong) * (1 + .01f * pwrVal));
-
-                newThingDef.Verbs.FirstOrDefault().defaultProjectile = thing.def.Verbs.FirstOrDefault().defaultProjectile;
-                newThingDef.Verbs.FirstOrDefault().range = thing.def.Verbs.FirstOrDefault().range * (1f + .02f * pwrVal);
-                newThingDef.Verbs.FirstOrDefault().warmupTime = thing.def.Verbs.FirstOrDefault().warmupTime * (1f - .02f * pwrVal);
-                newThingDef.Verbs.FirstOrDefault().burstShotCount = Mathf.RoundToInt(thing.def.Verbs.FirstOrDefault().burstShotCount * (1f + .02f * pwrVal));
-                newThingDef.Verbs.FirstOrDefault().ticksBetweenBurstShots = Mathf.RoundToInt(thing.def.Verbs.FirstOrDefault().ticksBetweenBurstShots * (1f - .02f * pwrVal));
-                newThingDef.Verbs.FirstOrDefault().soundCast = thing.def.Verbs.FirstOrDefault().soundCast;
-                Thing technoWeapon = ThingMaker.MakeThing(newThingDef, null);
-
-                try
-                {
-                    CompQuality twcq = technoWeapon.TryGetComp<CompQuality>();
-                    QualityCategory qc = thing.TryGetComp<CompQuality>().Quality;
-                    twcq.SetQuality(qc, ArtGenerationContext.Colony);
-                }
-                catch (NullReferenceException ex)
-                {
-                    //ignore
-                }
-
-                GenPlace.TryPlaceThing(technoWeapon, caster.Position, caster.Map, ThingPlaceMode.Direct, null, null);
-                Job job = new Job(JobDefOf.Equip, technoWeapon);
-                caster.jobs.TryTakeOrderedJob(job, JobTag.ChangingApparel);
-            }
-            else
-            {
-                Log.Message("cannot copy target thing or unable to restore techno weapon");
-            }
-            if (destroyThingAtEnd)
-            {
-                thing.Destroy(DestroyMode.Vanish);
-            }
+            finally { if (!accepted && !weapon.Destroyed) weapon.Destroy(); }
         }
 
         public static void DoAction_PistolSpecCopy(Pawn caster, ThingWithComps thing)

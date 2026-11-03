@@ -19,6 +19,7 @@
   
    	<ThingDef ParentName="BaseBitLaserProjectile">
 		<defName>Projectile_TM_BitTechLaser</defName>
+        <thingClass>TorannMagic.ClassProgression.Bullet_TechnoElemental</thingClass>
 		<label>tech micro laser</label>
 		<graphicData>
 			<texPath>Spells/tech_laser</texPath>
@@ -210,6 +211,7 @@ The Mark-IV will automatically miniaturize itself when it takes critical damage 
   
     <ThingDef ParentName="BaseBullet">
     <defName>Bullet_ES_Ice</defName>
+    <thingClass>TorannMagic.ClassProgression.Bullet_TechnoElemental</thingClass>
     <label>elemental shot - ice</label>
     <graphicData>
       <texPath>Spells/iceshot</texPath>
@@ -226,6 +228,7 @@ The Mark-IV will automatically miniaturize itself when it takes critical damage 
   
     <ThingDef ParentName="BaseBullet">
     <defName>Bullet_ES_Lit</defName>
+    <thingClass>TorannMagic.ClassProgression.Bullet_TechnoElemental</thingClass>
     <label>elemental shot - lightning</label>
     <graphicData>
       <texPath>Spells/shotlit</texPath>
@@ -769,6 +772,8 @@ Radius: 5.6</description>
   
   <ThingDef Name="TM_TW_Base" ParentName="BaseGunWithQuality">
     <defName>TM_TechnoWeapon_Base0</defName>
+    <thingClass>TorannMagic.Thing_TechnoWeaponCopy</thingClass>
+    <comps><li Class="TorannMagic.CompProperties_TechnoWeaponCopy" /></comps>
 	<label>techno weapon</label>
     <description>A weapon modified by a technomancer</description>    
     <graphicData>

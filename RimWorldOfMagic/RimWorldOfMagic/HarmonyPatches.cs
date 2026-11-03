@@ -112,7 +112,6 @@ namespace TorannMagic
             //SafePatch(harmonyInstance, AccessTools.Method(typeof(Pawn), "get_IsColonist", null, null), null, new HarmonyMethod(typeof(TorannMagicMod), "Get_IsColonist_Polymorphed"), null);
             SafePatch(harmonyInstance, AccessTools.Method(typeof(Caravan), "get_NightResting", null, null), new HarmonyMethod(typeof(TorannMagicMod), "Get_NightResting_Undead", null), null);
             SafePatch(harmonyInstance, AccessTools.Method(typeof(StaggerHandler), "get_Staggered", null, null), null, new HarmonyMethod(typeof(TorannMagicMod), "Get_Staggered", null));
-            SafePatch(harmonyInstance, AccessTools.Method(typeof(Verb_LaunchProjectile), "get_Projectile", null, null), new HarmonyMethod(typeof(TorannMagicMod), "Get_Projectile_ES", null), null);
             SafePatch(harmonyInstance, AccessTools.Method(typeof(WindManager), "get_WindSpeed", null, null), new HarmonyMethod(typeof(TorannMagicMod), "Get_WindSpeed", null), null);
             //SafePatch(harmonyInstance, AccessTools.Method(typeof(VerbProperties), "get_CausesExplosion", null, null), null, new HarmonyMethod(typeof(TorannMagicMod), "Get_CausesExplosion", null), null);
             SafePatch(harmonyInstance, AccessTools.Method(typeof(Pawn), "get_IsFreeNonSlaveColonist", null, null), null, new HarmonyMethod(typeof(TorannMagicMod), "Get_IsFreeNonSlaveColonist_Golem", null));
@@ -2921,16 +2920,21 @@ namespace TorannMagic
             }
         }
 
-        [HarmonyPatch(typeof(Thing), "IDNumberFromThingID", null)]
+        [HarmonyPatch(typeof(Thing), nameof(Thing.ThingID), MethodType.Setter)]
         public class TechnoWeapon_ThingID
         {
-            public static void Postfix(string thingID, ref int __result)
+            public static bool Prefix(Thing __instance, string value)
             {
-                if (thingID.Contains("TM_TechnoWeapon") || thingID.Contains("Spec_Base"))
-                {
-                    __result = Rand.Range(0, 50000);
-                    //Log.Message("changing thing id to " + __result);
-                }
+                var name = __instance.def?.defName;
+                if (string.IsNullOrEmpty(name) || !char.IsDigit(name[name.Length - 1]) ||
+                    !name.StartsWith("TM_", StringComparison.Ordinal) ||
+                    (!name.StartsWith("TM_TechnoWeapon_Base", StringComparison.Ordinal) && !name.Contains("Spec_Base")) ||
+                    value == null || !value.StartsWith(name, StringComparison.Ordinal)) return true;
+                // The numeric suffix of the definition is not part of the saved instance number.
+                if (!int.TryParse(value.Substring(name.Length), System.Globalization.NumberStyles.None,
+                    System.Globalization.CultureInfo.InvariantCulture, out int number)) return true;
+                __instance.thingIDNumber = number;
+                return false;
             }
         }
 
@@ -4125,48 +4129,6 @@ namespace TorannMagic
             //    return false;
             //}
             //return true;
-        }
-
-        public static bool Get_Projectile_ES(Verb_LaunchProjectile __instance, ref ThingDef __result)
-        {
-            if (__instance.caster != null && __instance.caster is Pawn && __instance.Bursting)
-            {
-                Pawn pawn = __instance.caster as Pawn;
-                CompAbilityUserMagic comp = pawn.GetCompAbilityUserMagic();
-                if (comp != null && pawn.RaceProps.Humanlike && pawn.GetPosture() == PawnPosture.Standing && comp.HasTechnoWeapon && (pawn.story != null && pawn.story.traits != null &&
-                    (((pawn.story.traits.HasTrait(TorannMagicDefOf.Technomancer) || ClassProgression.ClassIdentity.IsTechnomancer(pawn)) || pawn.story.traits.HasTrait(TorannMagicDefOf.ChaosMage) || TM_ClassUtility.ClassHasAbility(TorannMagicDefOf.TM_TechnoWeapon, comp, null)))) &&
-                    comp.useElementalShotToggle && pawn.equipment.Primary.def.IsRangedWeapon && pawn.equipment.Primary.def.techLevel >= TechLevel.Industrial)
-                {
-                    int verVal = comp.MagicData.MagicPowerSkill_TechnoWeapon.FirstOrDefault((MagicPowerSkill x) => x.label == "TM_TechnoWeapon_ver").level;
-                    if (Rand.Chance(.2f + .01f * verVal) && comp.Mana.CurLevel >= .02f)
-                    {
-                        ThingDef projectile = null;
-                        float rnd = Rand.Range(0f, 1f);
-                        if (rnd <= .33f) //fire
-                        {
-                            projectile = ThingDef.Named("Bullet_ES_Fire");
-                            projectile.projectile.explosionRadius = __instance.verbProps.defaultProjectile.projectile.explosionRadius + (1 + .05f * verVal);
-                            comp.Mana.CurLevel -= (.02f - .0008f * verVal);
-                            comp.MagicUserXP += 4;
-                        }
-                        else if (rnd <= .66f) //ice
-                        {
-                            projectile = ThingDef.Named("Bullet_ES_Ice");
-                            comp.Mana.CurLevel -= (.01f - .0004f * verVal);
-                            comp.MagicUserXP += 2;
-                        }
-                        else //stun
-                        {
-                            projectile = ThingDef.Named("Bullet_ES_Lit");
-                            comp.Mana.CurLevel -= (.015f - .0006f * verVal);
-                            comp.MagicUserXP += 3;
-                        }
-                        __result = projectile;
-                        return false;
-                    }
-                }
-            }
-            return true;
         }
 
         private static readonly HashSet<HediffDef> UndeadHediffDefs = new HashSet<HediffDef>()

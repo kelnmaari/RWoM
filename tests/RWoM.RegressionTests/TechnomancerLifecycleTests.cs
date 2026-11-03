@@ -15,6 +15,63 @@ internal static class TechnomancerLifecycleTests
     static T Get<T>(object target, string field) => (T)target.GetType().GetField(field, Fields)!.GetValue(target)!;
     public static IEnumerable<TestCase> Cases()
     {
+        yield return new("TechnomancerLifecycle.MarkIVSelectionDuringMapTeardown", f =>
+        {
+            var map = (Map)RuntimeHelpers.GetUninitializedObject(typeof(Map));
+            map.info = new MapInfo { Size=new IntVec3(8,1,8) };
+            var test = typeof(Projectile_TechnoTurret).GetMethod("CanDeploy",BindingFlags.NonPublic|BindingFlags.Static)!;
+            Set(map,"<Disposed>k__BackingField",true);
+            Check.Equal(false,(bool)test.Invoke(null,[map,new IntVec3(2,0,2)])!,"disposed map cannot be targeted");
+            Set(map,"<Disposed>k__BackingField",false);
+            Check.Equal(false,(bool)test.Invoke(null,[map,new IntVec3(2,0,2)])!,"no pathing grid yet");
+        });
+        yield return new("TechnomancerLifecycle.PartialLegacyFamiliesAreReadOnly", f =>
+        {
+            LoadBaseDefinitions(f);
+            var mage = PawnWithComps(true,false);
+            mage.pawn.story.traits.allTraits.Add(new Trait(TorannMagicDefOf.Technomancer));
+            mage.magic.SetIsMagicUser();
+            var data = mage.magic.MagicData;
+            data.magicPowerT = null;
+            Check.Equal(false,mage.magic.HasTechnoWeapon,"missing family grants no engineering");
+            Check.Equal(true,data.magicPowerT==null,"checking ammunition must not populate an absent save field");
+            var bit = new MagicPower(new List<AbilityUser.AbilityDef>{TorannMagicDefOf.TM_TechnoBit}){learned=true};
+            data.magicPowerT = [bit];
+            Check.Equal(true,mage.magic.HasTechnoBit,"partial old save retains its actual learned bit");
+            Check.Equal(false,mage.magic.HasTechnoWeapon || mage.magic.HasTechnoTurret,"missing rows safely unavailable");
+            Check.Equal(1,data.magicPowerT.Count,"no rows added to incomplete old save");
+        });
+        yield return new("TechnomancerLifecycle.NumberedWeaponsKeepStableThingIds", f =>
+        {
+            var prefix = Check.NotNull(typeof(TorannMagicMod.TechnoWeapon_ThingID).GetMethod("Prefix"), "ID resolution reads the actual weapon definition");
+            foreach (var name in new[]{"TM_TechnoWeapon_Base0","TM_TechnoWeapon_Base1","TM_TechnoWeapon_Base10","TM_PistolSpec_Base9","Gun_BoltActionRifle"})
+            {
+                var def = (ThingDef)RuntimeHelpers.GetUninitializedObject(typeof(ThingDef));
+                def.defName=name; def.category=ThingCategory.Item;
+                var item = new Thing {def=def};
+                for (int pass=0;pass<3;pass++)
+                {
+                    string saved=name+"165260";
+                    if ((bool)prefix.Invoke(null,[item,saved])!) item.ThingID=saved;
+                    Check.Equal(165260,item.thingIDNumber,"saved suffix preserved on each Scribe pass: "+name);
+                }
+            }
+        });
+        yield return new("TechnomancerLifecycle.InvalidWeaponCannotReplaceRememberedTemplate", f =>
+        {
+            LoadBaseDefinitions(f);
+            var creator = PawnWithComps(true, false);
+            var previous = (ThingDef)RuntimeHelpers.GetUninitializedObject(typeof(ThingDef));
+            previous.defName = "PreviousTechnoTemplate";
+            creator.magic.technoWeaponThingDef = previous;
+            creator.magic.technoWeaponQC = QualityCategory.Masterwork;
+            var item = (ThingDef)RuntimeHelpers.GetUninitializedObject(typeof(ThingDef));
+            item.defName = "TestHaulable"; item.category = ThingCategory.Item;
+            var invalid = new Thing { def=item };
+            TM_Action.DoAction_TechnoWeaponCopy(creator.pawn, invalid);
+            Check.Same(previous,creator.magic.technoWeaponThingDef,"invalid target cannot replace the original's saved weapon");
+            Check.Equal(QualityCategory.Masterwork,creator.magic.technoWeaponQC,"previous quality retained");
+        });
         yield return new("TechnomancerLifecycle.TurretNativeScribePreservesOwnerAndRemainingState", TurretSave);
         yield return new("TechnomancerLifecycle.TurretMissingOwnerAndLegacySnapshot", TurretLegacy);
         yield return new("TechnomancerLifecycle.OverdriveNativeScribeAndAbsentFields", OverdriveSave);

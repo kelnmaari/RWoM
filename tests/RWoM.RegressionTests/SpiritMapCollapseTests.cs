@@ -14,7 +14,7 @@ internal static partial class SpiritMapCollapseTests
     internal static Type Production(string name) => Check.NotNull(typeof(SpiritRebirthState).Assembly.GetType("TorannMagic.ClassProgression." + name), "map collapse " + name + " exists");
     public static IEnumerable<TestCase> Cases()
     {
-        foreach(var spell in new[]{"Firebolt","Icebolt","Fireball","Snowball","Heal","AdvancedHeal","Purify","Regenerate","Fireclaw","Poison","CureDisease","SootheAnimal","SootheAnimal_I","SootheAnimal_II","SootheAnimal_III","Rainmaker","Resurrection","HealingCircle","HealingCircle_I","HealingCircle_II","HealingCircle_III","RaiseUndead","Blink","Blink_I","Blink_II","Blink_III","Summon","Summon_I","Summon_II","Summon_III","MagicMissile","MagicMissile_I","MagicMissile_II","MagicMissile_III","LightningBolt","LightningCloud","LightningStorm","Firestorm","TechnoTurret","TechnoShield","Overdrive","OrbitalStrike","OrbitalStrike_I","OrbitalStrike_II","OrbitalStrike_III","Sabotage","FoldReality","Teleport","ValiantCharge","Overwhelm","BestowMight","BestowMight_I","BestowMight_II","BestowMight_III","DeathBolt","DeathBolt_I","DeathBolt_II","DeathBolt_III","FogOfTorment","CorpseExplosion","CorpseExplosion_I","CorpseExplosion_II","CorpseExplosion_III","ConsumeCorpse","ConsumeCorpse_I","ConsumeCorpse_II","ConsumeCorpse_III","ConsumeCorpse_Mass","DeathMark","DeathMark_I","DeathMark_II","DeathMark_III","FrostRay","FrostRay_I","FrostRay_II","FrostRay_III","AMP","AMP_I","AMP_II","AMP_III"})
+        foreach(var spell in new[]{"Firebolt","Icebolt","Fireball","Snowball","Heal","AdvancedHeal","Purify","Regenerate","Fireclaw","Poison","CureDisease","SootheAnimal","SootheAnimal_I","SootheAnimal_II","SootheAnimal_III","Rainmaker","Resurrection","HealingCircle","HealingCircle_I","HealingCircle_II","HealingCircle_III","RaiseUndead","Blink","Blink_I","Blink_II","Blink_III","Summon","Summon_I","Summon_II","Summon_III","MagicMissile","MagicMissile_I","MagicMissile_II","MagicMissile_III","LightningBolt","LightningCloud","LightningStorm","Firestorm","NanoStimulant","TechnoWeapon","TechnoTurret","TechnoShield","Overdrive","OrbitalStrike","OrbitalStrike_I","OrbitalStrike_II","OrbitalStrike_III","Sabotage","FoldReality","Teleport","ValiantCharge","Overwhelm","BestowMight","BestowMight_I","BestowMight_II","BestowMight_III","DeathBolt","DeathBolt_I","DeathBolt_II","DeathBolt_III","FogOfTorment","CorpseExplosion","CorpseExplosion_I","CorpseExplosion_II","CorpseExplosion_III","ConsumeCorpse","ConsumeCorpse_I","ConsumeCorpse_II","ConsumeCorpse_III","ConsumeCorpse_Mass","DeathMark","DeathMark_I","DeathMark_II","DeathMark_III","FrostRay","FrostRay_I","FrostRay_II","FrostRay_III","AMP","AMP_I","AMP_II","AMP_III"})
         yield return new("SpiritProjectedCast."+spell+"RemainsPhysicalWithOriginalOwner", r =>
             SpiritRebirthRitualTransactionTests.Run(r,c=>{
                 using var fixture=new Fixture(r,c);
@@ -37,6 +37,26 @@ internal static partial class SpiritMapCollapseTests
                     Check.Equal(true, find.Invoke(null,[body,soul,def])==null,"host's own lower rank wins without an extra button");
                 }
                 Check.Equal(true,find.Invoke(null,[body,body,def])==null,"physical body cannot impersonate the soul");
+            }));
+        yield return new("SpiritProjectedCast.TechnoBitRequiresOriginalLearnedOwner", r =>
+            SpiritRebirthRitualTransactionTests.Run(r,c =>
+            {
+                using var fixture = new Fixture(r,c);
+                var soul=c.Original; var host=c.Creator;
+                var magic=soul.GetCompAbilityUserMagic();
+                var bit=magic.MagicData.MagicPowersT.Single(row=>row.TMabilityDefs.Contains(TorannMagicDefOf.TM_TechnoBit));
+                var api=Production("SpiritHostedTechnoBit").GetMethod("Available",BindingFlags.Static|BindingFlags.NonPublic)!;
+                bit.learned=false;
+                Check.Equal(false,(bool)api.Invoke(null,[host,magic])!,"unlearned bit excluded");
+                bit.learned=true;
+                Check.Equal(true,(bool)api.Invoke(null,[host,magic])!,"soul's learned bit follows its current host");
+                var local=host.GetCompAbilityUserMagic();
+                var ownBit=local.MagicData.MagicPowersT.Single(row=>row.TMabilityDefs.Contains(TorannMagicDefOf.TM_TechnoBit));
+                ownBit.learned=true;
+                Check.Equal(false,(bool)api.Invoke(null,[host,magic])!,"host's own bit has precedence");
+                ownBit.learned=false;
+                fixture.Possession.GetDirectlyHeldThings().Remove(soul);
+                Check.Equal(false,(bool)api.Invoke(null,[host,magic])!,"release disables stale commands");
             }));
         foreach (bool impacted in new[] { false, true })
             yield return new("SpiritProjectedCast.SabotageScribeAfterImpact" + impacted, r =>

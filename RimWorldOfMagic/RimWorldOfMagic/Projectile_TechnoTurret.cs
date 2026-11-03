@@ -37,7 +37,13 @@ namespace TorannMagic
 
         internal static bool CanDeploy(Map map, IntVec3 cell)
         {
-            if (map == null || !cell.InBounds(map) || !cell.Standable(map)) return false;
+            if (map == null || map.Disposed || Scribe.mode != LoadSaveMode.Inactive || !cell.IsValid ||
+                map.thingGrid == null || !cell.InBounds(map)) return false;
+            // The targeter can repaint during map teardown after the native grids have been disposed.
+            var normal = map.pathing?.Normal?.pathGrid;
+            var fences = map.pathing?.FenceBlocked?.pathGrid;
+            if (normal == null || fences == null || !normal.Grid_Unsafe.IsCreated || !fences.Grid_Unsafe.IsCreated ||
+                !cell.Standable(map)) return false;
             var def = ThingDef.Named("TM_TechnoTurret_Base");
             return !cell.GetThingList(map).Any(t => t is Pawn || t is Building || GenSpawn.SpawningWipes(def,t.def));
         }

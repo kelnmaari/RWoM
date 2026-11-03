@@ -374,28 +374,13 @@ namespace TorannMagic
             }
         }
 
-        public bool HasTechnoBit
-        {
-            get
-            {
-                return this.IsMagicUser && this.MagicData.MagicPowersT.FirstOrDefault<MagicPower>((MagicPower x) => x.abilityDef == TorannMagicDefOf.TM_TechnoBit).learned;
-            }
-        }
-        public bool HasTechnoTurret
-        {
-            get
-            {
-                return this.IsMagicUser && this.MagicData.MagicPowersT.FirstOrDefault<MagicPower>((MagicPower x) => x.abilityDef == TorannMagicDefOf.TM_TechnoTurret).learned;
-            }
-        }
+        internal bool LearnedTechnomancerAbility(TMAbilityDef ability)
+            => ability != null && ExistingMagicData?.magicPowerT?.Any(row =>
+                row?.learned == true && row.TMabilityDefs?.Contains(ability) == true) == true;
 
-        public bool HasTechnoWeapon
-        {
-            get
-            {
-                return this.IsMagicUser && this.MagicData.MagicPowersT.FirstOrDefault<MagicPower>((MagicPower x) => x.abilityDef == TorannMagicDefOf.TM_TechnoWeapon).learned;
-            }
-        }
+        public bool HasTechnoBit => LearnedTechnomancerAbility(TorannMagicDefOf.TM_TechnoBit) && IsMagicUser;
+        public bool HasTechnoTurret => LearnedTechnomancerAbility(TorannMagicDefOf.TM_TechnoTurret) && IsMagicUser;
+        public bool HasTechnoWeapon => LearnedTechnomancerAbility(TorannMagicDefOf.TM_TechnoWeapon) && IsMagicUser;
 
         public int PowerModifier
         {
@@ -516,12 +501,20 @@ namespace TorannMagic
             }
         }
 
+        internal bool drawHostedBit;
         public bool shouldDraw = true;
         public override void PostDraw()
         {
             if (this.Pawn.DestroyedOrNull()) return;
             if (this.Pawn.Dead) return;
             if (this.Pawn.Map == null) return;
+            if (shouldDraw && drawHostedBit)
+            {
+                if (ClassProgression.SpiritRebirthState.TryGetPossessingSpirit(Pawn,out var soul) &&
+                    ClassProgression.SpiritHostedTechnoBit.Available(Pawn,soul.GetCompAbilityUserMagic()))
+                    soul.GetCompAbilityUserMagic().DrawTechnoBit(Pawn);
+                else drawHostedBit=false;
+            }
             if (shouldDraw && IsMagicUser)
             {
                 
@@ -540,9 +533,9 @@ namespace TorannMagic
                     }
                 }
 
-                if (this.MagicData.MagicPowersT.FirstOrDefault<MagicPower>((MagicPower mp) => mp.abilityDef == TorannMagicDefOf.TM_TechnoBit).learned == true && this.Pawn.health.hediffSet.HasHediff(TorannMagicDefOf.TM_TechnoBitHD))
+                if (HasTechnoBit && Pawn.health.hediffSet.HasHediff(TorannMagicDefOf.TM_TechnoBitHD))
                 {
-                    DrawTechnoBit();
+                    if (!ClassProgression.SpiritRebirthEnergy.Marked(Pawn)) DrawTechnoBit(Pawn);
                 }
 
                 if (this.Pawn.health.hediffSet.HasHediff(TorannMagicDefOf.TM_DemonScornHD) || this.Pawn.health.hediffSet.HasHediff(TorannMagicDefOf.TM_DemonScornHD_I) || this.Pawn.health.hediffSet.HasHediff(TorannMagicDefOf.TM_DemonScornHD_II) || this.Pawn.health.hediffSet.HasHediff(TorannMagicDefOf.TM_DemonScornHD_III))
@@ -566,7 +559,16 @@ namespace TorannMagic
         }
 
 
-        private void DrawTechnoBit()
+        internal Vector3 BitOrigin(Pawn body)
+        {
+            var pos=body.DrawPos;
+            pos.x-=.5f;
+            pos.z+=bitOffset;
+            pos.y=Altitudes.AltitudeFor(AltitudeLayer.MoteOverhead);
+            return pos;
+        }
+
+        private void DrawTechnoBit(Pawn body)
         {
             float num = Mathf.Lerp(1.2f, 1.55f, 1f);
             if (this.bitFloatingDown)
@@ -586,10 +588,8 @@ namespace TorannMagic
                 this.bitOffset += .001f;
             }
 
-            this.bitPosition = this.Pawn.Drawer.DrawPos;
-            this.bitPosition.x -= .5f + Rand.Range(-.01f, .01f);
-            this.bitPosition.z += this.bitOffset;
-            this.bitPosition.y = Altitudes.AltitudeFor(AltitudeLayer.MoteOverhead);
+            this.bitPosition = BitOrigin(body);
+            this.bitPosition.x -= Rand.Range(-.01f,.01f);
             float angle = 0f;
             Vector3 s = new Vector3(.35f, 1f, .35f);
             Matrix4x4 matrix = default(Matrix4x4);
@@ -5605,6 +5605,20 @@ namespace TorannMagic
             }
         }
 
+        internal void RestoreTechnoWeapon(ThingWithComps weapon)
+        {
+            var copy = weapon?.TryGetComp<CompTechnoWeaponCopy>();
+            if (copy == null || copy.Template != null || !TM_Action.CanCopyTechnoWeapon(technoWeaponThingDef)) return;
+            // Old saves store the template on the mage. Restore the equipped item in place.
+            var model = ThingMaker.MakeThing(technoWeaponThingDef, technoWeaponThingDef.MadeFromStuff ? GenStuff.DefaultStuffFor(technoWeaponThingDef) : null);
+            try
+            {
+                model.TryGetComp<CompQuality>()?.SetQuality(technoWeaponQC, ArtGenerationContext.Colony);
+                copy.Capture(model,TM_Action.TechnoWeaponRank(this));
+            }
+            finally { model.Destroy(); }
+        }
+
         internal void ExposeTechnomancerOverdrive()
         {
             Scribe_References.Look(ref overdriveBuilding, "overdriveBuilding");
@@ -6183,10 +6197,7 @@ namespace TorannMagic
                 }
                 if (this.HasTechnoWeapon && this.Pawn.equipment != null && this.Pawn.equipment.Primary != null)
                 {
-                    if (this.Pawn.equipment.Primary.def.defName.Contains("TM_TechnoWeapon_Base") && this.Pawn.equipment.Primary.def.Verbs != null && this.Pawn.equipment.Primary.def.Verbs.FirstOrDefault().range < 2)
-                    {
-                        TM_Action.DoAction_TechnoWeaponCopy(this.Pawn, this.technoWeaponThing, this.technoWeaponThingDef, this.technoWeaponQC);
-                    }
+                    RestoreTechnoWeapon(this.Pawn.equipment.Primary);
 
                     if (!this.Pawn.equipment.Primary.def.defName.Contains("TM_TechnoWeapon_Base") && (this.technoWeaponThing != null || this.technoWeaponThingDef != null))
                     {
@@ -8375,6 +8386,29 @@ namespace TorannMagic
         }
 
         private Dictionary<string, Command> gizmoCommands = new Dictionary<string, Command>();
+        internal Command_Toggle CreateTechnoToggle(string key, Func<bool> hosted)
+        {
+            bool combat = key == "elementalShot", repair = key == "technoRepair";
+            Func<bool> enabled = combat ? () => useElementalShotToggle : repair ? () => useTechnoBitRepairToggle : () => useTechnoBitToggle;
+            string icon = combat ? (enabled() ? "elementalshot" : "elementalshot_off") :
+                repair ? (enabled() ? "bit_repairon" : "bit_repairoff") : (enabled() ? "bit_c" : "bit_off");
+            Action native = combat ? ToggleElementalShot : repair ? ToggleTechnoBitRepair : ToggleTechnoBit;
+            return new Command_Toggle
+            {
+                isActive = enabled,
+                toggleAction = hosted == null ? native : () => {
+                    if (!hosted()) return;
+                    if (combat) useElementalShotToggle = !useElementalShotToggle;
+                    else if (repair) useTechnoBitRepairToggle = !useTechnoBitRepairToggle;
+                    else useTechnoBitToggle = !useTechnoBitToggle;
+                },
+                defaultLabel = (combat ? "TM_TechnoWeapon_ver" : repair ? "TM_TechnoBitRepair" : enabled() ? "TM_TechnoBitEnabled" : "TM_TechnoBitDisabled").Translate(),
+                defaultDesc = (combat ? "TM_ElementalShotToggleDesc" : repair ? "TM_TechnoBitRepairDesc" : "TM_TechnoBitToggleDesc").Translate(),
+                Order = combat || repair ? -88 : -89,
+                icon = ContentFinder<Texture2D>.Get("UI/" + icon)
+            };
+        }
+
         public Command GetGizmoCommands(string key)
         {
             if (!gizmoCommands.ContainsKey(key))
@@ -8410,67 +8444,8 @@ namespace TorannMagic
                     };
                     gizmoCommands.Add(key, itemWanderer);
                 }
-                if(key == "technoBit")
-                {
-                    String toggle = "bit_c";
-                    String label = "TM_TechnoBitEnabled".Translate();
-                    String desc = "TM_TechnoBitToggleDesc".Translate();
-                    if (!this.useTechnoBitToggle)
-                    {
-                        toggle = "bit_off";
-                        label = "TM_TechnoBitDisabled".Translate();
-                    }
-                    var item = new Command_Toggle
-                    {
-                        isActive = () => this.useTechnoBitToggle,
-                        toggleAction = ToggleTechnoBit,
-                        defaultLabel = label,
-                        defaultDesc = desc,
-                        Order = -89,
-                        icon = ContentFinder<Texture2D>.Get("UI/" + toggle, true)
-                    };
-                    gizmoCommands.Add(key, item);
-                }
-                if(key == "technoRepair")
-                {
-                    String toggle_repair = "bit_repairon";
-                    String label_repair = "TM_TechnoBitRepair".Translate();
-                    String desc_repair = "TM_TechnoBitRepairDesc".Translate();
-                    if (!this.useTechnoBitRepairToggle)
-                    {
-                        toggle_repair = "bit_repairoff";
-                    }
-                    var item_repair = new Command_Toggle
-                    {
-                        isActive = () => this.useTechnoBitRepairToggle,
-                        toggleAction = ToggleTechnoBitRepair,
-                        defaultLabel = label_repair,
-                        defaultDesc = desc_repair,
-                        Order = -88,
-                        icon = ContentFinder<Texture2D>.Get("UI/" + toggle_repair, true)
-                    };
-                    gizmoCommands.Add(key, item_repair);
-                }
-                if(key == "elementalShot")
-                {
-                    String toggle = "elementalshot";
-                    String label = "TM_TechnoWeapon_ver".Translate();
-                    String desc = "TM_ElementalShotToggleDesc".Translate();
-                    if (!this.useElementalShotToggle)
-                    {
-                        toggle = "elementalshot_off";
-                    }
-                    var item = new Command_Toggle
-                    {
-                        isActive = () => this.useElementalShotToggle,
-                        toggleAction = ToggleElementalShot,
-                        defaultLabel = label,
-                        defaultDesc = desc,
-                        Order = -88,
-                        icon = ContentFinder<Texture2D>.Get("UI/" + toggle, true)
-                    };
-                    gizmoCommands.Add(key, item);
-                }
+                if (key == "technoBit" || key == "technoRepair" || key == "elementalShot")
+                    gizmoCommands.Add(key, CreateTechnoToggle(key, null));
             }
             if (gizmoCommands.ContainsKey(key))
             {

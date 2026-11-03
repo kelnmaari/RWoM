@@ -9,6 +9,7 @@ namespace TorannMagic
         //Used for non-unique abilities that can be used with shieldbelt
         public override bool CanHitTargetFrom(IntVec3 root, LocalTargetInfo targ)
         {
+            if (CasterPawn?.Spawned != true || CasterPawn.Map.Disposed || !targ.IsValid) return false;
             if (Ability?.Def == TorannMagicDefOf.TM_TechnoTurret && !Projectile_TechnoTurret.CanDeploy(CasterPawn?.Map,targ.Cell)) return false;
             if (targ.Thing != null && targ.Thing == this.caster)
             {

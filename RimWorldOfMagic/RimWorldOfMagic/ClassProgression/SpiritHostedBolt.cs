@@ -74,6 +74,8 @@ namespace TorannMagic.ClassProgression
             ("TM_SpiritOrbitalStrike_III", () => TorannMagicDefOf.TM_OrbitalStrike_III, typeof(Projectile_OrbitalStrike)),
             ("TM_SpiritOverdrive", () => TorannMagicDefOf.TM_Overdrive, typeof(Verb_Overdrive)),
             ("TM_SpiritSabotage", () => TorannMagicDefOf.TM_Sabotage, typeof(Projectile_Sabotage)),
+            ("TM_SpiritNanoStimulant", () => TorannMagicDefOf.TM_NanoStimulant, typeof(Verb_NanoStimulant)),
+            ("TM_SpiritTechnoWeapon", () => TorannMagicDefOf.TM_TechnoWeapon, typeof(Verb_TechnoWeapon)),
             ("TM_SpiritTechnoTurret", () => TorannMagicDefOf.TM_TechnoTurret, typeof(Projectile_TechnoTurret)),
             ("TM_SpiritTechnoShield", () => TorannMagicDefOf.TM_TechnoShield, typeof(Verb_TechnoShield)),
             ("TM_SpiritFoldReality", () => TorannMagicDefOf.TM_FoldReality, typeof(Verb_FoldReality)),
@@ -200,6 +202,13 @@ namespace TorannMagic.ClassProgression
             if (!SpiritRebirthState.TryGetPossessingSpirit(body, out var soul)) yield break;
             var magic = soul.GetCompAbilityUserMagic();
             if (magic?.ExistingMagicData == null) yield break;
+            if (SpiritHostedTechnoBit.Available(body,magic))
+            {
+                yield return magic.CreateTechnoToggle("technoBit", () => SpiritHostedTechnoBit.Available(body,magic));
+                yield return magic.CreateTechnoToggle("technoRepair", () => SpiritHostedTechnoBit.Available(body,magic));
+            }
+            if (TechnomancerAmmunition.Owner(body) == magic)
+                yield return magic.CreateTechnoToggle("elementalShot", () => TechnomancerAmmunition.Owner(body) == magic);
             foreach (var power in magic.AbilityData.Powers)
             {
                 if (!(power is MagicAbility) || !ReferenceEquals(power.AbilityUser, magic)) continue;
@@ -267,7 +276,7 @@ namespace TorannMagic.ClassProgression
             if (verb is Verb_SpiritTargetable direct && Families.Any(f => f.spell() == def && f.effect == props.verbClass))
             {
                 bool travel = Odyssey.ManualTravelSafety.IsTravel(power);
-                if (!travel && !(verb is Verb_Summon) && !(verb is Verb_SummonSpiritWolves) && !(verb is Verb_RegrowLimb) && !(verb is ISpiritCorpseConsumer) && !(verb is Verb_Overdrive) &&
+                if (!travel && !(verb is Verb_Summon) && !(verb is Verb_SummonSpiritWolves) && !(verb is Verb_RegrowLimb) && !(verb is ISpiritCorpseConsumer) && !(verb is Verb_Overdrive) && !(verb is Verb_TechnoWeapon) &&
                     props.AbilityTargetCategory != AbilityTargetCategory.TargetAoE && !(target.Thing is Pawn { Dead: false }))
                     return false;
                 if (!direct.CastFromHost(target)) return false;

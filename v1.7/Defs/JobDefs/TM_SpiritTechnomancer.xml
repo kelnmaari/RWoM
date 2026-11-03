@@ -40,4 +40,14 @@
     <driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass>
     <reportString>deploying a Mark-IV turret through a spirit host.</reportString>
   </JobDef>
+  <JobDef>
+    <defName>TM_SpiritTechnoWeapon</defName>
+    <driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass>
+    <reportString>copying a weapon through a spirit host.</reportString>
+  </JobDef>
+  <JobDef>
+    <defName>TM_SpiritNanoStimulant</defName>
+    <driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass>
+    <reportString>activating a nano stimulant in a spirit host.</reportString>
+  </JobDef>
 </Defs>
