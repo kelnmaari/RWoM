@@ -4,4 +4,6 @@
   <JobDef><defName>TM_SpiritShadowBolt_I</defName><driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass><reportString>casting a shadow bolt.</reportString></JobDef>
   <JobDef><defName>TM_SpiritShadowBolt_II</defName><driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass><reportString>casting a shadow bolt.</reportString></JobDef>
   <JobDef><defName>TM_SpiritShadowBolt_III</defName><driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass><reportString>casting a shadow bolt.</reportString></JobDef>
+  <JobDef><defName>TM_SpiritShadowStep</defName><driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass><reportString>stepping to a bonded ally.</reportString></JobDef>
+  <JobDef><defName>TM_SpiritShadowCall</defName><driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass><reportString>calling a bonded ally.</reportString></JobDef>
 </Defs>

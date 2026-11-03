@@ -77,6 +77,18 @@ namespace TorannMagic.ClassProgression
             }
         }
 
+        internal static void RestoreTravelControls(CompAbilityUserMagic magic)
+        {
+            var partner = magic.soulBondPawn;
+            if (partner == null || partner.Dead || partner.Destroyed || partner.health?.hediffSet == null ||
+                !partner.health.hediffSet.hediffs.Any(h => h.TryGetComp<HediffComp_SoulBondHost>()?.BonderPawn == magic.Pawn)) return;
+            magic.spell_ShadowStep = magic.spell_ShadowCall = true;
+            if (magic.AbilityData.Powers.Count(p => p?.Def == TorannMagicDefOf.TM_ShadowStep) != 1)
+                TM_ClassState.AddRuntimeAbility(magic,TorannMagicDefOf.TM_ShadowStep);
+            if (magic.AbilityData.Powers.Count(p => p?.Def == TorannMagicDefOf.TM_ShadowCall) != 1)
+                TM_ClassState.AddRuntimeAbility(magic,TorannMagicDefOf.TM_ShadowCall);
+        }
+
         internal static void UpdateProjection(Pawn soul, bool ending)
         {
             if (!SpiritRebirthState.TryGet(soul,out var state) || state.Host is not Pawn body || body.health?.hediffSet == null) return;
@@ -106,11 +118,7 @@ namespace TorannMagic.ClassProgression
                 partner.health.AddHediff(received);
             }
             if (received?.TryGetComp<HediffComp_SoulBondHost>()?.BonderPawn != soul) return;
-            magic.spell_ShadowStep = magic.spell_ShadowCall = true;
-            if (magic.AbilityData.Powers.Count(p => p?.Def == TorannMagicDefOf.TM_ShadowStep) != 1)
-                TM_ClassState.AddRuntimeAbility(magic,TorannMagicDefOf.TM_ShadowStep);
-            if (magic.AbilityData.Powers.Count(p => p?.Def == TorannMagicDefOf.TM_ShadowCall) != 1)
-                TM_ClassState.AddRuntimeAbility(magic,TorannMagicDefOf.TM_ShadowCall);
+            RestoreTravelControls(magic);
             if (body.health.hediffSet.HasHediff(Sender(mental)) || !SourceAvailable(body,soul,mental)) return;
             ApplySource(body,soul,mental,.5f + TM_Calc.GetSkillPowerLevel(soul,TorannMagicDefOf.TM_SoulBond));
         }

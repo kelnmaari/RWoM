@@ -114,6 +114,8 @@ namespace TorannMagic.ClassProgression
             ("TM_SpiritShadowBolt_I", () => TorannMagicDefOf.TM_ShadowBolt_I, typeof(Projectile_HostedShadowBolt)),
             ("TM_SpiritShadowBolt_II", () => TorannMagicDefOf.TM_ShadowBolt_II, typeof(Projectile_HostedShadowBolt)),
             ("TM_SpiritShadowBolt_III", () => TorannMagicDefOf.TM_ShadowBolt_III, typeof(Projectile_HostedShadowBolt)),
+            ("TM_SpiritShadowStep", () => TorannMagicDefOf.TM_ShadowStep, typeof(Verb_ShadowStep)),
+            ("TM_SpiritShadowCall", () => TorannMagicDefOf.TM_ShadowCall, typeof(Verb_ShadowCall)),
             ("TM_SpiritSoulBond", () => TorannMagicDefOf.TM_SoulBond, typeof(Verb_SoulBond)),
             ("TM_SpiritSymbiosis", () => TorannMagicDefOf.TM_Symbiosis, typeof(Verb_Symbiosis)),
             ("TM_SpiritFadeEmotions", () => TorannMagicDefOf.TM_FadeEmotions, typeof(Verb_FadeEmotions)),
@@ -401,7 +403,9 @@ namespace TorannMagic.ClassProgression
                 if (def == TorannMagicDefOf.TM_EnchanterStone) order.targetC = Verb_EnchanterStone.Source(body, soul, target);
                 if (def == TorannMagicDefOf.TM_Transmutate) order.targetC = Verb_Transmutate.Source(body, soul, target);
                 void Submit() => body.jobs.TryTakeOrderedJob(order, JobTag.Misc);
-                if (def == TorannMagicDefOf.TM_ValiantCharge || def.MainVerb.verbClass == typeof(Verb_LightSkip) || Odyssey.ManualTravelSafety.IsTravel(power))
+                if (DemonBondTravel.Applies(power))
+                    DemonBondTravel.Submit(body, power, order, true, Valid, Submit);
+                else if (def == TorannMagicDefOf.TM_ValiantCharge || def.MainVerb.verbClass == typeof(Verb_LightSkip) || Odyssey.ManualTravelSafety.IsTravel(power))
                     Odyssey.ManualTravelSafety.Submit(body, order, map, target.Cell, true, Valid, Submit);
                 else Submit();
             }
@@ -497,7 +501,7 @@ namespace TorannMagic.ClassProgression
                     return false;
                 var soundPosition = new TargetInfo(body.Position, body.Map);
                 if (!direct.CastFromHost(target)) return false;
-                if (!travel && !(direct is Verb_FoldReality) && !(direct is Verb_LightSkipGlobal)) power.PayForAttempt(body);
+                if (!travel && !DemonBondTravel.Applies(power) && !(direct is Verb_FoldReality) && !(direct is Verb_LightSkipGlobal)) power.PayForAttempt(body);
                 props.soundCast?.PlayOneShot(soundPosition);
                 return true;
             }

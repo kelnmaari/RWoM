@@ -13,7 +13,8 @@ namespace TorannMagic
     public class MagicAbility : PawnAbility
     {
         public override Verse.AI.Job UseAbility(AbilityContext context, LocalTargetInfo target)
-            => Odyssey.ManualTravelSafety.IsTravel(this) ? Odyssey.ManualTravelSafety.UseAbility(this, context, target) : base.UseAbility(context, target);
+            => ClassProgression.DemonBondTravel.Applies(this) ? ClassProgression.DemonBondTravel.Order(this, context, target) :
+                Odyssey.ManualTravelSafety.IsTravel(this) ? Odyssey.ManualTravelSafety.UseAbility(this, context, target) : base.UseAbility(context, target);
 
        
         public CompAbilityUserMagic MagicUser

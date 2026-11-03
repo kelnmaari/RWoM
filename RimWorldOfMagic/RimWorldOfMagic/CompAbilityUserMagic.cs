@@ -7077,6 +7077,8 @@ namespace TorannMagic
             {
                 TM_PawnTracker.ResolveMagicComp(this);
                 RecoverMissingProgression();
+                if (soulBondPawn != null)
+                    LongEventHandler.ExecuteWhenFinished(() => ClassProgression.DemonSoulBond.RestoreTravelControls(this));
                 if (livingWall != null && ClassProgression.SpiritRebirthEnergy.Marked(Pawn))
                     LongEventHandler.ExecuteWhenFinished(() => ClassProgression.GolemancerLifecycle.SyncWallControl(this));
                 if (brands?.Count > 0 && ClassProgression.SpiritRebirthEnergy.Marked(Pawn))

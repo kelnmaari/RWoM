@@ -4,4 +4,6 @@
   <TM_SpiritShadowBolt_I.reportString>выпускает стрелу тени.</TM_SpiritShadowBolt_I.reportString>
   <TM_SpiritShadowBolt_II.reportString>выпускает стрелу тени.</TM_SpiritShadowBolt_II.reportString>
   <TM_SpiritShadowBolt_III.reportString>выпускает стрелу тени.</TM_SpiritShadowBolt_III.reportString>
+  <TM_SpiritShadowStep.reportString>переходит к связанному союзнику.</TM_SpiritShadowStep.reportString>
+  <TM_SpiritShadowCall.reportString>призывает связанного союзника.</TM_SpiritShadowCall.reportString>
 </LanguageData>

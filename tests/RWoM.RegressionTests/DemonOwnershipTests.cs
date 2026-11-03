@@ -211,6 +211,22 @@ internal static class DemonOwnershipTests
                 var host = (HediffWithComps)target.health.hediffSet.hediffs.Single(h => h.def.defName == hostName);
                 Check.Same(p.pawn, hostType.GetProperty("BonderPawn")!.GetValue(host.comps.Single())!, "native host references caster");
                 Check.Same(target, p.magic.soulBondPawn, "native bond stores target");
+                foreach (var child in children)
+                {
+                    var power = new MagicAbility(p.magic) { Def = child };
+                    Check.Equal(false, TorannMagic.Odyssey.ManualTravelSafety.TakePayment(power),
+                        "native job callback cannot charge before bonded travel succeeds");
+                }
+                var retained = p.magic.AbilityData.Powers.Single(v => v.Def == children[0]);
+                retained.CooldownTicksLeft = 91;
+                p.magic.RemovePawnAbility(children[1]);
+                var restore = typeof(TM_Action).Assembly.GetType("TorannMagic.ClassProgression.DemonSoulBond")!
+                    .GetMethod("RestoreTravelControls", BindingFlags.Static | BindingFlags.NonPublic)!;
+                restore.Invoke(null, [p.magic]);
+                restore.Invoke(null, [p.magic]);
+                Check.Same(retained, p.magic.AbilityData.Powers.Single(v => v.Def == children[0]), "load keeps the existing command");
+                Check.Equal(91, retained.CooldownTicksLeft, "load preserves bonded ability cooldown");
+                Check.Equal(1, p.magic.AbilityData.Powers.Count(v => v.Def == children[1]), "missing command restored once");
                 var substitute = PawnWithComps(false, false).pawn;
                 var replacement = hostType.GetField("polyHost")!;
                 TM_Action.TransferSoulBond(target, substitute);
