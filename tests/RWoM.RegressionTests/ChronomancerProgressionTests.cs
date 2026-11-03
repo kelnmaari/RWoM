@@ -13,6 +13,22 @@ internal static class ChronomancerProgressionTests
 {
     public static IEnumerable<TestCase> Cases()
     {
+        yield return new("ChronomancerProgression.AccelerateTimeTargetsOrdinaryItems", f => {
+            var def=(ThingDef)RuntimeHelpers.GetUninitializedObject(typeof(ThingDef));
+            def.defName="ChronomancerTestTool";def.category=ThingCategory.Item;
+            var target=new TargetInfo(new Thing { def=def });
+            foreach (var (file,name) in new[] {
+                ("Abilities_TMagic_Chronomancer.xml","TM_AccelerateTime"),
+                ("Bridge/Bridge_Abilities_TMagic_Chronomancer.xml","TM_Bridge_Acceleratetime") })
+            {
+                var root=XDocument.Load(System.IO.Path.Combine(f.Repository,"v1.7/Defs/AbilityDefs",file)).Root!;
+                var node=root.Elements().Single(n=>(string?)n.Element("defName")==name).Descendants("targetParams").Single();
+                var parameters=new TargetingParameters {
+                    canTargetItems=(bool?)node.Element("canTargetItems") ?? false,
+                    mapObjectTargetsMustBeAutoAttackable=(bool?)node.Element("mapObjectTargetsMustBeAutoAttackable") ?? true };
+                Check.Equal(true,parameters.CanTarget(target),name+" selects a normal noncombat item");
+            }
+        });
         yield return new("ChronomancerProgression.NativeBooksAndStageGates", Books);
         yield return new("ChronomancerProgression.NativeTimeMarkAndSavedRetention", Children);
         yield return new("ChronomancerProgression.RecallMarkerSnapshotReferencesUnchanged", Marker);

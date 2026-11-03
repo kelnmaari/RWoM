@@ -157,6 +157,7 @@ When used on friendly pawns, there is no area of effect, only the primary target
 			<isViolent>false</isViolent>
 			<targetParams>
 				<canTargetItems>true</canTargetItems>
+				<mapObjectTargetsMustBeAutoAttackable>false</mapObjectTargetsMustBeAutoAttackable>
                 <canTargetPawns>true</canTargetPawns>
                 <canTargetBuildings>true</canTargetBuildings>
                 <canTargetSelf>true</canTargetSelf>

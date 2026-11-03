@@ -11,6 +11,13 @@ internal static class ChronomancerTrialTests
 {
     public static IEnumerable<TestCase> Cases()
     {
+        yield return new("ChronomancerTrial.AccelerationAgeDoesNotOverflow", f => {
+            var next=typeof(HediffComp_AccelerateTime).GetMethod("NextAge",BindingFlags.Static|BindingFlags.NonPublic)!;
+            long Step(long ticks,int years,bool bad)=>(long)next.Invoke(null,[ticks,years,3.5f,bad])!;
+            Check.Equal(2500027500L,Step(2500000000L,99,false),"older ticks never narrow to a 32-bit value");
+            Check.Equal(2503600000L,Step(2500000000L,100,true),"harmful century advances one year");
+            Check.Equal(long.MaxValue,Step(long.MaxValue-5,200,true),"modded extreme ages do not wrap");
+        });
         yield return new("ChronomancerTrial.AlterFateRequiresOwnedPendingEventOnCurrentMap", AlterFate);
         yield return new("ChronomancerTrial.PredictionExactQueueAndActiveOwnedSource", Prediction);
         yield return new("ChronomancerTrial.PredictionSourceAndStageBoundaries", PredictionBoundaries);

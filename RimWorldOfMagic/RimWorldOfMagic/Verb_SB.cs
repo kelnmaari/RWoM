@@ -10,6 +10,7 @@ namespace TorannMagic
         public override bool CanHitTargetFrom(IntVec3 root, LocalTargetInfo targ)
         {
             if (CasterPawn?.Spawned != true || CasterPawn.Map.Disposed || !targ.IsValid) return false;
+            if (Ability?.Def == TorannMagicDefOf.TM_AccelerateTime && targ.Thing?.def.category == ThingCategory.Item && !Projectile_AccelerateTime.CanAgeItem(targ.Thing)) return false;
             if (Ability?.Def == TorannMagicDefOf.TM_TechnoTurret && !Projectile_TechnoTurret.CanDeploy(CasterPawn?.Map,targ.Cell)) return false;
             if (targ.Thing != null && targ.Thing == this.caster)
             {
