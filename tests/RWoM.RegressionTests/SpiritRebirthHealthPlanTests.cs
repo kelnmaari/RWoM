@@ -183,13 +183,17 @@ internal static class SpiritRebirthHealthPlanTests
         var crow = new HediffWithComps {def=crowDef,pawn=f.Original};
         crow.comps = [new HediffComp_CrowInsight {parent=crow}];
         f.Original.health.hediffSet.hediffs.AddRange([injury, marker, missing, implant, blood, crow]);
-        var empathyEffects = new Dictionary<string, Type> {
+        var physicalClassEffects = new Dictionary<string, Type> {
+            ["TM_SoulBondMentalHD"] = typeof(CompClassProgression).Assembly.GetType("TorannMagic.HediffComp_SoulBondHost",true)!,
+            ["TM_SoulBondPhysicalHD"] = typeof(CompClassProgression).Assembly.GetType("TorannMagic.HediffComp_SoulBondHost",true)!,
+            ["TM_WDSoulBondMentalHD"] = typeof(CompClassProgression).Assembly.GetType("TorannMagic.HediffComp_SoulBond",true)!,
+            ["TM_SDSoulBondPhysicalHD"] = typeof(CompClassProgression).Assembly.GetType("TorannMagic.HediffComp_SoulBond",true)!,
             ["TM_EmpathHD"] = typeof(TorannMagic.HediffComp_Empath), ["TM_SuppressiveAuraHD"] = typeof(TorannMagic.HediffComp_SuppressiveAura),
             ["TM_HarvestPassionHD"] = typeof(CompClassProgression).Assembly.GetType("TorannMagic.HediffComp_HarvestPassion",true)!,
             ["TM_EmotionSuppressionHD"] = typeof(HediffComp_SeverityPerDay),
             ["TM_OutOfBodyHD"] = typeof(TorannMagic.HediffComp_SymbiosisCaster), ["TM_SymbiosisHD"] = typeof(TorannMagic.HediffComp_SymbiosisHost)
         };
-        foreach (var (name,type) in empathyEffects)
+        foreach (var (name,type) in physicalClassEffects)
         {
             var definition = new HediffDef {defName=name,hediffClass=typeof(HediffWithComps), comps=[new HediffCompProperties{compClass=type}]};
             DefDatabase<HediffDef>.Add(definition);
@@ -203,7 +207,7 @@ internal static class SpiritRebirthHealthPlanTests
         Check.Equal(1, f.Original.health.hediffSet.GetMissingPartsCommonAncestors().Count, "prime real missing-part cache before cleanup");
         var magic = f.Magic.MagicData; var might = f.Might.MightData;
         Check.Equal(true, Prepare(f.Original, out var plan, out _), "known physical conditions accepted");
-        Check.Equal(6 + empathyEffects.Count, f.Original.health.hediffSet.hediffs.Count, "preparation removes nothing");
+        Check.Equal(6 + physicalClassEffects.Count, f.Original.health.hediffSet.hediffs.Count, "preparation removes nothing");
         Check.Equal(true, Apply(plan!), "native health removal succeeds");
         Check.Equal(1, f.Original.health.hediffSet.hediffs.Count, "only class marker survives");
         Check.Same(marker, f.Original.health.hediffSet.hediffs[0], "original class marker instance retained");

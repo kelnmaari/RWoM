@@ -22,6 +22,13 @@ namespace TorannMagic
             Scribe_References.Look<Pawn>(ref this.polyHost, "polyHost", false);
         }
 
+        public override void Notify_PawnDied(DamageInfo? dinfo, Hediff culprit = null)
+        {
+            base.Notify_PawnDied(dinfo,culprit);
+            if (Pawn.Dead)
+                ClassProgression.DemonSoulBond.EndOnDeath(bonderPawn,Pawn,parent.def.defName == "TM_SoulBondMentalHD",true);
+        }
+
         public override string CompLabelInBracketsExtra => BonderPawn != null ? BonderPawn.LabelShort + "[-]" + base.CompLabelInBracketsExtra : base.CompLabelInBracketsExtra;
 
         public Pawn BonderPawn
@@ -91,7 +98,8 @@ namespace TorannMagic
                 string source = mental ? "TM_WDSoulBondMentalHD" : "TM_SDSoulBondPhysicalHD";
                 soulPawnRemove = bonderPawn.DestroyedOrNull() || bonderPawn.Dead ||
                     bonderPawn.GetCompAbilityUserMagic()?.soulBondPawn != Pawn ||
-                    !bonderPawn.health.hediffSet.hediffs.Any(h => h.def.defName == source);
+                    (!ClassProgression.SpiritRebirthState.TryGet(bonderPawn,out _) &&
+                     !bonderPawn.health.hediffSet.hediffs.Any(h => h.def.defName == source));
 
             }
         }

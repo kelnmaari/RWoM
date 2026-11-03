@@ -177,7 +177,7 @@ internal static class DemonOwnershipTests
             var hostType = typeof(MagicAbility).Assembly.GetType("TorannMagic.HediffComp_SoulBondHost")!;
             foreach (string name in new[] { "TM_WDSoulBondMentalHD", "TM_SDSoulBondPhysicalHD", "TM_SoulBondMentalHD", "TM_SoulBondPhysicalHD" })
                 DefDatabase<HediffDef>.Add(new HediffDef { defName = name, hediffClass = typeof(HediffWithComps),
-                    comps = name.StartsWith("TM_SoulBond") ? new List<HediffCompProperties> { new() { compClass = hostType } } : new List<HediffCompProperties>() });
+                    comps = new List<HediffCompProperties> { new() { compClass = name.StartsWith("TM_SoulBond") ? hostType : typeof(MagicAbility).Assembly.GetType("TorannMagic.HediffComp_SoulBond")! } } });
             foreach (bool warlock in new[] { true, false })
             foreach (var gender in new[] { Gender.None, Gender.Male, Gender.Female })
             {

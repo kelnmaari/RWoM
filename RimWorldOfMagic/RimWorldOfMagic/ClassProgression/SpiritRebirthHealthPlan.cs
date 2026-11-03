@@ -88,7 +88,8 @@ namespace TorannMagic.ClassProgression
                 return component == typeof(HediffComp_SeverityPerDay);
             if (def.defName == "TM_LightCapacitanceHD" || def.defName == "TM_TechnoBitHD")
             {
-                var expected = def.defName == "TM_LightCapacitanceHD" ? typeof(HediffComp_LightCapacitance) : typeof(HediffComp_TechnoBit);
+                var expected = def.defName == "TM_LightCapacitanceHD" ? typeof(HediffComp_LightCapacitance) :
+                    typeof(HediffComp_TechnoBit);
                 var live = ((HediffWithComps)effect).comps;
                 return effect.Part == null && component == expected && live?.Count == 1
                     && live[0]?.GetType() == expected && live[0].parent == effect;
@@ -99,6 +100,8 @@ namespace TorannMagic.ClassProgression
 
         private static readonly Dictionary<string, Type> physicalClassEffects = new Dictionary<string, Type> {
             { "TM_BloodHD", typeof(HediffComp_Blood) }, { "TM_CrowInsightHD", typeof(HediffComp_CrowInsight) },
+            { "TM_SoulBondMentalHD", typeof(HediffComp_SoulBondHost) }, { "TM_SoulBondPhysicalHD", typeof(HediffComp_SoulBondHost) },
+            { "TM_WDSoulBondMentalHD", typeof(HediffComp_SoulBond) }, { "TM_SDSoulBondPhysicalHD", typeof(HediffComp_SoulBond) },
             { "TM_EmpathHD", typeof(HediffComp_Empath) }, { "TM_SuppressiveAuraHD", typeof(HediffComp_SuppressiveAura) },
             { "TM_EmotionSuppressionHD", typeof(HediffComp_SeverityPerDay) }, { "TM_HarvestPassionHD", typeof(HediffComp_HarvestPassion) },
             { "TM_OutOfBodyHD", typeof(HediffComp_SymbiosisCaster) }, { "TM_SymbiosisHD", typeof(HediffComp_SymbiosisHost) }
@@ -143,6 +146,10 @@ namespace TorannMagic.ClassProgression
             {
                 if (effect.def.defName == "TM_OutOfBodyHD") effect.TryGetComp<HediffComp_SymbiosisCaster>().RemoveHostHediff();
                 if (effect.def.defName == "TM_SymbiosisHD") effect.TryGetComp<HediffComp_SymbiosisHost>().RemoveSymbioteHediff();
+                if (effect.TryGetComp<HediffComp_SoulBond>() is { originalId: 0 })
+                    DemonSoulBond.EndOnDeath(pawn,pawn.GetCompAbilityUserMagic()?.soulBondPawn,effect.def.defName == "TM_WDSoulBondMentalHD",false);
+                if (effect.TryGetComp<HediffComp_SoulBondHost>() is { } receiver)
+                    DemonSoulBond.EndOnDeath(receiver.BonderPawn,pawn,effect.def.defName == "TM_SoulBondMentalHD",true);
                 pawn.health.RemoveHediff(effect);
             }
             return original.Except(physical).All(h => pawn.health.hediffSet.hediffs.Contains(h))

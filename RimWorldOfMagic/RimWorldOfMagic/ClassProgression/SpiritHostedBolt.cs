@@ -110,6 +110,7 @@ namespace TorannMagic.ClassProgression
             ("TM_SpiritVitalityBrand", () => TorannMagicDefOf.TM_VitalityBrand, typeof(Verb_BrandVitality)),
             ("TM_SpiritSiphonBrand", () => TorannMagicDefOf.TM_SiphonBrand, typeof(Verb_BrandSiphon)),
             ("TM_SpiritSuppressiveAura", () => TorannMagicDefOf.TM_SuppressiveAura, typeof(Verb_ToggleHediff)),
+            ("TM_SpiritSoulBond", () => TorannMagicDefOf.TM_SoulBond, typeof(Verb_SoulBond)),
             ("TM_SpiritSymbiosis", () => TorannMagicDefOf.TM_Symbiosis, typeof(Verb_Symbiosis)),
             ("TM_SpiritFadeEmotions", () => TorannMagicDefOf.TM_FadeEmotions, typeof(Verb_FadeEmotions)),
             ("TM_SpiritHarvestPassion", () => TorannMagicDefOf.TM_HarvestPassion, typeof(Verb_HarvestPassion)),
@@ -309,6 +310,16 @@ namespace TorannMagic.ClassProgression
                 (target.HasThing && target.Thing.Map != body.Map) ||
                 !power.magicDef.MainVerb.targetParams.CanTarget(target.ToTargetInfo(body.Map))) return false;
             if (power.magicDef == TorannMagicDefOf.TM_EnchantWeapon && target.Pawn?.equipment?.Primary?.def.IsMeleeWeapon != true) return false;
+            if (power.magicDef == TorannMagicDefOf.TM_SoulBond)
+            {
+                var ally = target.Pawn;
+                var soul = power.Pawn;
+                bool mental = ClassIdentity.DemonEffect(soul,true,soul.gender == Gender.Male);
+                bool physical = ClassIdentity.DemonEffect(soul,false,soul.gender == Gender.Female);
+                if (ally == null || ally == body || ally.Dead || !ally.RaceProps.Humanlike || ally.Faction != body.Faction ||
+                    ally.health.hediffSet.HasHediff(TorannMagicDefOf.TM_UndeadHD) ||
+                    !Verb_SoulBond.CanReplace(power.MagicUser,ally,physical,mental) || !DemonSoulBond.SourceAvailable(body,soul,mental)) return false;
+            }
             if (power.magicDef == TorannMagicDefOf.TM_Symbiosis && !Verb_Symbiosis.CanLink(body,target.Pawn)) return false;
             if (power.magicDef == TorannMagicDefOf.TM_FadeEmotions && !Verb_FadeEmotions.CanFade(body,target.Pawn)) return false;
             if (power.magicDef == TorannMagicDefOf.TM_HarvestPassion && !Verb_HarvestPassion.CanHarvest(body,power.Pawn,target.Pawn)) return false;

@@ -13,6 +13,23 @@ namespace TorannMagic
         private bool soulPawnRemove = false;
         Pawn bondedPawn = null;
 
+        internal int originalId;
+        internal Pawn Owner => originalId == 0 ? Pawn :
+            ClassProgression.SpiritRebirthState.TryGetPossessingSpirit(Pawn,out var soul) && soul.thingIDNumber == originalId ? soul : null;
+
+        public override void CompExposeData()
+        {
+            base.CompExposeData();
+            Scribe_Values.Look(ref originalId,"soulBondOriginalId",0);
+        }
+
+        public override void Notify_PawnDied(DamageInfo? dinfo, Hediff culprit = null)
+        {
+            base.Notify_PawnDied(dinfo,culprit);
+            if (originalId == 0 && Pawn.Dead)
+                ClassProgression.DemonSoulBond.EndOnDeath(Pawn,Pawn.GetCompAbilityUserMagic()?.soulBondPawn,parent.def.defName == "TM_WDSoulBondMentalHD",false);
+        }
+
         public override string CompLabelInBracketsExtra => bondedPawn != null ? bondedPawn.LabelShort + "[+]" + base.CompLabelInBracketsExtra : base.CompLabelInBracketsExtra;
 
         public string labelCap
@@ -73,7 +90,8 @@ namespace TorannMagic
 
         private void RefreshPair()
         {
-            var magic = Pawn.GetCompAbilityUserMagic();
+            var owner = Owner;
+            var magic = owner?.GetCompAbilityUserMagic();
             bondedPawn = magic?.soulBondPawn;
             if (bondedPawn.DestroyedOrNull() || bondedPawn.Dead)
             {
@@ -82,7 +100,7 @@ namespace TorannMagic
             }
             bool mental = parent.def.defName == "TM_WDSoulBondMentalHD";
             if ((!mental && parent.def.defName != "TM_SDSoulBondPhysicalHD") ||
-                (ClassProgression.ClassIdentity.TryGetDemonBranch(Pawn,out bool warlock) && warlock != mental))
+                (ClassProgression.ClassIdentity.TryGetDemonBranch(owner,out bool warlock) && warlock != mental))
             {
                 soulPawnRemove = true;
                 return;
@@ -93,7 +111,7 @@ namespace TorannMagic
             if (effects == null) { soulPawnRemove = true; return; }
             var target = effects.hediffs.FirstOrDefault(h => h.def.defName == name);
             var partner = target?.TryGetComp<HediffComp_SoulBondHost>();
-            if (target != null && (partner == null || partner.BonderPawn != null && partner.BonderPawn != Pawn))
+            if (target != null && (partner == null || partner.BonderPawn != null && partner.BonderPawn != owner))
             {
                 soulPawnRemove = true;
                 return;
@@ -106,13 +124,13 @@ namespace TorannMagic
                 target = HediffMaker.MakeHediff(HediffDef.Named(name),bondedPawn);
                 partner = target.TryGetComp<HediffComp_SoulBondHost>();
                 if (partner == null) { soulPawnRemove = true; return; }
-                partner.BonderPawn = Pawn;
+                partner.BonderPawn = owner;
                 target.Severity = receiverRank;
                 bondedPawn.health.AddHediff(target);
             }
             else
             {
-                partner.BonderPawn = Pawn;
+                partner.BonderPawn = owner;
                 if (target.Severity != receiverRank) target.Severity = receiverRank;
             }
             float senderRank = .5f + (ranks.FirstOrDefault(s => s.label == "TM_SoulBond_pwr")?.level ?? 0);

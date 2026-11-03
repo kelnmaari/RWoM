@@ -15,9 +15,9 @@ namespace TorannMagic.ClassProgression
         static CompAbilityUserMagic Magic(Pawn p) => p?.AllComps.OfType<CompAbilityUserMagic>().FirstOrDefault();
         static string Trial(string profile, bool mastery) => profile + (mastery ? ".mastery" : ".foundation");
         static TMAbilityDef Spell(string profile, bool mastery) => !mastery ? TorannMagicDefOf.TM_SoulBond : profile == "rwom.warlock" ? TorannMagicDefOf.TM_Repulsion : TorannMagicDefOf.TM_Attraction;
-        static DisciplineProgress Owned(Pawn caster, string profile, bool mastery, AbilityUser.AbilityDef ability)
+        static DisciplineProgress Owned(Pawn caster, string profile, bool mastery, AbilityUser.AbilityDef ability, Pawn body = null)
         {
-            if (caster == null || caster.Dead || !caster.Spawned || caster.Faction == null || caster.story?.traits?.HasTrait(TorannMagicDefOf.Faceless) == true
+            if (caster == null || caster.Dead || (body ?? caster).Spawned != true || caster.Faction == null || caster.story?.traits?.HasTrait(TorannMagicDefOf.Faceless) == true
                 || !ClassIdentity.TryGetState(caster, out var state) || (state.Vocation & Vocation.Mage) == 0 || state.Disciplines.Count != 1) return null;
             if (ClassIdentity.Profile(profile)?.domain != DisciplineDomain.Magic) return null;
             var path = state.Find(profile);
@@ -28,8 +28,8 @@ namespace TorannMagic.ClassProgression
             var owner = powers?.FirstOrDefault(p => p.TMabilityDefs.Contains(Spell(profile, mastery)));
             return owner?.learned == true && owner.TMabilityDefs.Contains(ability) && ReferenceEquals(TM_ClassState.PreferredMagicOwner(magic, ability), owner) ? path : null;
         }
-        static bool Runtime(Verb_UseAbility verb) => verb?.Ability != null && verb.Ability.AbilityUser == Magic(verb.CasterPawn)
-            && Magic(verb.CasterPawn)?.AbilityData.Powers.Any(a => ReferenceEquals(a, verb.Ability)) == true;
+        static bool Runtime(Verb_UseAbility verb) => verb?.Ability?.Pawn is Pawn owner && SpiritRebirthCasting.SkillOwner(verb.CasterPawn,verb.Ability) == owner &&
+            verb.Ability.AbilityUser == Magic(owner) && Magic(owner)?.AbilityData.Powers.Any(a => ReferenceEquals(a,verb.Ability)) == true;
         static bool Ally(Pawn caster, Pawn target) => target != null && target != caster && !target.Dead && target.Spawned && target.Map == caster.Map
             && target.RaceProps?.Humanlike == true && target.Faction == caster.Faction && !target.IsPrisoner && !target.IsSlave && !TM_Calc.IsUndead(target);
         static bool Hostile(Pawn caster, Pawn target) => target != null && !target.Dead && target.Spawned && target.Map == caster.Map && !target.IsPrisoner && !target.IsSlave
@@ -37,29 +37,34 @@ namespace TorannMagic.ClassProgression
         static Hediff Hediff(Pawn pawn, string name) => pawn?.health?.hediffSet?.hediffs.FirstOrDefault(h => h.def?.defName == name);
         static string CasterBond(string profile) => profile == "rwom.warlock" ? "TM_WDSoulBondMentalHD" : "TM_SDSoulBondPhysicalHD";
         static string HostBond(string profile) => profile == "rwom.warlock" ? "TM_SoulBondMentalHD" : "TM_SoulBondPhysicalHD";
-        static bool Bonded(Pawn caster, Pawn target, string profile) => target != null && Magic(caster)?.soulBondPawn == target && Hediff(caster, CasterBond(profile)) != null
+        static bool Bonded(Pawn caster, Pawn body, Pawn target, string profile) => target != null && Magic(caster)?.soulBondPawn == target && Hediff(body, CasterBond(profile)) != null
+            && (body == caster || Hediff(body,CasterBond(profile)).TryGetComp<HediffComp_SoulBond>()?.Owner == caster)
             && Hediff(target, HostBond(profile))?.TryGetComp<HediffComp_SoulBondHost>()?.BonderPawn == caster;
         public sealed class BondSnapshot
         {
-            internal Pawn caster, target; internal string profile; internal DisciplineProgress path; internal AbilityUser.AbilityDef ability; internal bool used;
+            internal Pawn caster, body, target; internal string profile; internal DisciplineProgress path; internal AbilityUser.PawnAbility ability; internal bool used;
         }
         public static BondSnapshot BeforeBond(Verb_UseAbility verb, Pawn target)
         {
-            if (!Runtime(verb) || !Ally(verb.CasterPawn, target)) return null;
+            if (!Runtime(verb) || !Ally(verb.CasterPawn,target)) return null;
+            var body = verb.CasterPawn;
+            var owner = verb.Ability.Pawn;
+            if (Magic(owner)?.soulBondPawn != null) return null;
             foreach (string profile in new[] { "rwom.warlock", "rwom.succubus" })
             {
-                var path = Owned(verb.CasterPawn, profile, false, verb.Ability.Def);
-                if (path != null && !Bonded(verb.CasterPawn, Magic(verb.CasterPawn)?.soulBondPawn, "rwom.warlock") && !Bonded(verb.CasterPawn, Magic(verb.CasterPawn)?.soulBondPawn, "rwom.succubus")
-                    && Hediff(verb.CasterPawn, CasterBond(profile)) == null && Hediff(target, HostBond(profile)) == null)
-                    return new BondSnapshot { caster = verb.CasterPawn, target = target, profile = profile, path = path, ability = verb.Ability.Def };
+                var path = Owned(owner,profile,false,verb.Ability.Def,body);
+                if (path != null && Hediff(body,CasterBond(profile)) == null && Hediff(target,HostBond(profile)) == null)
+                    return new BondSnapshot { caster=owner,body=body,target=target,profile=profile,path=path,ability=verb.Ability };
             }
             return null;
         }
         public static bool AfterBond(BondSnapshot snapshot)
         {
-            if (snapshot == null || snapshot.used) return false; snapshot.used = true;
-            return Ally(snapshot.caster, snapshot.target) && Owned(snapshot.caster, snapshot.profile, false, snapshot.ability) == snapshot.path
-                && Bonded(snapshot.caster, snapshot.target, snapshot.profile) && snapshot.path.RecordCompletedTrial(Trial(snapshot.profile, false));
+            if (snapshot == null || snapshot.used) return false;
+            snapshot.used = true;
+            return SpiritRebirthCasting.SkillOwner(snapshot.body,snapshot.ability) == snapshot.caster && Ally(snapshot.body,snapshot.target) &&
+                Owned(snapshot.caster,snapshot.profile,false,snapshot.ability.Def,snapshot.body) == snapshot.path &&
+                Bonded(snapshot.caster,snapshot.body,snapshot.target,snapshot.profile) && snapshot.path.RecordCompletedTrial(Trial(snapshot.profile,false));
         }
         public sealed class Tag : IExposable
         {
