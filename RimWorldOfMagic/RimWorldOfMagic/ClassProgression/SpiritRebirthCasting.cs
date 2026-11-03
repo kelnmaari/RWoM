@@ -7,6 +7,16 @@ namespace TorannMagic.ClassProgression
 {
     public static class SpiritRebirthCasting
     {
+        // The physical verb caster can differ from its ability owner only for
+        // the exact original still held by this host. Never redirect the host's own spell.
+        internal static Pawn SkillOwner(Pawn body, PawnAbility ability)
+        {
+            var owner = ability?.Pawn;
+            if (owner == null || ReferenceEquals(owner, body)) return body;
+            return SpiritRebirthState.TryGetPossessingSpirit(body, out var soul) && ReferenceEquals(soul, owner)
+                ? owner : null;
+        }
+
         public static bool Allows(Pawn pawn, AbilityDef ability)
         {
             // A trait, race, or native possession alone never opts a legacy pawn in.

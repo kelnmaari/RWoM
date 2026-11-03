@@ -14,23 +14,26 @@ namespace TorannMagic.ClassProgression
         private Pawn projectedOwner;
         protected bool projected;
         protected Thing SpellInstigator => projected ? projectedOwner : launcher;
+        internal Pawn SourcePawn => SpellInstigator as Pawn;
 
         protected abstract List<MagicPowerSkill> Skills(MagicData data);
         protected abstract string SkillStem { get; }
+
+        internal static int ProjectionRank(MagicAbility owner, List<MagicPowerSkill> skills, string stem, string suffix)
+        {
+            if (owner.Pawn.story.traits.HasTrait(TorannMagicDefOf.Faceless))
+                return owner.Pawn.GetCompAbilityUserMight()?.ExistingMightData?.MightPowerSkill_Mimic
+                    ?.FirstOrDefault(s => s.label == "TM_Mimic" + suffix)?.level ?? 0;
+            return skills.FirstOrDefault(s => s.label == stem + suffix)?.level ?? 0;
+        }
 
         internal virtual void PrepareProjection(MagicAbility owner)
         {
             projectedOwner = owner.Pawn;
             projected = true;
             var skills = Skills(owner.MagicUser.MagicData);
-            pwrVal = skills.FirstOrDefault(s => s.label == SkillStem + "_pwr")?.level ?? 0;
-            verVal = skills.FirstOrDefault(s => s.label == SkillStem + "_ver")?.level ?? 0;
-            if (owner.Pawn.story.traits.HasTrait(TorannMagicDefOf.Faceless))
-            {
-                var mimic = owner.Pawn.GetCompAbilityUserMight()?.ExistingMightData?.MightPowerSkill_Mimic;
-                pwrVal = mimic?.FirstOrDefault(s => s.label == "TM_Mimic_pwr")?.level ?? 0;
-                verVal = mimic?.FirstOrDefault(s => s.label == "TM_Mimic_ver")?.level ?? 0;
-            }
+            pwrVal = ProjectionRank(owner, skills, SkillStem, "_pwr");
+            verVal = ProjectionRank(owner, skills, SkillStem, "_ver");
             arcaneDmg = owner.MagicUser.arcaneDmg;
         }
 

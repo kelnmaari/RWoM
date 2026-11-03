@@ -99,6 +99,7 @@
   
   <ThingDef ParentName="TM_SkyfallerBase">
     <defName>TM_Firestorm_Large</defName>
+    <thingClass>TorannMagic.ClassProgression.SpiritStormSkyfaller</thingClass>
     <label>firestorm (large)</label>
 	
     <size>(3, 3)</size>
@@ -122,6 +123,7 @@
   
     <ThingDef ParentName="TM_SkyfallerBase">
     <defName>TM_Firestorm_Small</defName>
+    <thingClass>TorannMagic.ClassProgression.SpiritStormSkyfaller</thingClass>
     <label>firestorm (small)</label>
 	
     <size>(2, 2)</size>
@@ -147,6 +149,7 @@
   
   <ThingDef ParentName="TM_SkyfallerBase">
     <defName>TM_Firestorm_Tiny</defName>
+    <thingClass>TorannMagic.ClassProgression.SpiritStormSkyfaller</thingClass>
     <label>firestorm (tiny)</label>
 	
     <size>(1, 1)</size>
@@ -170,6 +173,7 @@
   
   <ThingDef ParentName="TM_SkyfallerBase">
     <defName>TM_Blizzard_Tiny</defName>
+    <thingClass>TorannMagic.ClassProgression.SpiritStormSkyfaller</thingClass>
     <label>blizzard(tiny)</label>
 	
     <size>(1, 1)</size>
@@ -193,6 +197,7 @@
   
   <ThingDef ParentName="TM_SkyfallerBase">
     <defName>TM_Blizzard_Small</defName>
+    <thingClass>TorannMagic.ClassProgression.SpiritStormSkyfaller</thingClass>
     <label>blizzard(small)</label>
 	
     <size>(2, 2)</size>
@@ -216,6 +221,7 @@
   
   <ThingDef ParentName="TM_SkyfallerBase">
     <defName>TM_Blizzard_Large</defName>
+    <thingClass>TorannMagic.ClassProgression.SpiritStormSkyfaller</thingClass>
     <label>Blizzard (large)</label>
 	
     <size>(3, 3)</size>
