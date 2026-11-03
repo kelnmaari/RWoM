@@ -64,9 +64,9 @@ namespace TorannMagic
         {
             get
             {
-                SetMaxLevel();
                 if (TMabilityDefs != null && TMabilityDefs.Count > 0)
                 {
+                    SetMaxLevel();
                     if (level <= 0)
                     {
                         return this.TMabilityDefs[0];
@@ -85,15 +85,9 @@ namespace TorannMagic
         {
             get
             {
+                if (TMabilityDefs == null || TMabilityDefs.Count == 0) return null;
                 SetMaxLevel();
-                if ((this.level + 1) >= this.maxLevel)
-                {
-                    return this.TMabilityDefs[maxLevel];
-                }
-                else
-                {
-                    return this.TMabilityDefs[level + 1];
-                }               
+                return GetAbilityDef(level >= maxLevel ? maxLevel : level + 1);
             }
         }
 
@@ -101,25 +95,19 @@ namespace TorannMagic
         {
             get
             {
-                return this.abilityDef.uiIcon;
+                return this.abilityDef?.uiIcon;
             }
         }
 
         public AbilityDef GetAbilityDef(int index)
         {
-            try
-            {
-                return this.TMabilityDefs[index];
-            }
-            catch
-            {
-                return this.TMabilityDefs[0];
-            }            
+            if (TMabilityDefs == null || TMabilityDefs.Count == 0) return null;
+            return TMabilityDefs[index >= 0 && index < TMabilityDefs.Count ? index : 0];
         }
 
         public AbilityDef HasAbilityDef(AbilityDef defToFind)
         {
-            return this.TMabilityDefs.FirstOrDefault((AbilityDef x) => x == defToFind);
+            return this.TMabilityDefs?.FirstOrDefault(x => x == defToFind);
         }
 
         public MagicPower()

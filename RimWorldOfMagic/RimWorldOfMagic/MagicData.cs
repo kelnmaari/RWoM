@@ -47,7 +47,7 @@ namespace TorannMagic
                         EnsureCustomSkills(power);
                         bool hasSkills = power.skills != null && power.skills.Any(skill => skill != null);
                         List<MagicPower> powers = hasSkills ? this.magicPowerCustom : this.MagicPowersCustomStandalone;
-                        MagicPower mp = powers.FirstOrDefault(existing => existing.GetAbilityDef(0) == power.abilityDefs[0]);
+                        MagicPower mp = powers.FirstOrDefault(existing => existing?.GetAbilityDef(0) == power.abilityDefs[0]);
                         if (mp == null)
                         {
                             mp = new MagicPower(power.abilityDefs, power.requiresScroll);
@@ -140,8 +140,8 @@ namespace TorannMagic
                 if(this.magicPowerCustomAll == null)
                 {
                     this.magicPowerCustomAll = new List<MagicPower>();
-                    this.magicPowerCustomAll.AddRange(customPowers);
-                    this.magicPowerCustomAll.AddRange(MagicPowersCustomStandalone);
+                    this.magicPowerCustomAll.AddRange(customPowers.Where(p => p?.TMabilityDefs?.Any(def => def != null) == true));
+                    this.magicPowerCustomAll.AddRange(MagicPowersCustomStandalone.Where(p => p?.TMabilityDefs?.Any(def => def != null) == true));
                 }
                 return magicPowerCustomAll;
             }
@@ -4033,7 +4033,7 @@ namespace TorannMagic
                     allMagicPowersList.Clear();
                     allMagicPowersList.AddRange(powersWithSkills);
                     allMagicPowersList.AddRange(this.MagicPowersStandalone);
-                    allMagicPowersList.AddRange(this.MagicPowersCustomStandalone);
+                    allMagicPowersList.AddRange(this.MagicPowersCustomStandalone.Where(p => p?.TMabilityDefs?.Any(def => def != null) == true));
                 }
                 return allMagicPowersList;
             }
@@ -4051,7 +4051,7 @@ namespace TorannMagic
                 {
                     allMagicPowersWithSkillsList = new List<MagicPower>();
                     allMagicPowersWithSkillsList.Clear();
-                    allMagicPowersWithSkillsList.AddRange(customPowers);
+                    allMagicPowersWithSkillsList.AddRange(customPowers.Where(p => p?.TMabilityDefs?.Any(def => def != null) == true));
                     allMagicPowersWithSkillsList.AddRange(this.MagicPowersCM);
                     allMagicPowersWithSkillsList.AddRange(this.MagicPowersW);
                     allMagicPowersWithSkillsList.AddRange(this.MagicPowersC);

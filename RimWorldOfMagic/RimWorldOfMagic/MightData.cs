@@ -1,4 +1,4 @@
-﻿using AbilityUser;
+using AbilityUser;
 using RimWorld;
 using System.Collections.Generic;
 using System.Linq;
@@ -96,8 +96,8 @@ namespace TorannMagic
                 if(mightPowerCustomAll == null)
                 {
                     mightPowerCustomAll = new List<MightPower>();
-                    mightPowerCustomAll.AddRange(custom);
-                    mightPowerCustomAll.AddRange(MightPowersCustomStandalone);                    
+                    mightPowerCustomAll.AddRange(custom.Where(p => p?.TMabilityDefs?.Any(def => def != null) == true));
+                    mightPowerCustomAll.AddRange(MightPowersCustomStandalone.Where(p => p?.TMabilityDefs?.Any(def => def != null) == true));
                 }
                 return mightPowerCustomAll;
             }
@@ -1992,7 +1992,7 @@ namespace TorannMagic
                     allMightPowersList = new List<MightPower>();
                     allMightPowersList.AddRange(learnedPowers);
                     allMightPowersList.AddRange(this.MightPowersStandalone);
-                    allMightPowersList.AddRange(this.MightPowersCustomStandalone);
+                    allMightPowersList.AddRange(this.MightPowersCustomStandalone.Where(p => p?.TMabilityDefs?.Any(def => def != null) == true));
                 }
                 return allMightPowersList;
             }
@@ -2007,7 +2007,7 @@ namespace TorannMagic
                 if (allMightPowersWithSkills == null || allMightPowersWithSkills.Count <= 0)
                 {
                     allMightPowersWithSkills = new List<MightPower>();
-                    allMightPowersWithSkills.AddRange(custom);
+                    allMightPowersWithSkills.AddRange(custom.Where(p => p?.TMabilityDefs?.Any(def => def != null) == true));
                     allMightPowersWithSkills.AddRange(this.MightPowersW);
                     allMightPowersWithSkills.AddRange(this.MightPowersM);
                     allMightPowersWithSkills.AddRange(this.MightPowersDK);
