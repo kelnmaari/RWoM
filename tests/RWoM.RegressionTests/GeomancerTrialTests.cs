@@ -10,6 +10,7 @@ internal static class GeomancerTrialTests
 {
     public static IEnumerable<TestCase> Cases()
     {
+        yield return new("GeomancerTrial.DamagedStoneskinRetainsMaximumAfterLoad", WardSave);
         yield return new("GeomancerTrial.FreshWardOwnershipAndNoops", Ward);
         yield return new("GeomancerTrial.EncaseDistinctCellsAndRankedSources", Encase);
         yield return new("GeomancerTrial.SourceAndBoundedCellsScribe", Save);
@@ -53,6 +54,47 @@ internal static class GeomancerTrialTests
         public void Adept() { Path.RecordCompletedTrial(GeomancerTrials.FoundationTrialId); Progression.State.TryAdvanceAfterTrial("rwom.geomancer", InitiationStage.Foundation, GeomancerTrials.FoundationTrialId); }
         public void Dispose() { GeomancerTrials.EndLaunch(null!); Current.Game = previous; DefDatabase<ClassDisciplineDef>.Clear(); foreach(var def in profiles) DefDatabase<ClassDisciplineDef>.Add(def); }
     }
+    public sealed class StoneskinEnvelope : IExposable
+    {
+        public static HediffComp current = null!;
+        public void ExposeData() => current.CompExposeData();
+    }
+    static void WardSave(RuntimeFixture f)
+    {
+        using var w = new Fixture(f);
+        var type = typeof(GeomancerTrials).Assembly.GetType("TorannMagic.HediffComp_Stoneskin",true)!;
+        var ward = new HediffWithComps { pawn=w.Target,def=new HediffDef {defName="TM_StoneskinHD"} };
+        Set(ward,"severityInt",2f);
+        HediffComp NewComp()
+        {
+            var c=(HediffComp)Activator.CreateInstance(type)!;
+            c.parent=ward;ward.comps=[c];return c;
+        }
+        string file=Path.Combine(f.WorkingDirectory,"damaged-stoneskin.xml");
+        try
+        {
+            StoneskinEnvelope.current=NewComp();
+            Set(StoneskinEnvelope.current,"maxSev",7);Set(StoneskinEnvelope.current,"initializing",false);
+            var envelope=new StoneskinEnvelope();
+            try { Scribe.saver.InitSaving(file,"regression");Scribe_Deep.Look(ref envelope,"stoneskin");Scribe.saver.FinalizeSaving(); }
+            finally { Scribe.ForceStop(); }
+            void Load()
+            {
+                StoneskinEnvelope.current=NewComp();StoneskinEnvelope loaded=null!;
+                try { Scribe.loader.InitLoading(file);Scribe_Deep.Look(ref loaded,"stoneskin");Scribe.loader.FinalizeLoading(); }
+                finally { Scribe.ForceStop(); }
+                Check.Equal(false,(bool)type.GetField("initializing",System.Reflection.BindingFlags.NonPublic|System.Reflection.BindingFlags.Instance)!.GetValue(StoneskinEnvelope.current)!,
+                    "loaded damaged ward will not reinitialize its capacity from remaining charges");
+                Check.Equal(7,(int)type.GetField("maxSev")!.GetValue(StoneskinEnvelope.current)!,"recorded maximum survives");
+            }
+            Load();
+            var xml=System.Xml.Linq.XDocument.Load(file);
+            xml.Descendants("TM_stoneskinInitializing").Single().Remove();
+            xml.Save(file);Load();
+        }
+        finally { StoneskinEnvelope.current=null!; }
+    }
+
     static void Ward(RuntimeFixture f)
     {
         using var w = new Fixture(f);
