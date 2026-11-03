@@ -99,6 +99,15 @@ namespace TorannMagic.ClassProgression
 
         private static bool IsKnownPhysical(Hediff effect)
         {
+            if (effect.def.defName == "TM_BloodHD")
+            {
+                var def = effect.def;
+                return ReferenceEquals(DefDatabase<HediffDef>.GetNamedSilentFail(def.defName), def) &&
+                    def.hediffClass == typeof(HediffWithComps) && effect.GetType() == def.hediffClass &&
+                    effect.Part == null && def.comps?.Count == 1 && def.comps[0]?.compClass == typeof(HediffComp_Blood) &&
+                    ((HediffWithComps)effect).comps is { Count: 1 } live && live[0]?.GetType() == typeof(HediffComp_Blood) &&
+                    live[0].parent == effect;
+            }
             if (effect.def == TorannMagicDefOf.TM_LichHD && SpiritNecromancyRenunciation.Required(effect.pawn))
                 return effect.GetType() == typeof(HediffWithComps) && ((HediffWithComps)effect).comps?.All(c =>
                     c is HediffComp_Lich || c is HediffComp_SeverityPerDay) == true;
