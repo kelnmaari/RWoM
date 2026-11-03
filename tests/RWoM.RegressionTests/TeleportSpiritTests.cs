@@ -63,6 +63,20 @@ internal static partial class TeleportSpiritTests
             Check.Same(w.Map, w.Caster.Map, "original map retains pawn");
             Check.Equal(true, magic.recallSet && magic.recallPosition == mark && magic.recallNeedValues.Single() == .75f, "blocked attempt preserves snapshot");
         }));
+        yield return new("FacelessProjection.FailedPossessionDoesNotClearDisguise",f=>World(f,w=>{
+            var target=w.Pawn("AlreadyDisguised",new IntVec3(5,0,6));
+            target.inventory=new Pawn_InventoryTracker(target);
+            target.apparel=new Pawn_ApparelTracker(target);
+            var disguise=new HediffWithComps{pawn=target,def=TorannMagicDefOf.TM_DisguiseHD_II};
+            target.health.hediffSet.hediffs.Add(disguise);
+            var rejected=new Projectile_Possess();
+            Set(rejected,"caster",w.Caster);Set(rejected,"hitPawn",target);
+            Set(rejected,"pFaction",target.Faction);Set(rejected,"age",1200);
+            using var patches=new Patches();
+            patches.Prefix(typeof(Thing).GetMethod("Destroy",Flags,[typeof(DestroyMode)])!,nameof(SkipGraphics));
+            rejected.Destroy();
+            Check.Equal(true,target.health.hediffSet.hediffs.Contains(disguise),"resisted possession cannot remove another effect");
+        }));
         yield return new("FacelessProjection.TransposeSwap",f=>World(f,w=>{
             using var guards=w.MovementBoundaries();
             var first=w.Caster.Position;

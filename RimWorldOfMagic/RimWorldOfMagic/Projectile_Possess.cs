@@ -25,8 +25,6 @@ namespace TorannMagic
         List<int> hitPawnWorkSetting = new List<int>();
         private bool prisoner = false;
 
-        Pawn loadPawn = new Pawn();
-
         private int verVal;
         private int pwrVal;
 
@@ -47,9 +45,14 @@ namespace TorannMagic
 
         protected override void Impact(Thing hitThing, bool blockedByShield = false)
         {
-            Map map = base.Map;
-            base.Impact(hitThing);
-            ThingDef def = this.def;
+            if (!initialized && (blockedByShield || launcher is not Pawn || hitThing is not Pawn))
+            {
+                age=duration;
+                base.Impact(hitThing,blockedByShield);
+                if (!Destroyed) Destroy();
+                return;
+            }
+            base.Impact(hitThing,blockedByShield);
             if (!initialized && this.age < this.duration && hitThing != null)
             {
                 caster = this.launcher as Pawn;
@@ -125,21 +128,13 @@ namespace TorannMagic
                                 FleckMaker.ThrowHeatGlow(caster.Position, caster.Map, .8f);
                                 if (!caster.IsColonist)
                                 {
-                                    Lord lord = caster.GetLord();
-                                    LordJob lordJob = caster.GetLord().LordJob;
-                                    try
+                                    var lord = caster.GetLord();
+                                    if (lord != null)
                                     {
-                                        PawnDuty duty = caster.mindState.duty;
-                                        hitPawn.mindState.duty = duty;
+                                        hitPawn.mindState.duty = caster.mindState.duty;
                                         lord.AddPawn(hitPawn);
                                     }
-                                    catch
-                                    {
-                                        Log.Message("error attempting to assign a duty to pawn during possession");
-                                    }
                                 }
-                                //loadPawn = caster;
-                                //loadPawn.ThingID += Rand.Range(0, 214).ToString();
                                 if(caster.IsColonist)
                                 {
                                     //
@@ -233,6 +228,12 @@ namespace TorannMagic
 
         public override void Destroy(DestroyMode mode = DestroyMode.Vanish)
         {
+            // A rejected cast owns neither pawn. Only an established possession needs release.
+            if (!initialized && age >= duration)
+            {
+                base.Destroy(mode);
+                return;
+            }
             bool flag = this.age >= duration;
             
             if (flag)
@@ -301,7 +302,7 @@ namespace TorannMagic
                         if(!caster.IsColonist && hitPawn.IsColonist)
                         {
                             List<WorkTypeDef> allWorkTypes = WorkTypeDefsUtility.WorkTypeDefsInPriorityOrder.ToList();
-                            for (int i = 0; i < hitPawnWorkSetting.Count(); i++)
+                            for (int i = 0; i < Math.Min(hitPawnWorkSetting?.Count ?? 0,allWorkTypes.Count); i++)
                             {
                                 hitPawn.workSettings.SetPriority(allWorkTypes[i], hitPawnWorkSetting[i]);
                             }
