@@ -146,6 +146,21 @@ internal static partial class SpiritMapCollapseTests
                     var local=c.Creator.GetCompAbilityUserMight();local.AbilityData.Powers.Add(new MightAbility(local){Def=def});local.AbilityData.AllPowers=null;
                     Check.Equal(true,Power()==null,"the host's own technique has priority");
                 }));
+        foreach(bool trails in new[]{false,true})
+            yield return new(trails?"RangerProjection.OutdoorHaul":"RangerProjection.ClassicTraining", f =>
+                SpiritRebirthRitualTransactionTests.Run(f,c => {
+                    using var held=new Fixture(f,c);
+                    var state=new ClassProgressionState(Vocation.Warrior);
+                    Set(ClassIdentity.Component(c.Original),"state",state);
+                    state.TryAddFoundation("rwom.ranger",DisciplineDomain.Might);
+                    Set(state.Find("rwom.ranger"),"RangerTrailLore",trails);
+                    var source=c.Original.GetCompAbilityUserMight();
+                    source.MightData.MightPowerSkill_RangerTraining.Single().levelMax=trails?4:3;
+                    var original=TorannMagicDefOf.Ranger;
+                    TorannMagicDefOf.Ranger=new TraitDef{defName="Ranger"};
+                    try { RangerFoundationTests.VerifyPassive(f,c.Creator,source,trails); }
+                    finally { TorannMagicDefOf.Ranger=original; }
+                }));
         foreach (bool treatment in new[]{false,true})
             yield return new("RangerProjection."+ (treatment?"VeterinaryShift":"StockpileFire"), f =>
                 SpiritRebirthRitualTransactionTests.Run(f,c => {
