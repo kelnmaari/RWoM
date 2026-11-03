@@ -161,6 +161,28 @@ internal static partial class SpiritMapCollapseTests
                     host.AbilityData.AllPowers=null;
                     Check.Equal(true,Owner()==null,"a lower native rank takes priority");
                 }));
+        yield return new("FacelessProjection.StudyOwner", f =>
+            SpiritRebirthRitualTransactionTests.Run(f,c => {
+                using var held=new Fixture(f,c);
+                var state=new ClassProgressionState(Vocation.Warrior);
+                Set(ClassIdentity.Component(c.Original),"state",state);
+                state.TryAddFoundation("rwom.faceless",DisciplineDomain.Might);
+                using var defs=FacelessCareerTests.Setup(f);
+                var source=c.Original.GetCompAbilityUserMight();
+                var power=new MightAbility(source){Def=TorannMagicDefOf.TM_Mimic};
+                source.AbilityData.Powers.Add(power);source.AbilityData.AllPowers=null;
+                var find=Production("SpiritHostedMartial").GetMethod("Find",BindingFlags.Static|BindingFlags.NonPublic)!;
+                Check.Same(power,find.Invoke(null,[c.Creator,c.Original,"TM_SpiritStudyFaceless"])!,"projected study must use the original Mimic");
+                var model=PawnWithComps(true,false);
+                Set(model.pawn,"mapIndexOrState",(sbyte)0);Set(model.pawn,"positionInt",c.Creator.Position+IntVec3.East);
+                model.magic.AddPawnAbility(TorannMagicDefOf.TM_Firebolt);
+                var learn=Production("FacelessImitation").GetMethod("LearnFrom",BindingFlags.Static|BindingFlags.NonPublic)!;
+                Check.Equal(true,(bool)learn.Invoke(null,[c.Creator,c.Original,model.pawn])!,"learn from the carrier's map");
+                var echo=DefDatabase<TMAbilityDef>.GetNamed("TM_FacelessEcho");
+                Check.Equal(1,source.AbilityData.Powers.Count(p=>p.Def==echo),"soul owns echo");
+                Check.Equal(0,c.Creator.GetCompAbilityUserMight().AbilityData.Powers.Count(p=>p.Def==echo),"host does not acquire echo");
+                Check.Equal(false,(bool)learn.Invoke(null,[c.Creator,c.Original,model.pawn])!,"same family cannot refresh the echo");
+            }));
         yield return new("FacelessProjection.RescueCredit", f =>
             SpiritRebirthRitualTransactionTests.Run(f,c => {
                 using var held=new Fixture(f,c);
