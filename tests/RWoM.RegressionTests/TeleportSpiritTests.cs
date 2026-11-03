@@ -63,6 +63,17 @@ internal static partial class TeleportSpiritTests
             Check.Same(w.Map, w.Caster.Map, "original map retains pawn");
             Check.Equal(true, magic.recallSet && magic.recallPosition == mark && magic.recallNeedValues.Single() == .75f, "blocked attempt preserves snapshot");
         }));
+        yield return new("FacelessProjection.ControlKeepsBodyWithoutReturnMap",f=>World(f,w=>{
+            var shot=new Projectile_Possess();
+            var body=w.Pawn("FacelessTemporarilyOffMap",new IntVec3(7,0,5));
+            Set(body,"mapIndexOrState",(sbyte)-1);
+            Set(shot,"caster",body);Set(shot,"initialized",true);Set(shot,"age",1400);
+            using var patches=new Patches();
+            patches.Prefix(typeof(Thing).GetMethod("Destroy",Flags,[typeof(DestroyMode)])!,nameof(ObserveControlDestroy));
+            controlDestroyed=false;
+            shot.Destroy();
+            Check.Equal(false,controlDestroyed,"controller must keep its unspawned caster when target and return map are unavailable");
+        }));
         yield return new("FacelessProjection.FailedPossessionDoesNotClearDisguise",f=>World(f,w=>{
             var target=w.Pawn("AlreadyDisguised",new IntVec3(5,0,6));
             target.inventory=new Pawn_InventoryTracker(target);
@@ -429,6 +440,12 @@ internal static partial class TeleportSpiritTests
             Check.Same(Map, Caster.Map, "map identity is unchanged");
         }
         public void Dispose() { pathGrid.Dispose(); Map.fogGrid.Dispose(); TM_Calc.InvalidateCompCache(Caster); }
+    }
+    private static bool controlDestroyed;
+    private static bool ObserveControlDestroy()
+    {
+        controlDestroyed=true;
+        return false;
     }
     static bool RunReal() => true;
     static bool SkipGraphics() => false;

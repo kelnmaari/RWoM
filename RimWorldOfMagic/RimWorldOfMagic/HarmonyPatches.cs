@@ -7632,7 +7632,7 @@ namespace TorannMagic
         {
             public static bool Prefix(MapParent __instance)
             {
-                return !ModOptions.Constants.GetPawnInFlight() && !FlyingObject_ValiantCharge.ProtectsMap(__instance.Map) && !FlyingObject_Whirlwind.ProtectsMap(__instance.Map) && !FlyingObject_TimeDelay.ProtectsMap(__instance.Map) && !Projectile_Scorn.ProtectsMap(__instance.Map) && !Projectile_SummonDemon.ProtectsMap(__instance.Map);
+                return !ModOptions.Constants.GetPawnInFlight() && !FlyingObject_ValiantCharge.ProtectsMap(__instance.Map) && !FlyingObject_Whirlwind.ProtectsMap(__instance.Map) && !FlyingObject_TimeDelay.ProtectsMap(__instance.Map) && !Projectile_Scorn.ProtectsMap(__instance.Map) && !Projectile_SummonDemon.ProtectsMap(__instance.Map) && !Projectile_Possess.ProtectsMap(__instance.Map);
             }
         }
 

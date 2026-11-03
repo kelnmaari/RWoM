@@ -202,6 +202,19 @@ internal static partial class SpiritMapCollapseTests
             bullet.projectile.explosionRadius=2;
             Check.Equal(true,Incoming(physical,weapon)==null,"exclude explosive ammunition");
         });
+        yield return new("FacelessProjection.ControlOwner",f=>SpiritRebirthRitualTransactionTests.Run(f,c=>{
+            using var held=new Fixture(f,c);
+            var comp=c.Original.GetCompAbilityUserMight();
+            var power=new MightAbility(comp){Def=TorannMagicDefOf.TM_Possess};
+            comp.AbilityData.Powers.Add(power);comp.AbilityData.AllPowers=null;
+            var find=Production("SpiritHostedMartial").GetMethod("Find",BindingFlags.NonPublic|BindingFlags.Static)!;
+            Check.Same(power,find.Invoke(null,[c.Creator,c.Original,"TM_SpiritCastFacelessControl"])!,"control must use the soul's trained ability");
+            var shot=new Projectile_Possess();
+            typeof(Projectile_Possess).GetMethod("BindSource",BindingFlags.NonPublic|BindingFlags.Instance)!.Invoke(shot,[c.Original]);
+            var source=typeof(Projectile_Possess).GetMethod("SourceFor",BindingFlags.NonPublic|BindingFlags.Instance)!;
+            Check.Same(c.Original,source.Invoke(shot,[c.Creator])!,"physical launch uses soul's ranks");
+            Check.Equal(true,source.Invoke(shot,[c.Original])==null,"cannot rebind a launched shot to another body");
+        }));
         yield return new("FacelessProjection.ReversalOwner",f=>
             SpiritRebirthRitualTransactionTests.Run(f,c=>{
                 using var held=new Fixture(f,c);
