@@ -4,4 +4,8 @@
   <TM_SpiritDispelStoneskin.reportString>正在驱散石肤术。</TM_SpiritDispelStoneskin.reportString>
   <TM_SpiritEarthSprites.reportString>正在召唤大地精灵。</TM_SpiritEarthSprites.reportString>
   <TM_SpiritDismissEarthSprites.reportString>正在遣散大地精灵。</TM_SpiritDismissEarthSprites.reportString>
+  <TM_SpiritEncase.reportString>正在筑起石墙。</TM_SpiritEncase.reportString>
+  <TM_SpiritEncase_I.reportString>正在筑起石墙。</TM_SpiritEncase_I.reportString>
+  <TM_SpiritEncase_II.reportString>正在筑起石墙。</TM_SpiritEncase_II.reportString>
+  <TM_SpiritEncase_III.reportString>正在筑起石墙。</TM_SpiritEncase_III.reportString>
 </LanguageData>

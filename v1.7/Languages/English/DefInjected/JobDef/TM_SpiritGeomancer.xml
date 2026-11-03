@@ -4,4 +4,8 @@
   <TM_SpiritDispelStoneskin.reportString>dispelling stoneskin.</TM_SpiritDispelStoneskin.reportString>
   <TM_SpiritEarthSprites.reportString>summoning earth sprites.</TM_SpiritEarthSprites.reportString>
   <TM_SpiritDismissEarthSprites.reportString>dismissing earth sprites.</TM_SpiritDismissEarthSprites.reportString>
+  <TM_SpiritEncase.reportString>casting encase.</TM_SpiritEncase.reportString>
+  <TM_SpiritEncase_I.reportString>casting encase.</TM_SpiritEncase_I.reportString>
+  <TM_SpiritEncase_II.reportString>casting encase.</TM_SpiritEncase_II.reportString>
+  <TM_SpiritEncase_III.reportString>casting encase.</TM_SpiritEncase_III.reportString>
 </LanguageData>

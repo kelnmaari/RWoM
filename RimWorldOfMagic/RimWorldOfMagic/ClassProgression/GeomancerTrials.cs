@@ -20,7 +20,7 @@ namespace TorannMagic.ClassProgression
         }
         static DisciplineProgress Owned(Pawn caster, AbilityUser.AbilityDef def, bool encase)
         {
-            if (!Matches(def, encase) || caster == null || caster.Dead || (encase ? !caster.Spawned : WardBody(caster) == null) || caster.Faction == null
+            if (!Matches(def, encase) || caster == null || caster.Dead || WardBody(caster) == null || caster.Faction == null
                 || caster.story?.traits?.HasTrait(TorannMagicDefOf.Faceless) == true
                 || !ClassIdentity.TryGetState(caster, out var state) || (state.Vocation & Vocation.Mage) == 0) return null;
             var path = state.Find("rwom.geomancer");
@@ -88,6 +88,13 @@ namespace TorannMagic.ClassProgression
             var tag = launching; launching = null; projectiles.Remove(projectile);
             if (tag != null && tag.casterId == caster?.thingIDNumber && tag.abilityName == ability?.defName && ProjectileMatches(projectile.def, ability)) projectiles.Add(projectile, tag);
         }
+        internal static void StampHosted(Projectile_Encase field, MagicAbility power)
+        {
+            if (field.SpellOwner != power.Pawn || WardBody(power.Pawn) != field.Caster ||
+                !ProjectileMatches(field.def, power.Def) || Owned(power,true) == null) return;
+            projectiles.Remove(field);
+            projectiles.Add(field,new Tag { casterId = power.Pawn.thingIDNumber, abilityName = power.Def.defName });
+        }
         public static void ExposeProjectile(Projectile_AbilityBase projectile)
         {
             projectiles.TryGetValue(projectile, out var tag);
@@ -97,11 +104,12 @@ namespace TorannMagic.ClassProgression
         }
         public static void WallSpawned(Projectile_AbilityBase projectile, Thing wall, IntVec3 cell, Map map)
         {
-            if (!projectiles.TryGetValue(projectile, out var tag) || tag.casterId != projectile.Caster?.thingIDNumber
+            var owner = projectile is Projectile_Encase field ? field.SpellOwner : projectile.Caster;
+            if (!projectiles.TryGetValue(projectile, out var tag) || tag.casterId != owner?.thingIDNumber || WardBody(owner) != projectile.Caster
                 || tag.abilityName != projectile.localAbilityDef?.defName || !ProjectileMatches(projectile.def, projectile.localAbilityDef)
                 || wall == null || !wall.Spawned || wall.Map != map || wall.Position != cell || map != projectile.Caster.Map
                 || wall.def.category != ThingCategory.Building || (wall.def.defName != "Sandstone" && wall.def.defName != "Slate" && wall.def.defName != "Limestone" && wall.def.defName != "Granite")) return;
-            var path = Owned(projectile.Caster, projectile.localAbilityDef, true);
+            var path = Owned(owner, projectile.localAbilityDef, true);
             if (path == null || tag.cells.Contains(cell) || tag.cells.Count >= 3) return;
             tag.cells.Add(cell);
             if (tag.cells.Count >= 3) path.RecordCompletedTrial(MasteryTrialId);

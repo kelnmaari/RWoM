@@ -4,4 +4,8 @@
   <TM_SpiritDispelStoneskin.reportString>disipa piel de piedra.</TM_SpiritDispelStoneskin.reportString>
   <TM_SpiritEarthSprites.reportString>invocando espíritus de la tierra.</TM_SpiritEarthSprites.reportString>
   <TM_SpiritDismissEarthSprites.reportString>despidiendo espíritus de la tierra.</TM_SpiritDismissEarthSprites.reportString>
+  <TM_SpiritEncase.reportString>levanta muros de piedra.</TM_SpiritEncase.reportString>
+  <TM_SpiritEncase_I.reportString>levanta muros de piedra.</TM_SpiritEncase_I.reportString>
+  <TM_SpiritEncase_II.reportString>levanta muros de piedra.</TM_SpiritEncase_II.reportString>
+  <TM_SpiritEncase_III.reportString>levanta muros de piedra.</TM_SpiritEncase_III.reportString>
 </LanguageData>

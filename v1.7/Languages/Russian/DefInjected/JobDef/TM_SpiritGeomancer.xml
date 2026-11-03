@@ -4,4 +4,8 @@
   <TM_SpiritDispelStoneskin.reportString>рассеивает каменную кожу.</TM_SpiritDispelStoneskin.reportString>
   <TM_SpiritEarthSprites.reportString>призывает духов земли.</TM_SpiritEarthSprites.reportString>
   <TM_SpiritDismissEarthSprites.reportString>отзывает духов земли.</TM_SpiritDismissEarthSprites.reportString>
+  <TM_SpiritEncase.reportString>возводит каменные стены.</TM_SpiritEncase.reportString>
+  <TM_SpiritEncase_I.reportString>возводит каменные стены.</TM_SpiritEncase_I.reportString>
+  <TM_SpiritEncase_II.reportString>возводит каменные стены.</TM_SpiritEncase_II.reportString>
+  <TM_SpiritEncase_III.reportString>возводит каменные стены.</TM_SpiritEncase_III.reportString>
 </LanguageData>
