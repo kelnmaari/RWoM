@@ -98,6 +98,7 @@ namespace TorannMagic.ClassProgression
             ("TM_SpiritSummonTotemEarth", () => TorannMagicDefOf.TM_SummonTotemEarth, typeof(Verb_SummonTotemEarth)),
             ("TM_SpiritSummonTotemLightning", () => TorannMagicDefOf.TM_SummonTotemLightning, typeof(Verb_SummonTotemLightning)),
             ("TM_SpiritSummonTotemHealing", () => TorannMagicDefOf.TM_SummonTotemHealing, typeof(Verb_SummonTotemHealing)),
+            ("TM_SpiritEnrage", () => TorannMagicDefOf.TM_Enrage, typeof(Verb_Enrage)),
             ("TM_SpiritChainLightning", () => TorannMagicDefOf.TM_ChainLightning, typeof(Projectile_ChainLightning)),
             ("TM_SpiritTimeMark", () => TorannMagicDefOf.TM_TimeMark, typeof(Verb_TimeMark)),
             ("TM_SpiritRecall", () => TorannMagicDefOf.TM_Recall, typeof(Verb_Recall)),

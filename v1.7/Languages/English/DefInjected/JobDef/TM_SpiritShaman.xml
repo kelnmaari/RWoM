@@ -4,4 +4,5 @@
   <TM_SpiritSummonTotemEarth.reportString>summoning an earth totem.</TM_SpiritSummonTotemEarth.reportString>
   <TM_SpiritSummonTotemLightning.reportString>summoning a lightning totem.</TM_SpiritSummonTotemLightning.reportString>
   <TM_SpiritSummonTotemHealing.reportString>summoning a healing totem.</TM_SpiritSummonTotemHealing.reportString>
+  <TM_SpiritEnrage.reportString>casting enrage.</TM_SpiritEnrage.reportString>
 </LanguageData>
