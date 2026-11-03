@@ -19,6 +19,7 @@ namespace TorannMagic
             string order;
             if (mightDef?.MainVerb?.verbClass == typeof(ClassProgression.Verb_GladiatorSweep)) order=ClassProgression.SpiritHostedMartial.Sweep;
             else if (ClassProgression.SpiritHostedMartial.GrappleRank(mightDef)) order=ClassProgression.SpiritHostedMartial.Grapple;
+            else if (mightDef == TorannMagicDefOf.TM_Whirlwind && mightDef != null) order=ClassProgression.GladiatorWhirlwind.JobName;
             else return base.GetJob(context,target);
             var job = JobMaker.MakeJob(DefDatabase<JobDef>.GetNamed(order), Pawn, target);
             job.playerForced = context == AbilityContext.Player;

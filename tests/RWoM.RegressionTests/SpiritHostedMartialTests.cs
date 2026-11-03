@@ -127,6 +127,62 @@ internal static partial class SpiritMapCollapseTests
                     "the original learned Reforged technique provides the host's melee order");
             }));
 
+        yield return new("GladiatorWhirlwind.AirbornePawnHasPhysicalOwner", f =>
+        {
+            Check.Equal(true, typeof(IThingHolder).IsAssignableFrom(typeof(FlyingObject_Whirlwind)),
+                "an airborne pawn and the pawn's inventory must remain reachable from the map's holder hierarchy");
+        });
+        yield return new("GladiatorLastCircle.ProjectOnlyChosenAscension", f =>
+            SpiritRebirthRitualTransactionTests.Run(f,c => {
+                using var held=new Fixture(f,c);
+                void Ascend(Pawn p)
+                {
+                    var state=new ClassProgressionState(Vocation.Warrior);
+                    Set(p.GetComp<CompClassProgression>(),"state",state);
+                    state.TryAddFoundation("rwom.gladiator",DisciplineDomain.Might);
+                    var path=state.Find("rwom.gladiator");
+                    Set(path,"stage",InitiationStage.Ascended);
+                    Set(path,"Ultimate",GladiatorUltimate.LastCircle);
+                }
+                var owns=typeof(JobDriver_LastCircle).GetMethod("CanProject",BindingFlags.NonPublic|BindingFlags.Static);
+                Check.NotNull(owns,"the native stance requires an explicit projected command");
+                bool Projects()=>(bool)owns!.Invoke(null,[c.Creator,c.Original])!;
+                Check.Equal(false,Projects(),"a spirit without the ascension does not receive the command");
+                Ascend(c.Original);
+                Check.Equal(true,Projects(),"only the soul has the chosen stance");
+                Ascend(c.Creator);
+                Check.Equal(false,Projects(),"the host's own stance has priority");
+            }));
+        yield return new("GladiatorCover.HostUsesLearnedDefenseAndTraining", f =>
+            SpiritRebirthRitualTransactionTests.Run(f,c => {
+                using var held=new Fixture(f,c);
+                var api=typeof(JobDriver_GladiatorDefense).GetMethod("CanOfferProjected",BindingFlags.NonPublic|BindingFlags.Static);
+                Check.NotNull(api,"the ally guard needs a source-aware job");
+                var state=new ClassProgressionState(Vocation.Warrior);
+                Set(c.Original.GetComp<CompClassProgression>(),"state",state);
+                state.TryAddFoundation("rwom.gladiator",DisciplineDomain.Might);
+                bool Offers(bool drill)=>(bool)api!.Invoke(null,[c.Creator,c.Original,drill])!;
+                Check.Equal(true,Offers(true),"a foundation gladiator can run the relief drill from its host");
+                Check.Equal(false,Offers(false),"training alone cannot unlock a combat defense");
+                var path=state.Find("rwom.gladiator");
+                Set(path,"stage",InitiationStage.Adept);Set(path,"Defense",GladiatorDefense.Cover);
+                Check.Equal(true,Offers(false),"a learned defense can be projected");
+            }));
+        yield return new("GladiatorWhirlwind.OriginalAbilityOwnsHostFlight", f =>
+            SpiritRebirthRitualTransactionTests.Run(f,c => {
+                using var held=new Fixture(f,c);
+                var def=TorannMagicDefOf.TM_Whirlwind;
+                var source=c.Original.GetCompAbilityUserMight();
+                var original=new MightAbility(source){ Def=def };
+                source.AbilityData.Powers.Add(original);source.AbilityData.AllPowers=null;
+                var find=Production("SpiritHostedMartial").GetMethod("Find",BindingFlags.NonPublic|BindingFlags.Static)!;
+                object? Power()=>find.Invoke(null,[c.Creator,c.Original,"TM_SpiritCastWhirlwind"]);
+                Check.Same(original,Power()!,"takeoff must use the retained ultimate");
+                Check.Equal(false,TorannMagic.Odyssey.ManualTravelSafety.TakePayment(original),"no charge before actual takeoff");
+                var host=c.Creator.GetCompAbilityUserMight();
+                host.AbilityData.Powers.Add(new MightAbility(host){Def=def});host.AbilityData.AllPowers=null;
+                Check.Equal(true,Power()==null,"native whirlwind prevents a second projected command");
+            }));
 
         foreach (var id in new[] { "TM_Grapple","TM_Grapple_I","TM_Grapple_II","TM_Grapple_III" })
             yield return new("SpiritProjectedCast.Martial.Grapple."+id, f =>

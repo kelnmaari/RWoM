@@ -18,7 +18,7 @@ namespace TorannMagic.ClassProgression
         internal const string Grapple = "TM_SpiritCastGrapple";
         internal static bool GrappleRank(TMAbilityDef def) => def != null && (def == TorannMagicDefOf.TM_Grapple ||
             def == TorannMagicDefOf.TM_Grapple_I || def == TorannMagicDefOf.TM_Grapple_II || def == TorannMagicDefOf.TM_Grapple_III);
-        internal static bool HasNativeOrder(string job) => job == Sweep || job == Grapple;
+        internal static bool HasNativeOrder(string job) => job == Sweep || job == Grapple || job == GladiatorWhirlwind.JobName;
         internal static bool IsSniperShot(string job) => job==Headshot || job==DisablingShot || job==AntiArmor || job==Aimed || job==Fracture;
         internal static bool CanFire(Pawn body, MightAbility owner, Pawn target) =>
             Verb_SniperBallisticShot.FromHost(body, owner) is Verb_SniperBallisticShot ballistic
@@ -45,6 +45,7 @@ namespace TorannMagic.ClassProgression
             else if (job == ShadowSlayer) def = TorannMagicDefOf.TM_ShadowSlayer;
             else if (job == Sweep) def = DefDatabase<TMAbilityDef>.GetNamedSilentFail("TM_GladiatorSweep");
             else if (job == Grapple) def = TorannMagicDefOf.TM_Grapple;
+            else if (job == GladiatorWhirlwind.JobName) def = TorannMagicDefOf.TM_Whirlwind;
             else if (job == SniperOpeningAbility.JobName) def = DefDatabase<TMAbilityDef>.GetNamedSilentFail("TM_SniperSingleOpening");
             else if (job == Aimed || job == Fracture) def = DefDatabase<TMAbilityDef>.GetNamedSilentFail(job == Aimed ? "TM_SniperAimedShot" : "TM_SniperArmorFracture");
             else if (job == SelfAid) def = TorannMagicDefOf.TM_FirstAid;
@@ -83,6 +84,7 @@ namespace TorannMagic.ClassProgression
             if (job == Sweep) return body.equipment?.Primary?.def.IsMeleeWeapon == true &&
                 !body.WorkTagIsDisabled(WorkTags.Violent) && JobDriver_GladiatorDefense.Path(ability.Pawn)?.Attack == GladiatorAttack.Sweep;
             if (job == Grapple) return !body.WorkTagIsDisabled(WorkTags.Violent) && ClassIdentity.Component(body)?.Circle == null;
+            if (job == GladiatorWhirlwind.JobName) return !body.WorkTagIsDisabled(WorkTags.Violent) && ClassIdentity.Component(body)?.Circle == null;
             if (job == Pommel) return !body.WorkTagIsDisabled(WorkTags.Violent) && body.health.capacities.CapableOf(PawnCapacityDefOf.Manipulation);
             if (job == SelfAid) return Verb_FirstAid.EligibleWounds(body).Any();
             var effect = DefDatabase<HediffDef>.GetNamedSilentFail(ManeuverEffect);
@@ -178,6 +180,31 @@ namespace TorannMagic.ClassProgression
         {
             foreach (var command in existing) yield return command;
             if (!SpiritRebirthState.TryGetPossessingSpirit(body, out var soul)) yield break;
+            if (JobDriver_GladiatorDefense.Path(soul) is DisciplineProgress gladiator)
+            {
+                foreach (bool training in new[] {false,true})
+                {
+                    if (!JobDriver_GladiatorDefense.CanOfferProjected(body,soul,training)) continue;
+                    string key = !training ? "TM_GladiatorUseCover" : gladiator.Stage==InitiationStage.Master ? "TM_GladiatorEvacTrial" :
+                        gladiator.Stage==InitiationStage.Adept ? "TM_GladiatorHoldDrill" : "TM_GladiatorReliefDrill";
+                    var cmd=new Command_Action {defaultLabel=key.Translate(), icon=TexButton.TMTex_Cleave,
+                        action=()=> { if(JobDriver_GladiatorDefense.CanWorkFrom(body,soul,training))
+                            JobDriver_GladiatorDefense.TargetFrom(body,soul,training); }};
+                    if (!JobDriver_GladiatorDefense.CanWorkFrom(body,soul,training)) cmd.Disable("TM_SpiritRebirthCastUnavailable".Translate());
+                    yield return cmd;
+                }
+            }
+            if (JobDriver_LastCircle.CanProject(body,soul))
+            {
+                var job=DefDatabase<JobDef>.GetNamed(JobDriver_LastCircle.HostedJobName);
+                var cmd=new Command_Action { defaultLabel="TM_GladiatorCastCircle".Translate(), icon=TexButton.TMTex_Cleave,
+                    action=()=> {
+                        if(body.CurJobDef!=job && JobDriver_LastCircle.ReadyFrom(body,soul))
+                            body.jobs.TryTakeOrderedJob(JobMaker.MakeJob(job,body,soul),JobTag.Misc);
+                    }};
+                if(body.CurJobDef==job || !JobDriver_LastCircle.ReadyFrom(body,soul))cmd.Disable("TM_SpiritRebirthCastUnavailable".Translate());
+                yield return cmd;
+            }
             var cleave = GladiatorMastery.AutomaticSource(body,body.GetCompAbilityUserMight());
             if (cleave?.Pawn == soul && body.Faction == Faction.OfPlayer)
                 yield return cleave.MakeCleaveCommand(() => {
@@ -185,7 +212,7 @@ namespace TorannMagic.ClassProgression
                         GladiatorMastery.AutomaticSource(body,body.GetCompAbilityUserMight()) == cleave)
                         cleave.useCleaveToggle = !cleave.useCleaveToggle;
                 });
-            foreach (var name in new[] { Maneuver, SelfAid, Pommel, Sweep, Grapple, Headshot, DisablingShot, AntiArmor, Aimed, Fracture, ShadowSlayer, SniperOpeningAbility.JobName, SpiritHostedStance.Job, SpiritHostedStance.StrongBack, SpiritHostedStance.HeavyBlow,
+            foreach (var name in new[] { Maneuver, SelfAid, Pommel, Sweep, Grapple, GladiatorWhirlwind.JobName, Headshot, DisablingShot, AntiArmor, Aimed, Fracture, ShadowSlayer, SniperOpeningAbility.JobName, SpiritHostedStance.Job, SpiritHostedStance.StrongBack, SpiritHostedStance.HeavyBlow,
                 SpiritHostedStance.ThickSkin, SpiritHostedStance.FightersFocus, SpiritHostedStance.GearRepair, SpiritHostedStance.InnerHealing })
             {
                 var owner = Find(body, soul, name);
@@ -194,7 +221,8 @@ namespace TorannMagic.ClassProgression
                 var cmd = new Command_Action { defaultLabel = owner.Def.LabelCap, defaultDesc = owner.Def.description,
                     icon = owner.Def.uiIcon, action = () => {
                         if (body.CurJobDef == job || !Ready(body, Find(body, soul, name), name)) return;
-                        if (name == SniperOpeningAbility.JobName && owner is SniperOpeningAbility opening)
+                        if (name == GladiatorWhirlwind.JobName) GladiatorWhirlwind.ChooseDestination(body,soul,owner);
+                        else if (name == SniperOpeningAbility.JobName && owner is SniperOpeningAbility opening)
                             FindTarget(body,soul,job,target => target!=null && Ready(body,Find(body,soul,name),name) &&
                                 opening.VerbFor(body).CanHitTargetFrom(body.Position,target));
                         else if (IsSniperShot(name))
@@ -238,6 +266,7 @@ namespace TorannMagic.ClassProgression
                 var owner = SpiritHostedMartial.Find(pawn, soul, name);
                 if (!SpiritHostedMartial.Ready(pawn, owner, name) ||
                     SpiritHostedMartial.IsSniperShot(name) && !SpiritHostedMartial.CanFire(pawn,owner,job.targetB.Pawn) ||
+                    name == GladiatorWhirlwind.JobName && !GladiatorWhirlwind.CanLaunch(pawn,owner,job.targetB.Cell) ||
                     SpiritHostedMartial.UsesCombatTarget(name) &&
                     !SpiritHostedMartial.CanMelee(pawn, job.targetB.Pawn, owner,name)) { EndJobWith(JobCondition.Incompletable); return; }
                 ticksLeftThisToil = UnityEngine.Mathf.Max(1, GenTicks.SecondsToTicks(
@@ -247,6 +276,12 @@ namespace TorannMagic.ClassProgression
             yield return Toils_General.Do(() => {
                 if (attempted || pawn.CurJob != job || pawn.jobs.curDriver != this) { EndJobWith(JobCondition.Incompletable); return; }
                 attempted = true;
+                if (name == GladiatorWhirlwind.JobName)
+                {
+                    var power = SpiritHostedMartial.Find(pawn,soul,name);
+                    if (!GladiatorWhirlwind.Launch(pawn,power,job.targetB.Cell)) EndJobWith(JobCondition.Incompletable);
+                    return;
+                }
                 if (SpiritHostedMartial.IsSniperShot(name))
                 {
                     var owner = SpiritHostedMartial.Find(pawn,soul,name);
