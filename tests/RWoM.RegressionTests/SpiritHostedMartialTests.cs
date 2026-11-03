@@ -161,6 +161,33 @@ internal static partial class SpiritMapCollapseTests
                     host.AbilityData.AllPowers=null;
                     Check.Equal(true,Owner()==null,"a lower native rank takes priority");
                 }));
+        yield return new("FacelessProjection.RescueCredit", f =>
+            SpiritRebirthRitualTransactionTests.Run(f,c => {
+                using var held=new Fixture(f,c);
+                DisciplineProgress Enroll(Pawn pawn)
+                {
+                    var state=new ClassProgressionState(Vocation.Warrior);
+                    Set(ClassIdentity.Component(pawn),"state",state);
+                    state.TryAddFoundation("rwom.faceless",DisciplineDomain.Might);
+                    return state.Find("rwom.faceless")!;
+                }
+                var soul=Enroll(c.Original);
+                var rescue=Production("FacelessMartialPath").GetMethod("Rescue",BindingFlags.Static|BindingFlags.NonPublic)!;
+                var patients=Enumerable.Range(0,6).Select(i=>{
+                    var patient=PawnWithComps(false,false).pawn;
+                    patient.thingIDNumber=47120+i;
+                    return patient;
+                }).ToArray();
+                void Credit(Pawn p)=>rescue.Invoke(null,[c.Creator,p]);
+                bool Complete(DisciplineProgress path)=>path.CompletedTrials.Contains("rwom.faceless.Foundation");
+                Credit(patients[0]);Credit(patients[0]);Credit(patients[1]);
+                Check.Equal(false,Complete(soul),"same rescued pawn counts only once");
+                Credit(patients[2]);
+                Check.Equal(true,Complete(soul),"third distinct rescue by carrier advances original Faceless");
+                var host=Enroll(c.Creator);
+                foreach(var patient in patients.Skip(3))Credit(patient);
+                Check.Equal(true,Complete(host),"host's own Faceless path takes precedence");
+            }));
         yield return new("RangerProjection.BreakthroughOrder",f=>
             SpiritRebirthRitualTransactionTests.Run(f,c=>{
                 using var held=new Fixture(f,c);
