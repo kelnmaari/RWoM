@@ -12,6 +12,7 @@ internal static class ChronomancerLifecycleTests
 {
     public static IEnumerable<TestCase> Cases()
     {
+        yield return new("ChronomancerLifecycle.RecallRetainsClassAndCustodyMarkersFromOldMarks", RecallIdentity);
         yield return new("ChronomancerLifecycle.RecallKeepsNewNeedsAndHandlesShortLegacySnapshots", RecallNeeds);
         yield return new("ChronomancerLifecycle.NativeQueueScribeKeepsIdenticalEventsDistinct", SaveDistinct);
         yield return new("ChronomancerLifecycle.UnknownAndAmbiguousOwnershipNeverDeletesEvents", Ambiguous);
@@ -19,6 +20,30 @@ internal static class ChronomancerLifecycleTests
         yield return new("ChronomancerLifecycle.ReturningPredictionRemainsRecognizedAfterOwnerClears", Returning);
         yield return new("ChronomancerLifecycle.NativeQueueDispatchesReturningPredictionExactlyOnce", NativeDispatch);
         yield return new("ChronomancerLifecycle.AttemptedNativeRetrySurvivesPredictionExpiry", RetryExpiry);
+    }
+    static void RecallIdentity(RuntimeFixture r)
+    {
+        using var f = new SpiritRebirthStateTests.Fixture(r);
+        var body = f.Host;
+        Hediff[] markers = [
+            new Hediff_ClassDiscipline { def = new HediffDef { defName = "TM_ClassDiscipline", hediffClass = typeof(Hediff_ClassDiscipline) } },
+            new Hediff_SpiritRebirthForm { def = new HediffDef { defName = "TM_SpiritRebirthForm", hediffClass = typeof(Hediff_SpiritRebirthForm) } },
+            new HediffWithComps { def = TorannMagicDefOf.TM_SpiritPossessionHD },
+            new Hediff_Addiction { def = new HediffDef { defName = "TestAddiction", hediffClass = typeof(Hediff_Addiction) } }
+        ];
+        foreach (var marker in markers) { marker.pawn = body; body.health.hediffSet.hediffs.Add(marker); }
+        f.Magic.recallInjuriesList = [];
+        f.Magic.recallHediffList = markers.Select(m=>new Hediff { def = m.def }).ToList();
+        f.Magic.recallHediffDefSeverityList = markers.Select(m=>.5f).ToList();
+        typeof(TM_Action).GetMethod("RecallHediffs", BindingFlags.NonPublic | BindingFlags.Static)!.Invoke(null,[body,f.Magic]);
+        foreach (var marker in markers)
+            Check.Same(marker, body.health.hediffSet.hediffs.Single(h=>h.def==marker.def), "old snapshot cannot erase or recreate identity or custody");
+        var current = new Hediff { pawn = body, def = new HediffDef { defName = "CurrentCondition" } };
+        body.health.hediffSet.hediffs.Add(current);
+        f.Magic.recallHediffList = [new Hediff { def = current.def }];
+        f.Magic.recallHediffDefSeverityList = [];
+        typeof(TM_Action).GetMethod("RecallHediffs", BindingFlags.NonPublic | BindingFlags.Static)!.Invoke(null,[body,f.Magic]);
+        Check.Same(current, body.health.hediffSet.hediffs.Single(h=>h.def==current.def), "missing severity leaves live health intact");
     }
     static void RecallNeeds(RuntimeFixture r)
     {

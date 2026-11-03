@@ -1,4 +1,4 @@
-﻿using RimWorld;
+using RimWorld;
 using System;
 using Verse;
 using AbilityUser;
@@ -43,6 +43,20 @@ namespace TorannMagic
             return result;
         }
 
+        // Old marks may contain plain Hediff snapshots of stateful effects. Check
+        // the definition as well as the live instance before restoring or removing one.
+        internal static bool PreservesHealthEffect(Hediff effect)
+        {
+            var def = effect?.def;
+            if (def?.defName == null) return true;
+            var kind = def.hediffClass;
+            return effect is ClassProgression.Hediff_ClassDiscipline or ClassProgression.Hediff_SpiritRebirthForm or Hediff_Addiction
+                || kind == typeof(ClassProgression.Hediff_ClassDiscipline) || kind == typeof(ClassProgression.Hediff_SpiritRebirthForm)
+                || kind != null && typeof(Hediff_Addiction).IsAssignableFrom(kind)
+                || def.defName == "LuciferiumHigh" || def == TorannMagicDefOf.TM_SpiritPossessionHD
+                || def.comps?.Any(c => c?.compClass != null && typeof(IThingHolder).IsAssignableFrom(c.compClass)) == true;
+        }
+
         private void SetRecallHediffs()
         {
             comp.recallHediffList = new List<Hediff>();
@@ -55,7 +69,7 @@ namespace TorannMagic
             comp.recallInjuriesList.Clear();
             for (int i = 0; i < this.CasterPawn.health.hediffSet.hediffs.Count; i++)
             {
-                if (!this.CasterPawn.health.hediffSet.hediffs[i].IsPermanent() && this.CasterPawn.health.hediffSet.hediffs[i].def != TorannMagicDefOf.TM_MagicUserHD && 
+                if (!PreservesHealthEffect(this.CasterPawn.health.hediffSet.hediffs[i]) && !this.CasterPawn.health.hediffSet.hediffs[i].IsPermanent() && this.CasterPawn.health.hediffSet.hediffs[i].def != TorannMagicDefOf.TM_MagicUserHD &&
                     !this.CasterPawn.health.hediffSet.hediffs[i].def.defName.Contains("TM_HediffEnchantment") && !this.CasterPawn.health.hediffSet.hediffs[i].def.defName.Contains("TM_Artifact") &&
                     this.CasterPawn.health.hediffSet.hediffs[i].def != TorannMagicDefOf.TM_MightUserHD && this.CasterPawn.health.hediffSet.hediffs[i].def != TorannMagicDefOf.TM_BloodHD && 
                     this.CasterPawn.health.hediffSet.hediffs[i].def != TorannMagicDefOf.TM_ChiHD && this.CasterPawn.health.hediffSet.hediffs[i].def != TorannMagicDefOf.TM_PsionicHD &&

@@ -1457,9 +1457,13 @@ namespace TorannMagic
         {
             if (comp.recallInjuriesList != null && comp.recallHediffList != null)
             {
+                // A partial legacy snapshot cannot replace the body's current health safely.
+                if (comp.recallHediffList.Count > (comp.recallHediffDefSeverityList?.Count ?? 0) ||
+                    comp.recallHediffList.Any(effect => effect?.def == null) ||
+                    comp.recallInjuriesList.Any(injury => injury?.def == null)) return;
                 for (int i = 0; i < pawn.health.hediffSet.hediffs.Count; i++)
                 {
-                    if (!pawn.health.hediffSet.hediffs[i].IsPermanent() && pawn.health.hediffSet.hediffs[i].def != TorannMagicDefOf.TM_MagicUserHD && !pawn.health.hediffSet.hediffs[i].def.defName.Contains("TM_HediffEnchantment") &&
+                    if (!Verb_TimeMark.PreservesHealthEffect(pawn.health.hediffSet.hediffs[i]) && !pawn.health.hediffSet.hediffs[i].IsPermanent() && pawn.health.hediffSet.hediffs[i].def != TorannMagicDefOf.TM_MagicUserHD && !pawn.health.hediffSet.hediffs[i].def.defName.Contains("TM_HediffEnchantment") &&
                         !pawn.health.hediffSet.hediffs[i].def.defName.Contains("TM_Artifact") && pawn.health.hediffSet.hediffs[i].def.defName != "PsychicAmplifier" && pawn.health.hediffSet.hediffs[i].def != TorannMagicDefOf.TM_MightUserHD &&
                         pawn.health.hediffSet.hediffs[i].def != TorannMagicDefOf.TM_BloodHD && pawn.health.hediffSet.hediffs[i].def != TorannMagicDefOf.TM_ChiHD && pawn.health.hediffSet.hediffs[i].def != TorannMagicDefOf.TM_PsionicHD &&
                         pawn.health.hediffSet.hediffs[i].def != TorannMagicDefOf.TM_SpiritPossessionHD)
@@ -1477,12 +1481,12 @@ namespace TorannMagic
                 {
                     //Log.Message("adding " + comp.recallHediffList[i].Label + " at severity " + comp.recallHediffList[i].Severity);
                     Hediff hdwc = comp.recallHediffList[i];
-                    pawn.health.AddHediff(hdwc.def, hdwc.Part, null, null);
-                    //Log.Message("adding hediff of " + hdwc.def.defName + " + with severity " + comp.recallHediffDefSeverityList[i]);
-                    Hediff hd = pawn.health.hediffSet.GetFirstHediffOfDef(hdwc.def);
+                    if (Verb_TimeMark.PreservesHealthEffect(hdwc)) continue;
+                    Hediff hd = pawn.health.AddHediff(hdwc.def, hdwc.Part);
+                    if (hd == null) continue;
                     hd.Severity = comp.recallHediffDefSeverityList[i];
                     //Log.Message("verifying hd severity is " + hd.Severity);
-                    if(comp.recallHediffDefTicksRemainingList[i] > 0)
+                    if(comp.recallHediffDefTicksRemainingList != null && i < comp.recallHediffDefTicksRemainingList.Count && comp.recallHediffDefTicksRemainingList[i] > 0)
                     {
                         HediffComp_Disappears hdc_d = hd.TryGetComp<HediffComp_Disappears>();
                         if(hdc_d != null)
