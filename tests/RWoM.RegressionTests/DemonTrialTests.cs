@@ -11,6 +11,7 @@ internal static class DemonTrialTests
 {
     public static IEnumerable<TestCase> Cases()
     {
+        yield return new("DemonTrials.RankedRepulsionUsesExactProjectileAndDisjointRings", RankedRepulsion);
         yield return new("DemonTrials.ReciprocalNewBondAndOneShot", Bond);
         yield return new("DemonTrials.RejectOccupiedBranchBeforeChangingCurrentBond", Occupied);
         yield return new("DemonTrials.RefreshKeepsEffectInstancesAndRejectsForeignBond", Refresh);
@@ -171,6 +172,35 @@ internal static class DemonTrialTests
         var snapshot = DemonTrials.BeforeEffect(shot, w.Target, false); Check.Equal(true, snapshot != null, "saved branch source valid"); Set(slow, "severityInt", .8f);
         Check.Equal(true, DemonTrials.AfterEffect(snapshot), "actual severity increase qualifies"); Check.Equal(false, DemonTrials.AfterEffect(snapshot), "one effect consumed once");
     }
+    static void RankedRepulsion(RuntimeFixture f)
+    {
+        using var w = new Fixture(f,true,true);
+        var spell = TorannMagicDefOf.TM_Repulsion_III;
+        Set(w.Verb.Ability,"powerDef",spell);
+        TestProjectile Fire(string name)
+        {
+            var def = (ThingDef)RuntimeHelpers.GetUninitializedObject(typeof(ThingDef));
+            def.defName = name;
+            var shot = new TestProjectile { def=def, localAbilityDef=spell };
+            shot.Seed(w.Caster);
+            var prior=DemonTrials.BeginLaunch(w.Verb,def);
+            try { DemonTrials.Launched(shot,w.Caster,spell); }
+            finally { DemonTrials.EndLaunch(prior); }
+            return shot;
+        }
+        Check.Equal(true,DemonTrials.BeforeEffect(Fire("Projectile_Repulsion_III"),w.Target,true)!=null,"rank III displacement can earn mastery");
+        Check.Equal(true,DemonTrials.BeforeEffect(Fire("Projectile_Repulsion_II"),w.Target,true)==null,"a mismatched projectile cannot earn mastery");
+        var ring = typeof(Verb_SB).Assembly.GetType("TorannMagic.Projectile_Repulsion")!.GetMethod("Ring",BindingFlags.NonPublic|BindingFlags.Static)!;
+        var seen=new HashSet<IntVec3>();
+        var center=new IntVec3(23,0,17);
+        for (int radius=1;radius<=10;radius++)
+        {
+            var cells=(List<IntVec3>)ring.Invoke(null,[center,radius])!;
+            Check.Equal(true,cells.All(seen.Add),"successive rings never hit a prior cell twice");
+            Check.Equal(true,seen.SetEquals(GenRadial.RadialCellsAround(center,radius,false)),"rings cover the native radius after reload");
+        }
+    }
+
     static void Repulsion(RuntimeFixture f)
     {
         using var w = new Fixture(f, true, true); var shot = w.Shot();
@@ -192,7 +222,7 @@ internal static class DemonTrialTests
     static void Hooks(RuntimeFixture f)
     {
         var assembly = typeof(DemonTrials).Assembly;
-        var attraction = assembly.GetType("TorannMagic.Projectile_Attraction")!.GetMethod("Impact", BindingFlags.NonPublic | BindingFlags.Instance)!;
+        var attraction = assembly.GetType("TorannMagic.Projectile_Attraction")!.GetMethod("TickField", BindingFlags.NonPublic | BindingFlags.Instance)!;
         Check.Equal(3, Calls(attraction, typeof(DemonTrials).GetMethod("AdjustSlow")!), "all three native adjustment sites observed");
         var nativeAdjust = typeof(HealthUtility).GetMethod("AdjustSeverity")!;
         Check.Equal(1, Calls(typeof(DemonTrials).GetMethod("AdjustSlow")!, nativeAdjust), "wrapper calls native severity once");

@@ -168,19 +168,29 @@ namespace TorannMagic
             this.Initialize();
         }
 
+        // Payload flight advances every simulation tick, including off-camera.
+        protected override void TickInterval(int delta) { }
+
+        public override void Destroy(DestroyMode mode = DestroyMode.Vanish)
+        {
+            if (Spawned && !Map.Disposed && flyingThing is Pawn passenger && !passenger.Spawned &&
+                !passenger.Dead && !passenger.Destroyed && passenger.holdingOwner == null)
+            {
+                GenSpawn.Spawn(passenger, Position, Map);
+                if (drafted && passenger.IsColonist && passenger.drafter != null) passenger.drafter.Drafted = true;
+            }
+            base.Destroy(mode);
+        }
+
         protected override void Tick()
         {
-        }
-        protected override void TickInterval(int delta)
-        {
-            //base.Tick();
             Vector3 exactPosition = this.ExactPosition;
             this.ticksToImpact--;
             bool flag = !this.ExactPosition.InBoundsWithNullCheck(base.Map);
             if (flag)
             {
                 this.ticksToImpact++;
-                base.Position = this.ExactPosition.ToIntVec3();
+                // The carrier is still at its last in-bounds position.
                 this.Destroy(DestroyMode.Vanish);
             }
             else if(!this.ExactPosition.ToIntVec3().Walkable(base.Map))

@@ -7,4 +7,12 @@
   <TM_SpiritShadowStep.reportString>正在移向灵魂绑定的盟友。</TM_SpiritShadowStep.reportString>
   <TM_SpiritShadowCall.reportString>正在召回灵魂绑定的盟友。</TM_SpiritShadowCall.reportString>
   <TM_SpiritDominate.reportString>正在施放支配术。</TM_SpiritDominate.reportString>
+  <TM_SpiritRepulsion.reportString>正在施放斥力术。</TM_SpiritRepulsion.reportString>
+  <TM_SpiritRepulsion_I.reportString>正在施放斥力术。</TM_SpiritRepulsion_I.reportString>
+  <TM_SpiritRepulsion_II.reportString>正在施放斥力术。</TM_SpiritRepulsion_II.reportString>
+  <TM_SpiritRepulsion_III.reportString>正在施放斥力术。</TM_SpiritRepulsion_III.reportString>
+  <TM_SpiritAttraction.reportString>正在施放引力术。</TM_SpiritAttraction.reportString>
+  <TM_SpiritAttraction_I.reportString>正在施放引力术。</TM_SpiritAttraction_I.reportString>
+  <TM_SpiritAttraction_II.reportString>正在施放引力术。</TM_SpiritAttraction_II.reportString>
+  <TM_SpiritAttraction_III.reportString>正在施放引力术。</TM_SpiritAttraction_III.reportString>
 </LanguageData>

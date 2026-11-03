@@ -7,4 +7,12 @@
   <TM_SpiritShadowStep.reportString>переходит к связанному союзнику.</TM_SpiritShadowStep.reportString>
   <TM_SpiritShadowCall.reportString>призывает связанного союзника.</TM_SpiritShadowCall.reportString>
   <TM_SpiritDominate.reportString>применяет подчинение.</TM_SpiritDominate.reportString>
+  <TM_SpiritRepulsion.reportString>применяет отталкивание.</TM_SpiritRepulsion.reportString>
+  <TM_SpiritRepulsion_I.reportString>применяет отталкивание.</TM_SpiritRepulsion_I.reportString>
+  <TM_SpiritRepulsion_II.reportString>применяет отталкивание.</TM_SpiritRepulsion_II.reportString>
+  <TM_SpiritRepulsion_III.reportString>применяет отталкивание.</TM_SpiritRepulsion_III.reportString>
+  <TM_SpiritAttraction.reportString>применяет притяжение.</TM_SpiritAttraction.reportString>
+  <TM_SpiritAttraction_I.reportString>применяет притяжение.</TM_SpiritAttraction_I.reportString>
+  <TM_SpiritAttraction_II.reportString>применяет притяжение.</TM_SpiritAttraction_II.reportString>
+  <TM_SpiritAttraction_III.reportString>применяет притяжение.</TM_SpiritAttraction_III.reportString>
 </LanguageData>

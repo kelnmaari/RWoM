@@ -116,6 +116,14 @@ namespace TorannMagic.ClassProgression
             ("TM_SpiritShadowBolt_III", () => TorannMagicDefOf.TM_ShadowBolt_III, typeof(Projectile_HostedShadowBolt)),
             ("TM_SpiritShadowStep", () => TorannMagicDefOf.TM_ShadowStep, typeof(Verb_ShadowStep)),
             ("TM_SpiritShadowCall", () => TorannMagicDefOf.TM_ShadowCall, typeof(Verb_ShadowCall)),
+            ("TM_SpiritRepulsion", () => TorannMagicDefOf.TM_Repulsion, typeof(Projectile_Repulsion)),
+            ("TM_SpiritRepulsion_I", () => TorannMagicDefOf.TM_Repulsion_I, typeof(Projectile_Repulsion)),
+            ("TM_SpiritRepulsion_II", () => TorannMagicDefOf.TM_Repulsion_II, typeof(Projectile_Repulsion)),
+            ("TM_SpiritRepulsion_III", () => TorannMagicDefOf.TM_Repulsion_III, typeof(Projectile_Repulsion)),
+            ("TM_SpiritAttraction", () => TorannMagicDefOf.TM_Attraction, typeof(Projectile_Attraction)),
+            ("TM_SpiritAttraction_I", () => TorannMagicDefOf.TM_Attraction_I, typeof(Projectile_Attraction)),
+            ("TM_SpiritAttraction_II", () => TorannMagicDefOf.TM_Attraction_II, typeof(Projectile_Attraction)),
+            ("TM_SpiritAttraction_III", () => TorannMagicDefOf.TM_Attraction_III, typeof(Projectile_Attraction)),
             ("TM_SpiritDominate", () => TorannMagicDefOf.TM_Dominate, typeof(Verb_Dominate)),
             ("TM_SpiritSoulBond", () => TorannMagicDefOf.TM_SoulBond, typeof(Verb_SoulBond)),
             ("TM_SpiritSymbiosis", () => TorannMagicDefOf.TM_Symbiosis, typeof(Verb_Symbiosis)),
@@ -264,10 +272,10 @@ namespace TorannMagic.ClassProgression
             if (def.MainVerb == null || def.MainVerb.isViolent && body.WorkTagIsDisabled(WorkTags.Violent) ||
                 !Families.Any(f => f.spell() == def && (f.effect == def.MainVerb.verbClass || (DeathBolt(def) && f.effect == typeof(Projectile_HostedDeathBolt)) ||
                     ((def.MainVerb.verbClass == typeof(Verb_UseAbility) || def.MainVerb.verbClass == typeof(Effect_ValiantCharge) || def.MainVerb.verbClass == typeof(Verb_SB) ||
-                    def.MainVerb.verbClass == typeof(Effect_ShadowBolt) || def.MainVerb.verbClass == typeof(Verb_LightSkip) || def.MainVerb.verbClass == typeof(Verb_BLOS) || def.MainVerb.verbClass == typeof(Verb_FogOfTorment) || def.MainVerb.verbClass == typeof(Verb_LightningCloud) || typeof(Verb_RankedStormField).IsAssignableFrom(def.MainVerb.verbClass) ||
+                    def.MainVerb.verbClass == typeof(Verb_Attraction) || def.MainVerb.verbClass == typeof(Effect_ShadowBolt) || def.MainVerb.verbClass == typeof(Verb_LightSkip) || def.MainVerb.verbClass == typeof(Verb_BLOS) || def.MainVerb.verbClass == typeof(Verb_FogOfTorment) || def.MainVerb.verbClass == typeof(Verb_LightningCloud) || typeof(Verb_RankedStormField).IsAssignableFrom(def.MainVerb.verbClass) ||
                     def.MainVerb.verbClass == typeof(Verb_UseAbility_TrueBurst)) &&
                     f.effect == def.MainVerb.defaultProjectile?.thingClass &&
-                    (typeof(Projectile_SpiritNativeAbility).IsAssignableFrom(f.effect) || typeof(Projectile_SpiritBolt).IsAssignableFrom(f.effect) || typeof(Projectile_SpiritRay).IsAssignableFrom(f.effect) || f.effect == typeof(Projectile_ChronostaticField) || f.effect == typeof(Projectile_AccelerateTime) || f.effect == typeof(Projectile_Sentinel) || f.effect == typeof(Projectile_EarthernHammer) || f.effect == typeof(Projectile_Encase) || f.effect == typeof(Projectile_IgniteBlood) || f.effect == typeof(Projectile_BloodMoon) || SpiritHostedSummons.IsProjectile(f.effect))))) ||
+                    (typeof(Projectile_SpiritNativeAbility).IsAssignableFrom(f.effect) || typeof(Projectile_SpiritBolt).IsAssignableFrom(f.effect) || typeof(Projectile_SpiritRay).IsAssignableFrom(f.effect) || typeof(Projectile_DemonField).IsAssignableFrom(f.effect) || f.effect == typeof(Projectile_ChronostaticField) || f.effect == typeof(Projectile_AccelerateTime) || f.effect == typeof(Projectile_Sentinel) || f.effect == typeof(Projectile_EarthernHammer) || f.effect == typeof(Projectile_Encase) || f.effect == typeof(Projectile_IgniteBlood) || f.effect == typeof(Projectile_BloodMoon) || SpiritHostedSummons.IsProjectile(f.effect))))) ||
                 (def.MainVerb.burstShotCount != 1 && !IsBurst(def)) || def.bloodCost != 0 && def != TorannMagicDefOf.TM_BloodShield && def != TorannMagicDefOf.TM_IgniteBlood && def != TorannMagicDefOf.TM_BloodForBlood && def.MainVerb.verbClass != typeof(Verb_Rend) && def.MainVerb.defaultProjectile?.thingClass != typeof(Projectile_BloodMoon) || def.chiCost != 0 ||
                 (def.requiredNeed != null && def != TorannMagicDefOf.TM_MindKiller && def != TorannMagicDefOf.TM_SuppressiveAura && def != TorannMagicDefOf.TM_IncitePassion && def != TorannMagicDefOf.TM_HarvestPassion && def != TorannMagicDefOf.TM_FadeEmotions && def != TorannMagicDefOf.TM_Symbiosis) ||
                 def.requiredHediff != null || !def.consumeEnergy || power.MagicUser.Mana == null) return false;
@@ -531,6 +539,7 @@ namespace TorannMagic.ClassProgression
             if (shot is Projectile_SpiritBolt bolt) bolt.PrepareProjection(power);
             else if (shot is Projectile_SpiritNativeAbility native) native.SetSource(power.Pawn);
             else if (shot is Projectile_SpiritRay laser) laser.PrepareProjection(power);
+            else if (shot is Projectile_DemonField demonField) demonField.PrepareHosted(power,body);
             else if (shot is Projectile_BloodMoon moon) moon.PrepareHosted(power);
             else if (shot is Projectile_ChronostaticField stasis) stasis.PrepareHosted(power);
             else if (shot is Projectile_AccelerateTime accelerate) accelerate.PrepareHosted(power);
@@ -551,6 +560,7 @@ namespace TorannMagic.ClassProgression
             var flags = ProjectileHitFlags.IntendedTarget | ProjectileHitFlags.NonTargetPawns;
             if (!target.HasThing || target.Thing.def.Fillage == FillCategory.Full) flags |= ProjectileHitFlags.NonTargetWorld;
             shot.Launch(body,power.Def,drawPos,target,flags,false,null,props.hediffsToApply,props.mentalStatesToApply,props.thingsToSpawn);
+            if (shot is Projectile_DemonField projected) DemonTrials.BindHosted(projected,verb);
             if (shot is Projectile_Encase field) GeomancerTrials.StampHosted(field, power);
             if (shot is Projectile_IgniteBlood fire) BloodMageTrials.StampHosted(fire, power);
             if (shot is Projectile_HostedShadowBolt) Effect_ShadowBolt.SpawnOrb(body,power.Pawn,target);

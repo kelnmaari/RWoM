@@ -7,4 +7,12 @@
   <JobDef><defName>TM_SpiritShadowStep</defName><driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass><reportString>stepping to a bonded ally.</reportString></JobDef>
   <JobDef><defName>TM_SpiritShadowCall</defName><driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass><reportString>calling a bonded ally.</reportString></JobDef>
   <JobDef><defName>TM_SpiritDominate</defName><driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass><reportString>casting dominate.</reportString></JobDef>
+  <JobDef><defName>TM_SpiritRepulsion</defName><driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass><reportString>casting repulsion.</reportString></JobDef>
+  <JobDef><defName>TM_SpiritRepulsion_I</defName><driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass><reportString>casting repulsion.</reportString></JobDef>
+  <JobDef><defName>TM_SpiritRepulsion_II</defName><driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass><reportString>casting repulsion.</reportString></JobDef>
+  <JobDef><defName>TM_SpiritRepulsion_III</defName><driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass><reportString>casting repulsion.</reportString></JobDef>
+  <JobDef><defName>TM_SpiritAttraction</defName><driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass><reportString>casting attraction.</reportString></JobDef>
+  <JobDef><defName>TM_SpiritAttraction_I</defName><driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass><reportString>casting attraction.</reportString></JobDef>
+  <JobDef><defName>TM_SpiritAttraction_II</defName><driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass><reportString>casting attraction.</reportString></JobDef>
+  <JobDef><defName>TM_SpiritAttraction_III</defName><driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass><reportString>casting attraction.</reportString></JobDef>
 </Defs>
