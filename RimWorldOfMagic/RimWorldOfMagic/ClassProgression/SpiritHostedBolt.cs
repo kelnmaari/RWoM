@@ -76,6 +76,7 @@ namespace TorannMagic.ClassProgression
             ("TM_SpiritSabotage", () => TorannMagicDefOf.TM_Sabotage, typeof(Projectile_Sabotage)),
             ("TM_SpiritSunfire", () => TorannMagicDefOf.TM_Sunfire, typeof(Projectile_Sunfire)),
             ("TM_SpiritLightBurst", () => TorannMagicDefOf.TM_LightBurst, typeof(Verb_LightBurst)),
+            ("TM_SpiritLightLance", () => TorannMagicDefOf.TM_LightLance, typeof(Effect_LightLance)),
             ("TM_SpiritSunfire_I", () => TorannMagicDefOf.TM_Sunfire_I, typeof(Projectile_Sunfire)),
             ("TM_SpiritSunfire_II", () => TorannMagicDefOf.TM_Sunfire_II, typeof(Projectile_Sunfire)),
             ("TM_SpiritSunfire_III", () => TorannMagicDefOf.TM_Sunfire_III, typeof(Projectile_Sunfire)),
@@ -148,7 +149,7 @@ namespace TorannMagic.ClassProgression
         private static bool DeathBolt(TMAbilityDef def) => def?.MainVerb?.verbClass == typeof(Effect_DeathBolt)
             && def.MainVerb.defaultProjectile?.thingClass == typeof(Projectile_HostedDeathBolt);
 
-        internal static bool IsBurst(TMAbilityDef def) => DeathBolt(def) || def?.MainVerb?.verbClass == typeof(Verb_LightBurst) || def?.MainVerb?.verbClass == typeof(Verb_UseAbility_TrueBurst)
+        internal static bool IsBurst(TMAbilityDef def) => DeathBolt(def) || def?.MainVerb?.verbClass == typeof(Effect_LightLance) || def?.MainVerb?.verbClass == typeof(Verb_LightBurst) || def?.MainVerb?.verbClass == typeof(Verb_UseAbility_TrueBurst)
             && (def.MainVerb.defaultProjectile?.thingClass == typeof(Projectile_SpiritMissile)
                 || def.MainVerb.defaultProjectile?.thingClass == typeof(Projectile_SpiritRay) && def.MainVerb.burstShotCount > 1);
 
@@ -278,6 +279,21 @@ namespace TorannMagic.ClassProgression
             if (def == TorannMagicDefOf.TM_ValiantCharge && !Odyssey.ManualTravelSafety.CanComplete(body, body.Map, target.Cell)) return false;
             var props = power.magicDef.MainVerb;
             var verb = PhysicalVerb(body, power);
+            if (verb is Effect_LightLance)
+            {
+                if (!(body.jobs?.curDriver is JobDriver_SpiritBolt driver) || body.CurJob.targetB.Pawn != soul ||
+                    Spell(body.CurJob.def) != def || paidBurst != (driver.PaidShots > 0)) return false;
+                if (!paidBurst && !Shoot(body, power, verb, target)) return false;
+                if (!Effect_LightLance.PayForPulse(soul, def, props.burstShotCount - driver.PaidShots, props.burstShotCount))
+                {
+                    driver.FinishSeries(props.burstShotCount);
+                    return true;
+                }
+                Effect_LightLance.Emit(body, power, target);
+                if (!paidBurst) power.PayForAttempt(body);
+                else props.soundCast?.PlayOneShot(new TargetInfo(body.Position, body.Map));
+                return true;
+            }
             if (verb is Verb_LightBurst flash)
             {
                 if (!(body.jobs?.curDriver is JobDriver_SpiritBolt driver) || body.CurJob?.targetB.Pawn != soul ||
@@ -367,6 +383,8 @@ namespace TorannMagic.ClassProgression
     {
         private bool attempted;
         private int shotsFired, nextShotTick;
+        internal int PaidShots => shotsFired;
+        internal void FinishSeries(int count) => shotsFired = count;
         private Verb_LightBurst.FlashSeries flashes;
         internal bool EmitFlash(Verb_LightBurst verb, LocalTargetInfo target, bool paid)
         {

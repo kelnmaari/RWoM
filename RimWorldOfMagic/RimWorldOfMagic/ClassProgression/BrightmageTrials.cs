@@ -10,14 +10,14 @@ namespace TorannMagic.ClassProgression
         public const string FoundationTrialId = "rwom.brightmage.foundation", MasteryTrialId = "rwom.brightmage.mastery";
         static CompAbilityUserMagic Magic(Pawn pawn) => pawn?.AllComps.OfType<CompAbilityUserMagic>().FirstOrDefault();
         static MagicPower Owner(Pawn pawn, bool burst) => Magic(pawn)?.MagicData.MagicPowersBrightmage.FirstOrDefault(p => p.learned && p.TMabilityDefs.Contains(burst ? TorannMagicDefOf.TM_LightBurst : TorannMagicDefOf.TM_LightLance));
-        static Pawn BurstBody(Pawn caster)
+        static Pawn CastingBody(Pawn caster)
         {
             if (!SpiritRebirthState.TryGet(caster, out var state)) return caster;
             return !state.DepletionPending && state.HasValidHost(caster) ? state.Host : null;
         }
         static DisciplineProgress Owned(Pawn pawn, bool burst)
         {
-            var body = burst ? BurstBody(pawn) : pawn;
+            var body = CastingBody(pawn);
             if (pawn == null || pawn.Dead || body?.Spawned != true || pawn.Faction == null
                 || pawn.story?.traits?.HasTrait(TorannMagicDefOf.Faceless) == true
                 || !ClassIdentity.TryGetState(pawn, out var state) || (state.Vocation & Vocation.Mage) == 0) return null;
@@ -59,7 +59,7 @@ namespace TorannMagic.ClassProgression
             if (snapshot == null || snapshot.used) return false;
             snapshot.used = true;
             if (emitter == null || !emitter.Spawned || emitter.def != TorannMagicDefOf.FlyingObject_LightLance || emitter.TrialCaster != snapshot.caster
-                || emitter.Map != snapshot.caster.Map || Owned(snapshot.caster, false) != snapshot.path || Owner(snapshot.caster, false) != snapshot.owner
+                || emitter.Map != CastingBody(snapshot.caster)?.Map || Owned(snapshot.caster, false) != snapshot.path || Owner(snapshot.caster, false) != snapshot.owner
                 || !RuntimeOwned(snapshot.ability, snapshot.caster, false)) return false;
             emitter.trialSource = new LanceSource { casterId = snapshot.caster.thingIDNumber, abilityId = "TM_LightLance", owner = snapshot.owner };
             return true;
@@ -68,7 +68,7 @@ namespace TorannMagic.ClassProgression
         {
             var tag = emitter?.trialSource; var caster = emitter?.TrialCaster;
             return tag != null && tag.casterId > 0 && tag.abilityId == "TM_LightLance" && caster?.thingIDNumber == tag.casterId
-                && emitter.Spawned && emitter.Map == caster.Map && emitter.def == TorannMagicDefOf.FlyingObject_LightLance
+                && emitter.Spawned && emitter.Map == CastingBody(caster)?.Map && emitter.def == TorannMagicDefOf.FlyingObject_LightLance
                 && (tag.owner == null || tag.owner == Owner(caster, false)) && Magic(caster)?.AbilityData.Powers.Any(a => RuntimeOwned(a, caster, false)) == true;
         }
         public sealed class DamageScope { internal FlyingObject_LightLance emitter; internal Thing victim; internal bool used; }
@@ -88,7 +88,7 @@ namespace TorannMagic.ClassProgression
             if (scope.used || scope.victim != victim || !ValidSource(scope.emitter)
                 || damage.Instigator != scope.emitter.TrialCaster || damage.Def != TMDamageDefOf.DamageDefOf.TM_BurningLight) return hit;
             scope.used = true; var caster = scope.emitter.TrialCaster; var path = Owned(caster, false);
-            if (path == null || !Enemy(caster, victim as Pawn)) return hit;
+            if (path == null || !Enemy(CastingBody(caster), victim as Pawn)) return hit;
             hit.caster = caster; hit.owner = Owner(caster, false); hit.path = path; return hit;
         }
         public static void CompleteHit(HitScope hit, DamageWorker.DamageResult result)
@@ -114,7 +114,7 @@ namespace TorannMagic.ClassProgression
         public static BurstSnapshot CaptureBurst(PawnAbility ability, Pawn target)
         {
             var caster = ability?.Pawn; var path = Owned(caster, true);
-            var body = BurstBody(caster);
+            var body = CastingBody(caster);
             if (path == null || !RuntimeOwned(ability, caster, true) || !Enemy(body, target)) return null;
             var before = target.health.hediffSet.GetFirstHediffOfDef(TorannMagicDefOf.TM_LightBurstHD)?.Severity ?? 0;
             return Finite(before) ? new BurstSnapshot { caster = caster, body = body, target = target, ability = ability, owner = Owner(caster, true), path = path, severity = before } : null;
@@ -124,7 +124,7 @@ namespace TorannMagic.ClassProgression
             if (snapshot == null || snapshot.used) return false;
             snapshot.used = true;
             if (Owned(snapshot.caster, true) != snapshot.path || Owner(snapshot.caster, true) != snapshot.owner
-                || !RuntimeOwned(snapshot.ability, snapshot.caster, true) || BurstBody(snapshot.caster) != snapshot.body
+                || !RuntimeOwned(snapshot.ability, snapshot.caster, true) || CastingBody(snapshot.caster) != snapshot.body
                 || !Enemy(snapshot.body, snapshot.target)) return false;
             float after = snapshot.target.health.hediffSet.GetFirstHediffOfDef(TorannMagicDefOf.TM_LightBurstHD)?.Severity ?? 0;
             return Finite(after) && after > 0 && after > snapshot.severity && snapshot.path.RecordCompletedTrial(MasteryTrialId);

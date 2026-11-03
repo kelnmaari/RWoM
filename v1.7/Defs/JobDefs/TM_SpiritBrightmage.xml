@@ -25,4 +25,9 @@
     <driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass>
     <reportString>casting light burst through a spirit host.</reportString>
   </JobDef>
+  <JobDef>
+    <defName>TM_SpiritLightLance</defName>
+    <driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass>
+    <reportString>casting light lance through a spirit host.</reportString>
+  </JobDef>
 </Defs>

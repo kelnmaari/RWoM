@@ -10,16 +10,15 @@ using UnityEngine;
 namespace TorannMagic
 {
     [StaticConstructorOnStartup]
-    public class Projectile_LightLance : Projectile_AbilityBase
+    public class Projectile_LightLance : ClassProgression.Projectile_SpiritBolt
     {
         private bool initialized = false;
         private bool geometryReady;
         private bool soundRequested;
-        private int verVal = 0;
-        private int pwrVal = 0;
+        protected override List<MagicPowerSkill> Skills(MagicData data) => data.MagicPowerSkill_LightLance;
+        protected override string SkillStem => "TM_LightLance";
         public int burnTime = 200;
         private int age = -1;
-        private float arcaneDmg = 1;
         private float lightPotency = .5f;
         IntVec3 launchPosition;
 
@@ -54,6 +53,13 @@ namespace TorannMagic
             Scribe_Values.Look(ref launchPosition, "TM_lanceOrigin", origin.ToIntVec3(), true);
         }
 
+        internal override void PrepareProjection(MagicAbility owner)
+        {
+            base.PrepareProjection(owner);
+            var light = owner.Pawn.health.hediffSet.GetFirstHediffOfDef(TorannMagicDefOf.TM_LightCapacitanceHD)?.TryGetComp<HediffComp_LightCapacitance>();
+            if (light != null) lightPotency = light.LightPotency;
+        }
+
         private int TicksLeft
         {
             get
@@ -65,17 +71,17 @@ namespace TorannMagic
         private void Initialize()
         {
             var caster = launcher as Pawn;
-            launchPosition = caster?.Spawned == true && caster.Map == Map ? caster.Position : origin.ToIntVec3();
-            var comp = caster?.GetCompAbilityUserMagic();
-            if (comp != null)
+            launchPosition = !projected && caster?.Spawned == true && caster.Map == Map ? caster.Position : origin.ToIntVec3();
+            var comp = SourcePawn?.GetCompAbilityUserMagic();
+            if (!projected && comp != null)
             {
                 pwrVal = TM_Calc.GetSkillPowerLevel(caster, TorannMagicDefOf.TM_LightLance);
                 verVal = TM_Calc.GetSkillVersatilityLevel(caster, TorannMagicDefOf.TM_LightLance);
                 arcaneDmg = comp.arcaneDmg;
             }
-            if (caster?.health?.hediffSet?.HasHediff(TorannMagicDefOf.TM_LightCapacitanceHD) == true)
+            if (!projected && SourcePawn?.health?.hediffSet?.HasHediff(TorannMagicDefOf.TM_LightCapacitanceHD) == true)
             {
-                HediffComp_LightCapacitance hd = caster.health.hediffSet.GetFirstHediffOfDef(TorannMagicDefOf.TM_LightCapacitanceHD).TryGetComp<HediffComp_LightCapacitance>();
+                HediffComp_LightCapacitance hd = SourcePawn.health.hediffSet.GetFirstHediffOfDef(TorannMagicDefOf.TM_LightCapacitanceHD).TryGetComp<HediffComp_LightCapacitance>();
                 this.lightPotency = hd.LightPotency;
             }
             this.burnTime += (pwrVal * 22);
