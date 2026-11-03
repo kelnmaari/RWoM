@@ -5842,6 +5842,23 @@ namespace TorannMagic
             }
         }
 
+        internal void SyncGuardianControl()
+        {
+            var def = TorannMagicDefOf.TM_DismissGuardianSpirit;
+            if (def == null || bondedSpirit == null && !dismissGuardianSpirit) return;
+            if (ClassProgression.ShamanLifecycle.OwnsGuardian(this))
+            {
+                if (!AbilityData.Powers.Any(p => p?.Def == def)) AddPawnAbility(def);
+                dismissGuardianSpirit = true;
+            }
+            else
+            {
+                bondedSpirit = null;
+                RemovePawnAbility(def);
+                dismissGuardianSpirit = false;
+            }
+        }
+
         public void ResolveSustainers()
         {
             if (ClassProgression.GolemancerLifecycle.Restore(this))
@@ -5898,16 +5915,7 @@ namespace TorannMagic
 
             SyncStoneskinControl();
 
-            if(this.bondedSpirit != null && !this.dismissGuardianSpirit)
-            {
-                this.AddPawnAbility(TorannMagicDefOf.TM_DismissGuardianSpirit);
-                this.dismissGuardianSpirit = true;
-            }
-            if (this.bondedSpirit == null && this.dismissGuardianSpirit)
-            {
-                this.RemovePawnAbility(TorannMagicDefOf.TM_DismissGuardianSpirit);
-                this.dismissGuardianSpirit = false;
-            }
+            SyncGuardianControl();
 
             if (this.summonedLights.Count > 0 && dismissSunlightSpell == false)
             {
@@ -6626,19 +6634,8 @@ namespace TorannMagic
                 {
                     HealthUtility.AdjustSeverity(this.bondedSpirit, TorannMagicDefOf.TM_SpiritBondHD, .5f);
                 }
-                if(applyOriginalBody && TorannMagicDefOf.TM_SpiritCrowR == this.GuardianSpiritType)
-                {
-                    Hediff hd = this.Pawn.health.hediffSet.GetFirstHediffOfDef(TorannMagicDefOf.TM_CrowInsightHD);
-                    if(hd != null && hd.Severity != (.5f + this.MagicData.GetSkill_Power(TorannMagicDefOf.TM_GuardianSpirit).level))
-                    {
-                        this.Pawn.health.RemoveHediff(hd);
-                        HealthUtility.AdjustSeverity(this.Pawn, TorannMagicDefOf.TM_CrowInsightHD, .5f + this.MagicData.GetSkill_Power(TorannMagicDefOf.TM_GuardianSpirit).level);
-                    }
-                    else
-                    {
-                        HealthUtility.AdjustSeverity(this.Pawn, TorannMagicDefOf.TM_CrowInsightHD, .5f + this.MagicData.GetSkill_Power(TorannMagicDefOf.TM_GuardianSpirit).level);
-                    }
-                }
+                if (bondedSpirit?.def == TorannMagicDefOf.TM_SpiritCrowR)
+                    ClassProgression.ShamanLifecycle.ApplyCrowInsight(this);
             }
             if (this.enchanterStones != null && this.enchanterStones.Count > 0)
             {

@@ -45,13 +45,20 @@ namespace TorannMagic
                 {
                     FleckMaker.ThrowHeatGlow(base.Pawn.DrawPos.ToIntVec3(), base.Pawn.Map, 2f);
                 }
+                var owner = Pawn.TryGetComp<CompAnimalController>()?.summonerPawn;
+                if (owner?.GetCompAbilityUserMagic()?.bondedSpirit == Pawn)
+                {
+                    bonderPawn = owner;
+                    return;
+                }
+                if (!spawned) return;
                 List<Pawn> mapPawns = this.Pawn.Map.mapPawns.AllPawnsSpawned.ToList();
                 for (int i = 0; i < mapPawns.Count(); i++)
                 {
                     if (!mapPawns[i].DestroyedOrNull() && mapPawns[i].Spawned && !mapPawns[i].Downed && mapPawns[i].RaceProps.Humanlike)
                     {
                         CompAbilityUserMight comp = mapPawns[i].GetCompAbilityUserMight();
-                        if (comp.IsMightUser && comp.bondedPet != null)
+                        if (comp?.IsMightUser == true && comp.bondedPet != null)
                         {
                             if (comp.bondedPet == this.Pawn)
                             {
@@ -60,7 +67,7 @@ namespace TorannMagic
                             }
                         }
                         CompAbilityUserMagic compMagic = mapPawns[i].GetCompAbilityUserMagic();
-                        if(compMagic.IsMagicUser && compMagic.bondedSpirit != null)
+                        if(compMagic?.IsMagicUser == true && compMagic.bondedSpirit != null)
                         {
                             if(compMagic.bondedSpirit == this.Pawn)
                             {

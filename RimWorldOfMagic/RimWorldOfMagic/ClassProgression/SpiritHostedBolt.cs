@@ -105,6 +105,8 @@ namespace TorannMagic.ClassProgression
             ("TM_SpiritHex_Pain", () => TorannMagicDefOf.TM_Hex_Pain, typeof(Verb_Hex_Pain)),
             ("TM_SpiritHex_CriticalFail", () => TorannMagicDefOf.TM_Hex_CriticalFail, typeof(Verb_Hex_CriticalFail)),
             ("TM_SpiritHex_MentalAssault", () => TorannMagicDefOf.TM_Hex_MentalAssault, typeof(Verb_Hex_MentalAssault)),
+            ("TM_SpiritGuardianSpirit", () => TorannMagicDefOf.TM_GuardianSpirit, typeof(Verb_SummonGuardianSpirit)),
+            ("TM_SpiritDismissGuardianSpirit", () => TorannMagicDefOf.TM_DismissGuardianSpirit, typeof(Verb_DismissGuardianSpirit)),
             ("TM_SpiritEnrage", () => TorannMagicDefOf.TM_Enrage, typeof(Verb_Enrage)),
             ("TM_SpiritChainLightning", () => TorannMagicDefOf.TM_ChainLightning, typeof(Projectile_ChainLightning)),
             ("TM_SpiritTimeMark", () => TorannMagicDefOf.TM_TimeMark, typeof(Verb_TimeMark)),
@@ -238,6 +240,7 @@ namespace TorannMagic.ClassProgression
             }
             float cost = power.MagicUser.ActualManaCost(def);
             if (def == TorannMagicDefOf.TM_Recall && (!TM_Action.RecallMatches(body,power.MagicUser) || power.MagicUser.recallExpiration <= Verse.Find.TickManager.TicksGame)) return false;
+            if (def == TorannMagicDefOf.TM_DismissGuardianSpirit && !ShamanLifecycle.OwnsGuardian(power.MagicUser)) return false;
             if (ShamanLifecycle.Control(def) && !power.MagicUser.HexedPawns.Any(p => p.Spawned)) return false;
             if (def == TorannMagicDefOf.TM_AlterFate && !Verb_AlterFate.Available(body,power)) return false;
             if (def == TorannMagicDefOf.TM_ShatterSentinel && !power.MagicUser.summonedSentinels.Any(t => t?.Spawned == true)) return false;
@@ -385,7 +388,7 @@ namespace TorannMagic.ClassProgression
             if (verb is Verb_SpiritTargetable direct && Families.Any(f => f.spell() == def && f.effect == props.verbClass))
             {
                 bool travel = Odyssey.ManualTravelSafety.IsTravel(power);
-                if (!travel && !(verb is Verb_SummonTotem) && !(verb is Verb_ReverseTime) && !(verb is Verb_EarthSprites) && !(verb is Verb_Summon) && !(verb is Verb_SummonSpiritWolves) && !(verb is Verb_RegrowLimb) && !(verb is ISpiritCorpseConsumer) && !(verb is Verb_Overdrive) && !(verb is Verb_TechnoWeapon) &&
+                if (!travel && !(verb is Verb_SummonGuardianSpirit) && !(verb is Verb_SummonTotem) && !(verb is Verb_ReverseTime) && !(verb is Verb_EarthSprites) && !(verb is Verb_Summon) && !(verb is Verb_SummonSpiritWolves) && !(verb is Verb_RegrowLimb) && !(verb is ISpiritCorpseConsumer) && !(verb is Verb_Overdrive) && !(verb is Verb_TechnoWeapon) &&
                     props.AbilityTargetCategory != AbilityTargetCategory.TargetAoE && !(target.Thing is Pawn { Dead: false }))
                     return false;
                 if (!direct.CastFromHost(target)) return false;

@@ -177,14 +177,19 @@ internal static class SpiritRebirthHealthPlanTests
         DefDatabase<HediffDef>.Add(bloodDef);
         var blood = new HediffWithComps {def=bloodDef,pawn=f.Original};
         blood.comps = [new TorannMagic.HediffComp_Blood {parent=blood}];
-        f.Original.health.hediffSet.hediffs.AddRange([injury, marker, missing, implant, blood]);
+        var crowDef = new HediffDef { defName="TM_CrowInsightHD", hediffClass=typeof(HediffWithComps),
+            comps=[new HediffCompProperties { compClass=typeof(HediffComp_CrowInsight) }] };
+        DefDatabase<HediffDef>.Add(crowDef);
+        var crow = new HediffWithComps {def=crowDef,pawn=f.Original};
+        crow.comps = [new HediffComp_CrowInsight {parent=crow}];
+        f.Original.health.hediffSet.hediffs.AddRange([injury, marker, missing, implant, blood, crow]);
         blood.Part = part;
         Check.Equal(false,Prepare(f.Original,out _,out _),"modified body-part blood effect excluded");
         blood.Part = null;
         Check.Equal(1, f.Original.health.hediffSet.GetMissingPartsCommonAncestors().Count, "prime real missing-part cache before cleanup");
         var magic = f.Magic.MagicData; var might = f.Might.MightData;
         Check.Equal(true, Prepare(f.Original, out var plan, out _), "known physical conditions accepted");
-        Check.Equal(5, f.Original.health.hediffSet.hediffs.Count, "preparation removes nothing");
+        Check.Equal(6, f.Original.health.hediffSet.hediffs.Count, "preparation removes nothing");
         Check.Equal(true, Apply(plan!), "native health removal succeeds");
         Check.Equal(1, f.Original.health.hediffSet.hediffs.Count, "only class marker survives");
         Check.Same(marker, f.Original.health.hediffSet.hediffs[0], "original class marker instance retained");

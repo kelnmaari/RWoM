@@ -12,4 +12,6 @@
   <JobDef><defName>TM_SpiritHex_Pain</defName><driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass><reportString>inflicting pain.</reportString></JobDef>
   <JobDef><defName>TM_SpiritHex_CriticalFail</defName><driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass><reportString>invoking misfortune.</reportString></JobDef>
   <JobDef><defName>TM_SpiritHex_MentalAssault</defName><driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass><reportString>assaulting the mind.</reportString></JobDef>
+  <JobDef><defName>TM_SpiritGuardianSpirit</defName><driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass><reportString>summoning a guardian spirit.</reportString></JobDef>
+  <JobDef><defName>TM_SpiritDismissGuardianSpirit</defName><driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass><reportString>dismissing a guardian spirit.</reportString></JobDef>
 </Defs>

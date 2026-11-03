@@ -174,6 +174,7 @@ namespace TorannMagic.ClassProgression
                 comp.SyncStoneskinControl();
                 comp.SyncEarthSpriteControl();
                 comp.SyncSentinelControl();
+                comp.SyncGuardianControl();
                 if (comp.recallSet && comp.recallExpiration <= now)
                 {
                     comp.recallSet = comp.recallSpell = false;

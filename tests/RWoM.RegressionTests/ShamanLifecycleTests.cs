@@ -31,6 +31,16 @@ internal static class ShamanLifecycleTests
         yield return new("ShamanLifecycle.CopiedAndItemHexControlsRemainUntilActualTargetsEnd", TemporaryOwnership);
         yield return new("ShamanLifecycle.NativeScribePreservesHexGuardianAndSummonerReferences", Save);
         yield return new("ShamanLifecycle.NativeGuardianControlPreservesTypeAndUpkeepSnapshot", Guardian);
+        yield return new("ShamanLifecycle.ForeignGuardianCannotBeDismissedOrReplaced", runtime =>
+        {
+            using var f = new Fixture(runtime);
+            f.Magic.bondedSpirit = f.Companion;
+            f.Controller.summonerPawn = f.Target;
+            var release = typeof(ShamanLifecycle).GetMethod("ReleaseGuardian",BindingFlags.Static | BindingFlags.NonPublic)!;
+            Check.Equal(false,(bool)release.Invoke(null,[f.Magic])!,"refuses another owner's guardian");
+            Check.Same(f.Companion,f.Magic.bondedSpirit,"refusal preserves the existing link");
+            Check.Equal(false,f.Companion.Destroyed,"refusal keeps the actual animal");
+        });
         yield return new("ShamanLifecycle.TotemAndHexChildrenUseNativeParentEfficiency", Costs);
     }
     sealed class Fixture : IDisposable
