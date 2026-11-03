@@ -863,30 +863,14 @@ namespace TorannMagic
 
             if (newPawn.Faction != null && newPawn.Faction != Faction.OfPlayer)
             {
-                Lord lord = null;
-                if (newPawn.Map.mapPawns.SpawnedPawnsInFaction(faction).Any((Pawn p) => p != newPawn))
-                {
-                    Predicate<Thing> validator = (Thing p) => p != newPawn && ((Pawn)p).GetLord() != null;
-                    Pawn p2 = (Pawn)GenClosest.ClosestThing_Global(newPawn.Position, newPawn.Map.mapPawns.SpawnedPawnsInFaction(faction), 99999f, validator, null);
-                    lord = p2.GetLord();
-                }
-                bool flag4 = lord == null;
-                if (flag4)
-                {
-                    LordJob_DefendPoint lordJob = new LordJob_DefendPoint(newPawn.Position);
-                    lord = LordMaker.MakeNewLord(faction, lordJob, newPawn.Map, null);
-                }
+                var members = newPawn.Map.mapPawns.SpawnedPawnsInFaction(faction);
+                var leader = (Pawn)GenClosest.ClosestThing_Global(newPawn.Position, members, 99999f,
+                    candidate => candidate is Pawn pawn && pawn != newPawn && pawn.GetLord() != null);
+                var lord = leader?.GetLord();
+                if (lord == null)
+                    lord = LordMaker.MakeNewLord(faction,new LordJob_DefendPoint(newPawn.Position),newPawn.Map);
                 else
-                {
-                    try
-                    {
-                        newPawn.mindState.duty = new PawnDuty(DutyDefOf.Defend);
-                    }
-                    catch
-                    {
-                        Log.Message("error attempting to assign a duty to summoned object");
-                    }
-                }
+                    newPawn.mindState.duty = new PawnDuty(DutyDefOf.Defend);
                 lord.AddPawn(newPawn);
             }
             return newPawn;
