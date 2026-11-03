@@ -1413,7 +1413,12 @@ namespace TorannMagic
         /// <param name="comp"></param>
         /// <param name="deathTrigger"></param>
         public static void DoRecall(Pawn pawn, CompAbilityUserMagic comp, bool deathTrigger)
+            => TryRecall(pawn, comp, deathTrigger);
+
+        internal static bool TryRecall(Pawn pawn, CompAbilityUserMagic comp, bool deathTrigger)
         {
+            if (pawn?.Spawned != true || comp?.recallSet != true || comp.recallExpiration <= Find.TickManager.TicksGame ||
+                !TryRecallCell(pawn, comp, out var destination)) return false;
             try
             {
                 if (ModCheck.Validate.GiddyUp.Core_IsInitialized())
@@ -1430,12 +1435,14 @@ namespace TorannMagic
             Effecter RecallFromEffect = TorannMagicDefOf.TM_RecallFromED.Spawn();
             RecallFromEffect.Trigger(new TargetInfo(pawn), new TargetInfo(pawn));
             RecallFromEffect.Cleanup();
-            RecallHediffs(pawn, comp);
-            RecallNeeds(pawn, comp);
-            RecallPosition(pawn, comp);
-            ResetPowers(pawn, comp);
+            if (!RecallPosition(pawn, comp.recallMap, destination)) return false;
+            // Health callbacks may re-enter the death/downing patch during restoration.
             comp.recallSet = false;
             comp.recallSpell = false;
+            comp.recallPosition = default;
+            RecallHediffs(pawn, comp);
+            RecallNeeds(pawn, comp);
+            ResetPowers(pawn, comp);
             comp.RemovePawnAbility(TorannMagicDefOf.TM_Recall);
             TM_MoteMaker.ThrowGenericMote(TorannMagicDefOf.Mote_AlterFate, pawn.DrawPos, pawn.Map, 1.6f, .2f, .1f, .8f, 500, 0, 0, Rand.Range(0, 360));
             Effecter RecallToEffect = TorannMagicDefOf.TM_RecallToED.Spawn();
@@ -1451,6 +1458,7 @@ namespace TorannMagic
             {
                 pawn.mindState.mentalStateHandler.TryStartMentalState(MentalStateDefOf.Wander_Psychotic);
             }
+            return true;
         }
 
         private static void RecallHediffs(Pawn pawn, CompAbilityUserMagic comp)
@@ -1531,14 +1539,43 @@ namespace TorannMagic
             values?.Clear();
         }
 
-        private static void RecallPosition(Pawn pawn, CompAbilityUserMagic comp)
+        private static bool TryRecallCell(Pawn pawn, CompAbilityUserMagic comp, out IntVec3 destination)
         {
-            bool draftFlag = pawn.Drafted;
-            bool selectFlag = Find.Selector.IsSelected(pawn);
-            pawn.DeSpawn();
-            GenPlace.TryPlaceThing(pawn, comp.recallPosition, comp.recallMap, ThingPlaceMode.Near);
-            pawn.drafter.Drafted = draftFlag;
-            comp.recallPosition = default(IntVec3);
+            destination = IntVec3.Invalid;
+            var map = comp.recallMap;
+            if (map == null || !Find.Maps.Contains(map) || !comp.recallPosition.InBounds(map)) return false;
+            foreach (var cell in GenRadial.RadialCellsAround(comp.recallPosition, 6.9f, true))
+            {
+                if (!cell.InBounds(map) || !cell.Standable(map)) continue;
+                var occupant = cell.GetFirstPawn(map);
+                if (occupant != null && occupant != pawn) continue;
+                destination = cell;
+                return true;
+            }
+            return false;
+        }
+
+        private static bool RecallPosition(Pawn pawn, Map destinationMap, IntVec3 cell)
+        {
+            var sourceMap = pawn.Map;
+            var sourceCell = pawn.Position;
+            if (sourceMap == destinationMap)
+                return sourceCell == cell || Compatibility.TM_Teleport.Move(pawn, cell);
+
+            var rotation = pawn.Rotation;
+            bool drafted = pawn.Drafted;
+            try
+            {
+                pawn.DeSpawn();
+                GenSpawn.Spawn(pawn, cell, destinationMap, rotation);
+                return pawn.Spawned && pawn.Map == destinationMap && pawn.Position == cell;
+            }
+            finally
+            {
+                if (!pawn.Destroyed && !pawn.Spawned && pawn.holdingOwner == null)
+                    GenSpawn.Spawn(pawn, sourceCell, sourceMap, rotation);
+                if (pawn.Spawned && pawn.drafter != null) pawn.drafter.Drafted = drafted;
+            }
         }
 
         private static void ResetPowers(Pawn pawn, CompAbilityUserMagic comp)

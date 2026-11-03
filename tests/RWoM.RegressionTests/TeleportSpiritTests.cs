@@ -36,6 +36,33 @@ internal static partial class TeleportSpiritTests
         foreach (var test in TravelEnvironmentAutoCases()) yield return test;
         foreach (var test in FlightCases()) yield return test;
         foreach (var test in TravelCases()) yield return test;
+        yield return new("ChronomancerRecall.UnloadedMapAndBlockedMarkLeavePawnInPlace", f => World(f, w =>
+        {
+            Set(Current.Game, "tickManager", new TickManager());
+            var oldCell = w.Caster.Position;
+            var mark = new IntVec3(12, 0, 12);
+            var magic = new CompAbilityUserMagic { parent = w.Caster, recallSet = true, recallExpiration = int.MaxValue,
+                recallMap = Blank<Map>(), recallPosition = mark, recallNeedValues = [.75f] };
+            var rewind = typeof(TM_Action).GetMethod("TryRecall", Flags)!;
+            bool Trigger(bool fatal) => (bool)rewind.Invoke(null, [w.Caster, magic, fatal])!;
+            Check.Equal(false, Trigger(true), "fatal trigger must not intercept normal health handling when map has unloaded");
+            magic.recallMap = w.Map;
+            foreach (var cell in GenRadial.RadialCellsAround(mark, 6.9f, true)) w.Building(cell);
+            Check.Equal(false, Trigger(false), "surrounded destination refuses return");
+            Check.Equal(oldCell, w.Caster.Position, "body remains at source");
+            Check.Same(w.Map, w.Caster.Map, "original map retains pawn");
+            Check.Equal(true, magic.recallSet && magic.recallPosition == mark && magic.recallNeedValues.Single() == .75f, "blocked attempt preserves snapshot");
+        }));
+        yield return new("ChronomancerRecall.SameMapKeepsDraftJobAndSelection", f => World(f, w =>
+        {
+            using var patches = w.MovementBoundaries();
+            var move = typeof(TM_Action).GetMethod("RecallPosition", Flags)!;
+            var cell = new IntVec3(11,0,11);
+            Check.Equal(true, (bool)move.Invoke(null,[w.Caster,w.Map,cell])!, "relocates");
+            Check.Equal(true, (bool)move.Invoke(null,[w.Caster,w.Map,cell])!, "rewinding on the marked cell needs no second movement");
+            Check.Equal("Position,Notify", string.Join(",",w.Events), "moves once without despawning");
+            w.AssertPreserved();
+        }));
         yield return new("TeleportSpirit.MoveUsesPositionNotificationAndPreservesSelectionJobDraft", f => World(f, w =>
         {
             using var patches = w.MovementBoundaries();

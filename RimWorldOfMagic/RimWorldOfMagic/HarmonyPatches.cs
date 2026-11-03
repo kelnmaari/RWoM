@@ -4611,9 +4611,8 @@ namespace TorannMagic
                                     if (comp != null && comp.IsMagicUser && comp.recallSet)
                                     {
                                         int pwrVal = comp.MagicData.MagicPowerSkill_Recall.FirstOrDefault((MagicPowerSkill x) => x.label == "TM_Recall_pwr").level;
-                                        if (pwrVal == 3 || (pwrVal >= 1 && Rand.Chance(.5f)))
+                                        if ((pwrVal == 3 || (pwrVal >= 1 && Rand.Chance(.5f))) && TM_Action.TryRecall(pawn, comp, true))
                                         {
-                                            TM_Action.DoRecall(pawn, comp, true);
                                             result = false;
                                             return false;
                                         }
@@ -4631,9 +4630,8 @@ namespace TorannMagic
                                     if (comp != null && comp.IsMagicUser && comp.recallSet)
                                     {
                                         int pwrVal = comp.MagicData.MagicPowerSkill_Recall.FirstOrDefault((MagicPowerSkill x) => x.label == "TM_Recall_pwr").level;
-                                        if (pwrVal == 3 || (pwrVal >= 2 && Rand.Chance(.5f)))
+                                        if ((pwrVal == 3 || (pwrVal >= 2 && Rand.Chance(.5f))) && TM_Action.TryRecall(pawn, comp, false))
                                         {
-                                            TM_Action.DoRecall(pawn, comp, false);
                                             result = false;
                                             return false;
                                         }
