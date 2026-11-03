@@ -20,4 +20,9 @@
     <driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass>
     <reportString>calling down sunfire through a spirit host.</reportString>
   </JobDef>
+  <JobDef>
+    <defName>TM_SpiritLightBurst</defName>
+    <driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass>
+    <reportString>casting light burst through a spirit host.</reportString>
+  </JobDef>
 </Defs>

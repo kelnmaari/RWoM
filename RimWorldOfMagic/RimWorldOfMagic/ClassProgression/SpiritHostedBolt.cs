@@ -75,6 +75,7 @@ namespace TorannMagic.ClassProgression
             ("TM_SpiritOverdrive", () => TorannMagicDefOf.TM_Overdrive, typeof(Verb_Overdrive)),
             ("TM_SpiritSabotage", () => TorannMagicDefOf.TM_Sabotage, typeof(Projectile_Sabotage)),
             ("TM_SpiritSunfire", () => TorannMagicDefOf.TM_Sunfire, typeof(Projectile_Sunfire)),
+            ("TM_SpiritLightBurst", () => TorannMagicDefOf.TM_LightBurst, typeof(Verb_LightBurst)),
             ("TM_SpiritSunfire_I", () => TorannMagicDefOf.TM_Sunfire_I, typeof(Projectile_Sunfire)),
             ("TM_SpiritSunfire_II", () => TorannMagicDefOf.TM_Sunfire_II, typeof(Projectile_Sunfire)),
             ("TM_SpiritSunfire_III", () => TorannMagicDefOf.TM_Sunfire_III, typeof(Projectile_Sunfire)),
@@ -147,7 +148,7 @@ namespace TorannMagic.ClassProgression
         private static bool DeathBolt(TMAbilityDef def) => def?.MainVerb?.verbClass == typeof(Effect_DeathBolt)
             && def.MainVerb.defaultProjectile?.thingClass == typeof(Projectile_HostedDeathBolt);
 
-        internal static bool IsBurst(TMAbilityDef def) => DeathBolt(def) || def?.MainVerb?.verbClass == typeof(Verb_UseAbility_TrueBurst)
+        internal static bool IsBurst(TMAbilityDef def) => DeathBolt(def) || def?.MainVerb?.verbClass == typeof(Verb_LightBurst) || def?.MainVerb?.verbClass == typeof(Verb_UseAbility_TrueBurst)
             && (def.MainVerb.defaultProjectile?.thingClass == typeof(Projectile_SpiritMissile)
                 || def.MainVerb.defaultProjectile?.thingClass == typeof(Projectile_SpiritRay) && def.MainVerb.burstShotCount > 1);
 
@@ -277,6 +278,14 @@ namespace TorannMagic.ClassProgression
             if (def == TorannMagicDefOf.TM_ValiantCharge && !Odyssey.ManualTravelSafety.CanComplete(body, body.Map, target.Cell)) return false;
             var props = power.magicDef.MainVerb;
             var verb = PhysicalVerb(body, power);
+            if (verb is Verb_LightBurst flash)
+            {
+                if (!(body.jobs?.curDriver is JobDriver_SpiritBolt driver) || body.CurJob?.targetB.Pawn != soul ||
+                    Spell(body.CurJob.def) != def || !driver.EmitFlash(flash, target, paidBurst)) return false;
+                if (!paidBurst) power.PayForAttempt(body);
+                props.soundCast?.PlayOneShot(new TargetInfo(body.Position, body.Map));
+                return true;
+            }
             if (verb is Verb_SpiritTargetable direct && Families.Any(f => f.spell() == def && f.effect == props.verbClass))
             {
                 bool travel = Odyssey.ManualTravelSafety.IsTravel(power);
@@ -358,6 +367,14 @@ namespace TorannMagic.ClassProgression
     {
         private bool attempted;
         private int shotsFired, nextShotTick;
+        private Verb_LightBurst.FlashSeries flashes;
+        internal bool EmitFlash(Verb_LightBurst verb, LocalTargetInfo target, bool paid)
+        {
+            if (paid != (flashes != null) || paid && shotsFired >= flashes.count) return false;
+            if (!paid) flashes = verb.BeginSeries(verb.Ability.Pawn);
+            verb.EmitHostedFlash(target, flashes);
+            return true;
+        }
         public override bool TryMakePreToilReservations(bool errorOnFailed) => true;
         public override void ExposeData()
         {
@@ -365,6 +382,7 @@ namespace TorannMagic.ClassProgression
             Scribe_Values.Look(ref attempted,"attempted");
             Scribe_Values.Look(ref shotsFired,"shotsFired");
             Scribe_Values.Look(ref nextShotTick,"nextShotTick");
+            Scribe_Deep.Look(ref flashes, "TM_lightBurstSeries");
         }
         protected override IEnumerable<Toil> MakeNewToils()
         {
@@ -385,7 +403,7 @@ namespace TorannMagic.ClassProgression
             var burst = ToilMaker.MakeToil("Continue projected spell burst");
             burst.defaultCompleteMode = ToilCompleteMode.Never;
             burst.tickAction = () => {
-                if (shotsFired >= def.MainVerb.burstShotCount) { ReadyForNextToil(); return; }
+                if (shotsFired >= (flashes?.count ?? def.MainVerb.burstShotCount)) { ReadyForNextToil(); return; }
                 if (Find.TickManager.TicksGame < nextShotTick) return;
                 if (!attempted || shotsFired < 1 || !SpiritHostedBolt.Launch(pawn,job.targetB.Pawn,def,job.targetA,true))
                 { EndJobWith(JobCondition.Incompletable); return; }
