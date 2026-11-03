@@ -66,8 +66,12 @@ internal static class SoulStoneDefinitionTests
     sealed class NativeStats : IDisposable
     {
         readonly Dictionary<FieldInfo, object?> previous = new();
+        readonly Game? priorGame = Current.Game;
+        readonly Scenario? priorScenario = Current.Game?.Scenario;
         public NativeStats()
         {
+            if (Current.Game == null) Current.Game = Blank<Game>();
+            Current.Game.Scenario = new Scenario();
             RuntimeLog.EnsureHeadlessDefOfInitialized(typeof(StatDefOf));
             RuntimeLog.EnsureHeadlessDefOfInitialized(typeof(ShaderTypeDefOf));
             foreach (string name in new[] { "Mass", "MaxHitPoints", "MarketValue", "DeteriorationRate", "Nutrition", "Flammability", "Beauty", "BeautyOutdoors" })
@@ -76,7 +80,12 @@ internal static class SoulStoneDefinitionTests
                 field.SetValue(null, new StatDef { defName = name, workerClass = typeof(StatWorker), defaultBaseValue = 0 });
             }
         }
-        public void Dispose() { foreach (var entry in previous) entry.Key.SetValue(null, entry.Value); }
+        public void Dispose()
+        {
+            foreach (var entry in previous) entry.Key.SetValue(null, entry.Value);
+            Current.Game.Scenario = priorScenario;
+            Current.Game = priorGame;
+        }
     }
 
     static void NativeConfig(RuntimeFixture f)
