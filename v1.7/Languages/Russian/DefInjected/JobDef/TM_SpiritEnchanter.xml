@@ -10,4 +10,6 @@
   <TM_SpiritPolymorph_I.reportString>накладывает полиморф.</TM_SpiritPolymorph_I.reportString>
   <TM_SpiritPolymorph_II.reportString>накладывает полиморф.</TM_SpiritPolymorph_II.reportString>
   <TM_SpiritPolymorph_III.reportString>накладывает полиморф.</TM_SpiritPolymorph_III.reportString>
+  <TM_SpiritShapeshift.reportString>меняет облик.</TM_SpiritShapeshift.reportString>
+  <TM_SpiritShapeshiftDW.reportString>принимает облик лютоволка.</TM_SpiritShapeshiftDW.reportString>
 </LanguageData>

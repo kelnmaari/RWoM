@@ -101,6 +101,8 @@ namespace TorannMagic.ClassProgression
             ("TM_SpiritPolymorph_I", () => TorannMagicDefOf.TM_Polymorph_I, typeof(Verb_Polymorph)),
             ("TM_SpiritPolymorph_II", () => TorannMagicDefOf.TM_Polymorph_II, typeof(Verb_Polymorph)),
             ("TM_SpiritPolymorph_III", () => TorannMagicDefOf.TM_Polymorph_III, typeof(Verb_Polymorph)),
+            ("TM_SpiritShapeshift", () => TorannMagicDefOf.TM_Shapeshift, typeof(Verb_Shapeshift)),
+            ("TM_SpiritShapeshiftDW", () => TorannMagicDefOf.TM_ShapeshiftDW, typeof(Verb_ShapeshiftDW)),
             ("TM_SpiritEnchantWeapon", () => TorannMagicDefOf.TM_EnchantWeapon, typeof(Verb_EnchantWeapon)),
             ("TM_SpiritDispelEnchantWeapon", () => TorannMagicDefOf.TM_DispelEnchantWeapon, typeof(Verb_DispelEnchantWeapon)),
             ("TM_SpiritEnchanterStone", () => TorannMagicDefOf.TM_EnchanterStone, typeof(Verb_EnchanterStone)),
@@ -417,9 +419,10 @@ namespace TorannMagic.ClassProgression
                 if (!travel && !(verb is Verb_EnchanterStone) && !(verb is Verb_Transmutate) && !(verb is Verb_SummonGuardianSpirit) && !(verb is Verb_SummonTotem) && !(verb is Verb_ReverseTime) && !(verb is Verb_EarthSprites) && !(verb is Verb_Summon) && !(verb is Verb_SummonSpiritWolves) && !(verb is Verb_RegrowLimb) && !(verb is ISpiritCorpseConsumer) && !(verb is Verb_Overdrive) && !(verb is Verb_TechnoWeapon) &&
                     props.AbilityTargetCategory != AbilityTargetCategory.TargetAoE && !(target.Thing is Pawn { Dead: false }))
                     return false;
+                var soundPosition = new TargetInfo(body.Position, body.Map);
                 if (!direct.CastFromHost(target)) return false;
                 if (!travel && !(direct is Verb_FoldReality) && !(direct is Verb_LightSkipGlobal)) power.PayForAttempt(body);
-                props.soundCast?.PlayOneShot(new TargetInfo(body.Position, body.Map));
+                props.soundCast?.PlayOneShot(soundPosition);
                 return true;
             }
             if (props.AbilityTargetCategory == AbilityTargetCategory.TargetAoE && verb is Verb_SpiritTargetable area)

@@ -84,17 +84,18 @@ namespace TorannMagic
         {
             if (ticksLeft <= 0) ticksLeft = ticksToDestroy;
             TransmutateEffects(ParentPawn.Position, ParentPawn.Map);
-            if (this.original != null && this.spawner == this.original && this.original.Spawned)
-            {
-                bool drafter = this.original.Drafted;
-                this.original.DeSpawn();
-                if(drafter)
-                {
-                    this.ParentPawn.drafter.Drafted = true;
-                }
-                Find.Selector.Select(this.ParentPawn, false, true);
-                
-            }
+            // Older casts transferred their original on the first tick.
+            if (spawner == original && original?.Spawned == true) EnterSelfForm();
+        }
+
+        internal void EnterSelfForm()
+        {
+            if (original?.Spawned != true || original.Map != ParentPawn.Map) return;
+            bool selected = Find.Selector.IsSelected(original);
+            bool drafted = original.Drafted;
+            original.DeSpawn();
+            if (drafted) ParentPawn.drafter.Drafted = true;
+            if (selected) Find.Selector.Select(ParentPawn, false, true);
         }
 
         private void CheckPawnState()
@@ -115,6 +116,14 @@ namespace TorannMagic
         {
             if (this.original == null) return;
             base.CompTick();
+            if (!parent.Spawned) return;
+            if (!original.Spawned && ClassProgression.SpiritRebirthState.TryGetPossessingSpirit(original, out var soul))
+            {
+                soul.GetCompAbilityUserMagic()?.CompTick();
+                soul.GetCompAbilityUserMight()?.CompTick();
+                if (ClassProgression.SpiritRebirthState.TryGet(soul, out var state))
+                    state.TickRecovery(soul, original, Find.TickManager.TicksGame);
+            }
             if (Find.TickManager.TicksGame % 4 != 0) return;
             if (!initialized)
             {
@@ -292,7 +301,7 @@ namespace TorannMagic
                 {
                     pawn.needs.mood.thoughts.memories.TryGainMemory(TorannMagicDefOf.Polymorphed_Transhumanist, this.spawner);
                 }
-                else if(this.spawner == this.original)
+                else if(this.spawner == this.original || (ClassProgression.SpiritRebirthState.TryGetPossessingSpirit(original, out var spirit) && spirit == spawner))
                 {
                     //do not give bad thoughts
                 }

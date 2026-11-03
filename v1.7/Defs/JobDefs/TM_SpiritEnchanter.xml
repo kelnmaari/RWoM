@@ -10,4 +10,6 @@
   <JobDef><defName>TM_SpiritPolymorph_I</defName><driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass><reportString>casting polymorph.</reportString></JobDef>
   <JobDef><defName>TM_SpiritPolymorph_II</defName><driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass><reportString>casting polymorph.</reportString></JobDef>
   <JobDef><defName>TM_SpiritPolymorph_III</defName><driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass><reportString>casting polymorph.</reportString></JobDef>
+  <JobDef><defName>TM_SpiritShapeshift</defName><driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass><reportString>shapeshifting.</reportString></JobDef>
+  <JobDef><defName>TM_SpiritShapeshiftDW</defName><driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass><reportString>shifting into a dire wolf.</reportString></JobDef>
 </Defs>

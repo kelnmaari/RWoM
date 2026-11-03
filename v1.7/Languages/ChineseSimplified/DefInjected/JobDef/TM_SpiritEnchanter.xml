@@ -10,4 +10,6 @@
   <TM_SpiritPolymorph_I.reportString>正在施放变形术。</TM_SpiritPolymorph_I.reportString>
   <TM_SpiritPolymorph_II.reportString>正在施放变形术。</TM_SpiritPolymorph_II.reportString>
   <TM_SpiritPolymorph_III.reportString>正在施放变形术。</TM_SpiritPolymorph_III.reportString>
+  <TM_SpiritShapeshift.reportString>正在变形。</TM_SpiritShapeshift.reportString>
+  <TM_SpiritShapeshiftDW.reportString>正在变为恐狼。</TM_SpiritShapeshiftDW.reportString>
 </LanguageData>
