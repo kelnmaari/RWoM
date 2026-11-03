@@ -1114,7 +1114,9 @@ namespace TorannMagic.AutoCast
         {
             success = false;
             Pawn caster = casterComp;
-            LocalTargetInfo jobTarget = caster.CurJob.targetA;
+            var job = caster?.CurJob;
+            if (job == null || !caster.Spawned || caster.Dead || caster.Downed) return;
+            LocalTargetInfo jobTarget = job.targetA;
             Thing carriedThing = null;
             if (caster.CurJob.targetA.Thing != null) //&& caster.CurJob.def.defName != "Sow")
             {
@@ -1147,10 +1149,12 @@ namespace TorannMagic.AutoCast
                     }
                 }
             }
+            if (!jobTarget.IsValid || !jobTarget.Cell.InBounds(caster.Map)) return;
             if (!jobTarget.Cell.Walkable(caster.Map))
             {
                 jobTarget = TM_Calc.FindWalkableCellNextTo(jobTarget.Cell, caster.Map);
             }
+            if (!jobTarget.IsValid || !jobTarget.Cell.InBounds(caster.Map)) return;
             float distanceToTarget = (jobTarget.Cell - caster.Position).LengthHorizontal;
             Vector3 directionToTarget = TM_Calc.GetVector(caster.Position, jobTarget.Cell);
             //Log.Message("" + caster.LabelShort + " job def is " + caster.CurJob.def.defName + " targetA " + caster.CurJob.targetA + " targetB " + caster.CurJob.targetB + " jobTarget " + jobTarget + " at distance " + distanceToTarget + " min distance " + minDistance + " at vector " + directionToTarget);

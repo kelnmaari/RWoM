@@ -17,6 +17,13 @@ internal static class EnchanterLifecycleTests
         yield return new("EnchanterLifecycle.EmptySavedStateDoesNotInventSustainedEffects", Empty);
         yield return new("EnchanterLifecycle.EnchantedWeaponNativeScribeKeepsBothSourceReferences", WeaponSave);
         yield return new("EnchanterLifecycle.PolymorphCancelPreservesOriginalIdentity", Cancel);
+        yield return new("EnchanterLifecycle.IdleWolfDoesNotBlink", r =>
+        {
+            var wolf = PawnWithComps(false,false).pawn;
+            wolf.jobs = new Verse.AI.Pawn_JobTracker(wolf);
+            TorannMagic.AutoCast.AnimalBlink.Evaluate(wolf,2,6,out var moved);
+            Check.Equal(false,moved,"an idle wolf has no blink destination");
+        });
         yield return new("EnchanterLifecycle.PolymorphEmptyAnimalRangeFallsBackToRat", r =>
         {
             var previous = DefDatabase<PawnKindDef>.AllDefsListForReading.ToArray();
