@@ -77,6 +77,7 @@ namespace TorannMagic.ClassProgression
             if (comp.overdriveBuilding != null && now % Math.Max(1, comp.overdriveFrequency) == 0)
                 comp.ResolveTechnomancerOverdrive();
             SpiritHostedTechnoBit.Tick(comp);
+            if (now % 60 == 0) BrightmageLifecycle.TickHostedLight(pawn, now);
             TickAbilities(comp, true);
             if (!SpiritRebirthBody.RetainsNeeds(pawn)) return true;
             for (int i = comp.chainedAbilitiesList.Count - 1; i >= 0; i--)

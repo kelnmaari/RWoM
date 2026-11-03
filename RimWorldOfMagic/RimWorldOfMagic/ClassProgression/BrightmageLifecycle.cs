@@ -5,6 +5,19 @@ namespace TorannMagic.ClassProgression
 {
     public static class BrightmageLifecycle
     {
+        internal static void TickHostedLight(Pawn soul, int now)
+        {
+            if (!SpiritRebirthState.TryGet(soul, out var state) || !state.HasValidHost(soul)
+                || state.DepletionPending || !state.Host.Spawned) return;
+            var def = TorannMagicDefOf.TM_LightCapacitanceHD;
+            if (def == null || soul.health?.hediffSet == null) return;
+            var resource = soul.health.hediffSet.GetFirstHediffOfDef(def);
+            if (resource == null && ClassIdentity.IsBrightmage(soul) &&
+                (!ClassIdentity.TryGetState(soul, out _) || ClassIdentity.Profile("rwom.brightmage")?.domain == DisciplineDomain.Magic))
+                resource = soul.health.AddHediff(def);
+            resource?.TryGetComp<HediffComp_LightCapacitance>()?.TickCharge(now);
+        }
+
         // True means new-model maintenance handled this pawn; classic paths remain native.
         public static bool Restore(CompAbilityUserMagic comp)
         {

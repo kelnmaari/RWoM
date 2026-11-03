@@ -151,6 +151,12 @@ internal static class BrightmageLifecycleTests
     {
         using var f = new Fixture(runtime); var p = f.Caster(); BrightmageLifecycle.Restore(p.magic);
         var energy = Energy(p.pawn); energy.LightEnergy = 61.25f;
+        float adjustment = 0;
+        energy.CompPostTick(ref adjustment);
+        float charged = energy.LightEnergy;
+        Check.Equal(61.25f + .02f, charged, "scheduled native charge");
+        energy.CompPostTick(ref adjustment);
+        Check.Equal(charged, energy.LightEnergy, "same tick cannot charge twice");
         string path = Path.Combine(runtime.WorkingDirectory, "bright-native-energy.xml");
         EnergyEnvelope.Target = energy; var envelope = new EnergyEnvelope();
         try { Scribe.saver.InitSaving(path, "regression"); Scribe_Deep.Look(ref envelope, "native"); Scribe.saver.FinalizeSaving(); }
@@ -159,9 +165,10 @@ internal static class BrightmageLifecycleTests
         try { Scribe.loader.InitLoading(path); Scribe_Deep.Look(ref envelope, "native"); Scribe.loader.FinalizeLoading(); }
         finally { Scribe.ForceStop(); EnergyEnvelope.Target = null!; }
         BrightmageLifecycle.Restore(p.magic);
-        Check.Equal(61.25f, energy.LightEnergy, "native Scribe restores energy without load refill");
+        energy.CompPostTick(ref adjustment);
+        Check.Equal(charged, energy.LightEnergy, "native Scribe restores energy and last charged tick without load refill");
         typeof(HediffComp_LightCapacitance).GetMethod("UpdateCharge", Fields)!.Invoke(energy, null);
-        Check.Equal(61.25f + .02f, energy.LightEnergy, "native detached charge formula applies once");
+        Check.Equal(charged + .02f, energy.LightEnergy, "native detached charge formula applies once");
         var ability = new AbilityUser.PawnAbility(p.magic) { Def = TorannMagicDefOf.TM_LightBurst };
         var verb = new Verb_LightBurst { Ability = ability };
         float before = energy.LightEnergy;
