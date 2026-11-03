@@ -87,6 +87,7 @@ namespace TorannMagic.ClassProgression
             ("TM_SpiritTechnoWeapon", () => TorannMagicDefOf.TM_TechnoWeapon, typeof(Verb_TechnoWeapon)),
             ("TM_SpiritTechnoTurret", () => TorannMagicDefOf.TM_TechnoTurret, typeof(Projectile_TechnoTurret)),
             ("TM_SpiritTechnoShield", () => TorannMagicDefOf.TM_TechnoShield, typeof(Verb_TechnoShield)),
+            ("TM_SpiritLightSkipGlobal", () => TorannMagicDefOf.TM_LightSkipGlobal, typeof(Verb_LightSkipGlobal)),
             ("TM_SpiritFoldReality", () => TorannMagicDefOf.TM_FoldReality, typeof(Verb_FoldReality)),
             ("TM_SpiritTeleport", () => TorannMagicDefOf.TM_Teleport, typeof(Projectile_Teleport)),
             ("TM_SpiritBlink", () => TorannMagicDefOf.TM_Blink, typeof(Verb_Blink)),
@@ -312,7 +313,7 @@ namespace TorannMagic.ClassProgression
                     props.AbilityTargetCategory != AbilityTargetCategory.TargetAoE && !(target.Thing is Pawn { Dead: false }))
                     return false;
                 if (!direct.CastFromHost(target)) return false;
-                if (!travel && !(direct is Verb_FoldReality)) power.PayForAttempt(body);
+                if (!travel && !(direct is Verb_FoldReality) && !(direct is Verb_LightSkipGlobal)) power.PayForAttempt(body);
                 props.soundCast?.PlayOneShot(new TargetInfo(body.Position, body.Map));
                 return true;
             }

@@ -57,7 +57,7 @@ namespace TorannMagic
             return true;
         }
 
-        internal static bool DispatchPod(CompTransporter transporter, RimWorld.Planet.PlanetTile destination, IntVec3 cell, bool drafted)
+        internal static bool DispatchPod(CompTransporter transporter, RimWorld.Planet.PlanetTile destination, IntVec3 cell, bool drafted, RimWorld.Planet.TransportersArrivalAction arrival = null)
         {
             var pod = transporter.parent;
             if (!pod.Spawned || transporter.innerContainer.Count == 0) return false;
@@ -69,6 +69,7 @@ namespace TorannMagic
             leaving.groupID = transporter.groupID;
             leaving.destinationTile = destination;
             leaving.arrivalCell = cell;
+            leaving.arrivalAction = arrival;
             leaving.draftFlag = drafted;
             var passengers = active.Contents.innerContainer;
             try

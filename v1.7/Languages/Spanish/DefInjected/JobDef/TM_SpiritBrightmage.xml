@@ -9,4 +9,5 @@
   <TM_SpiritRefraction.reportString>crea un muro de refracción a través del huésped del espíritu.</TM_SpiritRefraction.reportString>
   <TM_SpiritLightSkip.reportString>viaja mediante la luz a través del huésped del espíritu.</TM_SpiritLightSkip.reportString>
   <TM_SpiritLightSkipMass.reportString>transporta al grupo mediante la luz a través del huésped del espíritu.</TM_SpiritLightSkipMass.reportString>
+  <TM_SpiritLightSkipGlobal.reportString>elige un destino en el mapa para viajar mediante la luz.</TM_SpiritLightSkipGlobal.reportString>
 </LanguageData>
