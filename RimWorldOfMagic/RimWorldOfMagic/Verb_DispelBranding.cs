@@ -10,41 +10,35 @@ using TorannMagic.TMDefs;
 
 namespace TorannMagic
 {
-    public class Verb_DispelBranding : Verb_UseAbility
+    public class Verb_DispelBranding : ClassProgression.Verb_SpiritTargetable
     {
         protected override bool TryCastShot()
         {
-            bool flag = false;
-            CompAbilityUserMagic comp = CasterPawn.GetCompAbilityUserMagic();
+            ApplyHostedEffect();
+            bool result = false;
+            PostCastShot(result,out result);
+            return result;
+        }
 
-            if (comp != null && comp.IsMagicUser && comp.BrandPawns != null && comp.BrandDefs != null)
+        protected override bool ApplyHostedEffect()
+        {
+            var owner = ClassProgression.SpiritRebirthCasting.SkillOwner(CasterPawn,Ability);
+            var magic = owner?.GetCompAbilityUserMagic();
+            if (currentTarget.Pawn != CasterPawn || magic == null || magic.BrandPawns.Count == 0) return false;
+            for (int i = ClassProgression.GolemancerLifecycle.AlignBrandPairs(magic)-1; i >= 0; i--)
             {
-                if (comp.BrandPawns.Count > 0)
-                {
-                    for(int i=ClassProgression.GolemancerLifecycle.AlignBrandPairs(comp)-1; i >= 0; i--)
-                    {
-                        Pawn br = comp.BrandPawns[i];
-                        if (br != null && !br.DestroyedOrNull() && br.health != null && br.health.hediffSet != null)
-                        {
-                            if (RemoveOwnedBrand(comp.Pawn, br, comp.BrandDefs[i])) RemoveBrandHediffGraphics(br);
-                        }
-                    }
-                    comp.BrandPawns.Clear();
-                    comp.BrandDefs.Clear();
-                    if (CasterPawn.Map != null)
-                    {
-                        RemoveBrandCasterGraphics();
-                        RemoveBrandCasterRingGraphics();                        
-                        
-                        //Effecter effectExit = EffecterDefOf.Skip_EntryNoDelay.Spawn();
-                        //effectExit.Trigger(new TargetInfo(this.CasterPawn), new TargetInfo(this.CasterPawn));
-                        //effectExit.Cleanup();                        
-                    }                    
-                }
+                var recipient = magic.BrandPawns[i];
+                if (RemoveOwnedBrand(owner,recipient,magic.BrandDefs[i])) RemoveBrandHediffGraphics(recipient);
             }
-
-            this.PostCastShot(flag, out flag);
-            return flag;
+            magic.BrandPawns.Clear();
+            magic.BrandDefs.Clear();
+            if (owner != CasterPawn) ClassProgression.GolemancerLifecycle.SyncBrandControl(magic);
+            if (CasterPawn.Map != null)
+            {
+                RemoveBrandCasterGraphics();
+                RemoveBrandCasterRingGraphics();
+            }
+            return true;
         }
 
         private void RemoveBrandCasterGraphics()

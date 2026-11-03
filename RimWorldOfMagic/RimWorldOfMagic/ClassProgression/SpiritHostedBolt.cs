@@ -103,6 +103,13 @@ namespace TorannMagic.ClassProgression
             ("TM_SpiritPolymorph_III", () => TorannMagicDefOf.TM_Polymorph_III, typeof(Verb_Polymorph)),
             ("TM_SpiritShapeshift", () => TorannMagicDefOf.TM_Shapeshift, typeof(Verb_Shapeshift)),
             ("TM_SpiritShapeshiftDW", () => TorannMagicDefOf.TM_ShapeshiftDW, typeof(Verb_ShapeshiftDW)),
+            ("TM_SpiritAwarenessBrand", () => TorannMagicDefOf.TM_AwarenessBrand, typeof(Verb_BrandAwareness)),
+            ("TM_SpiritEmotionBrand", () => TorannMagicDefOf.TM_EmotionBrand, typeof(Verb_BrandEmotion)),
+            ("TM_SpiritFitnessBrand", () => TorannMagicDefOf.TM_FitnessBrand, typeof(Verb_BrandFitness)),
+            ("TM_SpiritProtectionBrand", () => TorannMagicDefOf.TM_ProtectionBrand, typeof(Verb_BrandProtection)),
+            ("TM_SpiritVitalityBrand", () => TorannMagicDefOf.TM_VitalityBrand, typeof(Verb_BrandVitality)),
+            ("TM_SpiritSiphonBrand", () => TorannMagicDefOf.TM_SiphonBrand, typeof(Verb_BrandSiphon)),
+            ("TM_SpiritDispelBranding", () => TorannMagicDefOf.TM_DispelBranding, typeof(Verb_DispelBranding)),
             ("TM_SpiritEnchantWeapon", () => TorannMagicDefOf.TM_EnchantWeapon, typeof(Verb_EnchantWeapon)),
             ("TM_SpiritDispelEnchantWeapon", () => TorannMagicDefOf.TM_DispelEnchantWeapon, typeof(Verb_DispelEnchantWeapon)),
             ("TM_SpiritEnchanterStone", () => TorannMagicDefOf.TM_EnchanterStone, typeof(Verb_EnchanterStone)),
@@ -253,6 +260,7 @@ namespace TorannMagic.ClassProgression
             }
             float cost = power.MagicUser.ActualManaCost(def);
             if (def == TorannMagicDefOf.TM_Recall && (!TM_Action.RecallMatches(body,power.MagicUser) || power.MagicUser.recallExpiration <= Verse.Find.TickManager.TicksGame)) return false;
+            if (def == TorannMagicDefOf.TM_DispelBranding && power.MagicUser.BrandPawns.Count == 0) return false;
             if (def == TorannMagicDefOf.TM_DispelEnchantWeapon && (power.MagicUser.weaponEnchants?.Count ?? 0) == 0) return false;
             if (def == TorannMagicDefOf.TM_DismissEnchanterStones && power.MagicUser.enchanterStones?.Any(s => !s.DestroyedOrNull()) != true) return false;
             if (def == TorannMagicDefOf.TM_DismissGuardianSpirit && !ShamanLifecycle.OwnsGuardian(power.MagicUser)) return false;
@@ -289,6 +297,7 @@ namespace TorannMagic.ClassProgression
             if (power.magicDef == TorannMagicDefOf.TM_Teleport && !Projectile_Teleport.HasSpace(body.Map, target.Cell)) return false;
             if (!SpiritHostedSummons.CanPlace(power.magicDef, body.Map, target.Cell)) return false;
             var verb = PhysicalVerb(body, power);
+            if (verb is Verb_Brand brand && !brand.Accepts(body,target.Pawn)) return false;
             if (verb is ISpiritCorpseConsumer consumer && !consumer.HasConsumableTarget(target)) return false;
             return verb.CanHitTargetFrom(body.Position, target);
         }

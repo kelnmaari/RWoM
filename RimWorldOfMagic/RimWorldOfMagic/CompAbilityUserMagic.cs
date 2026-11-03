@@ -7073,6 +7073,8 @@ namespace TorannMagic
             {
                 TM_PawnTracker.ResolveMagicComp(this);
                 RecoverMissingProgression();
+                if (brands?.Count > 0 && ClassProgression.SpiritRebirthEnergy.Marked(Pawn))
+                    LongEventHandler.ExecuteWhenFinished(() => ClassProgression.GolemancerLifecycle.SyncBrandControl(this));
                 if (weaponEnchants?.Count > 0) LongEventHandler.ExecuteWhenFinished(SyncEnchantWeaponControl);
                 if (enchanterStones?.Count > 0) LongEventHandler.ExecuteWhenFinished(SyncEnchanterStoneControl);
                 TM_ClassState.RestoreSharedMagicProgression(this);

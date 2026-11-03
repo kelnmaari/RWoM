@@ -75,7 +75,7 @@ namespace TorannMagic.ClassProgression
         public sealed class BrandSnapshot
         {
             internal PawnAbility ability;
-            internal Pawn caster, target;
+            internal Pawn caster, body, target;
             internal MagicPower owner, brandOwner;
             internal HediffDef def;
             internal DisciplineProgress path;
@@ -83,17 +83,17 @@ namespace TorannMagic.ClassProgression
         }
         public static BrandSnapshot CaptureBrand(PawnAbility ability, Pawn target)
         {
-            var caster = ability?.Pawn; var path = Path(caster, true); var def = BrandDef(ability); var owner = BrandOwner(ability);
-            return path != null && def != null && owner != null && Runtime(ability) && target != caster && Ally(caster, target)
+            var caster = ability?.Pawn; var body = GolemancerLifecycle.MasterBody(caster); var path = body == null ? null : Path(caster, true, body); var def = BrandDef(ability); var owner = BrandOwner(ability);
+            return path != null && def != null && owner != null && Runtime(ability) && target != body && Ally(body, target)
                 && !target.health.hediffSet.HasHediff(def) && Pairs(Magic(caster), target, def) == 0
-                ? new BrandSnapshot { ability = ability, caster = caster, target = target, owner = Owner(caster, true), brandOwner = owner, def = def, path = path } : null;
+                ? new BrandSnapshot { ability = ability, caster = caster, body = body, target = target, owner = Owner(caster, true), brandOwner = owner, def = def, path = path } : null;
         }
         public static bool CompleteBrand(BrandSnapshot s)
         {
             if (s == null || s.used) return false;
             s.used = true;
-            if (Path(s.caster, true) != s.path || Owner(s.caster, true) != s.owner || BrandOwner(s.ability) != s.brandOwner || !Runtime(s.ability)
-                || !Ally(s.caster, s.target) || Pairs(Magic(s.caster), s.target, s.def) != 1) return false;
+            if (GolemancerLifecycle.MasterBody(s.caster) != s.body || Path(s.caster, true, s.body) != s.path || Owner(s.caster, true) != s.owner || BrandOwner(s.ability) != s.brandOwner || !Runtime(s.ability)
+                || !Ally(s.body, s.target) || Pairs(Magic(s.caster), s.target, s.def) != 1) return false;
             var hd = s.target.health.hediffSet.GetFirstHediffOfDef(s.def);
             return hd?.pawn == s.target && Finite(hd.Severity) && hd.Severity > 0 && hd.TryGetComp<HediffComp_BrandingBase>()?.BranderPawn == s.caster
                 && s.path.RecordCompletedTrial(MasteryTrialId);

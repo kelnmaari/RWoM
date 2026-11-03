@@ -84,6 +84,14 @@ namespace TorannMagic.ClassProgression
             }
         }
 
+        internal static void SyncBrandControl(CompAbilityUserMagic comp)
+        {
+            var ability = TorannMagicDefOf.TM_DispelBranding;
+            if (comp == null || ability == null) return;
+            if (comp.BrandPawns.Count > 0) TM_ClassState.AddRuntimeAbility(comp, ability);
+            else if (comp.AbilityData.Powers.Any(p => p?.Def == ability)) comp.RemovePawnAbility(ability);
+        }
+
         public static bool Restore(CompAbilityUserMagic comp)
         {
             if (SpiritRebirthBodyEffects.SuppressFormerBodyEffects(comp?.Pawn)) return true;

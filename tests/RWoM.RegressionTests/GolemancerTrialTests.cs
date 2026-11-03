@@ -226,7 +226,8 @@ internal static class GolemancerTrialTests
             }
             Prefix(typeof(Pawn_HealthTracker).GetMethod("CheckForStateChange")!);
             Prefix(typeof(Verb_UseAbility).GetMethod("PostCastShot")!);
-            foreach (var t in new[] { typeof(Verb_BrandAwareness), typeof(Verb_BrandEmotion), typeof(Verb_BrandFitness), typeof(Verb_BrandProtection), typeof(Verb_BrandVitality) }) Prefix(t.GetMethod(t == typeof(Verb_BrandProtection) ? "DoBrandEffect" : "DoBrandingEffect", BindingFlags.Instance | BindingFlags.NonPublic)!);
+            foreach (var t in new[] { typeof(Verb_Brand), typeof(Verb_BrandProtection) })
+                Prefix(t.GetMethod("DrawBrand", BindingFlags.Instance | BindingFlags.NonPublic)!);
         }
         void Prefix(MethodInfo m, string name = nameof(Skip)) { var hook = Activator.CreateInstance(type.Assembly.GetType("HarmonyLib.HarmonyMethod")!, typeof(GolemancerTrialTests).GetMethod(name, BindingFlags.Static | BindingFlags.NonPublic)!)!; type.GetMethod("Patch")!.Invoke(harmony, [m, hook, null, null, null]); }
         public void Dispose() => type.GetMethod("UnpatchAll")!.Invoke(harmony, [id]);
