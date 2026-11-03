@@ -38,9 +38,15 @@ namespace TorannMagic.Odyssey
             Payments.GetOrCreateValue(ability).Due = true;
             ability.PostAbilityAttempt();
         }
+        internal static void SettleHosted(MagicAbility ability, Pawn host)
+        {
+            if (ability == null || ClassProgression.SpiritRebirthCasting.SkillOwner(host, ability) != ability.Pawn) return;
+            Payments.GetOrCreateValue(ability).Due = true;
+            ability.PayForAttempt(host);
+        }
         public static bool TakePayment(PawnAbility ability)
         {
-            if (!Payments.TryGetValue(ability, out var payment)) return !IsTravel(ability);
+            if (!Payments.TryGetValue(ability, out var payment)) return !IsTravel(ability) && ability?.Def != TorannMagicDefOf.TM_FoldReality;
             bool due = payment.Due; payment.Due = false; return due;
         }
 
@@ -49,7 +55,7 @@ namespace TorannMagic.Odyssey
             var name = ability?.Def?.defName;
             // Add-on combat jumps use the same Flight verb and despawn/payment lifecycle.
             // Resolve from the definition, without constructing a verb or touching graphics.
-            return IsFlight(ability) || name == "TM_Blink" || name?.StartsWith("TM_Blink_") == true
+            return IsFlight(ability) || name == "TM_BladePassage" || name == "TM_Blink" || name?.StartsWith("TM_Blink_") == true
                 || name == "TM_PhaseStrike" || name?.StartsWith("TM_PhaseStrike_") == true;
         }
 
@@ -117,9 +123,13 @@ namespace TorannMagic.Odyssey
             var map = pawn.Map;
             var job = ability.GetJob(context, target);
             int horizon = IsFlight(ability) ? (int)Math.Ceiling((pawn.Position - target.Cell).LengthHorizontal * 5f) : 0;
-            bool submitted = Submit(pawn, job, map, target.Cell, context == AbilityContext.Player,
+            IntVec3 destination = target.Cell;
+            var passage = ability.Verb as ClassProgression.Verb_BladePassage;
+            if (passage != null && !passage.TryDestination(target, out destination)) return null;
+            bool submitted = Submit(pawn, job, map, destination, context == AbilityContext.Player,
                 () => pawn.Spawned && pawn.Map == map && !pawn.Dead && ability.CanCastPowerCheck(context, out _)
-                    && ability.Verb.CanHitTargetFrom(pawn.Position, target),
+                    && ability.Verb.CanHitTargetFrom(pawn.Position, target)
+                    && (passage == null || (passage.TryDestination(target, out var actual) && actual == destination)),
                 () => { if (context == AbilityContext.Player) pawn.jobs.TryTakeOrderedJob(job); }, horizon);
             return submitted ? job : null;
         }

@@ -9,11 +9,729 @@ using static RWoM.RegressionTests.GrimoireProgressionTests;
 
 namespace RWoM.RegressionTests;
 
-internal static class SpiritMapCollapseTests
+internal static partial class SpiritMapCollapseTests
 {
     internal static Type Production(string name) => Check.NotNull(typeof(SpiritRebirthState).Assembly.GetType("TorannMagic.ClassProgression." + name), "map collapse " + name + " exists");
     public static IEnumerable<TestCase> Cases()
     {
+        foreach(var spell in new[]{"Firebolt","Icebolt","Fireball","Snowball","Heal","AdvancedHeal","Purify","Regenerate","Fireclaw","Poison","CureDisease","SootheAnimal","SootheAnimal_I","SootheAnimal_II","SootheAnimal_III","Rainmaker","Resurrection","HealingCircle","HealingCircle_I","HealingCircle_II","HealingCircle_III","RaiseUndead","Blink","Blink_I","Blink_II","Blink_III","Summon","Summon_I","Summon_II","Summon_III","MagicMissile","MagicMissile_I","MagicMissile_II","MagicMissile_III","LightningBolt","LightningCloud","LightningStorm","Firestorm","FoldReality","Teleport","ValiantCharge","Overwhelm","BestowMight","BestowMight_I","BestowMight_II","BestowMight_III","DeathBolt","DeathBolt_I","DeathBolt_II","DeathBolt_III","FogOfTorment","CorpseExplosion","CorpseExplosion_I","CorpseExplosion_II","CorpseExplosion_III","ConsumeCorpse","ConsumeCorpse_I","ConsumeCorpse_II","ConsumeCorpse_III","ConsumeCorpse_Mass","DeathMark","DeathMark_I","DeathMark_II","DeathMark_III","FrostRay","FrostRay_I","FrostRay_II","FrostRay_III","AMP","AMP_I","AMP_II","AMP_III"})
+        yield return new("SpiritProjectedCast."+spell+"RemainsPhysicalWithOriginalOwner", r =>
+            SpiritRebirthRitualTransactionTests.Run(r,c=>{
+                using var fixture=new Fixture(r,c);
+                var body=c.Creator;var soul=c.Original;var magic=soul.GetCompAbilityUserMagic();
+                var def = (TMAbilityDef)typeof(TorannMagicDefOf).GetField("TM_" + spell)!.GetValue(null)!;
+                var own=new MagicAbility(magic){Def=def};
+                magic.AbilityData.Powers.Add(own);magic.AbilityData.AllPowers=null;
+                var api=typeof(SpiritRebirthState).Assembly.GetType("TorannMagic.ClassProgression.SpiritHostedBolt",true)!;
+                var find=api.GetMethod("Find",BindingFlags.NonPublic|BindingFlags.Static)!;
+                Check.Same(own,find.Invoke(null,[body,soul,def]),"native original owns the projected shot");
+                var local=body.GetCompAbilityUserMagic();
+                var duplicate=new MagicAbility(local){Def=def};
+                local.AbilityData.Powers.Add(duplicate);local.AbilityData.AllPowers=null;
+                Check.Equal(true,find.Invoke(null,[body,soul,def])==null,"local spell wins without a second shot");
+                local.AbilityData.Powers.Remove(duplicate);local.AbilityData.AllPowers=null;
+                if (spell == "Blink_II")
+                {
+                    duplicate.Def = TorannMagicDefOf.TM_Blink;
+                    local.AbilityData.Powers.Add(duplicate);local.AbilityData.AllPowers=null;
+                    Check.Equal(true, find.Invoke(null,[body,soul,def])==null,"host's own lower rank wins without an extra button");
+                }
+                Check.Equal(true,find.Invoke(null,[body,body,def])==null,"physical body cannot impersonate the soul");
+            }));
+        yield return new("SpiritProjectedCast.ValiantChargeCarrierOwnsPassenger", r =>
+        {
+            Check.Equal(true,typeof(IThingHolder).IsAssignableFrom(typeof(FlyingObject_ValiantCharge)),"flight exposes native passenger ownership");
+        });
+        yield return new("SpiritProjectedCast.PoisonRetainsMovedVictimBodyAndOriginalRanksAfterLoad", r =>
+            SpiritRebirthRitualTransactionTests.Run(r, c =>
+            {
+                using var fixture = new Fixture(r, c);
+                using var shadow = new Patch(typeof(MaterialPool).GetMethod("MatFrom", [typeof(string), typeof(UnityEngine.Shader)])!, nameof(CancelNative));
+                RuntimeLog.EnsureHeadlessDefOfInitialized(typeof(BodyPartTagDefOf));
+                var victim = c.Creator;
+                var previousBody = victim.def.race.body;
+                var previousHeartTag = BodyPartTagDefOf.BloodPumpingSource;
+                try
+                {
+                    BodyPartTagDefOf.BloodPumpingSource = new BodyPartTagDef { defName = "TestHeartTag" };
+                    var body = new BodyDef();
+                    var heart = new BodyPartRecord { body = body, def = new BodyPartDef { defName = "TestPoisonHeart", tags = [BodyPartTagDefOf.BloodPumpingSource] } };
+                    body.corePart = heart; body.AllParts.Add(heart); victim.def.race.body = body;
+                    var def = (ThingDef)RuntimeHelpers.GetUninitializedObject(typeof(ThingDef));
+                    def.defName = "RegressionPoison"; def.thingClass = typeof(Projectile_Poison);
+                    def.comps = []; def.category = ThingCategory.Projectile; DefDatabase<ThingDef>.Add(def);
+                    var shot = new Projectile_Poison { def = def, thingIDNumber = 19551, intendedTarget = IntVec3.Zero, usedTarget = IntVec3.Zero };
+                    var owner = c.Original.GetCompAbilityUserMagic();
+                    var rank = owner.MagicData.MagicPowerSkill_Poison.Single(x => x.label == "TM_Poison_pwr"); rank.level = 2;
+                    var power = new MagicAbility(owner) { Def = TorannMagicDefOf.TM_Poison };
+                    typeof(Projectile_SpiritBolt).GetMethod("PrepareProjection", BindingFlags.Instance | BindingFlags.NonPublic)!.Invoke(shot, [power]);
+                    var origin = new IntVec3(9, 0, 11);
+                    Set(shot, "initialized", true); Set(shot, "age", 400); Set(shot, "lastPoison", 271);
+                    Set(shot, "oldPosition", origin); Set(shot, "hitPawn", victim); Set(shot, "launcher", victim);
+                    rank.level = 0;
+                    shot = RoundTripSummon(r, "poison-after-first-dose", shot, c.Original, victim);
+                    object Field(string name) => typeof(Projectile_Poison).GetField(name, BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(shot)!;
+                    Check.Same(heart, ((BodyPartRecord[])Field("vulnerableParts"))[0], "body lookup rebuilt from saved victim");
+                    Check.Same(victim, Field("hitPawn"), "persistent poison stays on the same pawn");
+                    Check.Same(c.Original, typeof(Projectile_SpiritBolt).GetProperty("SourcePawn", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(shot)!, "persistent poison credits the soul");
+                    Check.Equal(2, (int)Field("pwrVal"), "damage uses the paid rank, even after the soul's rank changes");
+                    Check.Equal(origin, (IntVec3)Field("oldPosition"), "resuming preserves distance moved since the last dose");
+                    Check.Equal(271, (int)Field("lastPoison"), "the previous dose is not replayed");
+                    RuntimeLog.AssertClean();
+                }
+                finally { victim.def.race.body = previousBody; BodyPartTagDefOf.BloodPumpingSource = previousHeartTag; }
+            }));
+        yield return new("SpiritProjectedCast.DeathMarkTrialFollowsPaidSoulAfterExit", r =>
+            SpiritRebirthRitualTransactionTests.Run(r, c =>
+            {
+                using var fixture = new Fixture(r, c);
+                var state = new ClassProgressionState(Vocation.Mage);
+                Set(ClassIdentity.Component(c.Original), "state", state);
+                state.TryAddFoundation("rwom.necromancer", DisciplineDomain.Magic);
+                var path = state.Find("rwom.necromancer");
+                path.RecordCompletedTrial(NecromancerControlTrial.TrialId);
+                state.TryAdvanceAfterTrial(path.ClassId, InitiationStage.Foundation, NecromancerControlTrial.TrialId);
+                var friend = new Faction { def = new FactionDef { isPlayer = true } };
+                var enemy = new Faction { def = new FactionDef() };
+                Set(friend, "relations", new List<FactionRelation>{new(){other=enemy,kind=FactionRelationKind.Hostile}});
+                Set(enemy, "relations", new List<FactionRelation>{new(){other=friend,kind=FactionRelationKind.Hostile}});
+                Set(c.Original,"factionInt",friend); Set(c.Creator,"factionInt",friend);
+                var target = PawnWithComps(false,false).pawn;
+                Set(target,"factionInt",enemy); Set(target,"mapIndexOrState",(sbyte)0);
+                target.guest = new Pawn_GuestTracker(target); target.mindState = new Verse.AI.Pawn_MindState(target);
+                target.kindDef = new PawnKindDef { defName = "TestMarkedPawn" };
+                var curse = new HediffWithComps { def = new HediffDef { defName = "TM_DeathMarkCurse" }, pawn = target };
+                var tracker = new HediffComp_DeathMarkTrial { parent = curse, props = new HediffCompProperties_DeathMarkTrial() };
+                curse.comps = [tracker]; Set(curse,"severityInt",8f); target.health.hediffSet.hediffs.Add(curse);
+                var def = TorannMagicDefOf.TM_DeathMark_III;
+                var owner = c.Original.GetCompAbilityUserMagic();
+                var mark = new MagicAbility(owner) { Def = def };
+                owner.AbilityData.Powers.Add(mark); owner.AbilityData.AllPowers = null;
+                NecromancerDeathMarkTrial.Applied(c.Creator,target,mark,8);
+                var sources = (List<Pawn>)typeof(HediffComp_DeathMarkTrial).GetField("sources", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(tracker)!;
+                Check.Same(c.Original,sources.Single(),"rank-three curse records the soul while the body is on the target map");
+                fixture.Possession.GetDirectlyHeldThings().Remove(c.Original);
+                NecromancerDeathMarkTrial.Applied(c.Creator,target,mark,8);
+                tracker.Notify_PawnKilled(); Set(target.health,"healthState",PawnHealthState.Dead); Set(target,"mapIndexOrState",(sbyte)-2); tracker.Notify_PawnDied(null);
+                Check.Equal(true,path.CompletedTrials.Contains(NecromancerDeathMarkTrial.TrialId),"death after exit credits the earlier real mark");
+            }));
+        yield return new("SpiritProjectedCast.RegrowthCreatesSeedOnHostMap", r =>
+            SpiritRebirthRitualTransactionTests.Run(r, c =>
+            {
+                using var fixture = new Fixture(r, c);
+                var def = (ThingDef)RuntimeHelpers.GetUninitializedObject(typeof(ThingDef));
+                def.defName = "SeedofRegrowth"; def.thingClass = typeof(Thing); def.category = ThingCategory.Item;
+                def.stackLimit = 10; def.size = new IntVec2(1, 1); def.drawerType = DrawerType.RealtimeOnly; def.comps = [];
+                DefDatabase<ThingDef>.Add(def);
+                var soul = c.Original.GetCompAbilityUserMagic();
+                var power = new MagicAbility(soul) { Def = TorannMagicDefOf.TM_RegrowLimb };
+                soul.AbilityData.Powers.Add(power); soul.AbilityData.AllPowers = null;
+                var api = Production("SpiritHostedBolt");
+                Check.Same(power, api.GetMethod("Find", BindingFlags.NonPublic | BindingFlags.Static)!.Invoke(null, [c.Creator,c.Original,power.magicDef]), "held soul supplies regrowth");
+                var cell = new IntVec3(16, 0, 16);
+                var verb = new Verb_RegrowLimb { caster = c.Creator, Ability = power, verbProps = power.magicDef.MainVerb };
+                var cast = typeof(Verb_SpiritTargetable).GetMethod("CastFromHost", BindingFlags.NonPublic | BindingFlags.Instance)!;
+                Check.Equal(true, (bool)cast.Invoke(verb, [new LocalTargetInfo(cell)])!, "successful native placement commits the hosted effect");
+                var seed = cell.GetThingList(c.Map).Single(t => t.def == def);
+                Check.Equal(1, seed.stackCount, "exactly one seed at the selected cell");
+            }));
+        yield return new("SpiritProjectedCast.RegrowthSurgeryChargesOnlyQualifiedOwner", r =>
+            SpiritRebirthRitualTransactionTests.Run(r, c =>
+            {
+                using var fixture = new Fixture(r, c);
+                var owner = c.Original.GetCompAbilityUserMagic();
+                var local = c.Creator.GetCompAbilityUserMagic();
+                var def = TorannMagicDefOf.TM_RegrowLimb;
+                var spell = new MagicAbility(owner) { Def = def };
+                owner.AbilityData.Powers.Add(spell); owner.AbilityData.AllPowers = null;
+                var policy = Production("RegrowthSurgery");
+                var resolve = policy.GetMethod("QualifiedOwner", BindingFlags.Static | BindingFlags.NonPublic)!;
+                owner.spell_RegrowLimb = true;
+                Check.Equal(null, resolve.Invoke(null, [c.Original]), "soul cannot perform former class surgery independently");
+                Check.Same(owner, resolve.Invoke(null, [c.Creator]), "host's personal magic does not displace the trained soul");
+                var rank = owner.MagicData.MagicPowerSkill_RegrowLimb.Single(s => s.label == "TM_RegrowLimb_eff");
+                rank.level = 2; owner.arcaneDmg = 1;
+                if (owner.Mana == null) c.Original.needs.AllNeeds.Add(new Need_Mana(c.Original) { def = TorannMagicDefOf.TM_Mana });
+                float debit = .9f * (1f - 2 * .08f);
+                owner.Mana.CurLevel = debit;
+                var pay = policy.GetMethod("TryPay", BindingFlags.Static | BindingFlags.NonPublic)!;
+                var localBefore = local.Mana?.CurLevel;
+                Check.Equal(true, (bool)pay.Invoke(null,[owner,.08f])!, "exact threshold pays");
+                Check.Equal(true, Math.Abs(owner.Mana.CurLevel) < .0001f, "debit uses original efficiency");
+                Check.Equal(localBefore, local.Mana?.CurLevel, "host mana untouched");
+                Check.Equal(false, (bool)pay.Invoke(null,[owner,.08f])!, "depleted original cannot pay again");
+                owner.AbilityData.Powers.Remove(spell); owner.AbilityData.AllPowers = null;
+                Check.Equal(null, resolve.Invoke(null,[c.Creator]), "missing original spell blocks surgery");
+            }));
+        yield return new("SpiritProjectedCast.LightningCloudPreviewUsesSoulRank", r =>
+            SpiritRebirthRitualTransactionTests.Run(r, c =>
+            {
+                using var fixture = new Fixture(r, c);
+                var magic = c.Original.GetCompAbilityUserMagic();
+                var power = new MagicAbility(magic) { Def = TorannMagicDefOf.TM_LightningCloud };
+                var projectile = (ThingDef)RuntimeHelpers.GetUninitializedObject(typeof(ThingDef));
+                projectile.projectile = new ProjectileProperties { explosionRadius = 6 };
+                var props = new AbilityUser.VerbProperties_Ability { abilityDef = power.magicDef, defaultProjectile = projectile };
+                var verb = new Verb_LightningCloud { caster = c.Creator, Ability = power, verbProps = props };
+                magic.MagicData.MagicPowerSkill_LightningCloud.Single(x => x.label == "TM_LightningCloud_ver").level = 3;
+                Check.Equal(7f, verb.HighlightFieldRadiusAroundTarget(out var needsSight), "preview includes three versatility ranks from the held soul");
+                Check.Equal(true, needsSight, "native targeting checks sight to the center");
+            }));
+        yield return new("SpiritProjectedCast.BlizzardKeepsSoulRanksAfterLaunch", r =>
+            SpiritRebirthRitualTransactionTests.Run(r, c =>
+            {
+                using var fixture = new Fixture(r, c);
+                var magic = c.Original.GetCompAbilityUserMagic();
+                var spell = TorannMagicDefOf.TM_Blizzard;
+                var power = new MagicAbility(magic) { Def = spell };
+                magic.AbilityData.Powers.Add(power); magic.AbilityData.AllPowers = null;
+                var skills = magic.MagicData.MagicPowerSkill_Blizzard;
+                skills.Single(x => x.label == "TM_Blizzard_pwr").level = 2;
+                var vers = skills.Single(x => x.label == "TM_Blizzard_ver");
+                vers.level = 3;
+                magic.arcaneDmg = 2;
+                var job = new JobDef { defName = "TM_SpiritBlizzard" };
+                var api = Production("SpiritHostedBolt");
+                Check.Same(spell, api.GetMethod("Spell", BindingFlags.Static | BindingFlags.NonPublic)!.Invoke(null, [job]), "job resolves to original Blizzard");
+                Check.Same(power, api.GetMethod("Find", BindingFlags.Static | BindingFlags.NonPublic)!.Invoke(null, [c.Creator, c.Original, spell]), "currently held original owns the cast");
+                var def = (ThingDef)RuntimeHelpers.GetUninitializedObject(typeof(ThingDef));
+                def.projectile = new ProjectileProperties { explosionRadius = 6 };
+                var props = new AbilityUser.VerbProperties_Ability { abilityDef = spell, defaultProjectile = def };
+                var verb = new Verb_Blizzard { caster = c.Creator, Ability = power, verbProps = props };
+                Check.Equal(8.5f, verb.HighlightFieldRadiusAroundTarget(out _), "both original ranks contribute to radius");
+                var shot = new Projectile_Blizzard { def = def };
+                typeof(Projectile_SpiritBolt).GetMethod("PrepareProjection", BindingFlags.Instance | BindingFlags.NonPublic)!.Invoke(shot, [power]);
+                vers.level = 0;
+                shot.Initialize(c.Map);
+                var duration = typeof(Projectile_Blizzard).GetField("duration", BindingFlags.Instance | BindingFlags.NonPublic)!;
+                Check.Equal(1260, (int)duration.GetValue(shot)!, "duration uses the ranks and scale at launch without reading the host");
+                shot.Initialize(c.Map);
+                Check.Equal(1260, (int)duration.GetValue(shot)!, "rebuilding the rectangle does not extend the storm");
+            }));
+        yield return new("SpiritPossession.LegacySummonReleasesClassicSoul", r =>
+            SpiritRebirthRitualTransactionTests.Run(r, c =>
+            {
+                using var fixture = new Fixture(r, c);
+                var host = c.Creator; var soul = c.Original;
+                host.def.race.lifeStageAges = soul.def.race.lifeStageAges;
+                host.ageTracker ??= new Pawn_AgeTracker(host);
+                host.ageTracker.AgeBiologicalTicks = 25L * GenDate.TicksPerYear;
+                Set(ClassIdentity.Component(soul), "spiritRebirth", null);
+                var timed = new CompSummoned { parent = host, Temporary = true };
+                host.AllComps.Add(timed);
+                var native = host.GetCompAbilityUserMagic();
+                host.AllComps.Remove(native); TM_Calc.InvalidateCompCache(host);
+                var prior = TorannMagicDefOf.TM_SpiritPossessorHD;
+                try
+                {
+                    TorannMagicDefOf.TM_SpiritPossessorHD = new HediffDef { defName = "ClassicSpiritOwnerTest" };
+                    var spiritHediff = new Hediff_Possessor { def = TorannMagicDefOf.TM_SpiritPossessorHD, pawn = soul, previousFaction = host.Faction.def };
+                    soul.health.hediffSet.hediffs.Add(spiritHediff);
+                    using var visuals = new Patch(typeof(TM_MoteMaker).GetMethod(nameof(TM_MoteMaker.ThrowGenericMote))!, nameof(CancelNative));
+                    var dismiss = Production("SpiritSummonedHost").GetMethod("CanDismiss", BindingFlags.NonPublic | BindingFlags.Static)!;
+                    Check.Equal(true, (bool)dismiss.Invoke(null, [host])!, "old occupied summon can finish dismissal");
+                    Check.Same(c.Map, soul.Map, "same classic pawn returned to the map");
+                    Check.Equal(false, fixture.Possession.GetDirectlyHeldThings().Contains(soul), "old container no longer owns the pawn");
+                    Check.Equal(true, (bool)dismiss.Invoke(null, [host])!, "retry after successful release is safe");
+                }
+                finally { TorannMagicDefOf.TM_SpiritPossessorHD = prior; host.AllComps.Remove(timed); host.AllComps.Add(native); TM_Calc.InvalidateCompCache(host); }
+            }));
+        yield return new("SpiritPossession.SummonedHostsRejectedEvenByDirectEntry", r =>
+            SpiritRebirthRitualTransactionTests.Run(r, c =>
+            {
+                using var fixture = new Fixture(r, c);
+                var api = Production("SpiritSummonedHost");
+                var check = api.GetMethod("IsSummoned", BindingFlags.NonPublic | BindingFlags.Static)!;
+                bool Excluded(Pawn p) => (bool)check.Invoke(null, [p])!;
+                Check.Equal(false, Excluded(c.Creator), "ordinary host allowed");
+                foreach (var summoned in new Pawn[] { new TMPawnSummoned(), new TorannMagic.Odyssey.Pawn_EtherServant(), new TorannMagic.Golems.TMPawnGolem() })
+                {
+                    Check.Equal(true, Excluded(summoned), "summoned race excluded before touching its faction or health");
+                    Check.Equal(false, new Projectile_SpiritPossession().Possess(c.Creator, summoned), "classic Spirit rejects a summoned host");
+                    Check.Equal(false, new Projectile_SpiritPossession().Possess(c.Original, summoned), "ritual Spirit rejects the same host");
+                }
+                var temp = new CompSummoned { parent = c.Creator, Temporary = true };
+                c.Creator.AllComps.Add(temp);
+                try
+                {
+                    Check.Equal(true, Excluded(c.Creator), "ordinary pawn with a timed summon component excluded");
+                    Check.Equal(false, new Projectile_SpiritPossession().Possess(c.Original, c.Creator), "direct impact cannot bypass prohibition");
+                    var blocks = api.GetMethod("BlocksTarget", BindingFlags.NonPublic | BindingFlags.Static)!;
+                    bool Blocked(LocalTargetInfo target) => (bool)blocks.Invoke(null, [target, c.Map])!;
+                    Check.Equal(true, Blocked(c.Creator), "reject explicit target before warmup");
+                    var cell = new IntVec3(29, 0, 29);
+                    var things = cell.GetThingList(c.Map);
+                    things.Add(c.Creator);
+                    try { Check.Equal(true, Blocked(cell), "targeting the occupied cell cannot bypass the block"); }
+                    finally { things.Remove(c.Creator); }
+                    var corpse = new Corpse();
+                    corpse.InnerPawn = new TorannMagic.Odyssey.Pawn_EtherServant { def = c.Creator.def, thingIDNumber = 59898 };
+                    Check.Equal(true, Blocked(corpse), "corpse is classified by its inner pawn");
+                    var dismiss = api.GetMethod("CanDismiss", BindingFlags.NonPublic | BindingFlags.Static)!;
+                    var state = ClassIdentity.Component(c.Original).SpiritRebirth;
+                    Check.Equal(false, state.CanVoluntarilyLeaveHost(c.Original), "the old bond is still recovering");
+                    var mapIndex = typeof(Thing).GetField("mapIndexOrState", BindingFlags.NonPublic | BindingFlags.Instance)!;
+                    var prior = mapIndex.GetValue(c.Creator);
+                    try
+                    {
+                        mapIndex.SetValue(c.Creator, (sbyte)-1);
+                        Check.Equal(false, (bool)dismiss.Invoke(null, [c.Creator])!, "a host without a destination cannot disappear with its soul");
+                        Check.Same(c.Original, fixture.Possession.SpiritPawn, "soul still has the same holder");
+                    }
+                    finally { mapIndex.SetValue(c.Creator,prior); }
+                    Check.Equal(true, (bool)dismiss.Invoke(null, [c.Creator])!, "old host can disappear after the soul has been secured");
+                    var stone = Check.NotNull(state.Stone, "ritual soul becomes a real stone");
+                    Check.Same(c.Original, stone.ContainedSpirit, "the stone holds exactly the original pawn");
+                    Check.Equal(0, state.RecoveryTicks, "forced collapse restarts recovery");
+                    Check.Equal(false, (bool)Production("SoulStoneImplant").GetMethod("Valid", BindingFlags.NonPublic | BindingFlags.Static)!
+                        .Invoke(null, [c.Creator, stone, c.Original, c.Creator])!, "cannot put the soul back in that timed host");
+                    Check.Same(c.Original, stone.ContainedSpirit, "failed entry leaves stone occupied");
+                }
+                finally { c.Creator.AllComps.Remove(temp); }
+            }));
+        yield return new("SpiritProjectedSummon.RealMineScribeBeforeAndAfterTrigger", r =>
+            SpiritRebirthRitualTransactionTests.Run(r, c =>
+            {
+                using var fixture = new Fixture(r, c);
+                RuntimeLog.EnsureHeadlessDefOfInitialized(typeof(FactionDefOf));
+                var def = (ThingDef)RuntimeHelpers.GetUninitializedObject(typeof(ThingDef));
+                def.defName = "RegressionManaMine"; def.comps = []; def.category = ThingCategory.Building;
+                def.building = new BuildingProperties(); def.thingClass = typeof(Building_ExplosiveProximityTrap);
+                DefDatabase<ThingDef>.Add(def);
+                var mine = new Building_ExplosiveProximityTrap { def = def, thingIDNumber = 19887 };
+                var target = mine.GetType().GetField("trapPawn", BindingFlags.Instance | BindingFlags.NonPublic)!;
+                var armed = RoundTripSummon(r, "armed-mana-mine", mine);
+                RuntimeLog.AssertClean();
+                Check.Equal(true, armed.Armed && target.GetValue(armed) == null, "newly armed mine has no pawn reference");
+                Set(mine, "trapPawn", c.Creator); Set(mine, "trapSprung", true); Set(mine, "trapSpringDelay", 11);
+                var triggered = RoundTripSummon(r, "triggered-mana-mine", mine, c.Creator);
+                Check.Same(c.Creator, target.GetValue(triggered), "real target persisted");
+                Check.Equal(false, triggered.Armed, "pending wick survives load");
+                Check.Equal(11, (int)mine.GetType().GetField("trapSpringDelay", BindingFlags.NonPublic | BindingFlags.Instance)!.GetValue(triggered)!, "remaining delay survived");
+                RuntimeLog.AssertClean();
+            }));
+        yield return new("SpiritProjectedCast.StormSkyfallerNativeImpactAfterLoad", r =>
+            SpiritRebirthRitualTransactionTests.Run(r, c =>
+            {
+                using var fixture = new Fixture(r, c);
+                var type = Production("SpiritStormSkyfaller");
+                var xml = XDocument.Load(Path.Combine(r.Repository, "v1.7/Defs/AbilityDefs/Skyfallers.xml"));
+                var spells = xml.Root!.Elements().Where(x => x.Element("defName")?.Value.StartsWith("TM_Firestorm_") == true ||
+                    x.Element("defName")?.Value.StartsWith("TM_Blizzard_") == true).ToList();
+                Check.Equal(6, spells.Count, "six native falling projectiles");
+                foreach (var spell in spells) Check.Equal(type.FullName, spell.Element("thingClass")?.Value, "storm supports original caster");
+                var def = (ThingDef)RuntimeHelpers.GetUninitializedObject(typeof(ThingDef));
+                def.defName = "RegressionStormSkyfaller"; def.thingClass = type; def.comps = [];
+                def.category = ThingCategory.Ethereal; def.size = new IntVec2(1, 1); def.stackLimit = 1;
+                def.drawerType = DrawerType.RealtimeOnly; def.altitudeLayer = AltitudeLayer.Skyfaller;
+                def.skyfaller = new SkyfallerProperties { explosionRadius = 2, explosionDamage = new DamageDef { defaultDamage = 10 } };
+                DefDatabase<ThingDef>.Add(def);
+                var sky = (Skyfaller)Activator.CreateInstance(type)!;
+                sky.def = def; sky.thingIDNumber = 19885;
+                var impact = typeof(Skyfaller).GetMethod("Impact", BindingFlags.Instance | BindingFlags.NonPublic)!;
+                using var production = new FleshStatTests.ProductionPatches();
+                production.Add(Production("SpiritStormSkyfallerImpactPatch"));
+                using var blasts = new Patch(typeof(GenExplosion).GetMethods().Single(m => m.Name == nameof(GenExplosion.DoExplosion)), nameof(StopAtSkyExplosion));
+                void Verify(Skyfaller obj, Thing? expected)
+                {
+                    Set(obj, "positionInt", new IntVec3(15, 0, 15)); Set(obj, "mapIndexOrState", (sbyte)0);
+                    try { impact.Invoke(obj, null); throw new InvalidOperationException("skyfaller skipped native explosion"); }
+                    catch (TargetInvocationException e) when (e.InnerException is SkyExplosionObserved found)
+                    { Check.Same(expected!, found.Owner!, "native GenExplosion received the right instigator"); }
+                }
+                Verify(sky, null);
+                var field = new Projectile_Blizzard();
+                var power = new MagicAbility(c.Original.GetCompAbilityUserMagic()) { Def = TorannMagicDefOf.TM_Blizzard };
+                typeof(Projectile_SpiritBolt).GetMethod("PrepareProjection", BindingFlags.NonPublic | BindingFlags.Instance)!.Invoke(field, [power]);
+                var cell = new IntVec3(15, 0, 15);
+                typeof(Projectile_SpiritStormField).GetMethod("SpawnStrike", BindingFlags.NonPublic | BindingFlags.Instance)!.Invoke(field, [def, cell, c.Map]);
+                sky = (Skyfaller)cell.GetThingList(c.Map).Single(item => item.def == def);
+                sky = RoundTripSummon(r, "storm-falling-body", sky, c.Original);
+                Verify(sky, c.Original);
+            }));
+        yield return new("SpiritProjectedCast.FirestormDelayedShrapnelCellsAndOwnerSurviveLoad", r =>
+            SpiritRebirthRitualTransactionTests.Run(r, c =>
+            {
+                using var fixture = new Fixture(r, c);
+                using var shadow = new Patch(typeof(MaterialPool).GetMethod("MatFrom", [typeof(string), typeof(UnityEngine.Shader)])!, nameof(CancelNative));
+                var def = (ThingDef)RuntimeHelpers.GetUninitializedObject(typeof(ThingDef));
+                def.defName = "RegressionFirestorm"; def.comps = []; def.category = ThingCategory.Projectile;
+                def.thingClass = typeof(Projectile_Firestorm);
+                def.projectile = new ProjectileProperties { explosionRadius = 5 };
+                Set(def.projectile, "damageAmountBase", 20);
+                DefDatabase<ThingDef>.Add(def);
+                var storm = new Projectile_Firestorm { def = def, thingIDNumber = 19882, intendedTarget = IntVec3.Zero, usedTarget = IntVec3.Zero };
+                var owner = c.Original.GetCompAbilityUserMagic();
+                owner.MagicData.MagicPowerSkill_Firestorm.Single(x => x.label == "TM_Firestorm_ver").level = 2;
+                owner.arcaneDmg = 2f;
+                var power = new MagicAbility(owner) { Def = TorannMagicDefOf.TM_Firestorm };
+                var field = typeof(Projectile_SpiritStormField);
+                typeof(Projectile_SpiritBolt).GetMethod("PrepareProjection", BindingFlags.NonPublic | BindingFlags.Instance)!.Invoke(storm, [power]);
+                Set(storm, "launcher", c.Creator);
+                storm.Initialize(c.Map);
+                var schedule = field.GetMethod("ScheduleCell", BindingFlags.NonPublic | BindingFlags.Instance)!;
+                var due = field.GetMethod("ApplyDueEffects", BindingFlags.NonPublic | BindingFlags.Instance)!;
+                var first = new IntVec3(13, 0, 12); var second = new IntVec3(15, 0, 14);
+                Set(storm, "age", 103);
+                schedule.Invoke(storm, [first, 2]); schedule.Invoke(storm, [IntVec3.Invalid, 2]); schedule.Invoke(storm, [second, 5]);
+                storm = RoundTripSummon(r, "firestorm-before-shrapnel", storm, c.Creator, c.Original);
+                storm.Initialize(c.Map);
+                Check.Equal(1080, (int)field.GetField("duration", BindingFlags.NonPublic | BindingFlags.Instance)!.GetValue(storm)!, "scaled duration remains fixed after reload");
+                using var blasts = new Patch(typeof(GenExplosion).GetMethods().Single(m => m.Name == nameof(GenExplosion.DoExplosion)), nameof(ObserveStormExplosion));
+                try
+                {
+                    foreach (int tick in new[] { 104, 105, 105, 107, 108, 109 })
+                    {
+                        Set(storm, "age", tick);
+                        due.Invoke(storm, [c.Map]);
+                        Check.Equal(tick < 105 ? 0 : tick < 108 ? 1 : 2, stormExplosions.Count, "each valid fragment fires once at its own deadline");
+                    }
+                    Check.Equal((first, (Thing)c.Original), stormExplosions[0], "first explosion");
+                    Check.Equal((second, (Thing)c.Original), stormExplosions[1], "second explosion");
+                }
+                finally { stormExplosions.Clear(); }
+            }));
+        foreach (var (suffix, shots) in new[] { ("", 1), ("_I", 1), ("_II", 2), ("_III", 3) })
+        yield return new("SpiritProjectedCast.FrostRayRankCadence" + suffix, r =>
+            SpiritRebirthRitualTransactionTests.Run(r, c =>
+            {
+                using var fixture = new Fixture(r, c);
+                var xml = XDocument.Load(Path.Combine(r.Repository, "v1.7/Defs/AbilityDefs/Abilities_TMagic_IceMage.xml")).Root!;
+                var row = xml.Elements().Single(x => x.Element("defName")?.Value == "TM_FrostRay" + suffix).Element("MainVerb")!;
+                var shotXml = xml.Elements().Single(x => x.Element("defName")?.Value == row.Element("defaultProjectile")!.Value);
+                var def = (TMAbilityDef)typeof(TorannMagicDefOf).GetField("TM_FrostRay" + suffix)!.GetValue(null)!;
+                var saved = def.MainVerb;
+                try
+                {
+                    var assembly = typeof(AbilityUser.Verb_UseAbility).Assembly;
+                    var bullet = (ThingDef)RuntimeHelpers.GetUninitializedObject(typeof(ThingDef));
+                    bullet.thingClass = typeof(TorannMagicDefOf).Assembly.GetType(shotXml.Element("thingClass")!.Value, true);
+                    def.MainVerb = new AbilityUser.VerbProperties_Ability { verbClass = assembly.GetType(row.Element("verbClass")!.Value, true),
+                        burstShotCount = (int)row.Element("burstShotCount")!, ticksBetweenBurstShots = (int)row.Element("ticksBetweenBurstShots")!, defaultProjectile = bullet };
+                    var job = JobMaker.MakeJob(new JobDef { defName = "TM_SpiritFrostRay" + suffix }, c.Creator.Position, c.Original);
+                    var driver = new JobDriver_SpiritBolt { pawn = c.Creator, job = job };
+                    Set(c.Creator.jobs, "curJob", job); Set(c.Creator.jobs, "curDriver", driver);
+                    using var launch = new Patch(Production("SpiritHostedBolt").GetMethod("Launch", BindingFlags.NonPublic | BindingFlags.Static)!, nameof(RecordRayLaunch));
+                    var toils = ((IEnumerable<Verse.AI.Toil>)typeof(JobDriver_SpiritBolt).GetMethod("MakeNewToils", BindingFlags.Instance | BindingFlags.NonPublic)!.Invoke(driver, null)!).ToArray();
+                    Check.Equal(shots > 1 ? 3 : 2, toils.Length, "only multi-shot ranks schedule a continuation");
+                    Set(Find.TickManager, "ticksGameInt", 100);
+                    toils[1].initAction();
+                    if (shots > 1)
+                        for (int tick = 101; tick <= 100 + 5 * (shots - 1); tick++)
+                        {
+                            Set(Find.TickManager, "ticksGameInt", tick);
+                            toils[2].tickAction();
+                        }
+                    Check.Equal(shots, rayLaunches.Count, "exact native shot count");
+                    for (int i = 0; i < shots; i++)
+                        Check.Equal((100 + 5 * i, i > 0), rayLaunches[i], "only first shot requests payment");
+                }
+                finally { def.MainVerb = saved; rayLaunches.Clear(); }
+            }));
+        yield return new("SpiritProjectedCast.DeathBoltNativeProjectileKeepsOwnerAcrossLoadAndExit", r =>
+            SpiritRebirthRitualTransactionTests.Run(r,c =>
+            {
+                using var fixture = new Fixture(r,c);
+                using var material = new Patch(typeof(MaterialPool).GetMethod("MatFrom", [typeof(string), typeof(UnityEngine.Shader)])!, nameof(CancelNative));
+                var def = (ThingDef)RuntimeHelpers.GetUninitializedObject(typeof(ThingDef));
+                def.defName = "TestHostedDeathBolt"; def.thingClass = typeof(Projectile_HostedDeathBolt);
+                def.comps = []; def.category = ThingCategory.Projectile; DefDatabase<ThingDef>.Add(def);
+                var shot = new Projectile_HostedDeathBolt { def = def, thingIDNumber = 19852, intendedTarget = IntVec3.Zero, usedTarget = IntVec3.Zero };
+                Set(shot,"launcher",c.Creator);
+                var impact = typeof(Projectile_HostedDeathBolt).GetMethod("Impact", BindingFlags.Instance | BindingFlags.NonPublic)!;
+                using var capture = new Patch(typeof(AbilityUser.Projectile_AbilityBase).GetMethod("ApplyImpact", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)!,nameof(ObserveDeathBoltImpact));
+                try
+                {
+                    impact.Invoke(shot,[null,true]);
+                    Check.Same(c.Creator,observedRayOwner,"ordinary projectile keeps physical caster");
+                    typeof(Projectile_HostedDeathBolt).GetMethod("SetSource",BindingFlags.Instance | BindingFlags.NonPublic)!.Invoke(shot,[c.Original]);
+                    shot = RoundTripSummon(r,"deathbolt-primary-owner",shot,c.Creator,c.Original);
+                    fixture.Possession.GetDirectlyHeldThings().Remove(c.Original);
+                    impact.Invoke(shot,[null,true]);
+                    Check.Same(c.Original,observedRayOwner,"loaded native projectile attributes impact to soul");
+                    Check.Same(c.Creator,shot.Launcher,"physical launcher restored after impact");
+                }
+                finally { observedRayOwner = null; }
+            }));
+        yield return new("SpiritProjectedCast.FrostRayNativeImpactUsesSoulAndRestoresHost", r =>
+            SpiritRebirthRitualTransactionTests.Run(r, c =>
+            {
+                using var fixture = new Fixture(r, c);
+                using var shadow = new Patch(typeof(MaterialPool).GetMethod("MatFrom", [typeof(string), typeof(UnityEngine.Shader)])!, nameof(CancelNative));
+                var beamDef = (AbilityUser.ProjectileDef_AbilityLaser)RuntimeHelpers.GetUninitializedObject(typeof(AbilityUser.ProjectileDef_AbilityLaser));
+                beamDef.defName = "RegressionFrostRay"; beamDef.comps = []; beamDef.category = ThingCategory.Projectile;
+                beamDef.thingClass = typeof(Projectile_SpiritRay); DefDatabase<ThingDef>.Add(beamDef);
+                var ray = new Projectile_SpiritRay { def = beamDef, thingIDNumber = 19881, intendedTarget = IntVec3.Zero, usedTarget = IntVec3.Zero };
+                Set(ray, "launcher", c.Creator);
+                var type = typeof(Projectile_SpiritRay);
+                var impact = type.GetMethod("Impact", BindingFlags.Instance | BindingFlags.NonPublic)!;
+                using var capture = new Patch(typeof(AbilityUser.Projectile_AbilityLaser).GetMethod("FinishImpact", BindingFlags.Instance | BindingFlags.NonPublic)!, nameof(ObserveFrostRayOwner));
+                try
+                {
+                    impact.Invoke(ray, [c.Creator, true]);
+                    Check.Same(c.Creator, observedRayOwner, "normal laser passes physical launcher to native shield impact");
+                    var power = new MagicAbility(c.Original.GetCompAbilityUserMagic()) { Def = TorannMagicDefOf.TM_FrostRay_III };
+                    type.GetMethod("PrepareProjection", BindingFlags.Instance | BindingFlags.NonPublic)!.Invoke(ray, [power]);
+                    ray = RoundTripSummon(r, "frost-ray-before-impact", ray, c.Creator, c.Original);
+                    var state = ClassIdentity.Component(c.Original).SpiritRebirth;
+                    Set(state, "recoveryTicks", SpiritRebirthState.RecoveryDurationTicks);
+                    fixture.Possession.GetDirectlyHeldThings().Remove(c.Original);
+                    GenSpawn.Spawn(c.Original, new IntVec3(15, 0, 15), c.Map);
+                    Check.Equal(true, SpiritRebirthStateTests.Invoke(state, "TryLeaveHost", c.Original, c.Creator), "soul leaves the living host before impact");
+                    impact.Invoke(ray, [c.Creator, true]);
+                    Check.Same(c.Original, observedRayOwner, "projected native impact uses original soul");
+                    Check.Same(c.Creator, ray.Launcher, "native beam still originates at host after impact");
+                }
+                finally { observedRayOwner = null; }
+            }));
+        yield return new("SpiritProjectedCast.ObstructedProjectileUsesNativeLaunchRules", r =>
+            SpiritRebirthRitualTransactionTests.Run(r, c =>
+            {
+                using var fixture = new Fixture(r, c);
+                var def = TorannMagicDefOf.TM_AMP;
+                var previous = def.MainVerb;
+                try
+                {
+                    var props = def.MainVerb = new AbilityUser.VerbProperties_Ability();
+                    var power = new MagicAbility(c.Original.GetCompAbilityUserMagic()) { Def = def };
+                    var verb = new Verb_BLOS { caster = c.Creator, Ability = power, verbProps = props };
+                    var shoot = Production("SpiritHostedBolt").GetMethod("Shoot", BindingFlags.Static | BindingFlags.NonPublic)!;
+                    using var blocked = new Patch(typeof(Verb).GetMethods().Single(m => m.Name == "TryFindShootLineFromTo" && m.GetParameters()[0].ParameterType == typeof(IntVec3)), nameof(CancelNative));
+                    using var observe = new Patch(typeof(ThingMaker).GetMethod(nameof(ThingMaker.MakeThing))!, nameof(ObserveProjectileCreation));
+                    foreach (bool needsSight in new[] { true, false }) foreach (bool stopBurst in new[] { true, false })
+                    {
+                        props.requireLineOfSight = needsSight;
+                        props.stopBurstWithoutLos = stopBurst;
+                        bool created = false;
+                        try { shoot.Invoke(null, [c.Creator, power, verb, new LocalTargetInfo(c.Creator.Position)]); }
+                        catch (TargetInvocationException error) when (error.InnerException is ProjectileCreationObserved) { created = true; }
+                        Check.Equal(!(needsSight && stopBurst), created, $"obstructed shot requireLineOfSight={needsSight} stopBurstWithoutLos={stopBurst}");
+                    }
+                }
+                finally { def.MainVerb = previous; }
+            }));
+        foreach(var test in HostedWardCases()) yield return test;
+        foreach(var test in HostedRaiseCases()) yield return test;
+        foreach(var test in HostedSummonCases()) yield return test;
+        foreach (bool ordered in new[] { false, true })
+        yield return new("SpiritProjectedCast.BloodGiftNativeFilthAndHostPool." + (ordered ? "Job" : "Effect"), r => SpiritRebirthRitualTransactionTests.Run(r, c =>
+        {
+            using var fixture = new Fixture(r, c);
+            var oldBlood = ThingDefOf.Filth_Blood;
+            var oldSettings = TorannMagic.ModOptions.Settings.Instance;
+            var defs = DefDatabase<HediffDef>.AllDefsListForReading.ToArray();
+            try
+            {
+                TorannMagic.ModOptions.Settings.Instance = new TorannMagic.ModOptions.Settings();
+                var body = c.Creator; var soul = c.Original;
+                var caster = soul.GetCompAbilityUserMagic();
+                var ability = new MagicAbility(caster) { Def = TorannMagicDefOf.TM_BloodGift };
+                var skill = caster.MagicData.MagicPowerSkill_BloodGift.Single(x => x.label == "TM_BloodGift_ver");
+                skill.level = 1; caster.arcaneDmg = 1f;
+                body.def.race.body = new BodyDef { corePart = new BodyPartRecord { def = new BodyPartDef { defName = "SpiritHostCore", bleedRate = 0 } } };
+                var blood = DefDatabase<HediffDef>.GetNamedSilentFail("TM_BloodHD");
+                if (blood == null) { blood = new HediffDef { defName = "TM_BloodHD", maxSeverity = 1000f }; DefDatabase<HediffDef>.Add(blood); }
+                var pool = new Hediff { pawn = body, def = blood }; body.health.hediffSet.hediffs.Add(pool);
+                var soulPool = new Hediff { pawn = soul, def = blood }; soul.health.hediffSet.hediffs.Add(soulPool);
+                float before = pool.Severity, soulBefore = soulPool.Severity;
+                ThingDefOf.Filth_Blood = c.Magicyte.def;
+                var filth = ThingMaker.MakeThing(c.Magicyte.def); filth.stackCount = 3;
+                GenSpawn.Spawn(filth, body.Position, c.Map);
+                int charges = 0;
+                var apply = typeof(Verb_BloodGift).GetMethod("Apply", BindingFlags.Static | BindingFlags.NonPublic)!;
+                if (ordered)
+                {
+                    var gift = ability.magicDef;
+                    var oldCost = gift.manaCost;
+                    float oldRecharge = gift.MainVerb.SecondsToRecharge;
+                    var events = DefDatabase<HistoryEventDef>.AllDefsListForReading.ToArray();
+                    var oldEvent = TorannMagicDefOf.TM_UsedMagic;
+                    try
+                    {
+                        TorannMagicDefOf.TM_UsedMagic = new HistoryEventDef { defName = "SpiritJobHistoryEvent" };
+                        DefDatabase<HistoryEventDef>.Add(TorannMagicDefOf.TM_UsedMagic);
+                        var history = (History)RuntimeHelpers.GetUninitializedObject(typeof(History));
+                        history.historyEventsManager = new HistoryEventsManager();
+                        Set(Current.Game, "history", history);
+                        using var noIdeoNotifications = new Patch(typeof(IdeoUtility).GetMethod(nameof(IdeoUtility.Notify_HistoryEvent))!, nameof(CancelNative));
+                        if (DefDatabase<HediffDef>.GetNamedSilentFail("TM_SyrriumSenseHD") == null)
+                            DefDatabase<HediffDef>.Add(new HediffDef { defName = "TM_SyrriumSenseHD" });
+                        gift.manaCost = .20f; gift.MainVerb.SecondsToRecharge = 3;
+                        caster.AbilityData.Powers.Add(ability); caster.AbilityData.AllPowers = null;
+                        if (caster.Mana == null) soul.needs.AllNeeds.Add(new Need_Mana(soul) { def = TorannMagicDefOf.TM_Mana });
+                        caster.Mana.CurLevel = .70f;
+                        float beforeMana = caster.Mana.CurLevel;
+                        float cost = caster.ActualManaCost(gift);
+                        var nativeHostMana = body.GetCompAbilityUserMagic()?.Mana;
+                        float hostMana = nativeHostMana?.CurLevel ?? 0;
+                        var job = new Verse.AI.Job(new JobDef { defName = "TM_SpiritBloodSacrifice" }, soul);
+                        var driver = new JobDriver_SpiritBloodSacrifice { pawn = body, job = job };
+                        Set(body.jobs, "curJob", job); Set(body.jobs, "curDriver", driver);
+                        var toils = (IEnumerable<Verse.AI.Toil>)driver.GetType().GetMethod("MakeNewToils", BindingFlags.Instance | BindingFlags.NonPublic)!.Invoke(driver, null)!;
+                        toils.Single().initAction();
+                        Check.Equal(true, Math.Abs(caster.Mana.CurLevel - (beforeMana - cost)) < .0001f && cost > 0, "actual mana paid once by original");
+                        Check.Equal(hostMana, nativeHostMana?.CurLevel ?? 0, "host mana untouched");
+                        Check.Equal(true, ability.CooldownTicksLeft > 0, "original ability recharging");
+                    }
+                    finally { gift.manaCost = oldCost; gift.MainVerb.SecondsToRecharge = oldRecharge;
+                        TorannMagicDefOf.TM_UsedMagic = oldEvent; DefDatabase<HistoryEventDef>.Clear(); foreach (var e in events) DefDatabase<HistoryEventDef>.Add(e); }
+                }
+                else Check.Equal(true, (bool)apply.Invoke(null, [body, ability, (Action)(() => charges++)])!, "rank one on soul absorbs filth for host");
+                Check.Equal(true, filth.Destroyed, "native physical resource consumed");
+                if (!ordered) Check.Equal(1, charges, "one commitment before effects");
+                Check.Equal(true, Math.Abs(pool.Severity - before - 3.3f) < .001f, "blood pool credited on host with soul rank");
+                Check.Equal(soulBefore, soulPool.Severity, "soul blood unaffected");
+                RuntimeLog.AssertClean();
+            }
+            finally { ThingDefOf.Filth_Blood = oldBlood; TorannMagic.ModOptions.Settings.Instance = oldSettings;
+                DefDatabase<HediffDef>.Clear(); foreach (var def in defs) DefDatabase<HediffDef>.Add(def); }
+        }));
+        yield return new("SpiritMapLoss.NativeWarningHooksAndManifest", r => SpiritRebirthRitualTransactionTests.Run(r, c =>
+        {
+            using var f = new Fixture(r, c);
+            using var patches = new FleshStatTests.ProductionPatches();
+            foreach (var type in new[] { "SpiritReformWarningPatch", "SpiritMapAbandonWarningPatch", "SpiritMapDeinitPatch" })
+                patches.Add(Production(type));
+            var native = typeof(RimWorld.Planet.SettlementAbandonUtility).GetMethod("TryAbandonWithColonyCheck", BindingFlags.Static | BindingFlags.NonPublic)!;
+            var processor = Assembly.Load("0Harmony").GetType("HarmonyLib.PatchProcessor")!;
+            var read = processor.GetMethods().First(m => m.Name == "GetOriginalInstructions" && m.GetParameters().Length == 2 && m.GetParameters()[1].ParameterType.Name == "ILGenerator");
+            var args = read.GetParameters().Select((p,i) => i == 0 ? (object)native : p.HasDefaultValue ? p.DefaultValue : null).ToArray();
+            var transpiler = Production("SpiritMapAbandonWarningPatch").GetMethod("Transpiler", BindingFlags.NonPublic | BindingFlags.Static)!;
+            var il = ((System.Collections.IEnumerable)transpiler.Invoke(null, [read.Invoke(null,args)])!).Cast<object>().ToList();
+            Check.Equal(1, il.Count(op => (op.GetType().GetField("operand")?.GetValue(op) as MethodInfo)?.Name == "AppendWarning"), "one warning in the final native confirmation");
+            c.Creator.health.SetDead();
+            Check.Equal(true, Begin(f.Keeper, c.Original, c.Creator), "real occupied shell");
+            var stone = ClassIdentity.Component(c.Original).SpiritRebirth.Stone;
+            var cargo = new List<TransferableOneWay>();
+            var leaves = Production("SpiritReformWarningPatch").GetMethod("LeavesWithParty", BindingFlags.NonPublic | BindingFlags.Static)!;
+            bool Selected() => (bool)leaves.Invoke(null, [c.Original, cargo])!;
+            Check.Equal(false, Selected(), "omitted stone warned");
+            var row = new TransferableOneWay();
+            row.things.Add(stone); cargo.Add(row);
+            row.AdjustTo(1);
+            Check.Equal(true, Selected(), "selected specific stone excluded from warning");
+            row.AdjustTo(0);
+            Check.Equal(false, Selected(), "deselected stone warned again");
+            Check.Same(c.Original, stone.ContainedSpirit, "preview does not alter ownership");
+        }));
+        foreach (string route in new[] { "Ground", "Evacuated", "Pending" })
+            yield return new("SpiritMapLoss." + route, r => SpiritRebirthRitualTransactionTests.Run(r, c =>
+            {
+                using var f = new Fixture(r, c);
+                c.Creator.health.SetDead();
+                using (var refuse = route == "Pending" ? new Patch(PlaceMethod(), nameof(RefusePlacement)) : null)
+                    Check.Equal(true, Begin(f.Keeper, c.Original, c.Creator), "committed loss of original host");
+                var loss = Production("SpiritMapLoss");
+                var remaining = loss.GetMethod("Remaining", BindingFlags.NonPublic | BindingFlags.Static)!;
+                var discard = loss.GetMethod("DiscardRemaining", BindingFlags.NonPublic | BindingFlags.Static)!;
+                List<Pawn> Souls() => (List<Pawn>)remaining.Invoke(null, [c.Map])!;
+                Check.Same(c.Original, Souls().Single(), "warning selects exact soul once");
+                if (route == "Evacuated")
+                {
+                    var stone = ClassIdentity.Component(c.Original).SpiritRebirth.Stone;
+                    stone.DeSpawn();
+                    var owner = new Pawn_InventoryTracker(new Pawn()).innerContainer;
+                    Check.Equal(true, owner.TryAdd(stone, false), "evacuated to off-map inventory");
+                    discard.Invoke(null, [c.Map]);
+                    Check.Same(c.Original, stone.ContainedSpirit, "evacuated soul survives map loss");
+                }
+                else
+                {
+                    var worldObjects = Find.World.worldObjects;
+                    try
+                    {
+                        Find.World.worldObjects = new RimWorld.Planet.WorldObjectsHolder();
+                        c.Map.attackTargetReservationManager = new Verse.AI.AttackTargetReservationManager(c.Map);
+                        c.Map.pawnDestinationReservationManager = new PawnDestinationReservationManager();
+                        c.Original.def.destroyable = true;
+                        typeof(SpellItemEffectTests).GetMethod("HeadlessDefOf", BindingFlags.Static | BindingFlags.NonPublic)!.Invoke(null, [typeof(PawnRelationDefOf)]);
+                        discard.Invoke(null, [c.Map]);
+                        Check.Equal(true, c.Original.Discarded && c.Original.Destroyed, "soul is permanently retired");
+                        Check.Equal(false, Find.WorldPawns.Contains(c.Original), "no independent world pawn");
+                        discard.Invoke(null, [c.Map]);
+                    }
+                    finally { Find.World.worldObjects = worldObjects; }
+                }
+                Check.Equal(0, Souls().Count, "no stale warning or second disposal");
+                RuntimeLog.AssertClean();
+            }));
+        foreach (string route in new[] { "Survivor", "LastOwner", "Veto", "OccupiedCargo" })
+            yield return new("SpiritCaravanLoss.Callback." + route, r => SpiritRebirthRitualTransactionTests.Run(r, c =>
+            {
+                using var f = new Fixture(r, c);
+                bool survives = route == "Survivor";
+                var previous = Find.World.worldObjects;
+                try
+                {
+                    Find.World.worldObjects = new RimWorld.Planet.WorldObjectsHolder();
+                    var caravan = new RimWorld.Planet.Caravan { ID = 69992, def = new RimWorld.WorldObjectDef { defName = "SpiritTestCaravan" } };
+                    Set(caravan, "factionInt", survives ? c.Creator.Faction : new Faction { def = new FactionDef() });
+                    if (!survives) Set(c.Creator, "factionInt", caravan.Faction);
+                    Find.World.worldObjects.AllWorldObjects.Add(caravan);
+                    typeof(RimWorld.Planet.WorldObjectsHolder).GetMethod("AddToCache", BindingFlags.Instance | BindingFlags.NonPublic)!.Invoke(Find.World.worldObjects, [caravan]);
+                    Set(((UIRoot_Play)Current.Root.uiRoot).mapUI, "colonistBar", RuntimeHelpers.GetUninitializedObject(typeof(ColonistBar)));
+                    Set(caravan, "babies", null);
+                    c.Map.spawnedThings.Remove(c.Creator);
+                    Set(c.Creator, "mapIndexOrState", (sbyte)-1);
+                    Check.Equal(true, caravan.pawns.TryAdd(c.Creator, false), "caravan holds host");
+                    var carrier = new Pawn { def = c.Creator.def, kindDef = c.Creator.kindDef, thingIDNumber = 69993 };
+                    Set(carrier, "factionInt", c.Creator.Faction);
+                    carrier.inventory = new Pawn_InventoryTracker(carrier);
+                    if (survives) Check.Equal(true, caravan.pawns.TryAdd(carrier, false), "caravan holds survivor");
+                    c.Creator.health.SetDead();
+                    c.Original.def.destroyable = true;
+                    c.Map.attackTargetReservationManager = new Verse.AI.AttackTargetReservationManager(c.Map);
+                    c.Map.pawnDestinationReservationManager = new PawnDestinationReservationManager();
+                    typeof(SpellItemEffectTests).GetMethod("HeadlessDefOf", BindingFlags.Static | BindingFlags.NonPublic)!.Invoke(null, [typeof(PawnRelationDefOf)]);
+                    var handler = Production("SpiritCaravanHostLoss").GetMethod("BeforeRemoval", BindingFlags.NonPublic | BindingFlags.Static)!;
+                    using var hooks = new FleshStatTests.ProductionPatches();
+                    hooks.Add(Production("SpiritCaravanHostLoss"));
+                    using var noWorldGraphics = new Patch(typeof(RimWorld.Planet.WorldObject).GetMethod(nameof(RimWorld.Planet.WorldObject.PostRemove))!, nameof(CancelNative));
+                    if (route == "Veto")
+                    {
+                        using var veto = new Patch(typeof(RimWorld.Planet.Caravan).GetMethod(nameof(RimWorld.Planet.Caravan.Notify_MemberDied))!, nameof(CancelNative));
+                        caravan.Notify_MemberDied(c.Creator);
+                        Check.Same(c.Original, f.Possession.SpiritPawn, "cancelled native removal retains original");
+                        Check.Equal(true, caravan.Spawned && caravan.pawns.Contains(c.Creator), "no terminal loss on a veto");
+                        return;
+                    }
+                    if (route == "OccupiedCargo")
+                    {
+                        var secure = Production("SpiritCaravanHostLoss").GetMethod("TrySecure", BindingFlags.Static | BindingFlags.NonPublic)!;
+                        Check.Equal(true,(bool)secure.Invoke(null,[c.Original,c.Creator,c.Creator.inventory.innerContainer])!,"actual occupied cargo aboard");
+                        Check.Equal(true,f.Possession.SpiritPawn == null,"dead member no longer contains a Spirit");
+                    }
+                    caravan.Notify_MemberDied(c.Creator);
+                    Check.Equal(survives, caravan.Spawned, "native callback keeps only a surviving caravan");
+                    handler.Invoke(null, [caravan, c.Creator]);
+                    if (survives)
+                    {
+                        var stone = (Thing_SoulStone)carrier.inventory.innerContainer.Single();
+                        Check.Same(c.Original, stone.ContainedSpirit, "surviving owner holds original");
+                    }
+                    else Check.Equal(true, c.Original.Destroyed && c.Original.Discarded, "last native owner lost");
+                    Check.Equal(false, Find.WorldPawns.Contains(c.Original), "no independent world pawn");
+                    RuntimeLog.AssertClean();
+                }
+                finally { Find.World.worldObjects = previous; }
+            }));
+        yield return new("SpiritCaravanLoss.SurvivorInventory", r => SpiritRebirthRitualTransactionTests.Run(r, c =>
+        {
+            using var fixture = new Fixture(r, c);
+            var carrier = new Pawn();
+            var inventory = new Pawn_InventoryTracker(carrier).innerContainer;
+            var secure = Production("SpiritCaravanHostLoss").GetMethod("TrySecure", BindingFlags.Static | BindingFlags.NonPublic)!;
+            bool Transfer() => (bool)secure.Invoke(null, [c.Original, c.Creator, inventory])!;
+            Check.Equal(false, Transfer(), "living host cannot be collapsed");
+            c.Creator.health.SetDead();
+            Check.Equal(true, Transfer(), "survivor inventory secures original");
+            Check.Equal(false, Transfer(), "duplicate death does not mint a stone");
+            var state = ClassIdentity.Component(c.Original).SpiritRebirth;
+            Check.Equal(true, state.HasValidStone(c.Original), "reciprocal stone custody");
+            Check.Same(state.Stone, inventory.Single(), "only stone belongs to survivor");
+            Check.Equal(0, state.RecoveryTicks, "lost host resets recovery");
+            RuntimeLog.AssertClean();
+        }));
         foreach (var route in new[] { "SetDead", "CancelKill", "RemoveHediff", "RemovePossession", "Destroy", "Kill", "RefusedRemoval" })
             yield return new("SpiritHostLoss.Native." + route, r => SpiritRebirthRitualTransactionTests.Run(r, c =>
             {
@@ -301,6 +1019,34 @@ internal static class SpiritMapCollapseTests
         public void Dispose() { ui.Dispose(); TorannMagicDefOf.TM_SpiritPossessionHD = oldPossession; DefDatabase<ThingDef>.Clear(); foreach (var def in defs) DefDatabase<ThingDef>.Add(def); release.Dispose(); }
     }
     static bool CancelNative() => false;
+    sealed class ProjectileCreationObserved : Exception { }
+    static bool ObserveProjectileCreation() => throw new ProjectileCreationObserved();
+    static Thing? observedRayOwner;
+    static readonly List<(IntVec3, Thing)> stormExplosions = [];
+    sealed class SkyExplosionObserved(Thing? owner) : Exception { public Thing? Owner => owner; }
+    static bool StopAtSkyExplosion(Thing instigator) => throw new SkyExplosionObserved(instigator);
+    static bool ObserveStormExplosion(IntVec3 center, Thing instigator)
+    {
+        stormExplosions.Add((center, instigator));
+        return false;
+    }
+    static readonly List<(int tick, bool paid)> rayLaunches = [];
+    static bool RecordRayLaunch(bool paidBurst, ref bool __result)
+    {
+        rayLaunches.Add((Find.TickManager.TicksGame, paidBurst));
+        __result = true;
+        return false;
+    }
+    static bool ObserveDeathBoltImpact(AbilityUser.Projectile_AbilityBase __instance)
+    {
+        observedRayOwner = __instance.Launcher;
+        return false;
+    }
+    static bool ObserveFrostRayOwner(AbilityUser.Projectile_AbilityLaser __instance)
+    {
+        observedRayOwner = __instance.Launcher;
+        return false;
+    }
     sealed class Patch : IDisposable
     {
         readonly object harmony; readonly string id = "rwom.map-collapse-fault." + Guid.NewGuid();
