@@ -198,9 +198,9 @@ namespace TorannMagic
                 }
                 if((magicDef.requiredInspiration != null || magicDef.requiresAnyInspiration) && magicDef.consumesInspiration)
                 {
-                    if (this.Pawn.mindState != null && this.Pawn.mindState.inspirationHandler != null && this.Pawn.Inspiration != null)
+                    if (body.mindState?.inspirationHandler != null && body.Inspiration != null)
                     {
-                        this.Pawn.mindState.inspirationHandler.EndInspiration(this.Pawn.Inspiration);
+                        body.mindState.inspirationHandler.EndInspiration(body.Inspiration);
                     }
                 }
                 if(magicDef.chainedAbility != null)
