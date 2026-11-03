@@ -14,4 +14,9 @@
     <driverClass>TorannMagic.ClassProgression.JobDriver_SpiritHostedMartial</driverClass>
     <reportString>entering reversal stance.</reportString>
   </JobDef>
+  <JobDef>
+    <defName>TM_SpiritCastTranspose</defName>
+    <driverClass>TorannMagic.ClassProgression.JobDriver_SpiritHostedMartial</driverClass>
+    <reportString>exchanging places with TargetB.</reportString>
+  </JobDef>
 </Defs>

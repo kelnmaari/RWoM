@@ -13,6 +13,18 @@ namespace TorannMagic.Compatibility
                 && destination.Standable(map);
         }
 
+        internal static bool Swap(Pawn first, Pawn second)
+        {
+            if (first == null || second == null || first.Map != second.Map ||
+                !CanMove(first,second.Position) || !CanMove(second,first.Position)) return false;
+            var origin=first.Position;
+            first.Position=second.Position;
+            second.Position=origin;
+            first.Notify_Teleported(endCurrentJob:false);
+            second.Notify_Teleported(endCurrentJob:false);
+            return true;
+        }
+
         public static bool Move(Pawn pawn, IntVec3 destination)
         {
             // Repeat destination validation at completion, not just during target selection.

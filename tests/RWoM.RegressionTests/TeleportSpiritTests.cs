@@ -63,6 +63,25 @@ internal static partial class TeleportSpiritTests
             Check.Same(w.Map, w.Caster.Map, "original map retains pawn");
             Check.Equal(true, magic.recallSet && magic.recallPosition == mark && magic.recallNeedValues.Single() == .75f, "blocked attempt preserves snapshot");
         }));
+        yield return new("FacelessProjection.TransposeSwap",f=>World(f,w=>{
+            using var guards=w.MovementBoundaries();
+            var first=w.Caster.Position;
+            var second=new IntVec3(10,0,5);
+            var other=w.Pawn("TransposePartner",second);
+            w.SwapPartner=other;
+            var swap=typeof(TM_Teleport).GetMethod("Swap",Flags);
+            Check.Equal(true,swap!=null,"paired relocation must avoid despawn");
+            bool Exchange()=>(bool)swap!.Invoke(null,[w.Caster,other])!;
+            Check.Equal(true,Exchange(),"exchange standable occupied cells");
+            Check.Equal(second,w.Caster.Position,"caster moved to target");
+            Check.Equal(first,other.Position,"target moved to caster");
+            Check.Equal("Position,Position,Notify,Notify",string.Join(",",w.Events),"place both before notifying either");
+            w.AssertPreserved();
+            w.Building(first);
+            Check.Equal(false,Exchange(),"blocked endpoint rejects both moves");
+            Check.Equal(second,w.Caster.Position,"caster stays when blocked");
+            Check.Equal(first,other.Position,"partner stays when blocked");
+        }));
         yield return new("ChronomancerRecall.SameMapKeepsDraftJobAndSelection", f => World(f, w =>
         {
             using var patches = w.MovementBoundaries();
@@ -317,6 +336,7 @@ internal static partial class TeleportSpiritTests
             Caster.drafter = new Pawn_DraftController(Caster); Set(Caster.drafter, "draftedInt", true);
             Set(Caster.jobs, "curJob", Job); Selected.Add(Caster);
         }
+        internal Pawn? SwapPartner;
         public Pawn Pawn(string name, IntVec3 position, bool player = true)
         {
             var race = Blank<ThingDef>(); race.defName = name; race.category = ThingCategory.Pawn; race.size = new IntVec2(1, 1);
@@ -400,13 +420,13 @@ internal static partial class TeleportSpiritTests
     static bool SkipGraphics() => false;
     static bool Position(Thing __instance, IntVec3 value)
     {
-        if (__instance != active?.Caster) return true;
+        if (__instance != active?.Caster && __instance != active?.SwapPartner) return true;
         active.Map.thingGrid.Deregister(__instance); Set(__instance, "positionInt", value); active.Map.thingGrid.Register(__instance);
         active.Events.Add("Position"); return false;
     }
     static bool Notify(Pawn __instance, bool endCurrentJob)
     {
-        if (__instance != active?.Caster) return true;
+        if (__instance != active?.Caster && __instance != active?.SwapPartner) return true;
         active.EndsJob = endCurrentJob; active.Events.Add("Notify"); return false;
     }
     static bool DrawPos(Pawn __instance, ref Vector3 __result)

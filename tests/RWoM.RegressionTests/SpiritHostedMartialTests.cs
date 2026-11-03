@@ -167,6 +167,21 @@ internal static partial class SpiritMapCollapseTests
                     host.AbilityData.AllPowers=null;
                     Check.Equal(true,Owner()==null,"a lower native rank takes priority");
                 }));
+        foreach(string id in new[]{"TM_Transpose","TM_Transpose_I","TM_Transpose_II","TM_Transpose_III"})
+            yield return new("FacelessProjection.TransposeOwner."+id,f=>
+                SpiritRebirthRitualTransactionTests.Run(f,c=>{
+                    using var held=new Fixture(f,c);
+                    var source=c.Original.GetCompAbilityUserMight();
+                    var def=(TMAbilityDef)typeof(TorannMagicDefOf).GetField(id)!.GetValue(null)!;
+                    var power=new MightAbility(source){Def=def};
+                    source.AbilityData.Powers.Add(power);source.AbilityData.AllPowers=null;
+                    var find=Production("SpiritHostedMartial").GetMethod("Find",BindingFlags.Static|BindingFlags.NonPublic)!;
+                    object? Power()=>find.Invoke(null,[c.Creator,c.Original,"TM_SpiritCastTranspose"]);
+                    Check.Same(power,Power()!,"exact retained transpose rank");
+                    var host=c.Creator.GetCompAbilityUserMight();
+                    host.AbilityData.Powers.Add(new MightAbility(host){Def=TorannMagicDefOf.TM_Transpose});host.AbilityData.AllPowers=null;
+                    Check.Equal(true,Power()==null,"native transpose has priority");
+                }));
         yield return new("FacelessProjection.ReversalHitKinds",f=>{
             var martial=typeof(MightAbility).Assembly.GetType("TorannMagic.Verb_Reversal",true)!;
             var round=martial.GetMethod("IncomingRound",BindingFlags.Static|BindingFlags.NonPublic);

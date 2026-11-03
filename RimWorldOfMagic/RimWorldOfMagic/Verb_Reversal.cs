@@ -63,12 +63,23 @@ namespace TorannMagic
             if (body == null || body.Dead || comp == null) return false;
             int rank = comp.MightData.MightPowerSkill_Reversal.FirstOrDefault(skill => skill.label == "TM_Reversal_pwr")?.level ?? 0;
             float strength = (8 + 2 * rank) * comp.mightPwr;
+            return Strengthen(body,source,strength);
+        }
+
+        internal static bool Strengthen(Pawn body, Pawn source, float strength)
+        {
             if (body == source)
             {
                 HealthUtility.AdjustSeverity(body,TorannMagicDefOf.TM_ReversalHD,strength);
                 return true;
             }
-            if (body.health.hediffSet.HasHediff(TorannMagicDefOf.TM_ReversalHD)) return false;
+            var prior=body.health.hediffSet.GetFirstHediffOfDef(TorannMagicDefOf.TM_ReversalHD);
+            if (prior != null)
+            {
+                if (prior.TryGetComp<HediffComp_Reversal>()?.SkillOwner != source) return false;
+                prior.Severity+=strength;
+                return true;
+            }
             var stance=HediffMaker.MakeHediff(TorannMagicDefOf.TM_ReversalHD,body);
             var marker=stance.TryGetComp<HediffComp_Reversal>();
             if (marker == null) return false;
