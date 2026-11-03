@@ -7728,9 +7728,9 @@ namespace TorannMagic
         [HarmonyPatch(typeof(MapParent), "CheckRemoveMapNow", null)]
         public class CheckRemoveMapNow_Patch
         {
-            public static bool Prefix()
+            public static bool Prefix(MapParent __instance)
             {
-                return !ModOptions.Constants.GetPawnInFlight();
+                return !ModOptions.Constants.GetPawnInFlight() && !FlyingObject_ValiantCharge.ProtectsMap(__instance.Map);
             }
         }
 

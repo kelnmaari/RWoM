@@ -19,10 +19,10 @@ namespace TorannMagic.ClassProgression
         protected abstract List<MagicPowerSkill> Skills(MagicData data);
         protected abstract string SkillStem { get; }
 
-        internal static int ProjectionRank(MagicAbility owner, List<MagicPowerSkill> skills, string stem, string suffix)
+        internal static int SpellRank(Pawn owner, List<MagicPowerSkill> skills, string stem, string suffix)
         {
-            if (owner.Pawn.story.traits.HasTrait(TorannMagicDefOf.Faceless))
-                return owner.Pawn.GetCompAbilityUserMight()?.ExistingMightData?.MightPowerSkill_Mimic
+            if (owner.story?.traits?.HasTrait(TorannMagicDefOf.Faceless) == true)
+                return owner.GetCompAbilityUserMight()?.ExistingMightData?.MightPowerSkill_Mimic
                     ?.FirstOrDefault(s => s.label == "TM_Mimic" + suffix)?.level ?? 0;
             return skills.FirstOrDefault(s => s.label == stem + suffix)?.level ?? 0;
         }
@@ -32,8 +32,8 @@ namespace TorannMagic.ClassProgression
             projectedOwner = owner.Pawn;
             projected = true;
             var skills = Skills(owner.MagicUser.MagicData);
-            pwrVal = ProjectionRank(owner, skills, SkillStem, "_pwr");
-            verVal = ProjectionRank(owner, skills, SkillStem, "_ver");
+            pwrVal = SpellRank(owner.Pawn, skills, SkillStem, "_pwr");
+            verVal = SpellRank(owner.Pawn, skills, SkillStem, "_ver");
             arcaneDmg = owner.MagicUser.arcaneDmg;
         }
 

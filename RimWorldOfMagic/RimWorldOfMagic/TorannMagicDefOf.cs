@@ -443,6 +443,7 @@ namespace TorannMagic
         public static TMAbilityDef TM_DeathBolt_III;
         public static TMAbilityDef TM_LichForm;
         public static HediffDef TM_LichHD;
+        public static ThingDef FlyingObject_ValiantCharge;
         public static ThingDef FlyingObject_DeathBolt;
         public static TMAbilityDef TM_Flight;
         public static ThingDef FlyingObject_Flight;

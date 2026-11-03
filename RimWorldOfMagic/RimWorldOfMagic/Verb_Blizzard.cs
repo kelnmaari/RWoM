@@ -24,8 +24,8 @@ namespace TorannMagic
                 {
                     if (ClassProgression.SpiritRebirthCasting.SkillOwner(CasterPawn, magic) == null) return 0f;
                     var skills = Skills(magic.MagicUser.MagicData);
-                    return adjustedRadius + .5f * (ClassProgression.Projectile_SpiritBolt.ProjectionRank(magic, skills, magic.magicDef.defName, "_pwr") +
-                        ClassProgression.Projectile_SpiritBolt.ProjectionRank(magic, skills, magic.magicDef.defName, "_ver"));
+                    return adjustedRadius + .5f * (ClassProgression.Projectile_SpiritBolt.SpellRank(magic.Pawn, skills, magic.magicDef.defName, "_pwr") +
+                        ClassProgression.Projectile_SpiritBolt.SpellRank(magic.Pawn, skills, magic.magicDef.defName, "_ver"));
                 }
                 CompAbilityUserMagic comp = this.CasterPawn.GetCompAbilityUserMagic();
                 if (comp != null && comp.MagicData != null)

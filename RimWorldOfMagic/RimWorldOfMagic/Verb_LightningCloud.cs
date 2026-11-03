@@ -21,7 +21,7 @@ namespace TorannMagic
                 if (Ability is MagicAbility magic && magic.Pawn != CasterPawn)
                 {
                     if (ClassProgression.SpiritRebirthCasting.SkillOwner(CasterPawn, magic) == null) return 0f;
-                    return adjustedRadius + ClassProgression.Projectile_SpiritBolt.ProjectionRank(magic,
+                    return adjustedRadius + ClassProgression.Projectile_SpiritBolt.SpellRank(magic.Pawn,
                         magic.MagicUser.MagicData.MagicPowerSkill_LightningCloud, "TM_LightningCloud", "_ver");
                 }
                 CompAbilityUserMagic comp = this.CasterPawn.GetCompAbilityUserMagic();
