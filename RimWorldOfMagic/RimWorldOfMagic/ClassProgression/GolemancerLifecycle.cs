@@ -14,6 +14,28 @@ namespace TorannMagic.ClassProgression
             return owner?.learned == true ? owner : null;
         }
 
+        internal static CompAbilityUserMagic RuneOwner(Pawn surgeon)
+        {
+            var local = surgeon?.GetCompAbilityUserMagic();
+            bool Learned(CompAbilityUserMagic magic) => magic?.ExistingMagicData != null &&
+                GetLearnedNativeOwner(magic, TorannMagicDefOf.TM_RuneCarving) != null;
+            if (Learned(local)) return local;
+            if (SpiritRebirthState.TryGetPossessingSpirit(surgeon, out var soul) &&
+                SpiritRebirthState.TryGet(soul, out var state) && !state.DepletionPending)
+            {
+                var projected = soul.GetCompAbilityUserMagic();
+                if (Learned(projected)) return projected;
+            }
+            return null;
+        }
+
+        internal static float RuneCost(CompAbilityUserMagic magic)
+        {
+            var spell = TorannMagicDefOf.TM_RuneCarving;
+            var skill = magic.MagicData.MagicPowerSkill_RuneCarving.First(x => x.label == "TM_RuneCarving_eff");
+            return spell.manaCost - skill.level * spell.efficiencyReductionPercent * spell.manaCost;
+        }
+
         public static bool Restore(CompAbilityUserMagic comp)
         {
             if (SpiritRebirthBodyEffects.SuppressFormerBodyEffects(comp?.Pawn)) return true;

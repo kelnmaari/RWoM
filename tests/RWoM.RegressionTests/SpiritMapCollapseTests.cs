@@ -38,6 +38,22 @@ internal static partial class SpiritMapCollapseTests
                 }
                 Check.Equal(true,find.Invoke(null,[body,body,def])==null,"physical body cannot impersonate the soul");
             }));
+        yield return new("GolemancerTrial.PossessedSurgeonUsesOneLearnedRuneOwner", r =>
+            SpiritRebirthRitualTransactionTests.Run(r,c => {
+                using var fixture = new Fixture(r,c);
+                var local = c.Creator.GetCompAbilityUserMagic();
+                var soul = c.Original.GetCompAbilityUserMagic();
+                var rune = TorannMagicDefOf.TM_RuneCarving;
+                var localPower = local.MagicData.MagicPowersGolemancer.Single(p=>p.TMabilityDefs.Contains(rune));
+                var spiritPower = soul.MagicData.MagicPowersGolemancer.Single(p=>p.TMabilityDefs.Contains(rune));
+                var resolve = typeof(GolemancerLifecycle).GetMethod("RuneOwner",BindingFlags.Static|BindingFlags.NonPublic)!;
+                localPower.learned=false; spiritPower.learned=true;
+                Check.Same(soul,resolve.Invoke(null,[c.Creator]),"surgery on the map uses the learned original");
+                localPower.learned=true;
+                Check.Same(local,resolve.Invoke(null,[c.Creator]),"surgeon's own learned rune takes precedence");
+                localPower.learned=false; spiritPower.learned=false;
+                Check.Equal(true,resolve.Invoke(null,[c.Creator])==null,"no owner invented");
+            }));
         yield return new("EnchanterAspect.OnlyTheOriginalMaySustainAProjectedAspect", r =>
             SpiritRebirthRitualTransactionTests.Run(r,c => {
                 using var fixture = new Fixture(r,c);

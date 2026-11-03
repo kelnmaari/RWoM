@@ -10,9 +10,9 @@ namespace TorannMagic.ClassProgression
         static CompAbilityUserMagic Magic(Pawn p) => p?.AllComps.OfType<CompAbilityUserMagic>().FirstOrDefault();
         static MagicPower Owner(Pawn p, bool brand) => Magic(p)?.MagicData.MagicPowersGolemancer.FirstOrDefault(x => x.learned && x.TMabilityDefs.Contains(brand ? TorannMagicDefOf.TM_Branding : TorannMagicDefOf.TM_RuneCarving));
         static bool Finite(float v) => !float.IsNaN(v) && !float.IsInfinity(v);
-        static DisciplineProgress Path(Pawn p, bool brand)
+        static DisciplineProgress Path(Pawn p, bool brand, Pawn surgeon = null)
         {
-            if (p == null || p.Dead || !p.Spawned || p.Faction == null || p.story?.traits?.HasTrait(TorannMagicDefOf.Faceless) == true
+            if (p == null || p.Dead || !(surgeon ?? p).Spawned || p.Faction == null || p.story?.traits?.HasTrait(TorannMagicDefOf.Faceless) == true
                 || !ClassIdentity.TryGetState(p, out var state) || (state.Vocation & Vocation.Mage) == 0) return null;
             var path = state.Find("rwom.golemancer");
             return path?.Domain == DisciplineDomain.Magic && path.Stage == (brand ? InitiationStage.Adept : InitiationStage.Foundation)
@@ -23,7 +23,7 @@ namespace TorannMagic.ClassProgression
         static bool HasRune(Pawn target, BodyPartRecord part) => target.health.hediffSet.hediffs.Any(h => h.Part == part && (h.def == TorannMagicDefOf.TM_RuneCarvedPartHD || h.def == TorannMagicDefOf.TM_ArcaneTatooPartHD));
         public sealed class RuneSnapshot
         {
-            internal Pawn caster, target;
+            internal Pawn caster, surgeon, target;
             internal Recipe_RuneCarving worker;
             internal Bill bill;
             internal BodyPartRecord part;
@@ -33,10 +33,12 @@ namespace TorannMagic.ClassProgression
         }
         public static RuneSnapshot CaptureRune(Recipe_RuneCarving worker, Pawn caster, Pawn target, BodyPartRecord part, Bill bill)
         {
-            var path = Path(caster, false);
+            var surgeon = caster;
+            caster = GolemancerLifecycle.RuneOwner(surgeon)?.Pawn;
+            var path = Path(caster, false, surgeon);
             return path != null && worker?.GetType() == typeof(Recipe_RuneCarving) && bill?.recipe != null && bill.recipe == worker.recipe && bill.recipe == DefDatabase<RecipeDef>.GetNamedSilentFail("TM_RuneCarveBodyPart")
-                && bill.recipe.surgerySuccessChanceFactor < 1f && part != null && Ally(caster, target) && !HasRune(target, part)
-                ? new RuneSnapshot { caster = caster, target = target, worker = worker, bill = bill, part = part, path = path, owner = Owner(caster, false) } : null;
+                && bill.recipe.surgerySuccessChanceFactor < 1f && part != null && Ally(surgeon, target) && !HasRune(target, part)
+                ? new RuneSnapshot { caster = caster, surgeon = surgeon, target = target, worker = worker, bill = bill, part = part, path = path, owner = Owner(caster, false) } : null;
         }
         public static void RecordRunePayment(RuneSnapshot s, float before, float after, float needed)
         {
@@ -48,7 +50,7 @@ namespace TorannMagic.ClassProgression
         {
             if (s == null || s.used) return false;
             s.used = true;
-            if (!s.paid || Path(s.caster, false) != s.path || Owner(s.caster, false) != s.owner || !Ally(s.caster, s.target)) return false;
+            if (!s.paid || GolemancerLifecycle.RuneOwner(s.surgeon)?.Pawn != s.caster || Path(s.caster, false, s.surgeon) != s.path || Owner(s.caster, false) != s.owner || !Ally(s.surgeon, s.target)) return false;
             var def = s.part.IsCorePart ? TorannMagicDefOf.TM_ArcaneTatooPartHD : TorannMagicDefOf.TM_RuneCarvedPartHD;
             return s.target.health.hediffSet.hediffs.Any(h => h.pawn == s.target && h.Part == s.part && h.def == def && Finite(h.Severity) && h.Severity > 0)
                 && s.path.RecordCompletedTrial(FoundationTrialId);

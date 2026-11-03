@@ -803,26 +803,9 @@ namespace TorannMagic
 
         public static bool HasRuneCarverOnMap(Faction faction, Map map, bool countSlaves = false)
         {
-            if (faction == null)
-            {
-                return false;
-            }
-            foreach (Pawn p in map.mapPawns.AllPawnsSpawned)
-            {
-                if(IsMagicUser(p) && p.IsSlave ? countSlaves : true)
-                {
-                    CompAbilityUserMagic comp = p.GetCompAbilityUserMagic();
-                    if(comp!= null && comp.MagicData != null)
-                    {
-                        MagicPower mp = ClassProgression.GolemancerLifecycle.GetLearnedNativeOwner(comp, TorannMagicDefOf.TM_RuneCarving);
-                        if(mp != null && mp.learned)
-                        {
-                            return true;
-                        }                            
-                    }
-                }
-            }
-            return false;
+            return faction != null && map != null && map.mapPawns.AllPawnsSpawned.Any(p =>
+                p.Faction == faction && !p.Dead && !p.IsPrisoner && (countSlaves || !p.IsSlave) &&
+                ClassProgression.GolemancerLifecycle.RuneOwner(p) != null);
         }
 
         public static List<Pawn> GolemancersInFaction(Faction faction)

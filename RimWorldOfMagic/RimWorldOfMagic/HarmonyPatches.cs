@@ -8387,21 +8387,12 @@ namespace TorannMagic
 
             private static bool IsCapableRuneCarver(Pawn p, RecipeDef recipe)
             {
-                if (p.RaceProps.Humanlike && p.skills != null)
-                {
-                    CompAbilityUserMagic comp = p.GetCompAbilityUserMagic();
-                    if (p.workSettings.WorkIsActive(WorkTypeDefOf.Doctor) && comp != null && (ClassProgression.ClassIdentity.TryGetState(p, out _) ? ClassProgression.GolemancerLifecycle.GetLearnedNativeOwner(comp, TorannMagicDefOf.TM_RuneCarving) != null : (p.story.traits.HasTrait(TorannMagicDefOf.TM_Golemancer) || TM_ClassUtility.ClassHasAbility(TorannMagicDefOf.TM_RuneCarving, comp, null))))
-                    {
-                        if (comp.MagicData.MagicPowersGolemancer.FirstOrDefault<MagicPower>((MagicPower x) => x.abilityDef == TorannMagicDefOf.TM_RuneCarving).learned && recipe.PawnSatisfiesSkillRequirements(p) && p.health.capacities.CapableOf(PawnCapacityDefOf.Manipulation) && p.health.capacities.CapableOf(PawnCapacityDefOf.Moving) && !p.skills.GetSkill(SkillDefOf.Artistic).TotallyDisabled && !p.skills.GetSkill(SkillDefOf.Crafting).TotallyDisabled)
-                        {
-                            if (comp.Mana.CurLevel > TorannMagicDefOf.TM_RuneCarving.manaCost)
-                            {
-                                return true;
-                            }
-                        }
-                    }
-                }
-                return false;
+                if (p?.RaceProps.Humanlike != true || p.skills == null || p.workSettings?.WorkIsActive(WorkTypeDefOf.Doctor) != true ||
+                    !recipe.PawnSatisfiesSkillRequirements(p) || !p.health.capacities.CapableOf(PawnCapacityDefOf.Manipulation) ||
+                    !p.health.capacities.CapableOf(PawnCapacityDefOf.Moving) || p.skills.GetSkill(SkillDefOf.Artistic).TotallyDisabled ||
+                    p.skills.GetSkill(SkillDefOf.Crafting).TotallyDisabled) return false;
+                var magic = ClassProgression.GolemancerLifecycle.RuneOwner(p);
+                return magic?.Mana != null && magic.Mana.CurLevel >= ClassProgression.GolemancerLifecycle.RuneCost(magic);
             }
         }
 
