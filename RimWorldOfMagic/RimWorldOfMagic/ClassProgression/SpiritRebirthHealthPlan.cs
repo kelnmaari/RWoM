@@ -72,6 +72,13 @@ namespace TorannMagic.ClassProgression
             var component = def.comps[0]?.compClass;
             if (def.defName == "TM_MagicUserHD" || def.defName == "TM_MightUserHD")
                 return component == typeof(HediffComp_SeverityPerDay);
+            if (def.defName == "TM_LightCapacitanceHD" || def.defName == "TM_TechnoBitHD")
+            {
+                var expected = def.defName == "TM_LightCapacitanceHD" ? typeof(HediffComp_LightCapacitance) : typeof(HediffComp_TechnoBit);
+                var live = ((HediffWithComps)effect).comps;
+                return effect.Part == null && component == expected && live?.Count == 1
+                    && live[0]?.GetType() == expected && live[0].parent == effect;
+            }
             return def.defName.StartsWith("TM_HediffEnchantment_", StringComparison.Ordinal)
                 && component == typeof(Enchantment.HediffComp_Enchantment);
         }

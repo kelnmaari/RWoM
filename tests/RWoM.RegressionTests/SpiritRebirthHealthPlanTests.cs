@@ -53,17 +53,36 @@ internal static class SpiritRebirthHealthPlanTests
         using var f = new SpiritRebirthStateTests.Fixture(r); Dead(f.Original);
         using var defs = new HealthDefinitions();
         var markers = new List<Hediff>();
-        foreach (var name in new[] {"TM_MagicUserHD", "TM_MightUserHD", "TM_HediffEnchantment_dmgBonus"})
+        foreach (var name in new[] {"TM_MagicUserHD", "TM_MightUserHD", "TM_HediffEnchantment_dmgBonus", "TM_LightCapacitanceHD", "TM_TechnoBitHD"})
         {
-            var type = name.StartsWith("TM_HediffEnchantment") ? typeof(CompClassProgression).Assembly.GetType("TorannMagic.Enchantment.HediffComp_Enchantment", true)! : typeof(HediffComp_SeverityPerDay);
+            var type = name switch {
+                "TM_HediffEnchantment_dmgBonus" => typeof(CompClassProgression).Assembly.GetType("TorannMagic.Enchantment.HediffComp_Enchantment", true)!,
+                "TM_LightCapacitanceHD" => typeof(TorannMagic.HediffComp_LightCapacitance),
+                "TM_TechnoBitHD" => typeof(CompClassProgression).Assembly.GetType("TorannMagic.HediffComp_TechnoBit", true)!,
+                _ => typeof(HediffComp_SeverityPerDay)
+            };
             var def = new HediffDef {defName=name, hediffClass=typeof(HediffWithComps), comps=[new HediffCompProperties {compClass=type}]};
             DefDatabase<HediffDef>.Add(def);
-            markers.Add(new HediffWithComps {def=def,pawn=f.Original});
+            var marker = new HediffWithComps {def=def,pawn=f.Original};
+            var component = (HediffComp)Activator.CreateInstance(type)!;
+            component.parent = marker;
+            marker.comps = [component];
+            markers.Add(marker);
         }
         f.Original.health.hediffSet.hediffs.AddRange(markers);
+        var light = ((HediffWithComps)markers[^2]).TryGetComp<TorannMagic.HediffComp_LightCapacitance>();
+        light.LightEnergy = 61.25f;
+        var bit = ((HediffWithComps)markers[^1]).comps.Single();
+        Set(bit, "nextBitGrenade", 421);
+        markers[^1].Part = Part();
+        Check.Equal(false, Prepare(f.Original, out _, out var unsupported), "a body-attached bit needs its own adapter");
+        Check.Same(markers[^1], unsupported!, "the body-attached effect is identified");
+        markers[^1].Part = null;
         Check.Equal(true, Prepare(f.Original, out var plan, out _), "native class resource markers accepted");
         Check.Equal(true, Apply(plan!), "resource markers preserved at payment");
         SameGraph(f.Original, markers.ToArray(), "existing resource markers retained");
+        Check.Equal(61.25f, light.LightEnergy, "stored sunlight retained");
+        Check.Equal(421, (int)bit.GetType().GetField("nextBitGrenade", Hidden)!.GetValue(bit)!, "scheduled grenade retained");
     }
     static void SameGraph(Pawn pawn, Hediff[] before, string reason)
     {
