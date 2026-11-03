@@ -442,7 +442,8 @@ namespace TorannMagic.ClassProgression
                     else if (field != null)
                     {
                         float radius = field.HighlightFieldRadiusAroundTarget(out _);
-                        if (radius > 0f) GenDraw.DrawRadiusRing(field is Verb_Scorn ? Projectile_Scorn.LandingCell(target.Cell,map: body.Map) : target.Cell, radius);
+                        var center = field is Verb_Scorn ? Projectile_Scorn.LandingCell(target.Cell,body.Map) : target.Cell;
+                        if (radius > 0f && center.IsValid) GenDraw.DrawRadiusRing(center,radius);
                     }
                 },
                 targetValidator: target => CanTarget(body, Find(body,soul,def), target), caster: body);
