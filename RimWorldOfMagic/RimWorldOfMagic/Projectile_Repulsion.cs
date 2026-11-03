@@ -11,6 +11,7 @@ namespace TorannMagic
 {
     class Projectile_Repulsion : ClassProgression.Projectile_DemonField
     {
+        protected override TMAbilityDef RankSpell => TorannMagicDefOf.TM_Repulsion;
         public Projectile_Repulsion() => duration = 20;
         int strikeDelay = 4;
         int strikeNum = 1;

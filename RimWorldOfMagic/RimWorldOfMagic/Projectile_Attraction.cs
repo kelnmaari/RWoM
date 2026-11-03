@@ -9,6 +9,7 @@ namespace TorannMagic
 {
     class Projectile_Attraction : ClassProgression.Projectile_DemonField
     {
+        protected override TMAbilityDef RankSpell => TorannMagicDefOf.TM_Attraction;
         public Projectile_Attraction() => duration = 1200;
         int strikeDelay = 6;
         List<IntVec3> cellList;

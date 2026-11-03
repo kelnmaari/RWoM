@@ -13,6 +13,7 @@ namespace TorannMagic.ClassProgression
         protected int duration;
         private bool resolvingImpact;
 
+        protected abstract TMAbilityDef RankSpell { get; }
         protected abstract void TickField();
 
         protected override void Impact(Thing hitThing, bool blockedByShield = false)
@@ -55,7 +56,7 @@ namespace TorannMagic.ClassProgression
         {
             projectedOwner = power.Pawn;
             pawn = body;
-            ReadRanks(projectedOwner,this is Projectile_Repulsion ? TorannMagicDefOf.TM_Repulsion : TorannMagicDefOf.TM_Attraction);
+            ReadRanks(projectedOwner,RankSpell);
         }
 
         protected void InitializeRanks(TMAbilityDef spell)
@@ -64,7 +65,7 @@ namespace TorannMagic.ClassProgression
             if (projectedOwner == null && pawn != null) ReadRanks(pawn,spell);
         }
 
-        private void ReadRanks(Pawn owner, TMAbilityDef spell)
+        protected virtual void ReadRanks(Pawn owner, TMAbilityDef spell)
         {
             var magic = owner.GetCompAbilityUserMagic();
             pwrVal = magic?.MagicData.GetSkill_Power(spell)?.level ?? 0;

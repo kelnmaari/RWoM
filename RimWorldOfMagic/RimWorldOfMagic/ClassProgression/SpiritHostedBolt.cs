@@ -124,6 +124,7 @@ namespace TorannMagic.ClassProgression
             ("TM_SpiritAttraction_I", () => TorannMagicDefOf.TM_Attraction_I, typeof(Projectile_Attraction)),
             ("TM_SpiritAttraction_II", () => TorannMagicDefOf.TM_Attraction_II, typeof(Projectile_Attraction)),
             ("TM_SpiritAttraction_III", () => TorannMagicDefOf.TM_Attraction_III, typeof(Projectile_Attraction)),
+            ("TM_SpiritPsychicShock", () => TorannMagicDefOf.TM_PsychicShock, typeof(Projectile_PsychicShock)),
             ("TM_SpiritDominate", () => TorannMagicDefOf.TM_Dominate, typeof(Verb_Dominate)),
             ("TM_SpiritSoulBond", () => TorannMagicDefOf.TM_SoulBond, typeof(Verb_SoulBond)),
             ("TM_SpiritSymbiosis", () => TorannMagicDefOf.TM_Symbiosis, typeof(Verb_Symbiosis)),
