@@ -11,6 +11,7 @@ internal static class ChronomancerTrialTests
 {
     public static IEnumerable<TestCase> Cases()
     {
+        yield return new("ChronomancerTrial.AlterFateRequiresOwnedPendingEventOnCurrentMap", AlterFate);
         yield return new("ChronomancerTrial.PredictionExactQueueAndActiveOwnedSource", Prediction);
         yield return new("ChronomancerTrial.PredictionSourceAndStageBoundaries", PredictionBoundaries);
         yield return new("ChronomancerTrial.PredictionMarkerScribe", MarkerSave);
@@ -70,6 +71,23 @@ internal static class ChronomancerTrialTests
             Current.Game = previous; TorannMagicDefOf.TM_PredictionHD = prediction; StatDefOf.MaxHitPoints = hp;
             DefDatabase<ClassDisciplineDef>.Clear(); foreach (var d in profiles) DefDatabase<ClassDisciplineDef>.Add(d);
         }
+    }
+    static void AlterFate(RuntimeFixture f)
+    {
+        using var w = new Fixture(f);
+        var ability=new MagicAbility(w.Magic){Def=TorannMagicDefOf.TM_AlterFate};
+        var method=typeof(Verb_AlterFate).GetMethod("Available",BindingFlags.Static|BindingFlags.NonPublic)!;
+        bool Ready() => (bool)method.Invoke(null,[w.Caster,ability])!;
+        var entry=w.Entry();
+        w.Magic.predictionIncidentDef=entry.FiringIncident.def;
+        Check.Equal(false,Ready(),"stale label cannot alter anything in the queue");
+        ChronomancerPrediction.Clear(w.Magic);
+        Check.Equal(true,ChronomancerPrediction.TryEnqueue(w.Magic,w.Queue,entry),"owned native incident inserted");
+        Check.Equal(true,Ready(),"exact pending event is eligible");
+        Set(w.Caster,"mapIndexOrState",(sbyte)1);
+        Check.Equal(false,Ready(),"caster moved away from the incident map");
+        Set(w.Caster,"mapIndexOrState",(sbyte)0);
+        Check.Same(entry,ChronomancerPrediction.ResolveOwned(w.Magic,w.Queue),"rejected cast keeps queue untouched");
     }
     static void Prediction(RuntimeFixture f)
     {

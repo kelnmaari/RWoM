@@ -91,6 +91,7 @@ namespace TorannMagic.ClassProgression
             ("TM_SpiritRend_III", () => TorannMagicDefOf.TM_Rend_III, typeof(Verb_Rend)),
             ("TM_SpiritEarthSprites", () => TorannMagicDefOf.TM_EarthSprites, typeof(Verb_EarthSprites)),
             ("TM_SpiritDismissEarthSprites", () => TorannMagicDefOf.TM_DismissEarthSprites, typeof(Verb_DismissEarthSprites)),
+            ("TM_SpiritAlterFate", () => TorannMagicDefOf.TM_AlterFate, typeof(Verb_AlterFate)),
             ("TM_SpiritPrediction", () => TorannMagicDefOf.TM_Prediction, typeof(Verb_Prediction)),
             ("TM_SpiritMeteor", () => TorannMagicDefOf.TM_Meteor, typeof(Verb_Meteor)),
             ("TM_SpiritMeteor_I", () => TorannMagicDefOf.TM_Meteor_I, typeof(Verb_Meteor)),
@@ -216,6 +217,7 @@ namespace TorannMagic.ClassProgression
                 if (meter == null || !float.IsFinite(required) || required < 0 || meter.Severity < required) return false;
             }
             float cost = power.MagicUser.ActualManaCost(def);
+            if (def == TorannMagicDefOf.TM_AlterFate && !Verb_AlterFate.Available(body,power)) return false;
             if (def == TorannMagicDefOf.TM_ShatterSentinel && !power.MagicUser.summonedSentinels.Any(t => t?.Spawned == true)) return false;
             if (def == TorannMagicDefOf.TM_DismissEarthSprites && power.MagicUser.earthSpriteType == 0) return false;
             if (def == TorannMagicDefOf.TM_DispelStoneskin && power.MagicUser.StoneskinPawns.Count == 0) return false;
