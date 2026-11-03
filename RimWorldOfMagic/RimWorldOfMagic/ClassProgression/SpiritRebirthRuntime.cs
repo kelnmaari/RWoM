@@ -165,6 +165,8 @@ namespace TorannMagic.ClassProgression
                 comp.ResolveTechnomancerOverdrive();
             SpiritHostedTechnoBit.Tick(comp);
             if (now % 60 == 0) BrightmageLifecycle.TickHostedLight(pawn, now);
+            if (now % 100 == 0) BardTrials.TickHostedInspiration(pawn);
+            if (now % 30 == 0) BardTrials.TickHostedHymn(pawn);
             TickAbilities(comp, true);
             if (!SpiritRebirthBody.RetainsNeeds(pawn)) return true;
             for (int i = comp.chainedAbilitiesList.Count - 1; i >= 0; i--)

@@ -7867,13 +7867,13 @@ namespace TorannMagic
         {
             public static void Postfix(Pawn initiator, Pawn recipient, ref float __result)
             {
-                CompAbilityUserMagic comp = initiator.GetCompAbilityUserMagic();
+                CompAbilityUserMagic comp = ClassProgression.BardTrials.SocialOwner(initiator, true);
                 if (initiator.story?.traits != null)
                 {
-                    if ((ClassProgression.ClassIdentity.IsBard(initiator) || TM_ClassUtility.ClassHasAbility(TorannMagicDefOf.TM_Entertain, comp, null)))
+                    if (comp != null)
                     {
                         MagicPowerSkill ver = comp.MagicData.MagicPowerSkill_Entertain.FirstOrDefault((MagicPowerSkill x) => x.label == "TM_Entertain_ver");
-                        __result = __result / (1 + ver.level);
+                        __result /= 1 + (ver?.level ?? 0);
 
                     }
                     if (initiator.story.traits.HasTrait(TorannMagicDefOf.TM_Sniper))
@@ -7984,12 +7984,12 @@ namespace TorannMagic
                 {
                     if (___pawn.IsColonist && !___pawn.Downed && !___pawn.Dead && ___pawn.RaceProps.Humanlike)
                     {
-                        CompAbilityUserMagic comp = ___pawn.GetCompAbilityUserMagic();
+                        CompAbilityUserMagic comp = ClassProgression.BardTrials.SocialOwner(___pawn, true);
 
-                        if (comp != null && comp.IsMagicUser && (ClassProgression.ClassIdentity.IsBard(comp.Pawn) || TM_ClassUtility.ClassHasAbility(TorannMagicDefOf.TM_Entertain, comp, null)))
+                        if (comp?.IsMagicUser == true)
                         {
                             MagicPowerSkill pwr = comp.MagicData.MagicPowerSkill_Entertain.FirstOrDefault((MagicPowerSkill x) => x.label == "TM_Entertain_pwr");
-                            if ((Find.TickManager.TicksGame - ___lastInteractionTime) > (3000 - (450 * pwr.level)))
+                            if ((Find.TickManager.TicksGame - ___lastInteractionTime) > (3000 - (450 * (pwr?.level ?? 0))))
                             {
                                 ___wantsRandomInteract = true;
                             }

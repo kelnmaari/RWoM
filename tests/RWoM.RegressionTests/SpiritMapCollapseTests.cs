@@ -14,7 +14,7 @@ internal static partial class SpiritMapCollapseTests
     internal static Type Production(string name) => Check.NotNull(typeof(SpiritRebirthState).Assembly.GetType("TorannMagic.ClassProgression." + name), "map collapse " + name + " exists");
     public static IEnumerable<TestCase> Cases()
     {
-        foreach(var spell in new[]{"Firebolt","Icebolt","Fireball","Snowball","Heal","AdvancedHeal","Purify","Regenerate","Fireclaw","Poison","CureDisease","SootheAnimal","SootheAnimal_I","SootheAnimal_II","SootheAnimal_III","Rainmaker","Resurrection","HealingCircle","HealingCircle_I","HealingCircle_II","HealingCircle_III","RaiseUndead","Blink","Blink_I","Blink_II","Blink_III","Summon","Summon_I","Summon_II","Summon_III","MagicMissile","MagicMissile_I","MagicMissile_II","MagicMissile_III","LightningBolt","LightningCloud","LightningStorm","Firestorm","SpiritOfLight","SoL_Equalize","SoL_CreateLight","LightSkip","LightSkipMass","LightSkipGlobal","Refraction","LightLance","LightBurst","Sunfire","Sunfire_I","Sunfire_II","Sunfire_III","NanoStimulant","TechnoWeapon","TechnoTurret","TechnoShield","Overdrive","OrbitalStrike","OrbitalStrike_I","OrbitalStrike_II","OrbitalStrike_III","Sabotage","FoldReality","Teleport","ValiantCharge","Overwhelm","BestowMight","BestowMight_I","BestowMight_II","BestowMight_III","DeathBolt","DeathBolt_I","DeathBolt_II","DeathBolt_III","FogOfTorment","CorpseExplosion","CorpseExplosion_I","CorpseExplosion_II","CorpseExplosion_III","ConsumeCorpse","ConsumeCorpse_I","ConsumeCorpse_II","ConsumeCorpse_III","ConsumeCorpse_Mass","DeathMark","DeathMark_I","DeathMark_II","DeathMark_III","FrostRay","FrostRay_I","FrostRay_II","FrostRay_III","AMP","AMP_I","AMP_II","AMP_III"})
+        foreach(var spell in new[]{"Firebolt","Icebolt","Fireball","Snowball","Heal","AdvancedHeal","Purify","Regenerate","Fireclaw","Poison","CureDisease","SootheAnimal","SootheAnimal_I","SootheAnimal_II","SootheAnimal_III","Rainmaker","Resurrection","HealingCircle","HealingCircle_I","HealingCircle_II","HealingCircle_III","RaiseUndead","Blink","Blink_I","Blink_II","Blink_III","Summon","Summon_I","Summon_II","Summon_III","Entertain","BattleHymn","Lullaby","Lullaby_I","Lullaby_II","Lullaby_III","MagicMissile","MagicMissile_I","MagicMissile_II","MagicMissile_III","LightningBolt","LightningCloud","LightningStorm","Firestorm","SpiritOfLight","SoL_Equalize","SoL_CreateLight","LightSkip","LightSkipMass","LightSkipGlobal","Refraction","LightLance","LightBurst","Sunfire","Sunfire_I","Sunfire_II","Sunfire_III","NanoStimulant","TechnoWeapon","TechnoTurret","TechnoShield","Overdrive","OrbitalStrike","OrbitalStrike_I","OrbitalStrike_II","OrbitalStrike_III","Sabotage","FoldReality","Teleport","ValiantCharge","Overwhelm","BestowMight","BestowMight_I","BestowMight_II","BestowMight_III","DeathBolt","DeathBolt_I","DeathBolt_II","DeathBolt_III","FogOfTorment","CorpseExplosion","CorpseExplosion_I","CorpseExplosion_II","CorpseExplosion_III","ConsumeCorpse","ConsumeCorpse_I","ConsumeCorpse_II","ConsumeCorpse_III","ConsumeCorpse_Mass","DeathMark","DeathMark_I","DeathMark_II","DeathMark_III","FrostRay","FrostRay_I","FrostRay_II","FrostRay_III","AMP","AMP_I","AMP_II","AMP_III"})
         yield return new("SpiritProjectedCast."+spell+"RemainsPhysicalWithOriginalOwner", r =>
             SpiritRebirthRitualTransactionTests.Run(r,c=>{
                 using var fixture=new Fixture(r,c);
@@ -37,6 +37,37 @@ internal static partial class SpiritMapCollapseTests
                     Check.Equal(true, find.Invoke(null,[body,soul,def])==null,"host's own lower rank wins without an extra button");
                 }
                 Check.Equal(true,find.Invoke(null,[body,body,def])==null,"physical body cannot impersonate the soul");
+            }));
+        yield return new("BardTrials.HostedSongsRequireOriginalOwnerAndAttachedBody", r =>
+            SpiritRebirthRitualTransactionTests.Run(r, c => {
+                using var fixture = new Fixture(r,c);
+                var host = c.Creator; var soul = c.Original;
+                var magic = soul.GetCompAbilityUserMagic();
+                var performance = typeof(BardTrials).GetMethod("EntertainmentOwner", BindingFlags.Static | BindingFlags.NonPublic)!;
+                var inspiration = typeof(BardTrials).GetMethod("InspirationBody", BindingFlags.Static | BindingFlags.NonPublic)!;
+                var song = new Hediff { pawn = soul, def = new HediffDef { defName = "TM_EntertainingHD" } };
+                soul.health.hediffSet.hediffs.Add(song);
+                Check.Same(null!,performance.Invoke(null,[host])!,"song without a retained command grants no host work");
+                var own = new MagicAbility(magic) { Def = TorannMagicDefOf.TM_Entertain };
+                magic.AbilityData.Powers.Add(own);magic.AbilityData.AllPowers=null;
+                Check.Same(soul,performance.Invoke(null,[host])!,"entertainment job belongs to original");
+                var local = host.GetCompAbilityUserMagic();
+                local.AbilityData.Powers.Add(new MagicAbility(local) { Def = own.Def });local.AbilityData.AllPowers=null;
+                Check.Same(null!,performance.Invoke(null,[host])!,"host's local dormant command has precedence");
+                var inspire = magic.MagicData.MagicPowersB.Single(row => row.TMabilityDefs.Contains(TorannMagicDefOf.TM_Inspire));
+                inspire.learned = false;
+                Check.Same(null!,inspiration.Invoke(null,[soul])!,"unlearned aura cannot use borrowed body");
+                inspire.learned = true;
+                Check.Same(host,inspiration.Invoke(null,[soul])!,"learned aura uses the retained physical host");
+                var aura = new Hediff { pawn = host, def = new HediffDef { defName = "TM_InspirationalHD" } };
+                host.health.hediffSet.hediffs.Add(aura);
+                Check.Same(null!,inspiration.Invoke(null,[soul])!,"local inspiration prevents duplicate roll");
+                host.health.hediffSet.hediffs.Remove(aura);
+                fixture.Possession.GetDirectlyHeldThings().Remove(soul);
+                Check.Same(null!,inspiration.Invoke(null,[soul])!,"detached original has no emitter");
+                Set(soul,"mapIndexOrState",(sbyte)0);
+                try { Check.Same(null!,performance.Invoke(null,[soul])!,"unhosted soul cannot resume physical performance"); }
+                finally { Set(soul,"mapIndexOrState",(sbyte)-1); }
             }));
         yield return new("SpiritProjectedCast.TechnoBitRequiresOriginalLearnedOwner", r =>
             SpiritRebirthRitualTransactionTests.Run(r,c =>

@@ -6881,6 +6881,7 @@ namespace TorannMagic
 
         public override void PostExposeData()
         {
+            Scribe_Values.Look(ref nextEntertainTick, "TM_nextEntertainTick", -1);
             if (Scribe.mode == LoadSaveMode.Saving && ClassProgression.SpiritRuntimeClock.TracksCooldowns(Pawn))
                 spiritRuntimeClock.CaptureCooldowns(this);
             if (Scribe.mode != LoadSaveMode.Saving || ClassProgression.SpiritRuntimeClock.TracksCooldowns(Pawn))
