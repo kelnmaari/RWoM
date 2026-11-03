@@ -6,6 +6,38 @@ namespace TorannMagic.ClassProgression
 {
     public static class EmpathLifecycle
     {
+        private static bool Learned(Pawn owner)
+        {
+            return ClassIdentity.IsEmpath(owner) && EmpathOwners.Resolve(owner.GetCompAbilityUserMagic()?.ExistingMagicData)
+                ?.Any(p => p.learned && p.TMabilityDefs.Contains(TorannMagicDefOf.TM_Empathy)) == true;
+        }
+
+        internal static void UpdateProjectedEmpathy(Pawn soul, bool ending)
+        {
+            if (TorannMagicDefOf.TM_EmpathHD == null || !SpiritRebirthState.TryGet(soul, out var state)) return;
+            var body = state.Host;
+            if (body?.health?.hediffSet == null) return;
+            var effect = body.health.hediffSet.GetFirstHediffOfDef(TorannMagicDefOf.TM_EmpathHD);
+            var empathy = effect?.TryGetComp<HediffComp_Empath>();
+            if (effect != null && (empathy == null || empathy.SourceId != soul.thingIDNumber)) return;
+            if (effect != null && Learned(body))
+            {
+                empathy.SourceId = 0;
+                return;
+            }
+            if (ending || state.DepletionPending || !state.HasValidHost(soul) || body.needs?.mood == null || !Learned(soul))
+            {
+                if (effect != null) body.health.RemoveHediff(effect);
+                return;
+            }
+            if (effect != null || Learned(body)) return;
+            var projection = HediffMaker.MakeHediff(TorannMagicDefOf.TM_EmpathHD, body);
+            var source = projection.TryGetComp<HediffComp_Empath>();
+            if (source == null) return;
+            source.SourceId = soul.thingIDNumber;
+            body.health.AddHediff(projection);
+        }
+
         public static bool Restore(CompAbilityUserMagic comp)
         {
             if (SpiritRebirthBodyEffects.SuppressFormerBodyEffects(comp?.Pawn)) return true;
