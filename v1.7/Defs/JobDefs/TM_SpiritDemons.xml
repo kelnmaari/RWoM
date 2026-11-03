@@ -1,3 +1,7 @@
 <Defs>
   <JobDef><defName>TM_SpiritSoulBond</defName><driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass><reportString>forming a soul bond.</reportString></JobDef>
+  <JobDef><defName>TM_SpiritShadowBolt</defName><driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass><reportString>casting a shadow bolt.</reportString></JobDef>
+  <JobDef><defName>TM_SpiritShadowBolt_I</defName><driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass><reportString>casting a shadow bolt.</reportString></JobDef>
+  <JobDef><defName>TM_SpiritShadowBolt_II</defName><driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass><reportString>casting a shadow bolt.</reportString></JobDef>
+  <JobDef><defName>TM_SpiritShadowBolt_III</defName><driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass><reportString>casting a shadow bolt.</reportString></JobDef>
 </Defs>

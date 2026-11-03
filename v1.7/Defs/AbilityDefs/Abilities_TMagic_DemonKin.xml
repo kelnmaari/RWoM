@@ -162,7 +162,7 @@ Succubi and Warlocks form distinct types of soul bonds - warlocks bonds are ment
 		
 	
 	<ThingDef ParentName="BaseBullet" Class="AbilityUser.ProjectileDef_Ability">
-		<thingClass>AbilityUser.Projectile_Ability</thingClass>
+		<thingClass>TorannMagic.ClassProgression.Projectile_HostedShadowBolt</thingClass>
 	    <defName>Projectile_ShadowBolt</defName>
         <label>shadow bolt</label>
         <graphicData>

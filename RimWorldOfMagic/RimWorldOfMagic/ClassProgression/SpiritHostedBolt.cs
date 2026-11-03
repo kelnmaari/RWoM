@@ -110,6 +110,10 @@ namespace TorannMagic.ClassProgression
             ("TM_SpiritVitalityBrand", () => TorannMagicDefOf.TM_VitalityBrand, typeof(Verb_BrandVitality)),
             ("TM_SpiritSiphonBrand", () => TorannMagicDefOf.TM_SiphonBrand, typeof(Verb_BrandSiphon)),
             ("TM_SpiritSuppressiveAura", () => TorannMagicDefOf.TM_SuppressiveAura, typeof(Verb_ToggleHediff)),
+            ("TM_SpiritShadowBolt", () => TorannMagicDefOf.TM_ShadowBolt, typeof(Projectile_HostedShadowBolt)),
+            ("TM_SpiritShadowBolt_I", () => TorannMagicDefOf.TM_ShadowBolt_I, typeof(Projectile_HostedShadowBolt)),
+            ("TM_SpiritShadowBolt_II", () => TorannMagicDefOf.TM_ShadowBolt_II, typeof(Projectile_HostedShadowBolt)),
+            ("TM_SpiritShadowBolt_III", () => TorannMagicDefOf.TM_ShadowBolt_III, typeof(Projectile_HostedShadowBolt)),
             ("TM_SpiritSoulBond", () => TorannMagicDefOf.TM_SoulBond, typeof(Verb_SoulBond)),
             ("TM_SpiritSymbiosis", () => TorannMagicDefOf.TM_Symbiosis, typeof(Verb_Symbiosis)),
             ("TM_SpiritFadeEmotions", () => TorannMagicDefOf.TM_FadeEmotions, typeof(Verb_FadeEmotions)),
@@ -257,7 +261,7 @@ namespace TorannMagic.ClassProgression
             if (def.MainVerb == null || def.MainVerb.isViolent && body.WorkTagIsDisabled(WorkTags.Violent) ||
                 !Families.Any(f => f.spell() == def && (f.effect == def.MainVerb.verbClass || (DeathBolt(def) && f.effect == typeof(Projectile_HostedDeathBolt)) ||
                     ((def.MainVerb.verbClass == typeof(Verb_UseAbility) || def.MainVerb.verbClass == typeof(Effect_ValiantCharge) || def.MainVerb.verbClass == typeof(Verb_SB) ||
-                    def.MainVerb.verbClass == typeof(Verb_LightSkip) || def.MainVerb.verbClass == typeof(Verb_BLOS) || def.MainVerb.verbClass == typeof(Verb_FogOfTorment) || def.MainVerb.verbClass == typeof(Verb_LightningCloud) || typeof(Verb_RankedStormField).IsAssignableFrom(def.MainVerb.verbClass) ||
+                    def.MainVerb.verbClass == typeof(Effect_ShadowBolt) || def.MainVerb.verbClass == typeof(Verb_LightSkip) || def.MainVerb.verbClass == typeof(Verb_BLOS) || def.MainVerb.verbClass == typeof(Verb_FogOfTorment) || def.MainVerb.verbClass == typeof(Verb_LightningCloud) || typeof(Verb_RankedStormField).IsAssignableFrom(def.MainVerb.verbClass) ||
                     def.MainVerb.verbClass == typeof(Verb_UseAbility_TrueBurst)) &&
                     f.effect == def.MainVerb.defaultProjectile?.thingClass &&
                     (typeof(Projectile_SpiritNativeAbility).IsAssignableFrom(f.effect) || typeof(Projectile_SpiritBolt).IsAssignableFrom(f.effect) || typeof(Projectile_SpiritRay).IsAssignableFrom(f.effect) || f.effect == typeof(Projectile_ChronostaticField) || f.effect == typeof(Projectile_AccelerateTime) || f.effect == typeof(Projectile_Sentinel) || f.effect == typeof(Projectile_EarthernHammer) || f.effect == typeof(Projectile_Encase) || f.effect == typeof(Projectile_IgniteBlood) || f.effect == typeof(Projectile_BloodMoon) || SpiritHostedSummons.IsProjectile(f.effect))))) ||
@@ -544,6 +548,7 @@ namespace TorannMagic.ClassProgression
             shot.Launch(body,power.Def,drawPos,target,flags,false,null,props.hediffsToApply,props.mentalStatesToApply,props.thingsToSpawn);
             if (shot is Projectile_Encase field) GeomancerTrials.StampHosted(field, power);
             if (shot is Projectile_IgniteBlood fire) BloodMageTrials.StampHosted(fire, power);
+            if (shot is Projectile_HostedShadowBolt) Effect_ShadowBolt.SpawnOrb(body,power.Pawn,target);
             if (shot is Projectile_HostedDeathBolt) Effect_DeathBolt.SpawnOrb(body, power.Pawn, target);
             if (shot is Projectile_SpiritMissile) ArcanistTrials.StampHostedMissile(shot, power);
             if (shot is Projectile_LightningCloud) LightningTrials.StampHosted(shot, power, LightningTrials.Spell.Cloud);
