@@ -265,7 +265,15 @@ internal static class EmpathLifecycleTests
         using var f = new Fixture(r); var host = f.HostHD.TryGetComp<HediffComp_SymbiosisHost>();
         host.symbiote = null; float adjustment = 0f; host.CompPostTick(ref adjustment);
         Check.Equal(true, host.CompShouldRemove, "native orphan marks for removal without dereference");
+        var caster = f.BodyHD.TryGetComp<HediffComp_SymbiosisCaster>();
+        caster.symbiosisHost = f.Other;
+        host.symbiote = f.Caster;
+        host.RemoveSymbioteHediff();
+        Check.Equal(true, f.Caster.health.hediffSet.hediffs.Contains(f.BodyHD), "obsolete partner cannot remove newer caster link");
+        caster.symbiosisHost = f.Host;
         host.symbiote = f.Other;
+        caster.RemoveHostHediff();
+        Check.Equal(true, f.Host.health.hediffSet.hediffs.Contains(f.HostHD), "obsolete caster cannot remove newer recipient link");
         TM_Action.RemoveSymbiosisCommand(f.Caster);
         Check.Equal(true, f.Host.health.hediffSet.hediffs.Contains(f.HostHD), "stale action preserves foreign host effect");
         Check.Equal(false, f.Caster.health.hediffSet.hediffs.Contains(f.BodyHD), "stale own body link safely released");

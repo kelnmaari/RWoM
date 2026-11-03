@@ -52,6 +52,9 @@ namespace TorannMagic.ClassProgression
             if (TorannMagicDefOf.TM_SuppressiveAuraHD != null && SpiritRebirthState.TryGet(soul,out var state))
             {
                 var body = state.Host;
+                if (TorannMagicDefOf.TM_OutOfBodyHD != null &&
+                    body?.health?.hediffSet?.GetFirstHediffOfDef(TorannMagicDefOf.TM_OutOfBodyHD)?.TryGetComp<HediffComp_SymbiosisCaster>()?.originalId == soul.thingIDNumber)
+                    TM_Action.RemoveSymbiosisCommand(body);
                 var aura = body?.health?.hediffSet?.GetFirstHediffOfDef(TorannMagicDefOf.TM_SuppressiveAuraHD);
                 if (aura?.TryGetComp<HediffComp_SuppressiveAura>()?.SourceId == soul.thingIDNumber)
                     body.health.RemoveHediff(aura);

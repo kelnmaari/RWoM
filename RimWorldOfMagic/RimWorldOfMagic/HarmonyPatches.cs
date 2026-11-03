@@ -5606,10 +5606,10 @@ namespace TorannMagic
                         if (symb != null && dinfo.Def.harmsHealth)
                         {
                             HediffComp_SymbiosisHost hdh = symb.TryGetComp<HediffComp_SymbiosisHost>();
-                            if (hdh != null && hdh.symbiote != null && hdh.lastDamageTick < Find.TickManager.TicksGame)
+                            if (hdh?.SkillOwner is Pawn owner && !hdh.symbiote.Dead && hdh.lastDamageTick < Find.TickManager.TicksGame)
                             {
                                 hdh.lastDamageTick = Find.TickManager.TicksGame + 2;
-                                float verVal = TM_Calc.GetSkillVersatilityLevel(hdh.symbiote, TorannMagicDefOf.TM_Symbiosis);
+                                float verVal = TM_Calc.GetSkillVersatilityLevel(owner, TorannMagicDefOf.TM_Symbiosis);
                                 float sAmt = dinfo.Amount * (.25f + (.05f * verVal));
                                 if (verVal >= 3)
                                 {
@@ -5624,14 +5624,18 @@ namespace TorannMagic
                                     sAmt *= .8f;
                                 }
 
-                                DamageInfo dinfo2 = new DamageInfo(TMDamageDefOf.DamageDefOf.TM_SymbiosisDD, sAmt, 2, -1, dinfo.Instigator, dinfo.HitPart, null);
+                                var part = dinfo.HitPart;
+                                if (part != null && !hdh.symbiote.RaceProps.body.AllParts.Contains(part)) part = null;
+                                DamageInfo dinfo2 = new DamageInfo(TMDamageDefOf.DamageDefOf.TM_SymbiosisDD, sAmt, 2, -1, dinfo.Instigator, part, null);
                                 hdh.symbiote.TakeDamage(dinfo2);
-                                dinfo.SetAmount(dinfo.Amount * (.75f - (.05f * verVal)));
-                                DamageInfo dinfo3 = new DamageInfo(dinfo.Def, dinfo.Amount, dinfo.ArmorPenetrationInt, dinfo.Angle, dinfo.Instigator, dinfo.HitPart, null);
+                                var dinfo3 = dinfo;
+                                dinfo3.SetAmount(dinfo.Amount * (.75f - (.05f * verVal)));
                                 ___pawn.TakeDamage(dinfo3);
 
-                                TM_Action.DisplayShield(___pawn, dinfo.Amount);
+                                TM_Action.DisplayShield(___pawn, dinfo3.Amount);
                                 TM_Action.DisplayShieldHit(hdh.symbiote, dinfo2);
+                                absorbed = true;
+                                return false;
                             }
                         }
                     }
