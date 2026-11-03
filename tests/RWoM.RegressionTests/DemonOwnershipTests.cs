@@ -12,12 +12,39 @@ internal static class DemonOwnershipTests
 {
     public static IEnumerable<TestCase> Cases()
     {
+        yield return new("DemonOwnership.DominateEffectRanksAndRefresh", DominateEffects);
         yield return new("DemonOwnership.NativeSoulBondSelectedFamilyAndToggle", NativeBond);
         yield return new("DemonOwnership.RestoreCanonicalRuntimeAndExactUltimateFlags", Restore);
         yield return new("DemonOwnership.PreparedSnapshotIsAtomicAndBounded", PreparedSnapshot);
         yield return new("DemonOwnership.SelectedOwnerAndOppositeLearningGate", SelectedOwners);
         yield return new("DemonOwnership.ExplicitIdentityOverridesGenderOnlyForNewProfiles", Identity);
         yield return new("DemonOwnership.LegacyOwnerPredicatesRemainNative", LegacyOwners);
+    }
+
+    static void DominateEffects(RuntimeFixture f)
+    {
+        var assembly = typeof(MagicAbility).Assembly;
+        var select = assembly.GetType("TorannMagic.Verb_Dominate")!.GetMethod("Effect", BindingFlags.NonPublic | BindingFlags.Static)!;
+        foreach (bool mental in new[] { false, true })
+        foreach (int rank in Enumerable.Range(0,4))
+        {
+            var name = (mental ? "TM_WDDominateHD" : "TM_SDDominateHD") + new[] { "", "_I", "_II", "_III" }[rank];
+            var field = typeof(TorannMagicDefOf).GetField(name)!;
+            var original = field.GetValue(null);
+            var sentinel = new HediffDef { defName = name };
+            try
+            {
+                field.SetValue(null,sentinel);
+                Check.Same(sentinel,select.Invoke(null,[mental,rank])!, "selected branch and rank resolve to the exact native effect");
+            }
+            finally { field.SetValue(null,original); }
+        }
+        var type = assembly.GetType("TorannMagic.HediffComp_Dominate")!;
+        var effect = Activator.CreateInstance(type)!;
+        type.GetProperty("EffVal")!.SetValue(effect,3);
+        type.GetProperty("VerVal")!.SetValue(effect,2);
+        Check.Equal(true, Math.Abs((float)type.GetProperty("MinimumSeverity",BindingFlags.NonPublic | BindingFlags.Instance)!.GetValue(effect)! - .21f) < .001f,"saved efficiency determines spread cost");
+        Check.Equal(5,(int)type.GetField("infectionRadius",BindingFlags.NonPublic | BindingFlags.Instance)!.GetValue(effect)!,"recast updates spread radius on the existing effect");
     }
 
     static ClassDisciplineDef Profile(bool warlock) => new() { defName = warlock ? "DemonOwnerWD" : "DemonOwnerSD",

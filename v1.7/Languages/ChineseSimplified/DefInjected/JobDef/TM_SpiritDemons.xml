@@ -6,4 +6,5 @@
   <TM_SpiritShadowBolt_III.reportString>正在施放暗影箭。</TM_SpiritShadowBolt_III.reportString>
   <TM_SpiritShadowStep.reportString>正在移向灵魂绑定的盟友。</TM_SpiritShadowStep.reportString>
   <TM_SpiritShadowCall.reportString>正在召回灵魂绑定的盟友。</TM_SpiritShadowCall.reportString>
+  <TM_SpiritDominate.reportString>正在施放支配术。</TM_SpiritDominate.reportString>
 </LanguageData>

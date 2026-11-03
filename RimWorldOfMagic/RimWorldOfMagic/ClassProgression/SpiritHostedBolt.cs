@@ -116,6 +116,7 @@ namespace TorannMagic.ClassProgression
             ("TM_SpiritShadowBolt_III", () => TorannMagicDefOf.TM_ShadowBolt_III, typeof(Projectile_HostedShadowBolt)),
             ("TM_SpiritShadowStep", () => TorannMagicDefOf.TM_ShadowStep, typeof(Verb_ShadowStep)),
             ("TM_SpiritShadowCall", () => TorannMagicDefOf.TM_ShadowCall, typeof(Verb_ShadowCall)),
+            ("TM_SpiritDominate", () => TorannMagicDefOf.TM_Dominate, typeof(Verb_Dominate)),
             ("TM_SpiritSoulBond", () => TorannMagicDefOf.TM_SoulBond, typeof(Verb_SoulBond)),
             ("TM_SpiritSymbiosis", () => TorannMagicDefOf.TM_Symbiosis, typeof(Verb_Symbiosis)),
             ("TM_SpiritFadeEmotions", () => TorannMagicDefOf.TM_FadeEmotions, typeof(Verb_FadeEmotions)),
