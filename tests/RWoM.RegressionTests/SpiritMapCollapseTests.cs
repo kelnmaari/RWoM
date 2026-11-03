@@ -14,7 +14,7 @@ internal static partial class SpiritMapCollapseTests
     internal static Type Production(string name) => Check.NotNull(typeof(SpiritRebirthState).Assembly.GetType("TorannMagic.ClassProgression." + name), "map collapse " + name + " exists");
     public static IEnumerable<TestCase> Cases()
     {
-        foreach(var spell in new[]{"Firebolt","Icebolt","Fireball","Snowball","Heal","AdvancedHeal","Purify","Regenerate","Fireclaw","Poison","CureDisease","SootheAnimal","SootheAnimal_I","SootheAnimal_II","SootheAnimal_III","Rainmaker","Resurrection","HealingCircle","HealingCircle_I","HealingCircle_II","HealingCircle_III","RaiseUndead","Blink","Blink_I","Blink_II","Blink_III","Summon","Summon_I","Summon_II","Summon_III","MagicMissile","MagicMissile_I","MagicMissile_II","MagicMissile_III","LightningBolt","LightningCloud","LightningStorm","Firestorm","FoldReality","Teleport","ValiantCharge","Overwhelm","BestowMight","BestowMight_I","BestowMight_II","BestowMight_III","DeathBolt","DeathBolt_I","DeathBolt_II","DeathBolt_III","FogOfTorment","CorpseExplosion","CorpseExplosion_I","CorpseExplosion_II","CorpseExplosion_III","ConsumeCorpse","ConsumeCorpse_I","ConsumeCorpse_II","ConsumeCorpse_III","ConsumeCorpse_Mass","DeathMark","DeathMark_I","DeathMark_II","DeathMark_III","FrostRay","FrostRay_I","FrostRay_II","FrostRay_III","AMP","AMP_I","AMP_II","AMP_III"})
+        foreach(var spell in new[]{"Firebolt","Icebolt","Fireball","Snowball","Heal","AdvancedHeal","Purify","Regenerate","Fireclaw","Poison","CureDisease","SootheAnimal","SootheAnimal_I","SootheAnimal_II","SootheAnimal_III","Rainmaker","Resurrection","HealingCircle","HealingCircle_I","HealingCircle_II","HealingCircle_III","RaiseUndead","Blink","Blink_I","Blink_II","Blink_III","Summon","Summon_I","Summon_II","Summon_III","MagicMissile","MagicMissile_I","MagicMissile_II","MagicMissile_III","LightningBolt","LightningCloud","LightningStorm","Firestorm","TechnoShield","Overdrive","OrbitalStrike","OrbitalStrike_I","OrbitalStrike_II","OrbitalStrike_III","Sabotage","FoldReality","Teleport","ValiantCharge","Overwhelm","BestowMight","BestowMight_I","BestowMight_II","BestowMight_III","DeathBolt","DeathBolt_I","DeathBolt_II","DeathBolt_III","FogOfTorment","CorpseExplosion","CorpseExplosion_I","CorpseExplosion_II","CorpseExplosion_III","ConsumeCorpse","ConsumeCorpse_I","ConsumeCorpse_II","ConsumeCorpse_III","ConsumeCorpse_Mass","DeathMark","DeathMark_I","DeathMark_II","DeathMark_III","FrostRay","FrostRay_I","FrostRay_II","FrostRay_III","AMP","AMP_I","AMP_II","AMP_III"})
         yield return new("SpiritProjectedCast."+spell+"RemainsPhysicalWithOriginalOwner", r =>
             SpiritRebirthRitualTransactionTests.Run(r,c=>{
                 using var fixture=new Fixture(r,c);
@@ -38,6 +38,30 @@ internal static partial class SpiritMapCollapseTests
                 }
                 Check.Equal(true,find.Invoke(null,[body,body,def])==null,"physical body cannot impersonate the soul");
             }));
+        foreach (bool impacted in new[] { false, true })
+            yield return new("SpiritProjectedCast.SabotageScribeAfterImpact" + impacted, r =>
+                SpiritRebirthRitualTransactionTests.Run(r, c =>
+                {
+                    using var fixture = new Fixture(r,c);
+                    using var material = new Patch(typeof(MaterialPool).GetMethod("MatFrom", [typeof(string),typeof(UnityEngine.Shader)])!, nameof(CancelNative));
+                    var type = typeof(Projectile_SpiritBolt).Assembly.GetType("TorannMagic.Projectile_Sabotage",true)!;
+                    var def = (ThingDef)RuntimeHelpers.GetUninitializedObject(typeof(ThingDef));
+                    def.defName = "RegressionSabotage" + impacted; def.thingClass = type; def.category = ThingCategory.Projectile; def.comps = [];
+                    DefDatabase<ThingDef>.Add(def);
+                    var shot = (Projectile_SpiritBolt)Activator.CreateInstance(type)!;
+                    shot.def = def; shot.thingIDNumber = 19884; shot.usedTarget = shot.intendedTarget = IntVec3.Zero;
+                    Set(shot,"launcher",c.Creator); Set(shot,"initialized",impacted);
+                    var magic = c.Original.GetCompAbilityUserMagic();
+                    magic.MagicData.MagicPowerSkill_Sabotage.Single(s=>s.label=="TM_Sabotage_pwr").level=2;
+                    var power = new MagicAbility(magic){ Def=TorannMagicDefOf.TM_Sabotage };
+                    typeof(Projectile_SpiritBolt).GetMethod("PrepareProjection",BindingFlags.Instance|BindingFlags.NonPublic)!.Invoke(shot,[power]);
+                    shot = RoundTripSummon(r, "sabotage-impact-"+impacted,shot,c.Creator,c.Original);
+                    fixture.Possession.GetDirectlyHeldThings().Remove(c.Original);
+                    Check.Equal(impacted,(bool)type.GetField("initialized",BindingFlags.Instance|BindingFlags.NonPublic)!.GetValue(shot)!,"impact receipt survives load");
+                    Check.Same(c.Creator,shot.Launcher,"physical origin retained");
+                    Check.Same(c.Original,typeof(Projectile_SpiritBolt).GetProperty("SourcePawn",BindingFlags.Instance|BindingFlags.NonPublic)!.GetValue(shot),"owner remains with projectile after exit");
+                    Check.Equal(2,(int)typeof(Projectile_SpiritBolt).GetField("pwrVal",BindingFlags.Instance|BindingFlags.NonPublic)!.GetValue(shot)!,"captured rank survives load");
+                }));
         yield return new("SpiritProjectedCast.ValiantChargeCarrierOwnsPassenger", r =>
         {
             Check.Equal(true,typeof(IThingHolder).IsAssignableFrom(typeof(FlyingObject_ValiantCharge)),"flight exposes native passenger ownership");

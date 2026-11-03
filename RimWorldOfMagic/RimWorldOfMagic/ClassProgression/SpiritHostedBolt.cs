@@ -68,6 +68,13 @@ namespace TorannMagic.ClassProgression
             ("TM_SpiritValiantCharge", () => TorannMagicDefOf.TM_ValiantCharge, typeof(Projectile_SpiritNativeAbility)),
             ("TM_SpiritOverwhelm", () => TorannMagicDefOf.TM_Overwhelm, typeof(Projectile_Overwhelm)),
             ("TM_SpiritHolyWrath", () => TorannMagicDefOf.TM_HolyWrath, typeof(Projectile_HolyWrath)),
+            ("TM_SpiritOrbitalStrike", () => TorannMagicDefOf.TM_OrbitalStrike, typeof(Projectile_OrbitalStrike)),
+            ("TM_SpiritOrbitalStrike_I", () => TorannMagicDefOf.TM_OrbitalStrike_I, typeof(Projectile_OrbitalStrike)),
+            ("TM_SpiritOrbitalStrike_II", () => TorannMagicDefOf.TM_OrbitalStrike_II, typeof(Projectile_OrbitalStrike)),
+            ("TM_SpiritOrbitalStrike_III", () => TorannMagicDefOf.TM_OrbitalStrike_III, typeof(Projectile_OrbitalStrike)),
+            ("TM_SpiritOverdrive", () => TorannMagicDefOf.TM_Overdrive, typeof(Verb_Overdrive)),
+            ("TM_SpiritSabotage", () => TorannMagicDefOf.TM_Sabotage, typeof(Projectile_Sabotage)),
+            ("TM_SpiritTechnoShield", () => TorannMagicDefOf.TM_TechnoShield, typeof(Verb_TechnoShield)),
             ("TM_SpiritFoldReality", () => TorannMagicDefOf.TM_FoldReality, typeof(Verb_FoldReality)),
             ("TM_SpiritTeleport", () => TorannMagicDefOf.TM_Teleport, typeof(Projectile_Teleport)),
             ("TM_SpiritBlink", () => TorannMagicDefOf.TM_Blink, typeof(Verb_Blink)),
@@ -259,7 +266,7 @@ namespace TorannMagic.ClassProgression
             if (verb is Verb_SpiritTargetable direct && Families.Any(f => f.spell() == def && f.effect == props.verbClass))
             {
                 bool travel = Odyssey.ManualTravelSafety.IsTravel(power);
-                if (!travel && !(verb is Verb_Summon) && !(verb is Verb_SummonSpiritWolves) && !(verb is Verb_RegrowLimb) && !(verb is ISpiritCorpseConsumer) &&
+                if (!travel && !(verb is Verb_Summon) && !(verb is Verb_SummonSpiritWolves) && !(verb is Verb_RegrowLimb) && !(verb is ISpiritCorpseConsumer) && !(verb is Verb_Overdrive) &&
                     props.AbilityTargetCategory != AbilityTargetCategory.TargetAoE && !(target.Thing is Pawn { Dead: false }))
                     return false;
                 if (!direct.CastFromHost(target)) return false;

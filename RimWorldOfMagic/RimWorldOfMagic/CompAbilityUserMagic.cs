@@ -5614,7 +5614,12 @@ namespace TorannMagic
             if (Scribe.mode == LoadSaveMode.PostLoadInit)
             {
                 if (overdriveFrequency <= 0) overdriveFrequency = 100;
-                RefreshTechnomancerOverdrive();
+                if (overdriveBuilding != null && overdriveDuration > 0)
+                {
+                    // Held pawns finish loading before the map respawns their target.
+                    LongEventHandler.ExecuteWhenFinished(() => RefreshTechnomancerOverdrive());
+                }
+                else RefreshTechnomancerOverdrive();
             }
         }
 

@@ -9,9 +9,9 @@ namespace TorannMagic.ClassProgression
         public const string FoundationTrialId = "rwom.technomancer.foundation", MasteryTrialId = "rwom.technomancer.mastery";
         static CompAbilityUserMagic Magic(Pawn pawn) => pawn?.AllComps.OfType<CompAbilityUserMagic>().FirstOrDefault();
         static MagicPower Owner(Pawn pawn, TMAbilityDef def) => Magic(pawn)?.MagicData.MagicPowersT.FirstOrDefault(p => p.learned && p.TMabilityDefs.Contains(def));
-        static DisciplineProgress Owned(Pawn caster, bool shield)
+        static DisciplineProgress Owned(Pawn caster, bool shield, Pawn body = null)
         {
-            if (caster == null || caster.Dead || !caster.Spawned || caster.Faction == null
+            if (caster == null || caster.Dead || !(body ?? caster).Spawned || caster.Faction == null
                 || caster.story?.traits?.HasTrait(TorannMagicDefOf.Faceless) == true
                 || !ClassIdentity.TryGetState(caster, out var state) || (state.Vocation & Vocation.Mage) == 0) return null;
             var path = state.Find("rwom.technomancer");
@@ -62,28 +62,29 @@ namespace TorannMagic.ClassProgression
         }
         public sealed class ShieldSnapshot
         {
-            internal Pawn caster, target;
+            internal Pawn caster, body, target;
             internal PawnAbility ability;
             internal MagicPower owner;
             internal DisciplineProgress path;
             internal float severity;
             internal bool used;
         }
-        public static ShieldSnapshot CaptureShield(PawnAbility ability, Pawn target)
+        public static ShieldSnapshot CaptureShield(PawnAbility ability, Pawn target) => CaptureShield(ability, target, ability?.Pawn);
+        internal static ShieldSnapshot CaptureShield(PawnAbility ability, Pawn target, Pawn body)
         {
             var caster = ability?.Pawn;
-            var path = Owned(caster, true);
-            if (path == null || !RuntimeOwned(ability, caster) || !Ally(caster, target)) return null;
+            var path = Owned(caster, true, body);
+            if (path == null || SpiritRebirthCasting.SkillOwner(body, ability) != caster || !RuntimeOwned(ability, caster) || !Ally(body, target)) return null;
             float severity = Shield(target);
-            return Finite(severity) ? new ShieldSnapshot { caster = caster, target = target, ability = ability, path = path,
+            return Finite(severity) ? new ShieldSnapshot { caster = caster, body = body, target = target, ability = ability, path = path,
                 owner = Owner(caster, TorannMagicDefOf.TM_TechnoShield), severity = severity } : null;
         }
         public static bool CompleteShield(ShieldSnapshot snapshot)
         {
             if (snapshot == null || snapshot.used) return false;
             snapshot.used = true;
-            float after = Ally(snapshot.caster, snapshot.target) ? Shield(snapshot.target) : float.NaN;
-            return Owned(snapshot.caster, true) == snapshot.path && Owner(snapshot.caster, TorannMagicDefOf.TM_TechnoShield) == snapshot.owner
+            float after = Ally(snapshot.body, snapshot.target) ? Shield(snapshot.target) : float.NaN;
+            return SpiritRebirthCasting.SkillOwner(snapshot.body, snapshot.ability) == snapshot.caster && Owned(snapshot.caster, true, snapshot.body) == snapshot.path && Owner(snapshot.caster, TorannMagicDefOf.TM_TechnoShield) == snapshot.owner
                 && RuntimeOwned(snapshot.ability, snapshot.caster) && Finite(after) && after > 0 && after > snapshot.severity
                 && snapshot.path.RecordCompletedTrial(MasteryTrialId);
         }
