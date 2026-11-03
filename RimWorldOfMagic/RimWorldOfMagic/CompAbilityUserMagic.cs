@@ -5859,6 +5859,17 @@ namespace TorannMagic
             }
         }
 
+        internal void SyncEnchanterStoneControl()
+        {
+            enchanterStones?.RemoveAll(s => s.DestroyedOrNull());
+            var def = TorannMagicDefOf.TM_DismissEnchanterStones;
+            if (def == null) return;
+            bool hasStones = enchanterStones?.Count > 0;
+            if (hasStones && !AbilityData.Powers.Any(p => p?.Def == def)) AddPawnAbility(def);
+            else if (!hasStones && (dismissEnchanterStones || AbilityData.Powers.Any(p => p?.Def == def))) RemovePawnAbility(def);
+            dismissEnchanterStones = hasStones;
+        }
+
         public void ResolveSustainers()
         {
             if (ClassProgression.GolemancerLifecycle.Restore(this))
@@ -5965,16 +5976,7 @@ namespace TorannMagic
                 dismissHeaterSpell = false;
             }
 
-            if (this.enchanterStones.Count > 0 && this.dismissEnchanterStones == false)
-            {
-                this.AddPawnAbility(TorannMagicDefOf.TM_DismissEnchanterStones);
-                dismissEnchanterStones = true;
-            }
-            if (this.enchanterStones.Count <= 0 && this.dismissEnchanterStones == true)
-            {
-                this.RemovePawnAbility(TorannMagicDefOf.TM_DismissEnchanterStones);
-                dismissEnchanterStones = false;
-            }
+            SyncEnchanterStoneControl();
 
             if (this.lightningTraps.Count > 0 && this.dismissLightningTrap == false)
             {
@@ -6639,13 +6641,7 @@ namespace TorannMagic
             }
             if (this.enchanterStones != null && this.enchanterStones.Count > 0)
             {
-                for (int i = 0; i < this.enchanterStones.Count; i++)
-                {
-                    if (this.enchanterStones[i].DestroyedOrNull())
-                    {
-                        this.enchanterStones.Remove(this.enchanterStones[i]);
-                    }
-                }
+                enchanterStones.RemoveAll(s => s.DestroyedOrNull());
                 _maxMPUpkeep += (this.enchanterStones.Count * (TorannMagicDefOf.TM_EnchanterStone.upkeepEnergyCost * (1f - TorannMagicDefOf.TM_EnchanterStone.upkeepEfficiencyPercent * (applyOriginalBody ? this.MagicData.MagicPowerSkill_EnchanterStone.FirstOrDefault((MagicPowerSkill x) => x.label == "TM_EnchanterStone_eff").level : ClassProgression.SpiritRebirthRuntime.SavedRank(this.MagicData, "TM_EnchanterStone_eff")))));
             }
             try
@@ -7090,6 +7086,7 @@ namespace TorannMagic
             {
                 TM_PawnTracker.ResolveMagicComp(this);
                 RecoverMissingProgression();
+                if (enchanterStones?.Count > 0) LongEventHandler.ExecuteWhenFinished(SyncEnchanterStoneControl);
                 TM_ClassState.RestoreSharedMagicProgression(this);
                 Pawn abilityUser = base.Pawn;
                 int index = TM_ClassUtility.CustomClassIndexOfBaseMageClass(abilityUser.story.traits.allTraits);

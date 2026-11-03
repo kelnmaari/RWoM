@@ -12,6 +12,7 @@ internal static class EnchanterLifecycleTests
     const BindingFlags Fields = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
     public static IEnumerable<TestCase> Cases()
     {
+        yield return new("EnchanterLifecycle.MaterialCostsAndRequiredRanks", Recipes);
         yield return new("EnchanterLifecycle.SustainedReferencesAndNativeControlsSurviveRestore", Sustained);
         yield return new("EnchanterLifecycle.EmptySavedStateDoesNotInventSustainedEffects", Empty);
         yield return new("EnchanterLifecycle.EnchantedWeaponNativeScribeKeepsBothSourceReferences", WeaponSave);
@@ -49,7 +50,7 @@ internal static class EnchanterLifecycleTests
     {
         using var fixture = new Fixture(f); var magic = fixture.Magic;
         var stone = Item(74501); var target = PawnWithComps(false, false).pawn;
-        magic.enchanterStones.Add(stone); magic.weaponEnchants.Add(target);
+        magic.enchanterStones.AddRange([null!, null!, stone]); magic.weaponEnchants.Add(target);
         var stones = magic.enchanterStones; var enchants = magic.weaponEnchants;
         magic.maxMP = .57f; magic.mpRegenRate = .83f;
         for (int i = 0; i < 2; i++)
@@ -69,6 +70,31 @@ internal static class EnchanterLifecycleTests
         Check.Equal(0, Count(magic, TorannMagicDefOf.TM_DismissEnchanterStones), "native control removed when stones end");
         Check.Equal(0, Count(magic, TorannMagicDefOf.TM_DispelEnchantWeapon), "native control removed when enchantments end");
     }
+    static void Recipes(RuntimeFixture f)
+    {
+        var lookup = typeof(Verb_EnchanterStone).GetMethod("Recipe", BindingFlags.Static | BindingFlags.NonPublic)!;
+        foreach (var (material, suffix, count, rank) in new (string,string,int,int)[] {
+            ("Silver","Silver",500,1), ("Steel","Steel",75,1), ("LotR_Iron","Iron",75,1),
+            ("WoodLog","Wood",75,2), ("MedicineHerbal","Medicine",10,2), ("Jade","Jade",50,2),
+            ("Gold","Gold",50,3), ("RawMagicyte","Magicyte",100,3),
+            ("ChunkMarble","Marble",1,0), ("ChunkSlate","Slate",1,0), ("ChunkGranite","Granite",1,0),
+            ("ChunkSandstone","Sandstone",1,0), ("ChunkLimestone","Limestone",1,0) })
+        {
+            var field = typeof(TorannMagicDefOf).GetField("TM_Artifact_" + suffix)!;
+            var previous = field.GetValue(null);
+            try
+            {
+                var artifact = Item(0).def;
+                var input = Item(0).def; input.defName = material;
+                field.SetValue(null, artifact);
+                var recipe = ((ThingDef,int,int))lookup.Invoke(null,[input])!;
+                Check.Same(artifact, recipe.Item1, material + " native artifact");
+                Check.Equal((count,rank), (recipe.Item2,recipe.Item3), material + " payment and required versatility");
+            }
+            finally { field.SetValue(null, previous); }
+        }
+    }
+
     static void Empty(RuntimeFixture f)
     {
         using var fixture = new Fixture(f); var magic = fixture.Magic;

@@ -2,4 +2,6 @@
   <TM_SpiritTransmutate.reportString>трансмутує матеріал.</TM_SpiritTransmutate.reportString>
   <TM_SpiritEnchantedBody.reportString>зачаровує тіло.</TM_SpiritEnchantedBody.reportString>
   <TM_SpiritEnchantedAura.reportString>зачаровує ауру.</TM_SpiritEnchantedAura.reportString>
+  <TM_SpiritEnchanterStone.reportString>створює зачарований камінь.</TM_SpiritEnchanterStone.reportString>
+  <TM_SpiritDismissEnchanterStones.reportString>розвіює зачарований камінь.</TM_SpiritDismissEnchanterStones.reportString>
 </LanguageData>

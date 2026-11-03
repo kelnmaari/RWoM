@@ -97,6 +97,8 @@ namespace TorannMagic.ClassProgression
             ("TM_SpiritChronostaticField_III", () => TorannMagicDefOf.TM_ChronostaticField_III, typeof(Projectile_ChronostaticField)),
             ("TM_SpiritEnchantedBody", () => TorannMagicDefOf.TM_EnchantedBody, typeof(Verb_EnchantedBody)),
             ("TM_SpiritEnchantedAura", () => TorannMagicDefOf.TM_EnchantedAura, typeof(Verb_EnchantedAura)),
+            ("TM_SpiritEnchanterStone", () => TorannMagicDefOf.TM_EnchanterStone, typeof(Verb_EnchanterStone)),
+            ("TM_SpiritDismissEnchanterStones", () => TorannMagicDefOf.TM_DismissEnchanterStones, typeof(Verb_DismissEnchanterStones)),
             ("TM_SpiritTransmutate", () => TorannMagicDefOf.TM_Transmutate, typeof(Verb_Transmutate)),
             ("TM_SpiritSummonTotemEarth", () => TorannMagicDefOf.TM_SummonTotemEarth, typeof(Verb_SummonTotemEarth)),
             ("TM_SpiritSummonTotemLightning", () => TorannMagicDefOf.TM_SummonTotemLightning, typeof(Verb_SummonTotemLightning)),
@@ -243,6 +245,7 @@ namespace TorannMagic.ClassProgression
             }
             float cost = power.MagicUser.ActualManaCost(def);
             if (def == TorannMagicDefOf.TM_Recall && (!TM_Action.RecallMatches(body,power.MagicUser) || power.MagicUser.recallExpiration <= Verse.Find.TickManager.TicksGame)) return false;
+            if (def == TorannMagicDefOf.TM_DismissEnchanterStones && power.MagicUser.enchanterStones?.Any(s => !s.DestroyedOrNull()) != true) return false;
             if (def == TorannMagicDefOf.TM_DismissGuardianSpirit && !ShamanLifecycle.OwnsGuardian(power.MagicUser)) return false;
             if (ShamanLifecycle.Control(def) && !power.MagicUser.HexedPawns.Any(p => p.Spawned)) return false;
             if (def == TorannMagicDefOf.TM_AlterFate && !Verb_AlterFate.Available(body,power)) return false;
@@ -263,6 +266,7 @@ namespace TorannMagic.ClassProgression
             if (!Ready(body,power,paidBurst) || !target.IsValid || !target.Cell.InBounds(body.Map) || target.Cell.Fogged(body.Map) ||
                 (target.HasThing && target.Thing.Map != body.Map) ||
                 !power.magicDef.MainVerb.targetParams.CanTarget(target.ToTargetInfo(body.Map))) return false;
+            if (power.magicDef == TorannMagicDefOf.TM_EnchanterStone && Verb_EnchanterStone.Source(body, power.Pawn, target) == null) return false;
             if (power.magicDef == TorannMagicDefOf.TM_Transmutate && Verb_Transmutate.Source(body, power.Pawn, target) == null) return false;
             if (power.magicDef == TorannMagicDefOf.TM_Sentinel && target.Cell.GetFirstBuilding(body.Map) is Building existing &&
                 (!(existing is Building_TMSentinel) || !power.MagicUser.summonedSentinels.Contains(existing))) return false;
@@ -328,6 +332,7 @@ namespace TorannMagic.ClassProgression
                     return;
                 }
                 var order = JobMaker.MakeJob(job, target, soul);
+                if (def == TorannMagicDefOf.TM_EnchanterStone) order.targetC = Verb_EnchanterStone.Source(body, soul, target);
                 if (def == TorannMagicDefOf.TM_Transmutate) order.targetC = Verb_Transmutate.Source(body, soul, target);
                 void Submit() => body.jobs.TryTakeOrderedJob(order, JobTag.Misc);
                 if (def == TorannMagicDefOf.TM_ValiantCharge || def.MainVerb.verbClass == typeof(Verb_LightSkip) || Odyssey.ManualTravelSafety.IsTravel(power))
@@ -367,7 +372,7 @@ namespace TorannMagic.ClassProgression
             if ((def == TorannMagicDefOf.TM_ValiantCharge || def.MainVerb.verbClass == typeof(Verb_LightSkip)) && !Odyssey.ManualTravelSafety.CanComplete(body, body.Map, target.Cell)) return false;
             var props = power.magicDef.MainVerb;
             var verb = PhysicalVerb(body, power);
-            if (verb is Verb_Transmutate)
+            if (verb is Verb_Transmutate || verb is Verb_EnchanterStone)
             {
                 var source = body.CurJob?.targetC.Thing;
                 if (source?.Spawned != true || source.Map != body.Map || source.Position != target.Cell) return false;
@@ -399,7 +404,7 @@ namespace TorannMagic.ClassProgression
             if (verb is Verb_SpiritTargetable direct && Families.Any(f => f.spell() == def && f.effect == props.verbClass))
             {
                 bool travel = Odyssey.ManualTravelSafety.IsTravel(power);
-                if (!travel && !(verb is Verb_Transmutate) && !(verb is Verb_SummonGuardianSpirit) && !(verb is Verb_SummonTotem) && !(verb is Verb_ReverseTime) && !(verb is Verb_EarthSprites) && !(verb is Verb_Summon) && !(verb is Verb_SummonSpiritWolves) && !(verb is Verb_RegrowLimb) && !(verb is ISpiritCorpseConsumer) && !(verb is Verb_Overdrive) && !(verb is Verb_TechnoWeapon) &&
+                if (!travel && !(verb is Verb_EnchanterStone) && !(verb is Verb_Transmutate) && !(verb is Verb_SummonGuardianSpirit) && !(verb is Verb_SummonTotem) && !(verb is Verb_ReverseTime) && !(verb is Verb_EarthSprites) && !(verb is Verb_Summon) && !(verb is Verb_SummonSpiritWolves) && !(verb is Verb_RegrowLimb) && !(verb is ISpiritCorpseConsumer) && !(verb is Verb_Overdrive) && !(verb is Verb_TechnoWeapon) &&
                     props.AbilityTargetCategory != AbilityTargetCategory.TargetAoE && !(target.Thing is Pawn { Dead: false }))
                     return false;
                 if (!direct.CastFromHost(target)) return false;

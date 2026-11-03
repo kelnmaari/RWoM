@@ -2,4 +2,6 @@
   <TM_SpiritTransmutate.reportString>transmutando um material.</TM_SpiritTransmutate.reportString>
   <TM_SpiritEnchantedBody.reportString>encantando o corpo.</TM_SpiritEnchantedBody.reportString>
   <TM_SpiritEnchantedAura.reportString>encantando a aura.</TM_SpiritEnchantedAura.reportString>
+  <TM_SpiritEnchanterStone.reportString>criando uma pedra encantada.</TM_SpiritEnchanterStone.reportString>
+  <TM_SpiritDismissEnchanterStones.reportString>dissipando uma pedra encantada.</TM_SpiritDismissEnchanterStones.reportString>
 </LanguageData>
