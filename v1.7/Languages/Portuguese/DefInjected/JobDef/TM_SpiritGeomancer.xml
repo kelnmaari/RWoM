@@ -2,4 +2,6 @@
 <LanguageData>
   <TM_SpiritStoneskin.reportString>conjurando pele de pedra.</TM_SpiritStoneskin.reportString>
   <TM_SpiritDispelStoneskin.reportString>dissipando pele de pedra.</TM_SpiritDispelStoneskin.reportString>
+  <TM_SpiritEarthSprites.reportString>a invocar espíritos da terra.</TM_SpiritEarthSprites.reportString>
+  <TM_SpiritDismissEarthSprites.reportString>a dispensar espíritos da terra.</TM_SpiritDismissEarthSprites.reportString>
 </LanguageData>

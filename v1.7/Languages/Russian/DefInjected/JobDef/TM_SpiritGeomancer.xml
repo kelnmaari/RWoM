@@ -2,4 +2,6 @@
 <LanguageData>
   <TM_SpiritStoneskin.reportString>накладывает каменную кожу.</TM_SpiritStoneskin.reportString>
   <TM_SpiritDispelStoneskin.reportString>рассеивает каменную кожу.</TM_SpiritDispelStoneskin.reportString>
+  <TM_SpiritEarthSprites.reportString>призывает духов земли.</TM_SpiritEarthSprites.reportString>
+  <TM_SpiritDismissEarthSprites.reportString>отзывает духов земли.</TM_SpiritDismissEarthSprites.reportString>
 </LanguageData>

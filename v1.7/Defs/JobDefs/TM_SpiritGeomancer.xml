@@ -2,4 +2,6 @@
 <Defs>
   <JobDef><defName>TM_SpiritStoneskin</defName><driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass><reportString>casting stoneskin.</reportString></JobDef>
   <JobDef><defName>TM_SpiritDispelStoneskin</defName><driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass><reportString>dispelling stoneskin.</reportString></JobDef>
+  <JobDef><defName>TM_SpiritEarthSprites</defName><driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass><reportString>summoning earth sprites.</reportString></JobDef>
+  <JobDef><defName>TM_SpiritDismissEarthSprites</defName><driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass><reportString>dismissing earth sprites.</reportString></JobDef>
 </Defs>

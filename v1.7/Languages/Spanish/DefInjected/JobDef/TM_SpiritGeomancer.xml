@@ -2,4 +2,6 @@
 <LanguageData>
   <TM_SpiritStoneskin.reportString>aplica piel de piedra.</TM_SpiritStoneskin.reportString>
   <TM_SpiritDispelStoneskin.reportString>disipa piel de piedra.</TM_SpiritDispelStoneskin.reportString>
+  <TM_SpiritEarthSprites.reportString>invocando espíritus de la tierra.</TM_SpiritEarthSprites.reportString>
+  <TM_SpiritDismissEarthSprites.reportString>despidiendo espíritus de la tierra.</TM_SpiritDismissEarthSprites.reportString>
 </LanguageData>

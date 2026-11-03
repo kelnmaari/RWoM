@@ -163,11 +163,14 @@ namespace TorannMagic.ClassProgression
             SpiritRebirthHealthForm.TryRefreshPending(pawn);
             if (comp.overdriveBuilding != null && now % Math.Max(1, comp.overdriveFrequency) == 0)
                 comp.ResolveTechnomancerOverdrive();
+            if (comp.earthSpriteType != 0 && SpiritRebirthState.TryGet(pawn, out var spriteState) && !spriteState.DepletionPending)
+                comp.TickEarthSprites(spriteState.HasValidHost(pawn) ? spriteState.Host : pawn);
             SpiritHostedTechnoBit.Tick(comp);
             if (now % 60 == 0)
             {
                 BrightmageLifecycle.TickHostedLight(pawn,now);
                 comp.SyncStoneskinControl();
+                comp.SyncEarthSpriteControl();
             }
             if (now % 100 == 0) BardTrials.TickHostedInspiration(pawn);
             if (now % 30 == 0) BardTrials.TickHostedHymn(pawn);

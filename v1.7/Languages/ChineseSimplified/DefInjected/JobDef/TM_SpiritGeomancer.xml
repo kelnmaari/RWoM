@@ -2,4 +2,6 @@
 <LanguageData>
   <TM_SpiritStoneskin.reportString>正在施放石肤术。</TM_SpiritStoneskin.reportString>
   <TM_SpiritDispelStoneskin.reportString>正在驱散石肤术。</TM_SpiritDispelStoneskin.reportString>
+  <TM_SpiritEarthSprites.reportString>正在召唤大地精灵。</TM_SpiritEarthSprites.reportString>
+  <TM_SpiritDismissEarthSprites.reportString>正在遣散大地精灵。</TM_SpiritDismissEarthSprites.reportString>
 </LanguageData>

@@ -115,6 +115,7 @@ namespace TorannMagic
         public IntVec3 earthSprites = default(IntVec3);
         public bool earthSpritesInArea = false;
         public Map earthSpriteMap = null;
+        private bool earthSpriteNeedsLegacyMap;
         public int nextEarthSpriteAction = 0;
         public int nextEarthSpriteMote = 0;
         public int earthSpriteType = 0;
@@ -5238,6 +5239,7 @@ namespace TorannMagic
 
         internal void AssignEarthSprites(Map map, IntVec3 cell, bool mining)
         {
+            earthSpriteNeedsLegacyMap = false;
             earthSpriteMap = map;
             earthSprites = cell;
             earthSpriteType = mining ? 1 : 2;
@@ -5245,14 +5247,66 @@ namespace TorannMagic
             nextEarthSpriteAction = Find.TickManager.TicksGame + (mining ? 300 : 20000);
         }
 
-        private void ResolveEarthSpriteAction()
+        internal void ClearEarthSprites()
+        {
+            earthSpriteType = 0;
+            earthSpriteMap = null;
+            earthSprites = IntVec3.Invalid;
+            earthSpritesInArea = false;
+        }
+
+        internal void SyncEarthSpriteControl()
+        {
+            var def = TorannMagicDefOf.TM_DismissEarthSprites;
+            if (def == null || earthSpriteType == 0 && !dismissEarthSpriteSpell) return;
+            if (earthSpriteType != 0 && !AbilityData.Powers.Any(p => p.Def == def))
+            {
+                AddPawnAbility(def);
+                AbilityData.AllPowers = null;
+            }
+            else if (earthSpriteType == 0) RemovePawnAbility(def);
+            dismissEarthSpriteSpell = earthSpriteType != 0;
+        }
+
+        internal void TickEarthSprites(Pawn worker)
+        {
+            if (worker?.Spawned != true || earthSpriteType == 0 || !earthSprites.IsValid) return;
+            if (earthSpriteNeedsLegacyMap)
+            {
+                earthSpriteMap = worker.Map;
+                earthSpriteNeedsLegacyMap = false;
+            }
+            if (earthSpriteMap == null || (earthSpriteMap != worker.Map && !Find.Maps.Contains(earthSpriteMap)) || !earthSprites.InBounds(earthSpriteMap))
+            {
+                ClearEarthSprites();
+                SyncEarthSpriteControl();
+                return;
+            }
+            if (this.nextEarthSpriteAction < Find.TickManager.TicksGame)
+            {
+                ResolveEarthSpriteAction(worker);
+            }
+
+            if (this.earthSpriteType != 0 && earthSpriteMap != null && this.nextEarthSpriteMote < Find.TickManager.TicksGame)
+            {
+                this.nextEarthSpriteMote += Rand.Range(7, 12);
+                Vector3 shiftLoc = this.earthSprites.ToVector3Shifted();
+                shiftLoc.x += Rand.Range(-.3f, .3f);
+                shiftLoc.z += Rand.Range(-.3f, .3f);
+                TM_MoteMaker.ThrowGenericMote(TorannMagicDefOf.Mote_Twinkle, shiftLoc, earthSpriteMap, Rand.Range(.6f, 1.4f), .15f, Rand.Range(.2f, .5f), Rand.Range(.2f, .5f), Rand.Range(-100, 100), Rand.Range(0f, .3f), Rand.Range(0, 360), 0);
+                if(Rand.Chance(.3f))
+                {
+                    shiftLoc = this.earthSprites.ToVector3Shifted();
+                    shiftLoc.x += Rand.Range(-.3f, .3f);
+                    shiftLoc.z += Rand.Range(-.3f, .3f);
+                    TM_MoteMaker.ThrowGenericMote(TorannMagicDefOf.Mote_GreenTwinkle, shiftLoc, earthSpriteMap, Rand.Range(.6f, 1f), .15f, Rand.Range(.2f, .9f), Rand.Range(.5f, .9f), Rand.Range(-200, 200), Rand.Range(0f, .3f), Rand.Range(0, 360), 0);
+                }
+            }
+        }
+
+        private void ResolveEarthSpriteAction(Pawn worker)
         {
             MagicPowerSkill magicPowerSkill = this.MagicData.MagicPowerSkill_EarthSprites.FirstOrDefault((MagicPowerSkill x) => x.label == "TM_EarthSprites_pwr");
-            //Log.Message("resolving sprites");
-            if (this.earthSpriteMap == null)
-            {
-                this.earthSpriteMap = this.Pawn.Map;
-            }
             if (this.earthSpriteType == 1) //mining stone
             {
                 //Log.Message("stone");
@@ -5263,7 +5317,7 @@ namespace TorannMagic
                 int num = 80;
                 if (mineable != null && mineTarget.HitPoints > num)
                 {
-                    var dinfo = new DamageInfo(DamageDefOf.Mining, num, 0, -1f, this.Pawn, null, null, DamageInfo.SourceCategory.ThingOrUnknown);
+                    var dinfo = new DamageInfo(DamageDefOf.Mining, num, 0, -1f, worker, null, null, DamageInfo.SourceCategory.ThingOrUnknown);
                     mineTarget.TakeDamage(dinfo);
                     
                     if (Rand.Chance(ModOptions.Settings.Instance.magicyteChance * 2))
@@ -5279,7 +5333,7 @@ namespace TorannMagic
                 }
                 else if (mineable != null && mineTarget.HitPoints <= num)
                 {
-                    mineable.DestroyMined(this.Pawn);
+                    mineable.DestroyMined(worker);
                 }
 
                 if (mineable.DestroyedOrNull())
@@ -6012,17 +6066,7 @@ namespace TorannMagic
                 }
             }
 
-            if (this.earthSpriteType != 0 && dismissEarthSpriteSpell == false)
-            {
-                this.AddPawnAbility(TorannMagicDefOf.TM_DismissEarthSprites);
-                dismissEarthSpriteSpell = true;
-            }
-
-            if (this.earthSpriteType == 0 && dismissEarthSpriteSpell == true)
-            {
-                this.RemovePawnAbility(TorannMagicDefOf.TM_DismissEarthSprites);
-                dismissEarthSpriteSpell = false;
-            }
+            SyncEarthSpriteControl();
         }
 
         public void ResolveMana()
@@ -6197,29 +6241,8 @@ namespace TorannMagic
                 this.spell_Teach = true;
             }
 
-            if ((this.Pawn.story.traits.HasTrait(TorannMagicDefOf.Geomancer) || ClassProgression.ClassIdentity.IsGeomancer(this.Pawn) || flagCM || isCustom) && this.earthSpriteType != 0 && this.earthSprites.IsValid)
-            {
-                if (this.nextEarthSpriteAction < Find.TickManager.TicksGame)
-                {
-                    ResolveEarthSpriteAction();
-                }
-
-                if (this.earthSpriteType != 0 && earthSpriteMap != null && this.nextEarthSpriteMote < Find.TickManager.TicksGame)
-                {
-                    this.nextEarthSpriteMote += Rand.Range(7, 12);
-                    Vector3 shiftLoc = this.earthSprites.ToVector3Shifted();
-                    shiftLoc.x += Rand.Range(-.3f, .3f);
-                    shiftLoc.z += Rand.Range(-.3f, .3f);
-                    TM_MoteMaker.ThrowGenericMote(TorannMagicDefOf.Mote_Twinkle, shiftLoc, earthSpriteMap, Rand.Range(.6f, 1.4f), .15f, Rand.Range(.2f, .5f), Rand.Range(.2f, .5f), Rand.Range(-100, 100), Rand.Range(0f, .3f), Rand.Range(0, 360), 0);
-                    if(Rand.Chance(.3f))
-                    {
-                        shiftLoc = this.earthSprites.ToVector3Shifted();
-                        shiftLoc.x += Rand.Range(-.3f, .3f);
-                        shiftLoc.z += Rand.Range(-.3f, .3f);
-                        TM_MoteMaker.ThrowGenericMote(TorannMagicDefOf.Mote_GreenTwinkle, shiftLoc, earthSpriteMap, Rand.Range(.6f, 1f), .15f, Rand.Range(.2f, .9f), Rand.Range(.5f, .9f), Rand.Range(-200, 200), Rand.Range(0f, .3f), Rand.Range(0, 360), 0);
-                    }
-                }
-            }
+            if (earthSpriteType != 0 && (Pawn.story.traits.HasTrait(TorannMagicDefOf.Geomancer) || ClassProgression.ClassIdentity.IsGeomancer(Pawn) || flagCM || isCustom))
+                TickEarthSprites(Pawn);
 
             if (this.summonedSentinels.Count > 0)
             {
@@ -6878,6 +6901,7 @@ namespace TorannMagic
         internal void RestoreSavedCooldowns()
         {
             if (stoneskinPawns?.Count > 0) SyncStoneskinControl();
+            if (earthSpriteType != 0) SyncEarthSpriteControl();
             if (SoL != null && ClassProgression.SpiritRebirthState.TryGet(Pawn,out var state) && state.HasValidHost(Pawn))
                 ClassProgression.BrightmageLifecycle.SynchronizeControl(this);
             spiritRuntimeClock?.RestoreCooldowns(this);
@@ -6987,6 +7011,8 @@ namespace TorannMagic
             Scribe_Collections.Look<Pawn>(ref this.hexedPawns, "hexedPawns", LookMode.Reference);
             Scribe_Values.Look<IntVec3>(ref this.earthSprites, "earthSprites", default(IntVec3), false);
             Scribe_Values.Look<int>(ref this.earthSpriteType, "earthSpriteType", 0, false);
+            if (Scribe.mode == LoadSaveMode.LoadingVars)
+                earthSpriteNeedsLegacyMap = earthSpriteType != 0 && Scribe.loader.curXmlParent["earthSpriteMap"] == null;
             Scribe_References.Look<Map>(ref this.earthSpriteMap, "earthSpriteMap", false);
             Scribe_Values.Look<bool>(ref this.earthSpritesInArea, "earthSpritesInArea", false, false);
             Scribe_Values.Look<int>(ref this.nextEarthSpriteAction, "nextEarthSpriteAction", 0, false);

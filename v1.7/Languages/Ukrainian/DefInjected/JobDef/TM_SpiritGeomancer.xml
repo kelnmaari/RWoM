@@ -2,4 +2,6 @@
 <LanguageData>
   <TM_SpiritStoneskin.reportString>накладає кам’яну шкіру.</TM_SpiritStoneskin.reportString>
   <TM_SpiritDispelStoneskin.reportString>розсіює кам’яну шкіру.</TM_SpiritDispelStoneskin.reportString>
+  <TM_SpiritEarthSprites.reportString>прикликає духів землі.</TM_SpiritEarthSprites.reportString>
+  <TM_SpiritDismissEarthSprites.reportString>відкликає духів землі.</TM_SpiritDismissEarthSprites.reportString>
 </LanguageData>
