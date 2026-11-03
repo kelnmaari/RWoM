@@ -14,7 +14,7 @@ internal static partial class SpiritMapCollapseTests
     internal static Type Production(string name) => Check.NotNull(typeof(SpiritRebirthState).Assembly.GetType("TorannMagic.ClassProgression." + name), "map collapse " + name + " exists");
     public static IEnumerable<TestCase> Cases()
     {
-        foreach(var spell in new[]{"Firebolt","Icebolt","Fireball","Snowball","Heal","AdvancedHeal","Purify","Regenerate","Fireclaw","Poison","CureDisease","SootheAnimal","SootheAnimal_I","SootheAnimal_II","SootheAnimal_III","Rainmaker","Resurrection","HealingCircle","HealingCircle_I","HealingCircle_II","HealingCircle_III","RaiseUndead","Blink","Blink_I","Blink_II","Blink_III","Summon","Summon_I","Summon_II","Summon_III","MagicMissile","MagicMissile_I","MagicMissile_II","MagicMissile_III","LightningBolt","LightningCloud","LightningStorm","Firestorm","NanoStimulant","TechnoWeapon","TechnoTurret","TechnoShield","Overdrive","OrbitalStrike","OrbitalStrike_I","OrbitalStrike_II","OrbitalStrike_III","Sabotage","FoldReality","Teleport","ValiantCharge","Overwhelm","BestowMight","BestowMight_I","BestowMight_II","BestowMight_III","DeathBolt","DeathBolt_I","DeathBolt_II","DeathBolt_III","FogOfTorment","CorpseExplosion","CorpseExplosion_I","CorpseExplosion_II","CorpseExplosion_III","ConsumeCorpse","ConsumeCorpse_I","ConsumeCorpse_II","ConsumeCorpse_III","ConsumeCorpse_Mass","DeathMark","DeathMark_I","DeathMark_II","DeathMark_III","FrostRay","FrostRay_I","FrostRay_II","FrostRay_III","AMP","AMP_I","AMP_II","AMP_III"})
+        foreach(var spell in new[]{"Firebolt","Icebolt","Fireball","Snowball","Heal","AdvancedHeal","Purify","Regenerate","Fireclaw","Poison","CureDisease","SootheAnimal","SootheAnimal_I","SootheAnimal_II","SootheAnimal_III","Rainmaker","Resurrection","HealingCircle","HealingCircle_I","HealingCircle_II","HealingCircle_III","RaiseUndead","Blink","Blink_I","Blink_II","Blink_III","Summon","Summon_I","Summon_II","Summon_III","MagicMissile","MagicMissile_I","MagicMissile_II","MagicMissile_III","LightningBolt","LightningCloud","LightningStorm","Firestorm","Sunfire","Sunfire_I","Sunfire_II","Sunfire_III","NanoStimulant","TechnoWeapon","TechnoTurret","TechnoShield","Overdrive","OrbitalStrike","OrbitalStrike_I","OrbitalStrike_II","OrbitalStrike_III","Sabotage","FoldReality","Teleport","ValiantCharge","Overwhelm","BestowMight","BestowMight_I","BestowMight_II","BestowMight_III","DeathBolt","DeathBolt_I","DeathBolt_II","DeathBolt_III","FogOfTorment","CorpseExplosion","CorpseExplosion_I","CorpseExplosion_II","CorpseExplosion_III","ConsumeCorpse","ConsumeCorpse_I","ConsumeCorpse_II","ConsumeCorpse_III","ConsumeCorpse_Mass","DeathMark","DeathMark_I","DeathMark_II","DeathMark_III","FrostRay","FrostRay_I","FrostRay_II","FrostRay_III","AMP","AMP_I","AMP_II","AMP_III"})
         yield return new("SpiritProjectedCast."+spell+"RemainsPhysicalWithOriginalOwner", r =>
             SpiritRebirthRitualTransactionTests.Run(r,c=>{
                 using var fixture=new Fixture(r,c);
@@ -57,6 +57,52 @@ internal static partial class SpiritMapCollapseTests
                 ownBit.learned=false;
                 fixture.Possession.GetDirectlyHeldThings().Remove(soul);
                 Check.Equal(false,(bool)api.Invoke(null,[host,magic])!,"release disables stale commands");
+            }));
+        yield return new("BrightmageLifecycle.MovingSunfireBeamsPreserveTheirCurves", r =>
+            SpiritRebirthRitualTransactionTests.Run(r,c =>
+            {
+                using var fixture = new Fixture(r,c);
+                var mat = typeof(MaterialPool).GetMethod("MatFrom",[typeof(string),typeof(UnityEngine.Shader),typeof(int)])!;
+                using var skipMaterial = new Patch(mat,nameof(CancelNative));
+                using var baseMaterial = new Patch(typeof(MaterialPool).GetMethod("MatFrom",[typeof(string),typeof(UnityEngine.Shader)])!,nameof(CancelNative));
+                var definition = (ThingDef)RuntimeHelpers.GetUninitializedObject(typeof(ThingDef));
+                definition.defName="RegressionSunfireField"; definition.thingClass=typeof(Projectile_Sunfire); definition.comps=[]; definition.category=ThingCategory.Projectile;
+                DefDatabase<ThingDef>.Add(definition);
+                var field = new Projectile_Sunfire {def=definition, thingIDNumber=19866, usedTarget=IntVec3.Zero, intendedTarget=IntVec3.Zero};
+                var origin = new UnityEngine.Vector3(12,0,13);
+                var curve = new UnityEngine.Vector3(.0001f,0,-.0002f);
+                Set(field,"launcher",c.Creator);Set(field,"initialized",true);
+                Set(field,"sfBeams",new List<UnityEngine.Vector3>{origin});
+                Set(field,"sfBeamsROM",new List<UnityEngine.Vector3>{new(.03f,0,.1f)});
+                Set(field,"sfBeamsCurve",new List<UnityEngine.Vector3>{curve});
+                Set(field,"sfBeamsStep",new List<int>{9});Set(field,"sfBeamsStartTick",new List<int>{11});
+                field=RoundTripSummon(r,"sunfire-live-beams",field,c.Creator);
+                var flags=BindingFlags.NonPublic|BindingFlags.Instance;
+                Check.Equal(origin,((List<UnityEngine.Vector3>)typeof(Projectile_Sunfire).GetField("sfBeams",flags)!.GetValue(field)!).Single(),"beam resumes from actual cell");
+                var restored=(List<UnityEngine.Vector3>)typeof(Projectile_Sunfire).GetField("sfBeamsCurve",flags)!.GetValue(field)!;
+                Check.Equal(1,restored.Count,"one saved curved trajectory");
+                Check.Equal(curve,restored[0],"curve is distinct from current beam position");
+                Check.Equal(9,((List<int>)typeof(Projectile_Sunfire).GetField("sfBeamsStep",flags)!.GetValue(field)!).Single(),"remaining steps survive");
+                var path=Path.Combine(r.WorkingDirectory,"sunfire-live-beams.xml");
+                var xml=XDocument.Load(path);
+                var saved=xml.Descendants("summon").Single();
+                saved.Element("TM_sunfireCurvature")!.Remove();
+                saved.Add(new XElement("sfBeamsCurve",saved.Element("sfBeams")!.Nodes().Select(n=>new XElement((XElement)n))));
+                xml.Save(path);
+                var culture=System.Globalization.CultureInfo.CurrentCulture;
+                Projectile_Sunfire? legacy=null;
+                try
+                {
+                    System.Globalization.CultureInfo.CurrentCulture=System.Globalization.CultureInfo.InvariantCulture;
+                    Scribe.loader.InitLoading(path);
+                    Scribe_Deep.Look(ref legacy,"summon");
+                    var directory=(LoadedObjectDirectory)typeof(CrossRefHandler).GetField("loadedObjectDirectory",flags)!.GetValue(Scribe.loader.crossRefs)!;
+                    directory.RegisterLoaded(c.Creator);
+                    Scribe.loader.FinalizeLoading();
+                }
+                finally { Scribe.ForceStop(); System.Globalization.CultureInfo.CurrentCulture=culture; }
+                Check.Equal(UnityEngine.Vector3.zero,((List<UnityEngine.Vector3>)typeof(Projectile_Sunfire).GetField("sfBeamsCurve",flags)!.GetValue(legacy)!).Single(),"legacy positions are never interpreted as curvature");
+                Check.Equal(origin,((List<UnityEngine.Vector3>)typeof(Projectile_Sunfire).GetField("sfBeams",flags)!.GetValue(legacy)!).Single(),"old beam keeps its position without restarting");
             }));
         foreach (bool impacted in new[] { false, true })
             yield return new("SpiritProjectedCast.SabotageScribeAfterImpact" + impacted, r =>
