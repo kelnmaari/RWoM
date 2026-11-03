@@ -1,4 +1,4 @@
-﻿using Verse;
+using Verse;
 using AbilityUser;
 using UnityEngine;
 using System.Linq;
@@ -179,7 +179,7 @@ namespace TorannMagic
                     CompTransporter podT = podL.parent.TryGetComp<CompTransporter>(); // Traverse.Create(root: podL).Field(name: "Transporter").GetValue<CompTransporter>(); //podL.Transporter;
                     GenPlace.TryPlaceThing(pod, p.Position, p.Map, ThingPlaceMode.Near);
                     //GenSpawn.Spawn(pod, p.Position, this.Map, WipeMode.Vanish);
-                    podT.groupID = 12;
+                    podT.groupID = Find.UniqueIDsManager.GetNextTransporterGroupID();
                     p.DeSpawn();
                     p.teleporting = true;
                     if (mount != null)

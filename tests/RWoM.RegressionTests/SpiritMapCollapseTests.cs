@@ -170,6 +170,47 @@ internal static partial class SpiritMapCollapseTests
                 Check.Equal(true,((List<IntVec3>)typeof(Projectile_Refraction).GetField("wallPositions",flags)!.GetValue(field)!).SequenceEqual(cells), "same wall cells survive");
                 Check.Equal(625f,(float)typeof(Projectile_Refraction).GetField("wallEnergy",flags)!.GetValue(field)!, "remaining wall energy survives");
             }));
+        yield return new("BrightmageLifecycle.LightSkipFlightUsesNativePassengerManifest", r =>
+            SpiritRebirthRitualTransactionTests.Run(r,c =>
+            {
+                var trip = new TorannMagic.WorldTransport.TM_TravelingTransportPods();
+                var pod = new ActiveTransporterInfo();
+                trip.AddPod(pod,true);
+                var holders = new List<IThingHolder>();
+                trip.GetChildHolders(holders);
+                Check.Equal(1,holders.Count,"native save and arrival must see the light transporter");
+                Check.Same(pod,holders.Single(),"exact transporter retained");
+                Check.Same(trip,pod.parent,"single world owner");
+            }));
+        yield return new("BrightmageLifecycle.LightSkipArrivalRestoresOldDestination", r =>
+            SpiritRebirthRitualTransactionTests.Run(r,c =>
+            {
+                var parent = new RimWorld.Planet.MapParent {ID=19335};
+                var cell = new IntVec3(9,0,13);
+                var action = new TorannMagic.WorldTransport.TM_TransportPodsArrivalAction_LandAtExactCell(parent,cell,true);
+                var path=Path.Combine(r.WorkingDirectory,"light-arrival.xml");
+                try { Scribe.saver.InitSaving(path,"trial"); Scribe_Deep.Look(ref action,"arrival"); Scribe.saver.FinalizeSaving(); }
+                finally { Scribe.ForceStop(); }
+                var xml=XDocument.Load(path);
+                var row=xml.Descendants("arrival").Single();
+                Check.Equal(1,row.Elements("mapParent").Count(),"new action has one authoritative destination");
+                Check.Equal(1,row.Elements("cell").Count(),"new action has one authoritative landing cell");
+                row.AddFirst(new XElement("mapParent","null"),new XElement("cell","(0, 0, 0)"));
+                xml.Save(path);
+                action=null;
+                var flags=BindingFlags.Instance|BindingFlags.NonPublic;
+                try
+                {
+                    Scribe.loader.InitLoading(path); Scribe_Deep.Look(ref action,"arrival");
+                    ((LoadedObjectDirectory)typeof(CrossRefHandler).GetField("loadedObjectDirectory",flags)!.GetValue(Scribe.loader.crossRefs)!).RegisterLoaded(parent);
+                    Scribe.loader.FinalizeLoading();
+                }
+                finally { Scribe.ForceStop(); }
+                var native=typeof(RimWorld.Planet.TransportersArrivalAction_LandInSpecificCell);
+                Check.Same(parent,native.GetField("mapParent",flags)!.GetValue(action)!,"original destination survives legacy duplicate");
+                Check.Equal(cell,(IntVec3)native.GetField("cell",flags)!.GetValue(action)!,"original landing cell survives legacy duplicate");
+                Check.Equal(true,action!.draftFlag,"draft instruction preserved");
+            }));
         foreach (bool impacted in new[] { false, true })
             yield return new("SpiritProjectedCast.SabotageScribeAfterImpact" + impacted, r =>
                 SpiritRebirthRitualTransactionTests.Run(r, c =>

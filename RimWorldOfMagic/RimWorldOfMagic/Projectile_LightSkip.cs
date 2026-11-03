@@ -1,4 +1,4 @@
-﻿using Verse;
+using Verse;
 using AbilityUser;
 using UnityEngine;
 using System.Linq;
@@ -102,7 +102,7 @@ namespace TorannMagic
                 CompLaunchable podL = pod.TryGetComp<CompLaunchable>();
                 CompTransporter podT = podL.parent.GetComp<CompTransporter>(); // Traverse.Create(root: podL).Field(name: "Transporter").GetValue<CompTransporter>();
                 GenPlace.TryPlaceThing(pod, pawn.Position, pawn.Map, ThingPlaceMode.Near);
-                podT.groupID = 11;
+                podT.groupID = Find.UniqueIDsManager.GetNextTransporterGroupID();
                 pawnToSkip.DeSpawn();
                 pawn.teleporting = true;
                 if(mount != null)

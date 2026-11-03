@@ -109,6 +109,7 @@ namespace TorannMagic
         {
             if (pawnList != null && pawnList.Count > 0)
             {
+                int groupId = Find.UniqueIDsManager.GetNextTransporterGroupID();
                 for (int i = 0; i < pawnList.Count; i++)
                 {
                     Pawn p = pawnList[i];
@@ -123,7 +124,7 @@ namespace TorannMagic
                     CompTransporter podT = podL.parent.TryGetComp<CompTransporter>(); // Traverse.Create(root: podL).Field(name: "Transporter").GetValue<CompTransporter>();  //podL.Transporter;
                     GenPlace.TryPlaceThing(pod, p.Position, p.Map, ThingPlaceMode.Near);
                     //GenSpawn.Spawn(pod, p.Position, p.Map, WipeMode.Vanish);
-                    podT.groupID = 12;
+                    podT.groupID = groupId;
                     p.DeSpawn();
                     p.teleporting = true;
                     if(mount != null)
