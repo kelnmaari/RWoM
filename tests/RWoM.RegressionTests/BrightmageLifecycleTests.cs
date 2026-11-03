@@ -162,6 +162,7 @@ internal static class BrightmageLifecycleTests
         try { Scribe.saver.InitSaving(path, "regression"); Scribe_Deep.Look(ref envelope, "native"); Scribe.saver.FinalizeSaving(); }
         finally { Scribe.ForceStop(); }
         energy.LightEnergy = 0;
+        Set(energy, "lastChargeTick", -1);
         try { Scribe.loader.InitLoading(path); Scribe_Deep.Look(ref envelope, "native"); Scribe.loader.FinalizeLoading(); }
         finally { Scribe.ForceStop(); EnergyEnvelope.Target = null!; }
         BrightmageLifecycle.Restore(p.magic);
