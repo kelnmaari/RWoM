@@ -10,6 +10,7 @@ internal static class GeomancerTrialTests
 {
     public static IEnumerable<TestCase> Cases()
     {
+        yield return new("GeomancerTrial.SentinelKeepsOnlyItsOwnersUpkeep", SentinelOwner);
         yield return new("GeomancerTrial.EarthSpritesRetargetAcrossMaps", SpriteRetarget);
         yield return new("GeomancerTrial.RecastingTransfersOneWardAndItsUpkeep", TransferUpkeep);
         yield return new("GeomancerTrial.DamagedStoneskinRetainsMaximumAfterLoad", WardSave);
@@ -55,6 +56,31 @@ internal static class GeomancerTrialTests
         }
         public void Adept() { Path.RecordCompletedTrial(GeomancerTrials.FoundationTrialId); Progression.State.TryAdvanceAfterTrial("rwom.geomancer", InitiationStage.Foundation, GeomancerTrials.FoundationTrialId); }
         public void Dispose() { GeomancerTrials.EndLaunch(null!); Current.Game = previous; DefDatabase<ClassDisciplineDef>.Clear(); foreach(var def in profiles) DefDatabase<ClassDisciplineDef>.Add(def); }
+    }
+    static void SentinelOwner(RuntimeFixture f)
+    {
+        using var w = new Fixture(f);
+        var def = (ThingDef)RuntimeHelpers.GetUninitializedObject(typeof(ThingDef));
+        def.defName="TM_Sentinel"; def.category=ThingCategory.Building;
+        Building_TMSentinel Statue(int id)
+        {
+            var stone=(Building_TMSentinel)RuntimeHelpers.GetUninitializedObject(typeof(Building_TMSentinel));
+            stone.def=def; stone.thingIDNumber=id;
+            Set(stone,"mapIndexOrState",(sbyte)-1);
+            return stone;
+        }
+        var mine=Statue(41003);
+        var other=Statue(41004);
+        Set(mine,"sustainerPawn",w.Caster);
+        Set(other,"sustainerPawn",w.Target);
+        var legacy=Statue(41005);
+        w.Magic.summonedSentinels = [mine,other,legacy,mine,w.Target,null!];
+        var prune = typeof(CompAbilityUserMagic).GetMethod("PruneSentinels",
+            System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!;
+        prune.Invoke(w.Magic,null);
+        Check.Equal(2,w.Magic.summonedSentinels.Count,"one reservation per owned or unbound legacy statue");
+        Check.Same(mine,w.Magic.summonedSentinels[0],"oldest owned sentinel remains first for the cap");
+        Check.Same(legacy,w.Magic.summonedSentinels[1],"legacy forward reference retained until the statue binds");
     }
     static void SpriteRetarget(RuntimeFixture f)
     {

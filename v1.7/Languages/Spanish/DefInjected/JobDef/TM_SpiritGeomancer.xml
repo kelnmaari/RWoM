@@ -9,4 +9,6 @@
   <TM_SpiritEncase_II.reportString>levanta muros de piedra.</TM_SpiritEncase_II.reportString>
   <TM_SpiritEncase_III.reportString>levanta muros de piedra.</TM_SpiritEncase_III.reportString>
   <TM_SpiritEarthernHammer.reportString>invocando el martillo de tierra.</TM_SpiritEarthernHammer.reportString>
+  <TM_SpiritSentinel.reportString>invocando un centinela de piedra.</TM_SpiritSentinel.reportString>
+  <TM_SpiritShatterSentinel.reportString>destrozando los centinelas de piedra.</TM_SpiritShatterSentinel.reportString>
 </LanguageData>

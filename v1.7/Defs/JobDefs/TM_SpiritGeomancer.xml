@@ -9,4 +9,6 @@
   <JobDef><defName>TM_SpiritEncase_II</defName><driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass><reportString>casting encase.</reportString></JobDef>
   <JobDef><defName>TM_SpiritEncase_III</defName><driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass><reportString>casting encase.</reportString></JobDef>
   <JobDef><defName>TM_SpiritEarthernHammer</defName><driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass><reportString>casting earthen hammer.</reportString></JobDef>
+  <JobDef><defName>TM_SpiritSentinel</defName><driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass><reportString>summoning a stone sentinel.</reportString></JobDef>
+  <JobDef><defName>TM_SpiritShatterSentinel</defName><driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass><reportString>shattering stone sentinels.</reportString></JobDef>
 </Defs>

@@ -5255,6 +5255,34 @@ namespace TorannMagic
             earthSpritesInArea = false;
         }
 
+        internal void PruneSentinels()
+        {
+            summonedSentinels ??= new List<Thing>();
+            for (int i = summonedSentinels.Count - 1; i >= 0; i--)
+            {
+                var thing = summonedSentinels[i];
+                var active = (thing as Pawn)?.TryGetComp<CompSentinel>();
+                var owner = thing is Building_TMSentinel stone ? stone.Owner : active?.sustainerPawn;
+                if (thing.DestroyedOrNull() || thing is Pawn { Dead: true } || (thing is not Building_TMSentinel && active == null)
+                    || (owner != null && owner != Pawn) || summonedSentinels.IndexOf(thing) != i)
+                    summonedSentinels.RemoveAt(i);
+            }
+        }
+
+        internal void SyncSentinelControl()
+        {
+            PruneSentinels();
+            var def = TorannMagicDefOf.TM_ShatterSentinel;
+            if (def == null || summonedSentinels.Count == 0 && !shatterSentinel) return;
+            if (summonedSentinels.Count > 0 && !AbilityData.Powers.Any(p => p.Def == def))
+            {
+                AddPawnAbility(def);
+                AbilityData.AllPowers = null;
+            }
+            else if (summonedSentinels.Count == 0) RemovePawnAbility(def);
+            shatterSentinel = summonedSentinels.Count > 0;
+        }
+
         internal void SyncEarthSpriteControl()
         {
             var def = TorannMagicDefOf.TM_DismissEarthSprites;
@@ -5939,16 +5967,7 @@ namespace TorannMagic
                 dismissLightningTrap = false;
             }
 
-            if (this.summonedSentinels.Count > 0 && this.shatterSentinel == false)
-            {
-                this.AddPawnAbility(TorannMagicDefOf.TM_ShatterSentinel);
-                shatterSentinel = true;
-            }
-            if (this.summonedSentinels.Count <= 0 && this.shatterSentinel == true)
-            {
-                this.RemovePawnAbility(TorannMagicDefOf.TM_ShatterSentinel);
-                shatterSentinel = false;
-            }
+            SyncSentinelControl();
 
             if (this.soulBondPawn.DestroyedOrNull() && (this.spell_ShadowStep == true || this.spell_ShadowCall == true))
             {
@@ -6244,16 +6263,7 @@ namespace TorannMagic
             if (earthSpriteType != 0 && (Pawn.story.traits.HasTrait(TorannMagicDefOf.Geomancer) || ClassProgression.ClassIdentity.IsGeomancer(Pawn) || flagCM || isCustom))
                 TickEarthSprites(Pawn);
 
-            if (this.summonedSentinels.Count > 0)
-            {
-                for (int i = 0; i < this.summonedSentinels.Count(); i++)
-                {
-                    if (summonedSentinels[i].DestroyedOrNull())
-                    {
-                        this.summonedSentinels.Remove(this.summonedSentinels[i]);
-                    }
-                }
-            }
+            PruneSentinels();
 
             if (this.lightningTraps.Count > 0)
             {
@@ -6902,6 +6912,7 @@ namespace TorannMagic
         {
             if (stoneskinPawns?.Count > 0) SyncStoneskinControl();
             if (earthSpriteType != 0) SyncEarthSpriteControl();
+            if (summonedSentinels?.Count > 0) SyncSentinelControl();
             if (SoL != null && ClassProgression.SpiritRebirthState.TryGet(Pawn,out var state) && state.HasValidHost(Pawn))
                 ClassProgression.BrightmageLifecycle.SynchronizeControl(this);
             spiritRuntimeClock?.RestoreCooldowns(this);

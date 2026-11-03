@@ -91,6 +91,8 @@ namespace TorannMagic.ClassProgression
             ("TM_SpiritRend_III", () => TorannMagicDefOf.TM_Rend_III, typeof(Verb_Rend)),
             ("TM_SpiritEarthSprites", () => TorannMagicDefOf.TM_EarthSprites, typeof(Verb_EarthSprites)),
             ("TM_SpiritDismissEarthSprites", () => TorannMagicDefOf.TM_DismissEarthSprites, typeof(Verb_DismissEarthSprites)),
+            ("TM_SpiritSentinel", () => TorannMagicDefOf.TM_Sentinel, typeof(Projectile_Sentinel)),
+            ("TM_SpiritShatterSentinel", () => TorannMagicDefOf.TM_ShatterSentinel, typeof(Verb_ShatterSentinel)),
             ("TM_SpiritEarthernHammer", () => TorannMagicDefOf.TM_EarthernHammer, typeof(Projectile_EarthernHammer)),
             ("TM_SpiritEncase", () => TorannMagicDefOf.TM_Encase, typeof(Projectile_Encase)),
             ("TM_SpiritEncase_I", () => TorannMagicDefOf.TM_Encase_I, typeof(Projectile_Encase)),
@@ -199,7 +201,7 @@ namespace TorannMagic.ClassProgression
                     def.MainVerb.verbClass == typeof(Verb_LightSkip) || def.MainVerb.verbClass == typeof(Verb_BLOS) || def.MainVerb.verbClass == typeof(Verb_FogOfTorment) || def.MainVerb.verbClass == typeof(Verb_LightningCloud) || typeof(Verb_RankedStormField).IsAssignableFrom(def.MainVerb.verbClass) ||
                     def.MainVerb.verbClass == typeof(Verb_UseAbility_TrueBurst)) &&
                     f.effect == def.MainVerb.defaultProjectile?.thingClass &&
-                    (typeof(Projectile_SpiritNativeAbility).IsAssignableFrom(f.effect) || typeof(Projectile_SpiritBolt).IsAssignableFrom(f.effect) || typeof(Projectile_SpiritRay).IsAssignableFrom(f.effect) || f.effect == typeof(Projectile_EarthernHammer) || f.effect == typeof(Projectile_Encase) || f.effect == typeof(Projectile_IgniteBlood) || f.effect == typeof(Projectile_BloodMoon) || SpiritHostedSummons.IsProjectile(f.effect))))) ||
+                    (typeof(Projectile_SpiritNativeAbility).IsAssignableFrom(f.effect) || typeof(Projectile_SpiritBolt).IsAssignableFrom(f.effect) || typeof(Projectile_SpiritRay).IsAssignableFrom(f.effect) || f.effect == typeof(Projectile_Sentinel) || f.effect == typeof(Projectile_EarthernHammer) || f.effect == typeof(Projectile_Encase) || f.effect == typeof(Projectile_IgniteBlood) || f.effect == typeof(Projectile_BloodMoon) || SpiritHostedSummons.IsProjectile(f.effect))))) ||
                 (def.MainVerb.burstShotCount != 1 && !IsBurst(def)) || def.bloodCost != 0 && def != TorannMagicDefOf.TM_BloodShield && def != TorannMagicDefOf.TM_IgniteBlood && def != TorannMagicDefOf.TM_BloodForBlood && def.MainVerb.verbClass != typeof(Verb_Rend) && def.MainVerb.defaultProjectile?.thingClass != typeof(Projectile_BloodMoon) || def.chiCost != 0 || def.requiredNeed != null ||
                 def.requiredHediff != null || !def.consumeEnergy || power.MagicUser.Mana == null) return false;
             if (def.bloodCost != 0)
@@ -209,6 +211,7 @@ namespace TorannMagic.ClassProgression
                 if (meter == null || !float.IsFinite(required) || required < 0 || meter.Severity < required) return false;
             }
             float cost = power.MagicUser.ActualManaCost(def);
+            if (def == TorannMagicDefOf.TM_ShatterSentinel && !power.MagicUser.summonedSentinels.Any(t => t?.Spawned == true)) return false;
             if (def == TorannMagicDefOf.TM_DismissEarthSprites && power.MagicUser.earthSpriteType == 0) return false;
             if (def == TorannMagicDefOf.TM_DispelStoneskin && power.MagicUser.StoneskinPawns.Count == 0) return false;
             if (def == TorannMagicDefOf.TM_SoL_CreateLight && (power.MagicUser.SoL?.Spawned != true ||
@@ -225,6 +228,8 @@ namespace TorannMagic.ClassProgression
             if (!Ready(body,power,paidBurst) || !target.IsValid || !target.Cell.InBounds(body.Map) || target.Cell.Fogged(body.Map) ||
                 (target.HasThing && target.Thing.Map != body.Map) ||
                 !power.magicDef.MainVerb.targetParams.CanTarget(target.ToTargetInfo(body.Map))) return false;
+            if (power.magicDef == TorannMagicDefOf.TM_Sentinel && target.Cell.GetFirstBuilding(body.Map) is Building existing &&
+                (!(existing is Building_TMSentinel) || !power.MagicUser.summonedSentinels.Contains(existing))) return false;
             if (power.magicDef == TorannMagicDefOf.TM_RaiseUndead &&
                 !Projectile_RaiseUndead.HasHostedTarget(body.Map, target.Cell, power.magicDef.MainVerb.defaultProjectile)) return false;
             if (power.magicDef.MainVerb.defaultProjectile?.thingClass == typeof(Projectile_CorpseExplosion) &&
@@ -385,6 +390,7 @@ namespace TorannMagic.ClassProgression
             else if (shot is Projectile_SpiritNativeAbility native) native.SetSource(power.Pawn);
             else if (shot is Projectile_SpiritRay laser) laser.PrepareProjection(power);
             else if (shot is Projectile_BloodMoon moon) moon.PrepareHosted(power);
+            else if (shot is Projectile_Sentinel sentinel) sentinel.PrepareHosted(power);
             else if (shot is Projectile_EarthernHammer hammer) hammer.PrepareHosted(power);
             else if (shot is Projectile_Encase encase) encase.PrepareHosted(power);
             else if (shot is Projectile_IgniteBlood ignite) ignite.PrepareHosted(power);

@@ -171,6 +171,7 @@ namespace TorannMagic.ClassProgression
                 BrightmageLifecycle.TickHostedLight(pawn,now);
                 comp.SyncStoneskinControl();
                 comp.SyncEarthSpriteControl();
+                comp.SyncSentinelControl();
             }
             if (now % 100 == 0) BardTrials.TickHostedInspiration(pawn);
             if (now % 30 == 0) BardTrials.TickHostedHymn(pawn);
