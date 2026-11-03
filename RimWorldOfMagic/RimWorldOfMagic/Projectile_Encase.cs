@@ -249,14 +249,21 @@ namespace TorannMagic
 
         // Natural rocks are normally saved as a compressed cell grid and receive fresh IDs on load.
         [HarmonyPatch(typeof(CompressibilityDecider), nameof(CompressibilityDecider.DetermineReferences))]
-        internal static class PreserveSectionReferences
+        internal static class PreserveGeomancerReferences
         {
             private static void Postfix(Map ___map, HashSet<Thing> ___referencedThings)
             {
                 foreach (var projectile in ___map.listerThings.ThingsInGroup(ThingRequestGroup.Projectile))
                     if (projectile is Projectile_Encase encase)
+                    {
                         foreach (var section in encase.sections)
                             if (section?.Spawned == true && section.Map == ___map) ___referencedThings.Add(section);
+                    }
+                    else if (projectile is Projectile_EarthernHammer hammer)
+                    {
+                        foreach (var candidate in hammer.StoneTargets)
+                            if (candidate?.Spawned == true && candidate.Map == ___map) ___referencedThings.Add(candidate);
+                    }
             }
         }
 

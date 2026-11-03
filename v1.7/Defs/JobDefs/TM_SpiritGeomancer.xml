@@ -8,4 +8,5 @@
   <JobDef><defName>TM_SpiritEncase_I</defName><driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass><reportString>casting encase.</reportString></JobDef>
   <JobDef><defName>TM_SpiritEncase_II</defName><driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass><reportString>casting encase.</reportString></JobDef>
   <JobDef><defName>TM_SpiritEncase_III</defName><driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass><reportString>casting encase.</reportString></JobDef>
+  <JobDef><defName>TM_SpiritEarthernHammer</defName><driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass><reportString>casting earthen hammer.</reportString></JobDef>
 </Defs>
