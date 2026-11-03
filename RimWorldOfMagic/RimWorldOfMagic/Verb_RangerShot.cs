@@ -16,9 +16,15 @@ namespace TorannMagic
         internal static Verb_RangerShot For(Pawn body,MightAbility power) =>
             new Verb_RangerShot {caster=body,Ability=power,verbProps=power.mightDef.MainVerb};
 
-        internal static bool HasBow(Pawn body) => body?.equipment?.Primary is ThingWithComps weapon &&
-            weapon.def.IsRangedWeapon && weapon.GetComp<CompEquippable>()?.PrimaryVerb?.GetProjectile()?.projectile!=null &&
-            TM_Calc.IsUsingBow(body);
+        internal static bool HasBow(Pawn body)
+        {
+            var weapon=body?.equipment?.Primary;
+            var projectile=weapon?.GetComp<CompEquippable>()?.PrimaryVerb?.GetProjectile()?.projectile;
+            if (weapon?.def.IsRangedWeapon != true || projectile == null) return false;
+            return projectile.damageDef?.defName?.IndexOf("arrow",System.StringComparison.OrdinalIgnoreCase) >= 0 ||
+                weapon.def.defName.IndexOf("bow",System.StringComparison.OrdinalIgnoreCase) >= 0 ||
+                DefDatabase<WeaponCategoryList>.GetNamedSilentFail("TM_Category_Bows")?.weaponDefNames?.Contains(weapon.def.defName)==true;
+        }
 
         internal static Job MakeOrder(Pawn body,Pawn soul,LocalTargetInfo target) =>
             JobMaker.MakeJob(DefDatabase<JobDef>.GetNamed(Order),soul,target,body.equipment?.Primary);
