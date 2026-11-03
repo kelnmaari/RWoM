@@ -14,4 +14,9 @@
     <driverClass>TorannMagic.ClassProgression.JobDriver_SpiritHostedMartial</driverClass>
     <reportString>marking a safe trail to TargetB.</reportString>
   </JobDef>
+  <JobDef>
+    <defName>TM_SpiritArrowStorm</defName>
+    <driverClass>TorannMagic.JobDriver_RangerVolley</driverClass>
+    <reportString>firing an arrow storm at TargetB.</reportString>
+  </JobDef>
 </Defs>

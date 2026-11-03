@@ -122,7 +122,15 @@ namespace TorannMagic
         }
 
         private static Thing Spawn(ThingDef def, IntVec3 cell, Map map, WipeMode mode, Verb_UseAbility verb)
-            => verb is Verb_SniperShot sniper ? GenSpawn.Spawn(sniper.MakeRound(def), cell, map, mode)
-                : GenSpawn.Spawn(def, cell, map, mode);
+        {
+            if (verb is Verb_SniperShot sniper) return GenSpawn.Spawn(sniper.MakeRound(def),cell,map,mode);
+            if (verb is Verb_RangerShot && def.thingClass==typeof(Projectile_ArrowStorm) && verb.Ability is MightAbility power)
+            {
+                var arrow=(Projectile_ArrowStorm)ThingMaker.MakeThing(def);
+                arrow.BindShot(verb.CasterPawn,power,def);
+                return GenSpawn.Spawn(arrow,cell,map,mode);
+            }
+            return GenSpawn.Spawn(def,cell,map,mode);
+        }
     }
 }

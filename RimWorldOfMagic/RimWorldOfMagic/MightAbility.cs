@@ -16,6 +16,12 @@ namespace TorannMagic
 
         public override Verse.AI.Job GetJob(AbilityContext context, LocalTargetInfo target)
         {
+            if (Verb_RangerShot.Family(mightDef))
+            {
+                var volley=Verb_RangerShot.MakeOrder(Pawn,Pawn,target);
+                volley.playerForced=context==AbilityContext.Player;
+                return volley;
+            }
             if (mightDef!=null && mightDef==TorannMagicDefOf.TM_PoisonTrap)
             {
                 var trap=Verb_PoisonTrap.MakeOrder(Pawn,target);

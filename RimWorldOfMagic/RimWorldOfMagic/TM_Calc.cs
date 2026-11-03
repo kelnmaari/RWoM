@@ -4121,18 +4121,9 @@ namespace TorannMagic
             VerbProperties vp = p.equipment.Primary.def.Verbs?.FirstOrDefault();
             if (vp == null) return 0;
 
-            //const QualityCategory qc = QualityCategory.Normal;
-            //p.equipment.Primary.TryGetQuality(out qc);
-            //float qc_m = GetQualityMultiplier(qc);
-            const float qc_m = 1f;
-
             try
             {
-                float result = (
-                    qc_m * vp.defaultProjectile.projectile.GetDamageAmount(p.equipment.Primary)
-                    - 2 * (vp.warmupTime + vp.defaultCooldownTime)
-                    + 3 * vp.defaultProjectile.projectile.stoppingPower
-                ) * strFactor;
+                float result = RangedWeaponDamage(p.equipment.Primary,vp,strFactor);
                 DamageCache_Ranged.Add(p, result);
                 return result;
             }
@@ -4141,6 +4132,14 @@ namespace TorannMagic
                 DamageCache_Ranged.Add(p, 0);
                 return 0;
             }            
+        }
+
+        internal static float RangedWeaponDamage(ThingWithComps weapon,VerbProperties verb,float strength)
+        {
+            var projectile=verb?.defaultProjectile?.projectile;
+            if (weapon==null || projectile==null) return 0f;
+            return (projectile.GetDamageAmount(weapon) - 2f*(verb.warmupTime+verb.defaultCooldownTime) +
+                3f*projectile.stoppingPower)*strength;
         }
 
         public static float GetQualityMultiplier(QualityCategory qc)

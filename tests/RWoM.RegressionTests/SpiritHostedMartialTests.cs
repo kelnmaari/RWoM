@@ -146,6 +146,28 @@ internal static partial class SpiritMapCollapseTests
                     var local=c.Creator.GetCompAbilityUserMight();local.AbilityData.Powers.Add(new MightAbility(local){Def=def});local.AbilityData.AllPowers=null;
                     Check.Equal(true,Power()==null,"the host's own technique has priority");
                 }));
+        foreach(string id in new[]{"TM_ArrowStorm","TM_ArrowStorm_I","TM_ArrowStorm_II","TM_ArrowStorm_III"})
+            yield return new("RangerProjection.VolleyOwner."+id,f=>
+                SpiritRebirthRitualTransactionTests.Run(f,c=>{
+                    using var held=new Fixture(f,c);
+                    var source=c.Original.GetCompAbilityUserMight();
+                    var def=(TMAbilityDef)typeof(TorannMagicDefOf).GetField(id)!.GetValue(null)!;
+                    var power=new MightAbility(source){Def=def,CooldownTicksLeft=31};
+                    source.AbilityData.Powers.Add(power);source.AbilityData.AllPowers=null;
+                    var find=Production("SpiritHostedMartial").GetMethod("Find",BindingFlags.Static|BindingFlags.NonPublic)!;
+                    object? Owner()=>find.Invoke(null,[c.Creator,c.Original,"TM_SpiritArrowStorm"]);
+                    Check.Same(power,Owner()!,"volley order must use the original exact rank");
+                    var host=c.Creator.GetCompAbilityUserMight();host.AbilityData.Powers.Add(new MightAbility(host){Def=TorannMagicDefOf.TM_ArrowStorm});
+                    host.AbilityData.AllPowers=null;
+                    Check.Equal(true,Owner()==null,"a lower native rank takes priority");
+                }));
+        yield return new("RangerProjection.ArrowStormNoBow", f =>
+        {
+            var pawn=PawnWithComps(false,false).pawn;
+            pawn.equipment=new Pawn_EquipmentTracker(pawn);
+            Check.Equal(0f,Projectile_ArrowStorm.GetWeaponAccuracy(pawn),"no bow cannot supply arrow accuracy");
+            Check.Equal(0,Projectile_ArrowStorm.GetWeaponDmg(pawn),"no bow cannot supply arrow damage");
+        });
         yield return new("RangerProjection.SafeTrailAfterLoad", f =>
             SpiritRebirthRitualTransactionTests.Run(f,c => {
                 using var held=new Fixture(f,c);
