@@ -1510,27 +1510,21 @@ namespace TorannMagic
 
         private static void RecallNeeds(Pawn pawn, CompAbilityUserMagic comp)
         {
-            for (int i = 0; i < pawn.needs.AllNeeds.Count; i++)
+            var names = comp.recallNeedDefnames;
+            var values = comp.recallNeedValues;
+            int count = Math.Min(names?.Count ?? 0, values?.Count ?? 0);
+            foreach (var need in pawn.needs.AllNeeds)
             {
-                bool hasNeed = false;
-                for (int j = 0; j < comp.recallNeedValues.Count; j++)
+                if (need.def.defName == "Chemical_Luciferium") continue;
+                for (int i = 0; i < count; i++)
                 {
-                    if (comp.recallNeedDefnames[j] == pawn.needs.AllNeeds[i].def.defName)
-                    {
-                        //Log.Message("setting " + pawn.needs.AllNeeds[i].def.defName + " from " + pawn.needs.AllNeeds[i].CurLevel + " to " + comp.recallNeedValues[j]);
-                        pawn.needs.AllNeeds[i].CurLevel = comp.recallNeedValues[j];
-                        hasNeed = true;
-                    }
-                }
-                if (!hasNeed)
-                {
-                    //Log.Message("removing need " + pawn.needs.AllNeeds[i].def.defName);
-                    pawn.needs.AllNeeds.Remove(pawn.needs.AllNeeds[i]);
+                    if (names[i] != need.def.defName || float.IsNaN(values[i]) || float.IsInfinity(values[i])) continue;
+                    need.CurLevel = values[i];
+                    break;
                 }
             }
-            pawn.needs.AddOrRemoveNeedsAsAppropriate();
-            comp.recallNeedDefnames.Clear();
-            comp.recallNeedValues.Clear();
+            names?.Clear();
+            values?.Clear();
         }
 
         private static void RecallPosition(Pawn pawn, CompAbilityUserMagic comp)

@@ -12,12 +12,42 @@ internal static class ChronomancerLifecycleTests
 {
     public static IEnumerable<TestCase> Cases()
     {
+        yield return new("ChronomancerLifecycle.RecallKeepsNewNeedsAndHandlesShortLegacySnapshots", RecallNeeds);
         yield return new("ChronomancerLifecycle.NativeQueueScribeKeepsIdenticalEventsDistinct", SaveDistinct);
         yield return new("ChronomancerLifecycle.UnknownAndAmbiguousOwnershipNeverDeletesEvents", Ambiguous);
         yield return new("ChronomancerLifecycle.ExactReplacementAndFailedInsertionPreserveOtherOwners", Replace);
         yield return new("ChronomancerLifecycle.ReturningPredictionRemainsRecognizedAfterOwnerClears", Returning);
         yield return new("ChronomancerLifecycle.NativeQueueDispatchesReturningPredictionExactlyOnce", NativeDispatch);
         yield return new("ChronomancerLifecycle.AttemptedNativeRetrySurvivesPredictionExpiry", RetryExpiry);
+    }
+    static void RecallNeeds(RuntimeFixture r)
+    {
+        using var f = new SpiritRebirthStateTests.Fixture(r);
+        var pawn = f.Original;
+        pawn.needs ??= new Pawn_NeedsTracker(pawn);
+        Need_Rest MakeNeed(string name, float level)
+        {
+            var need = (Need_Rest)RuntimeHelpers.GetUninitializedObject(typeof(Need_Rest));
+            GrimoireProgressionTests.Set(need, "pawn", pawn);
+            need.def = new NeedDef { defName = name };
+            pawn.needs.AllNeeds.Add(need);
+            need.CurLevel = level;
+            return need;
+        }
+        var food = MakeNeed("Food", .25f);
+        var newNeed = MakeNeed("NewModNeed", .42f);
+        var addiction = MakeNeed("Chemical_Luciferium", .13f);
+        var recall = typeof(TM_Action).GetMethod("RecallNeeds", BindingFlags.NonPublic | BindingFlags.Static)!;
+        f.Magic.recallNeedDefnames = ["Food", "Chemical_Luciferium", "NewModNeed"];
+        f.Magic.recallNeedValues = [.78f, .95f];
+        recall.Invoke(null, [pawn, f.Magic]);
+        Check.Equal(.78f, food.CurLevel, "matching snapshot restored");
+        Check.Equal(.13f, addiction.CurLevel, "luciferium remains outside recall");
+        Check.Equal(.42f, newNeed.CurLevel, "incomplete snapshot does not overwrite new need");
+        Check.Equal(true, pawn.needs.AllNeeds.Contains(newNeed) && pawn.needs.AllNeeds.Contains(addiction), "same need instances are retained");
+        f.Magic.recallNeedValues = null;
+        recall.Invoke(null, [pawn, f.Magic]);
+        Check.Equal(.78f, food.CurLevel, "missing old values are harmless");
     }
     public sealed class Envelope : IExposable
     {
