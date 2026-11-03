@@ -77,6 +77,8 @@ namespace TorannMagic.ClassProgression
             ("TM_SpiritSunfire", () => TorannMagicDefOf.TM_Sunfire, typeof(Projectile_Sunfire)),
             ("TM_SpiritLightBurst", () => TorannMagicDefOf.TM_LightBurst, typeof(Verb_LightBurst)),
             ("TM_SpiritLightLance", () => TorannMagicDefOf.TM_LightLance, typeof(Effect_LightLance)),
+            ("TM_SpiritLightSkip", () => TorannMagicDefOf.TM_LightSkip, typeof(Projectile_LightSkip)),
+            ("TM_SpiritLightSkipMass", () => TorannMagicDefOf.TM_LightSkipMass, typeof(Projectile_LightSkipMass)),
             ("TM_SpiritRefraction", () => TorannMagicDefOf.TM_Refraction, typeof(Projectile_Refraction)),
             ("TM_SpiritSunfire_I", () => TorannMagicDefOf.TM_Sunfire_I, typeof(Projectile_Sunfire)),
             ("TM_SpiritSunfire_II", () => TorannMagicDefOf.TM_Sunfire_II, typeof(Projectile_Sunfire)),
@@ -164,7 +166,7 @@ namespace TorannMagic.ClassProgression
             if (def.MainVerb == null || def.MainVerb.isViolent && body.WorkTagIsDisabled(WorkTags.Violent) ||
                 !Families.Any(f => f.spell() == def && (f.effect == def.MainVerb.verbClass || (DeathBolt(def) && f.effect == typeof(Projectile_HostedDeathBolt)) ||
                     ((def.MainVerb.verbClass == typeof(Verb_UseAbility) || def.MainVerb.verbClass == typeof(Effect_ValiantCharge) || def.MainVerb.verbClass == typeof(Verb_SB) ||
-                    def.MainVerb.verbClass == typeof(Verb_BLOS) || def.MainVerb.verbClass == typeof(Verb_FogOfTorment) || def.MainVerb.verbClass == typeof(Verb_LightningCloud) || typeof(Verb_RankedStormField).IsAssignableFrom(def.MainVerb.verbClass) ||
+                    def.MainVerb.verbClass == typeof(Verb_LightSkip) || def.MainVerb.verbClass == typeof(Verb_BLOS) || def.MainVerb.verbClass == typeof(Verb_FogOfTorment) || def.MainVerb.verbClass == typeof(Verb_LightningCloud) || typeof(Verb_RankedStormField).IsAssignableFrom(def.MainVerb.verbClass) ||
                     def.MainVerb.verbClass == typeof(Verb_UseAbility_TrueBurst)) &&
                     f.effect == def.MainVerb.defaultProjectile?.thingClass &&
                     (typeof(Projectile_SpiritNativeAbility).IsAssignableFrom(f.effect) || typeof(Projectile_SpiritBolt).IsAssignableFrom(f.effect) || typeof(Projectile_SpiritRay).IsAssignableFrom(f.effect) || SpiritHostedSummons.IsProjectile(f.effect))))) ||
@@ -243,7 +245,7 @@ namespace TorannMagic.ClassProgression
                 }
                 var order = JobMaker.MakeJob(job, target, soul);
                 void Submit() => body.jobs.TryTakeOrderedJob(order, JobTag.Misc);
-                if (def == TorannMagicDefOf.TM_ValiantCharge || Odyssey.ManualTravelSafety.IsTravel(power))
+                if (def == TorannMagicDefOf.TM_ValiantCharge || def.MainVerb.verbClass == typeof(Verb_LightSkip) || Odyssey.ManualTravelSafety.IsTravel(power))
                     Odyssey.ManualTravelSafety.Submit(body, order, map, target.Cell, true, Valid, Submit);
                 else Submit();
             }
@@ -277,7 +279,7 @@ namespace TorannMagic.ClassProgression
         {
             var power = Find(body,soul,def);
             if (!CanTarget(body,power,target,paidBurst)) return false;
-            if (def == TorannMagicDefOf.TM_ValiantCharge && !Odyssey.ManualTravelSafety.CanComplete(body, body.Map, target.Cell)) return false;
+            if ((def == TorannMagicDefOf.TM_ValiantCharge || def.MainVerb.verbClass == typeof(Verb_LightSkip)) && !Odyssey.ManualTravelSafety.CanComplete(body, body.Map, target.Cell)) return false;
             var props = power.magicDef.MainVerb;
             var verb = PhysicalVerb(body, power);
             if (verb is Effect_LightLance)

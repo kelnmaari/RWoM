@@ -35,4 +35,6 @@
     <driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass>
     <reportString>casting refraction through a spirit host.</reportString>
   </JobDef>
+  <JobDef><defName>TM_SpiritLightSkip</defName><driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass><reportString>traveling by light through a spirit host.</reportString></JobDef>
+  <JobDef><defName>TM_SpiritLightSkipMass</defName><driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass><reportString>traveling by light through a spirit host.</reportString></JobDef>
 </Defs>

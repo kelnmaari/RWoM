@@ -7,4 +7,6 @@
   <TM_SpiritLightBurst.reportString>вызывает вспышки света через носителя духа.</TM_SpiritLightBurst.reportString>
   <TM_SpiritLightLance.reportString>направляет световое копьё через носителя духа.</TM_SpiritLightLance.reportString>
   <TM_SpiritRefraction.reportString>создаёт стену преломления через носителя духа.</TM_SpiritRefraction.reportString>
+  <TM_SpiritLightSkip.reportString>перемещается со светом через носителя духа.</TM_SpiritLightSkip.reportString>
+  <TM_SpiritLightSkipMass.reportString>переносит группу светом через носителя духа.</TM_SpiritLightSkipMass.reportString>
 </LanguageData>

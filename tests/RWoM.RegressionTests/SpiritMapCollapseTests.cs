@@ -14,7 +14,7 @@ internal static partial class SpiritMapCollapseTests
     internal static Type Production(string name) => Check.NotNull(typeof(SpiritRebirthState).Assembly.GetType("TorannMagic.ClassProgression." + name), "map collapse " + name + " exists");
     public static IEnumerable<TestCase> Cases()
     {
-        foreach(var spell in new[]{"Firebolt","Icebolt","Fireball","Snowball","Heal","AdvancedHeal","Purify","Regenerate","Fireclaw","Poison","CureDisease","SootheAnimal","SootheAnimal_I","SootheAnimal_II","SootheAnimal_III","Rainmaker","Resurrection","HealingCircle","HealingCircle_I","HealingCircle_II","HealingCircle_III","RaiseUndead","Blink","Blink_I","Blink_II","Blink_III","Summon","Summon_I","Summon_II","Summon_III","MagicMissile","MagicMissile_I","MagicMissile_II","MagicMissile_III","LightningBolt","LightningCloud","LightningStorm","Firestorm","Refraction","LightLance","LightBurst","Sunfire","Sunfire_I","Sunfire_II","Sunfire_III","NanoStimulant","TechnoWeapon","TechnoTurret","TechnoShield","Overdrive","OrbitalStrike","OrbitalStrike_I","OrbitalStrike_II","OrbitalStrike_III","Sabotage","FoldReality","Teleport","ValiantCharge","Overwhelm","BestowMight","BestowMight_I","BestowMight_II","BestowMight_III","DeathBolt","DeathBolt_I","DeathBolt_II","DeathBolt_III","FogOfTorment","CorpseExplosion","CorpseExplosion_I","CorpseExplosion_II","CorpseExplosion_III","ConsumeCorpse","ConsumeCorpse_I","ConsumeCorpse_II","ConsumeCorpse_III","ConsumeCorpse_Mass","DeathMark","DeathMark_I","DeathMark_II","DeathMark_III","FrostRay","FrostRay_I","FrostRay_II","FrostRay_III","AMP","AMP_I","AMP_II","AMP_III"})
+        foreach(var spell in new[]{"Firebolt","Icebolt","Fireball","Snowball","Heal","AdvancedHeal","Purify","Regenerate","Fireclaw","Poison","CureDisease","SootheAnimal","SootheAnimal_I","SootheAnimal_II","SootheAnimal_III","Rainmaker","Resurrection","HealingCircle","HealingCircle_I","HealingCircle_II","HealingCircle_III","RaiseUndead","Blink","Blink_I","Blink_II","Blink_III","Summon","Summon_I","Summon_II","Summon_III","MagicMissile","MagicMissile_I","MagicMissile_II","MagicMissile_III","LightningBolt","LightningCloud","LightningStorm","Firestorm","LightSkip","LightSkipMass","Refraction","LightLance","LightBurst","Sunfire","Sunfire_I","Sunfire_II","Sunfire_III","NanoStimulant","TechnoWeapon","TechnoTurret","TechnoShield","Overdrive","OrbitalStrike","OrbitalStrike_I","OrbitalStrike_II","OrbitalStrike_III","Sabotage","FoldReality","Teleport","ValiantCharge","Overwhelm","BestowMight","BestowMight_I","BestowMight_II","BestowMight_III","DeathBolt","DeathBolt_I","DeathBolt_II","DeathBolt_III","FogOfTorment","CorpseExplosion","CorpseExplosion_I","CorpseExplosion_II","CorpseExplosion_III","ConsumeCorpse","ConsumeCorpse_I","ConsumeCorpse_II","ConsumeCorpse_III","ConsumeCorpse_Mass","DeathMark","DeathMark_I","DeathMark_II","DeathMark_III","FrostRay","FrostRay_I","FrostRay_II","FrostRay_III","AMP","AMP_I","AMP_II","AMP_III"})
         yield return new("SpiritProjectedCast."+spell+"RemainsPhysicalWithOriginalOwner", r =>
             SpiritRebirthRitualTransactionTests.Run(r,c=>{
                 using var fixture=new Fixture(r,c);
@@ -169,6 +169,26 @@ internal static partial class SpiritMapCollapseTests
                 Check.Equal(true,((HashSet<int>)typeof(Projectile_Refraction).GetField("mirrored",flags)!.GetValue(field)!).SetEquals([312]), "already mirrored crossing survives reload");
                 Check.Equal(true,((List<IntVec3>)typeof(Projectile_Refraction).GetField("wallPositions",flags)!.GetValue(field)!).SequenceEqual(cells), "same wall cells survive");
                 Check.Equal(625f,(float)typeof(Projectile_Refraction).GetField("wallEnergy",flags)!.GetValue(field)!, "remaining wall energy survives");
+            }));
+        yield return new("BrightmageLifecycle.MassLightSkipResumesPendingCapsules", r =>
+            SpiritRebirthRitualTransactionTests.Run(r,c =>
+            {
+                using var fixture = new Fixture(r,c);
+                var def = (ThingDef)RuntimeHelpers.GetUninitializedObject(typeof(ThingDef));
+                def.defName="RegressionMassLightSkip"; def.thingClass=typeof(Projectile_LightSkipMass); def.comps=[]; def.category=ThingCategory.Projectile;
+                DefDatabase<ThingDef>.Add(def);
+                var shot=new Projectile_LightSkipMass {def=def,thingIDNumber=19869,usedTarget=IntVec3.Zero,intendedTarget=IntVec3.Zero};
+                var start=new IntVec3(31,0,18);
+                Set(shot,"launcherPosition",start); Set(shot,"launchedFlag",true); Set(shot,"initialized",true); Set(shot,"draftFlag",true);
+                var podDef=(ThingDef)RuntimeHelpers.GetUninitializedObject(typeof(ThingDef)); podDef.defName="TM_LightPod";
+                var pod=new ThingWithComps {def=podDef,thingIDNumber=19870};
+                Set(shot,"pods",new List<Thing>{pod});
+                shot=RoundTripSummon(r,"mass-skip-in-progress",shot,pod);
+                var flags=BindingFlags.NonPublic|BindingFlags.Instance;
+                object Read(string name)=>typeof(Projectile_LightSkipMass).GetField(name,flags)!.GetValue(shot)!;
+                Check.Equal(start,(IntVec3)Read("launcherPosition"),"formation keeps its launch cell");
+                Check.Equal(true,(bool)Read("draftFlag"),"original draft status retained");
+                Check.Same(pod,((List<Thing>)Read("pods")).Single(),"pending transporter reference retained exactly once");
             }));
         yield return new("BrightmageLifecycle.LightSkipFlightUsesNativePassengerManifest", r =>
             SpiritRebirthRitualTransactionTests.Run(r,c =>
