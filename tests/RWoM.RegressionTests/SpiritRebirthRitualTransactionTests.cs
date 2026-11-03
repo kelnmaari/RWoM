@@ -46,6 +46,30 @@ internal static class SpiritRebirthRitualTransactionTests
             Check.Equal("ConvertedHeld",c.Execute(),"repeat completion is idempotent");
         }));
         yield return new("SpiritRitualTransaction.NativeConversionPaymentAndDuplicate", r => Run(r, Success));
+        yield return new("SpiritRitualTransaction.LegacyLichConsentIsBoundToOrder", r => Run(r,c =>
+        {
+            var priorDegrees = TorannMagicDefOf.Lich.degreeDatas;
+            try
+            {
+                TorannMagicDefOf.Lich.degreeDatas = [new TraitDegreeData { degree = 0 }];
+                var original = c.Original;
+                var lich = new Trait(TorannMagicDefOf.Lich);
+                original.story.traits.allTraits.Add(lich);
+                var confirm = Transaction.Assembly.GetType("TorannMagic.ClassProgression.SpiritNecromancyRenunciation",true)!
+                    .GetMethod("Confirm",BindingFlags.Static | BindingFlags.NonPublic)!;
+                var abandonedOrder = JobMaker.MakeJob(c.Job.def, c.Circle, c.Corpse);
+                confirm.Invoke(null,[abandonedOrder,original]);
+                Check.Equal("Rejected",c.Execute(),"old order cannot consent to a replacement ritual");
+                Check.Equal(true,original.Dead && original.story.traits.allTraits.Contains(lich),"old class survives refusal");
+                confirm.Invoke(null,[c.Job,original]);
+                var result = c.Execute();
+                RuntimeLog.AssertClean();
+                Check.Equal("ConvertedHeld",result,"legacy lich can consent without a new-style discipline");
+                Check.Equal(false,original.story.traits.HasTrait(TorannMagicDefOf.Lich),"legacy lich trait removed");
+                Check.Equal(InitiationStage.Ascended,c.Creator.GetComp<CompClassProgression>().State.Find("rwom.necromancer").Stage,"caster keeps ascension");
+            }
+            finally { TorannMagicDefOf.Lich.degreeDatas = priorDegrees; }
+        }));
         yield return new("SpiritRitualTransaction.ExactJobReservationAndInterruptedWork", r => Run(r, Rejected));
         yield return new("SpiritRitualTransaction.ExceptionAfterDetachKeepsActualPawn", r => Run(r, ExceptionAfterDetach));
         yield return new("SpiritRitualTransaction.RefusedEscrowRefundAllowsNewJob", r => Run(r, RefusedEscrow));
