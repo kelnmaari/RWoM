@@ -39,12 +39,19 @@ namespace TorannMagic
         }
 
         protected override bool TryCastShot()
+            => Execute(currentTarget);
+
+        internal bool Execute(LocalTargetInfo target)
         {
+            currentTarget=target;
             Odyssey.ManualTravelSafety.BeginAttempt(Ability);
             burstShotsLeft = 0;
             Pawn pawn = CasterPawn;
-            if (!Odyssey.ManualTravelSafety.CanPay(Ability) || !currentTarget.IsValid || !Odyssey.ManualTravelSafety.CanComplete(pawn, pawn.Map, currentTarget.Cell)
-                || !TM_Teleport.CanMove(pawn, currentTarget.Cell))
+            bool canPay=Ability is MightAbility source && source.Pawn!=null && source.Pawn!=pawn
+                ? ClassProgression.SpiritHostedMartial.Find(pawn,source.Pawn,ClassProgression.BladeMartialCast.Phase)==source &&
+                    ClassProgression.SpiritHostedMartial.Ready(pawn,source,ClassProgression.BladeMartialCast.Phase)
+                : Odyssey.ManualTravelSafety.CanPay(Ability);
+            if (!canPay || pawn?.Spawned!=true || !CanHitTargetFrom(pawn.Position,currentTarget) || !Odyssey.ManualTravelSafety.CanComplete(pawn, pawn.Map, currentTarget.Cell))
             {
                 Messages.Message("InvalidTargetLocation".Translate(), MessageTypeDefOf.RejectInput);
                 return false;
@@ -58,9 +65,10 @@ namespace TorannMagic
             CompAbilityUserMight comp = pawn.GetCompAbilityUserMight();
             TMAbilityDef ability = Ability?.Def as TMAbilityDef;
             if (comp == null || ability == null) return false;
-            verVal = TM_Calc.GetSkillVersatilityLevel(pawn, ability);
-            pwrVal = TM_Calc.GetSkillPowerLevel(pawn, ability);
-            dmgNum = Mathf.RoundToInt(comp.weaponDamage * ability.weaponDamageFactor);
+            Pawn owner=Ability.Pawn ?? pawn;
+            verVal = TM_Calc.GetSkillVersatilityLevel(owner, ability);
+            pwrVal = TM_Calc.GetSkillPowerLevel(owner, ability);
+            dmgNum = Mathf.RoundToInt(ClassProgression.BladeMartialCast.StrikeDamage(pawn,owner) * ability.weaponDamageFactor);
             if (!pawn.IsColonist && ModOptions.Settings.Instance.AIHardMode) dmgNum += 10;
 
             Map map = pawn.Map;
@@ -93,21 +101,22 @@ namespace TorannMagic
             IEnumerable<IntVec3> targets = GenRadial.RadialCellsAround(center, radius, true);
             foreach (IntVec3 curCell in targets)
             {
-                FleckMaker.ThrowDustPuff(curCell, map, .2f);
                 if (curCell.InBoundsWithNullCheck(map) && curCell.IsValid)
                 {
+                    FleckMaker.ThrowDustPuff(curCell, map, .2f);
                     // The old cast temporarily despawned its caster. Exclude only
                     // that pawn so its new position cannot hide a destination victim.
                     Pawn victim = curCell.GetThingList(map).OfType<Pawn>().FirstOrDefault(candidate => candidate != pawn);
                     if (victim != null && victim.Faction != pawn.Faction)
                     {
+                        int damage=dmgNum;
                         if (Rand.Chance(.1f + .15f * pwrVal))
                         {
-                            this.dmgNum *= 3;
+                            damage *= 3;
                             MoteMaker.ThrowText(victim.DrawPos, victim.Map, "Critical Hit", -1f);
                         }
                         DrawStrike(center, victim.Position.ToVector3(), map);
-                        damageEntities(victim, null, this.dmgNum, TMDamageDefOf.DamageDefOf.TM_PhaseStrike);                        
+                        damageEntities(victim, null, damage, TMDamageDefOf.DamageDefOf.TM_PhaseStrike);
                     }
                 }
             }

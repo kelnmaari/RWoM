@@ -132,6 +132,174 @@ internal static partial class SpiritMapCollapseTests
             Check.Equal(true, typeof(IThingHolder).IsAssignableFrom(typeof(FlyingObject_Whirlwind)),
                 "an airborne pawn and the pawn's inventory must remain reachable from the map's holder hierarchy");
         });
+        foreach(var (defName,order) in new[] {("TM_BladeSpin","TM_SpiritCastBladeSpin"),("TM_SeismicSlash","TM_SpiritCastSeismicSlash"),("TM_BladePassage","TM_SpiritCastBladePassage")})
+            yield return new("BladeProjection.OriginalOwner."+defName,f =>
+                SpiritRebirthRitualTransactionTests.Run(f,c => {
+                    using var held=new Fixture(f,c);
+                    var def=typeof(TorannMagicDefOf).GetField(defName)?.GetValue(null) as TMAbilityDef ??
+                        DefDatabase<TMAbilityDef>.GetNamedSilentFail(defName) ?? f.AddAbility(defName);
+                    var source=c.Original.GetCompAbilityUserMight();
+                    var original=new MightAbility(source){Def=def};source.AbilityData.Powers.Add(original);source.AbilityData.AllPowers=null;
+                    var find=Production("SpiritHostedMartial").GetMethod("Find",BindingFlags.NonPublic|BindingFlags.Static)!;
+                    object? Power()=>find.Invoke(null,[c.Creator,c.Original,order]);
+                    Check.Same(original,Power()!,"project the exact learned blade technique");
+                    var local=c.Creator.GetCompAbilityUserMight();local.AbilityData.Powers.Add(new MightAbility(local){Def=def});local.AbilityData.AllPowers=null;
+                    Check.Equal(true,Power()==null,"the host's own technique has priority");
+                }));
+        yield return new("BladeProjection.SevenStepsOrder", f =>
+            SpiritRebirthRitualTransactionTests.Run(f,c => {
+                using var held = new Fixture(f,c);
+                var def = DefDatabase<TMAbilityDef>.GetNamedSilentFail("TM_BladeSevenSteps") ?? f.AddAbility("TM_BladeSevenSteps");
+                var source = c.Original.GetCompAbilityUserMight();
+                var power = new BladeFormAbility(source) { Def=def };
+                source.AbilityData.Powers.Add(power);
+                source.AbilityData.AllPowers=null;
+                var state = new ClassProgressionState(Vocation.Warrior);
+                Set(ClassIdentity.Component(c.Original),"state",state);
+                state.TryAddFoundation("rwom.bladedancer",DisciplineDomain.Might);
+                var path = state.Find("rwom.bladedancer");
+                Set(path,"stage",InitiationStage.Ascended);
+                Set(path,"BladeUltimate",Enum.Parse(Production("BladeUltimate"),"SevenSteps"));
+                const string name="TM_BladeSevenStepsCast";
+                var find=Production("SpiritHostedMartial").GetMethod("Find",BindingFlags.NonPublic|BindingFlags.Static)!;
+                Check.Same(power,find.Invoke(null,[c.Creator,c.Original,name])!,"retained Seven Steps uses the exact learned form");
+                if (DefDatabase<JobDef>.GetNamedSilentFail(name)==null)
+                    DefDatabase<JobDef>.Add(new JobDef{defName=name,driverClass=typeof(JobDriver_BladeSevenSteps)});
+                var order=(Job)typeof(BladeFormAbility).GetMethod("MakeJobFor",BindingFlags.NonPublic|BindingFlags.Instance)!
+                    .Invoke(power,[c.Creator,new LocalTargetInfo(c.Creator.Position+IntVec3.North)])!;
+                Check.Same(c.Original,order.targetQueueB.Single().Pawn,"source survives independently of later possession changes");
+                Check.Equal(c.Creator.Position,order.targetC.Cell,"route starts at the physical host");
+                c.Original.ageTracker.AgeBiologicalTicks = 25L * GenDate.TicksPerYear;
+                source.maxSP = 1;
+                _ = source.MightData;
+                if (source.Stamina == null) c.Original.needs.AllNeeds.Add(new Need_Stamina(c.Original){def=TorannMagicDefOf.TM_Stamina});
+                source.Stamina.CurLevelPercentage=1;
+                var driver=new JobDriver_BladeSevenSteps{pawn=c.Creator,job=order};
+                Set(driver,"preparing",true);
+                var finish=driver.GetType().GetMethod("FinishForm",BindingFlags.Instance|BindingFlags.NonPublic)!;
+                c.Creator.health.hediffSet.hediffs.Remove(held.Possession.parent);
+                try
+                {
+                    finish.Invoke(driver,null);
+                    finish.Invoke(driver,null);
+                    Check.Equal(true,Math.Abs(source.Stamina.CurLevelPercentage-.94f)<.001f,"exit during preparation charges the original once");
+                    Check.Equal(true,power.CooldownTicksLeft>0,"interrupted form cooldown remains with source");
+                    var paidDriver=new JobDriver_BladeSevenSteps{pawn=c.Creator,job=order};
+                    Set(paidDriver,"paid",true);
+                    float before=source.Stamina.CurLevel;
+                    finish.Invoke(paidDriver,null);
+                    Check.Equal(before,source.Stamina.CurLevel,"an already paid series has no second exit price");
+                }
+                finally { c.Creator.health.hediffSet.hediffs.Add(held.Possession.parent); }
+                var exhausted=typeof(JobDriver_BladeSevenSteps).GetMethod("Exhausted",BindingFlags.Static|BindingFlags.NonPublic);
+                Check.NotNull(exhausted,"movement fatigue must use the held discipline");
+                Check.Equal(true,(bool)exhausted!.Invoke(null,[c.Creator])!,"the occupied body moves more slowly after Seven Steps");
+                c.Creator.health.hediffSet.hediffs.Remove(held.Possession.parent);
+                try { Check.Equal(false,(bool)exhausted.Invoke(null,[c.Creator])!,"former body no longer receives class fatigue"); }
+                finally { c.Creator.health.hediffSet.hediffs.Add(held.Possession.parent); }
+            }));
+        yield return new("BladeProjection.ServiceWornWeapon", f =>
+            SpiritRebirthRitualTransactionTests.Run(f,c => {
+                using var held = new Fixture(f,c);
+                var state = new ClassProgressionState(Vocation.Warrior);
+                Set(ClassIdentity.Component(c.Original),"state",state);
+                state.TryAddFoundation("rwom.bladedancer",DisciplineDomain.Might);
+                BladeServiceTests.Verify(f,c.Creator,c.Original);
+            }));
+        yield return new("BladeProjection.RiposteAfterSave", f =>
+            SpiritRebirthRitualTransactionTests.Run(f,c => {
+                using var held=new Fixture(f,c);
+                var state=new ClassProgressionState(Vocation.Warrior);
+                Set(ClassIdentity.Component(c.Original),"state",state);
+                state.TryAddFoundation("rwom.bladedancer",DisciplineDomain.Might);
+                Set(state.Find("rwom.bladedancer"),"stage",InitiationStage.Adept);
+                BladeRiposteTests.Verify(f,c.Creator,c.Original);
+            }));
+        yield return new("BladeProjection.MemoryAlternatingTargets", f =>
+            SpiritRebirthRitualTransactionTests.Run(f,c => {
+                using var held = new Fixture(f,c);
+                var state=new ClassProgressionState(Vocation.Warrior);
+                Set(ClassIdentity.Component(c.Original),"state",state);
+                state.TryAddFoundation("rwom.bladedancer",DisciplineDomain.Might);
+                var path=state.Find("rwom.bladedancer");
+                Set(path,"BladeMemory",true);
+                var skill=c.Original.GetCompAbilityUserMight().MightData.MightPowerSkill_BladeFocus.Single();
+                skill.levelMax=4; skill.level=4;
+                BladeFoundationTests.Melee(c.Creator);
+                var flags=BindingFlags.Instance|BindingFlags.NonPublic;
+                Check.Equal(1720,(int)path.GetType().GetField("BladeMemoryReadyAt",flags)!.GetValue(path)!,
+                    "last switch writes the cooldown to the original discipline");
+            }));
+        yield return new("BladeProjection.TrainedFocus", f =>
+            SpiritRebirthRitualTransactionTests.Run(f,c => {
+                using var held=new Fixture(f,c);
+                var state=new ClassProgressionState(Vocation.Warrior);
+                Set(ClassIdentity.Component(c.Original),"state",state);
+                state.TryAddFoundation("rwom.bladedancer",DisciplineDomain.Might);
+                var old=TorannMagicDefOf.Bladedancer;
+                TorannMagicDefOf.Bladedancer=new TraitDef {defName="Bladedancer"};
+                try
+                {
+                    var skill=c.Original.GetCompAbilityUserMight().MightData.MightPowerSkill_BladeFocus.Single();
+                    skill.levelMax=3;
+                    BladeFoundationTests.Verify(f,c.Creator,c.Original.GetCompAbilityUserMight(),false);
+                }
+                finally { TorannMagicDefOf.Bladedancer=old; }
+            }));
+        yield return new("BladeProjection.DeliverMedicine", f =>
+            SpiritRebirthRitualTransactionTests.Run(f,c => {
+                using var held = new Fixture(f,c);
+                var state=new ClassProgressionState(Vocation.Warrior);
+                Set(ClassIdentity.Component(c.Original),"state",state);
+                state.TryAddFoundation("rwom.bladedancer",DisciplineDomain.Might);
+                Set(state.Find("rwom.bladedancer"),"stage",InitiationStage.Master);
+                BladeMedicalSupplyTests.Verify(f,c.Creator,c.Original);
+            }));
+        yield return new("BladeProjection.RescueTrialOwnership", f =>
+            SpiritRebirthRitualTransactionTests.Run(f,c => {
+                using var held = new Fixture(f,c);
+                void Train(Pawn pawn)
+                {
+                    var state = new ClassProgressionState(Vocation.Warrior);
+                    Set(ClassIdentity.Component(pawn),"state",state);
+                    state.TryAddFoundation("rwom.bladedancer",DisciplineDomain.Might);
+                    Set(state.Find("rwom.bladedancer"),"stage",InitiationStage.Adept);
+                }
+                var api = Production("BladeMastery");
+                var delivered = api.GetMethod("Delivered",BindingFlags.NonPublic|BindingFlags.Static)!;
+                var rescues = api.GetMethod("Rescues",BindingFlags.NonPublic|BindingFlags.Static)!;
+                int Count(Pawn pawn) => (int)rescues.Invoke(null,[pawn])!;
+                var ally = new Pawn { thingIDNumber = 100001 };
+                Train(c.Original);
+                delivered.Invoke(null,[c.Creator,ally]);
+                delivered.Invoke(null,[c.Creator,ally]);
+                Check.Equal(1,Count(c.Original),"one delivery per casualty per day on the retained path");
+                var possession = held.Possession.parent;
+                c.Creator.health.hediffSet.hediffs.Remove(possession);
+                try
+                {
+                    delivered.Invoke(null,[c.Creator,new Pawn { thingIDNumber = 100002 }]);
+                    Check.Equal(1,Count(c.Original),"former host cannot credit a different casualty");
+                }
+                finally { c.Creator.health.hediffSet.hediffs.Add(possession); }
+                Train(c.Creator);
+                delivered.Invoke(null,[c.Creator,ally]);
+                Check.Equal(1,Count(c.Creator),"local discipline owns the next delivery");
+                Check.Equal(1,Count(c.Original),"local rescue does not double-credit the soul");
+            }));
+        foreach(var id in new[]{"TM_PhaseStrike","TM_PhaseStrike_I","TM_PhaseStrike_II","TM_PhaseStrike_III"})
+            yield return new("BladeProjection.PhaseStrike."+id,f =>
+                SpiritRebirthRitualTransactionTests.Run(f,c => {
+                    using var held=new Fixture(f,c);
+                    var def=(TMAbilityDef)typeof(TorannMagicDefOf).GetField(id)!.GetValue(null)!;
+                    var source=c.Original.GetCompAbilityUserMight();
+                    var original=new MightAbility(source){Def=def};source.AbilityData.Powers.Add(original);source.AbilityData.AllPowers=null;
+                    var find=Production("SpiritHostedMartial").GetMethod("Find",BindingFlags.NonPublic|BindingFlags.Static)!;
+                    object? Power()=>find.Invoke(null,[c.Creator,c.Original,"TM_SpiritCastPhaseStrike"]);
+                    Check.Same(original,Power()!,"use the real acquired rank and its targeting range");
+                    var host=c.Creator.GetCompAbilityUserMight();host.AbilityData.Powers.Add(new MightAbility(host){Def=TorannMagicDefOf.TM_PhaseStrike});
+                    host.AbilityData.AllPowers=null;Check.Equal(true,Power()==null,"a native lower rank takes precedence");
+                }));
         yield return new("GladiatorLastCircle.ProjectOnlyChosenAscension", f =>
             SpiritRebirthRitualTransactionTests.Run(f,c => {
                 using var held=new Fixture(f,c);

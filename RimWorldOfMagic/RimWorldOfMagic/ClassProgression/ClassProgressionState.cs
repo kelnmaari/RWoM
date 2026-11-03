@@ -155,6 +155,29 @@ namespace TorannMagic.ClassProgression
         }
         public ServantControlProgress ServantControl => servantControl;
         public ServantControlProgress EnsureServantControl() => servantControl ?? (servantControl = new ServantControlProgress());
+        internal bool BladeMemory;
+        internal int BladeLastTargetId;
+        internal int BladeMemoryReadyAt;
+        internal int BladeChallengerId;
+        internal int BladeReplyBody;
+        internal int BladeReplyUntil;
+        internal int BladeReplies;
+        internal int BladeRescues;
+        internal Dictionary<int,int> BladeRescueTimes;
+        internal int BladePassageUpgrades;
+        internal int BladePassages;
+        internal BladeUltimate BladeUltimate;
+        internal int BladeRoutes;
+        internal int BladeDeliveries;
+        internal int BladeNextSupplyAt;
+        internal int BladeRouteOpponent;
+        internal int BladeRouteUntil;
+        internal int BladeRouteMap;
+        internal int BladeRouteBody;
+        internal IntVec3 BladeRouteOrigin;
+        internal int BladeFormReadyAt;
+        internal int BladeExhaustedUntil;
+        internal List<int> BladeWeapons;
         public string ClassId => classId;
         public DisciplineDomain Domain => domain;
         public InitiationStage Stage => stage;
@@ -183,6 +206,29 @@ namespace TorannMagic.ClassProgression
 
         public void ExposeData()
         {
+            Scribe_Values.Look(ref BladeMemory, "bladeMemory");
+            Scribe_Values.Look(ref BladeLastTargetId, "bladeLastTargetId");
+            Scribe_Values.Look(ref BladeMemoryReadyAt, "bladeMemoryReadyAt");
+            Scribe_Values.Look(ref BladeChallengerId, "bladeChallengerId");
+            Scribe_Values.Look(ref BladeReplyBody,"bladeReplyBody");
+            Scribe_Values.Look(ref BladeReplyUntil, "bladeReplyUntil");
+            Scribe_Values.Look(ref BladeReplies, "bladeReplies");
+            Scribe_Values.Look(ref BladeRescues, "bladeRescues");
+            Scribe_Collections.Look(ref BladeRescueTimes, "bladeRescueTimes", LookMode.Value, LookMode.Value);
+            Scribe_Values.Look(ref BladePassageUpgrades, "bladePassageUpgrades");
+            Scribe_Values.Look(ref BladeUltimate, "bladeUltimate");
+            Scribe_Values.Look(ref BladeRoutes, "bladeRoutes");
+            Scribe_Values.Look(ref BladeDeliveries, "bladeDeliveries");
+            Scribe_Values.Look(ref BladeNextSupplyAt, "bladeNextSupplyAt");
+            Scribe_Values.Look(ref BladeRouteOpponent, "bladeRouteOpponent");
+            Scribe_Values.Look(ref BladeRouteUntil, "bladeRouteUntil");
+            Scribe_Values.Look(ref BladeRouteMap, "bladeRouteMap");
+            Scribe_Values.Look(ref BladeRouteBody,"bladeRouteBody");
+            Scribe_Values.Look(ref BladeRouteOrigin, "bladeRouteOrigin");
+            Scribe_Values.Look(ref BladeFormReadyAt, "bladeFormReadyAt");
+            Scribe_Values.Look(ref BladeExhaustedUntil, "bladeExhaustedUntil");
+            Scribe_Values.Look(ref BladePassages, "bladePassages");
+            Scribe_Collections.Look(ref BladeWeapons, "bladeWeapons", LookMode.Value);
             Scribe_Values.Look(ref classId, "classId");
             Scribe_Values.Look(ref domain, "domain");
             Scribe_Values.Look(ref stage, "stage", InitiationStage.Foundation);
