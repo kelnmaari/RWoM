@@ -53,33 +53,40 @@ namespace TorannMagic.ClassProgression
         }
         public sealed class Activation
         {
-            internal Pawn caster;
+            internal Pawn caster, body;
             internal PawnAbility ability;
             internal MagicPower owner;
             internal bool used;
         }
-        public static Activation CaptureAura(PawnAbility ability)
+        public static Activation CaptureAura(PawnAbility ability) => CaptureAura(ability, ability?.Pawn);
+
+        internal static Activation CaptureAura(PawnAbility ability, Pawn body)
         {
             var c = ability?.Pawn;
-            return Caster(c) && Runtime(ability, true) && Owner(c, true) != null && !c.health.hediffSet.HasHediff(TorannMagicDefOf.TM_SuppressiveAuraHD)
-                ? new Activation { caster = c, ability = ability, owner = Owner(c, true) } : null;
+            return Caster(body) && c != null && SpiritRebirthCasting.SkillOwner(body, ability) == c && Runtime(ability, true)
+                && Owner(c, true) != null && !body.health.hediffSet.HasHediff(TorannMagicDefOf.TM_SuppressiveAuraHD)
+                ? new Activation { caster = c, body = body, ability = ability, owner = Owner(c, true) } : null;
         }
         public static bool CompleteAura(Activation s)
         {
             if (s == null || s.used) return false;
             s.used = true;
-            if (!Caster(s.caster) || Owner(s.caster, true) != s.owner || !Runtime(s.ability, true)) return false;
-            var hd = s.caster.health.hediffSet.GetFirstHediffOfDef(TorannMagicDefOf.TM_SuppressiveAuraHD); var comp = hd?.TryGetComp<HediffComp_SuppressiveAura>();
-            if (comp == null || hd.pawn != s.caster || !Finite(hd.Severity) || hd.Severity <= 0) return false;
+            if (!Caster(s.body) || SpiritRebirthCasting.SkillOwner(s.body, s.ability) != s.caster ||
+                Owner(s.caster, true) != s.owner || !Runtime(s.ability, true)) return false;
+            var hd = s.body.health.hediffSet.GetFirstHediffOfDef(TorannMagicDefOf.TM_SuppressiveAuraHD);
+            var comp = hd?.TryGetComp<HediffComp_SuppressiveAura>();
+            if (comp == null || hd.pawn != s.body || !Finite(hd.Severity) || hd.Severity <= 0) return false;
             comp.trialCaster = s.caster; comp.ownTrialActivation = true; comp.trialOwner = s.owner;
             return true;
         }
         static bool Source(HediffComp_SuppressiveAura source)
         {
-            var c = source?.Pawn;
-            return Caster(c) && source.ownTrialActivation && source.trialCaster == c && !source.CompShouldRemove && source.parent.def == TorannMagicDefOf.TM_SuppressiveAuraHD
-                && c.health.hediffSet.hediffs.Contains(source.parent) && Finite(source.parent.Severity) && source.parent.Severity > 0
-                && Owner(c, true) != null && (source.trialOwner == null || source.trialOwner == Owner(c, true)) && Magic(c).AbilityData.Powers.Any(a => Runtime(a, true));
+            var body = source?.Pawn;
+            var owner = source?.SkillOwner;
+            return Caster(body) && owner != null && source.ownTrialActivation && source.trialCaster == owner && !source.CompShouldRemove
+                && source.parent.def == TorannMagicDefOf.TM_SuppressiveAuraHD && body.health.hediffSet.hediffs.Contains(source.parent)
+                && Finite(source.parent.Severity) && source.parent.Severity > 0 && Owner(owner, true) != null
+                && (source.trialOwner == null || source.trialOwner == Owner(owner, true)) && Magic(owner).AbilityData.Powers.Any(a => Runtime(a, true));
         }
         public sealed class SuppressionSnapshot
         {
@@ -91,15 +98,17 @@ namespace TorannMagic.ClassProgression
         }
         public static SuppressionSnapshot CaptureSuppression(HediffComp_SuppressiveAura source, Pawn target)
         {
-            var c = source?.Pawn; var path = Path(c, true);
-            return path != null && Source(source) && Target(c, target) && target.Faction == c.Faction && !target.health.hediffSet.HasHediff(TorannMagicDefOf.TM_EmotionSuppressionHD)
-                ? new SuppressionSnapshot { source = source, caster = c, target = target, owner = Owner(c, true), path = path } : null;
+            var body = source?.Pawn; var owner = source?.SkillOwner; var path = Path(owner, true, body);
+            return path != null && Source(source) && Target(body, target) && target.Faction == body.Faction && !target.health.hediffSet.HasHediff(TorannMagicDefOf.TM_EmotionSuppressionHD)
+                ? new SuppressionSnapshot { source = source, caster = owner, target = target, owner = Owner(owner, true), path = path } : null;
         }
         public static bool CompleteSuppression(SuppressionSnapshot s)
         {
             if (s == null || s.used) return false;
             s.used = true;
-            if (Path(s.caster, true) != s.path || Owner(s.caster, true) != s.owner || !Source(s.source) || !Target(s.caster, s.target) || s.target.Faction != s.caster.Faction) return false;
+            var body = s.source.Pawn;
+            if (s.source.SkillOwner != s.caster || Path(s.caster, true, body) != s.path || Owner(s.caster, true) != s.owner ||
+                !Source(s.source) || !Target(body, s.target) || s.target.Faction != body.Faction) return false;
             var hd = s.target.health.hediffSet.GetFirstHediffOfDef(TorannMagicDefOf.TM_EmotionSuppressionHD);
             return hd != null && hd.pawn == s.target && Finite(hd.Severity) && hd.Severity > 0 && s.path.RecordCompletedTrial(MasteryTrialId);
         }

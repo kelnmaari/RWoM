@@ -1,3 +1,4 @@
 <Defs>
   <JobDef><defName>TM_SpiritMindKiller</defName><driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass><reportString>releasing an empathic wail.</reportString></JobDef>
+  <JobDef><defName>TM_SpiritSuppressiveAura</defName><driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass><reportString>channeling a suppressive aura.</reportString></JobDef>
 </Defs>

@@ -109,6 +109,7 @@ namespace TorannMagic.ClassProgression
             ("TM_SpiritProtectionBrand", () => TorannMagicDefOf.TM_ProtectionBrand, typeof(Verb_BrandProtection)),
             ("TM_SpiritVitalityBrand", () => TorannMagicDefOf.TM_VitalityBrand, typeof(Verb_BrandVitality)),
             ("TM_SpiritSiphonBrand", () => TorannMagicDefOf.TM_SiphonBrand, typeof(Verb_BrandSiphon)),
+            ("TM_SpiritSuppressiveAura", () => TorannMagicDefOf.TM_SuppressiveAura, typeof(Verb_ToggleHediff)),
             ("TM_SpiritMindKiller", () => TorannMagicDefOf.TM_MindKiller, typeof(Verb_MindKiller)),
             ("TM_SpiritLivingWall", () => TorannMagicDefOf.TM_LivingWall, typeof(Verb_LivingWall)),
             ("TM_SpiritDispelLivingWall", () => TorannMagicDefOf.TM_DispelLivingWall, typeof(Verb_DispelLivingWall)),
@@ -256,8 +257,13 @@ namespace TorannMagic.ClassProgression
                     f.effect == def.MainVerb.defaultProjectile?.thingClass &&
                     (typeof(Projectile_SpiritNativeAbility).IsAssignableFrom(f.effect) || typeof(Projectile_SpiritBolt).IsAssignableFrom(f.effect) || typeof(Projectile_SpiritRay).IsAssignableFrom(f.effect) || f.effect == typeof(Projectile_ChronostaticField) || f.effect == typeof(Projectile_AccelerateTime) || f.effect == typeof(Projectile_Sentinel) || f.effect == typeof(Projectile_EarthernHammer) || f.effect == typeof(Projectile_Encase) || f.effect == typeof(Projectile_IgniteBlood) || f.effect == typeof(Projectile_BloodMoon) || SpiritHostedSummons.IsProjectile(f.effect))))) ||
                 (def.MainVerb.burstShotCount != 1 && !IsBurst(def)) || def.bloodCost != 0 && def != TorannMagicDefOf.TM_BloodShield && def != TorannMagicDefOf.TM_IgniteBlood && def != TorannMagicDefOf.TM_BloodForBlood && def.MainVerb.verbClass != typeof(Verb_Rend) && def.MainVerb.defaultProjectile?.thingClass != typeof(Projectile_BloodMoon) || def.chiCost != 0 ||
-                (def.requiredNeed != null && def != TorannMagicDefOf.TM_MindKiller) ||
+                (def.requiredNeed != null && def != TorannMagicDefOf.TM_MindKiller && def != TorannMagicDefOf.TM_SuppressiveAura) ||
                 def.requiredHediff != null || !def.consumeEnergy || power.MagicUser.Mana == null) return false;
+            if (def == TorannMagicDefOf.TM_SuppressiveAura)
+            {
+                var aura = body.health.hediffSet.GetFirstHediffOfDef(def.abilityHediff);
+                if (aura != null && aura.TryGetComp<HediffComp_SuppressiveAura>()?.SourceId != power.Pawn.thingIDNumber) return false;
+            }
             if (def.requiredNeed != null)
             {
                 var need = body.needs?.TryGetNeed(def.requiredNeed);

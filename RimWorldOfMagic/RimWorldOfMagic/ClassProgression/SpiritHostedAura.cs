@@ -49,6 +49,13 @@ namespace TorannMagic.ClassProgression
         internal static void EndAuras(Pawn soul)
         {
             EmpathLifecycle.UpdateProjectedEmpathy(soul, true);
+            if (TorannMagicDefOf.TM_SuppressiveAuraHD != null && SpiritRebirthState.TryGet(soul,out var state))
+            {
+                var body = state.Host;
+                var aura = body?.health?.hediffSet?.GetFirstHediffOfDef(TorannMagicDefOf.TM_SuppressiveAuraHD);
+                if (aura?.TryGetComp<HediffComp_SuppressiveAura>()?.SourceId == soul.thingIDNumber)
+                    body.health.RemoveHediff(aura);
+            }
             Visit(soul, TorannMagicDefOf.TM_RayOfHope_AuraHD, true);
             Visit(soul, TorannMagicDefOf.TM_InnerFire_AuraHD, true);
             Visit(soul, TorannMagicDefOf.TM_Shadow_AuraHD, true);
