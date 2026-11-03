@@ -22,9 +22,14 @@ namespace TorannMagic.ClassProgression
         public const string FoundationTrialId = "rwom.bloodmage.foundation", MasteryTrialId = "rwom.bloodmage.mastery";
         static CompAbilityUserMagic Magic(Pawn pawn) => pawn?.AllComps.OfType<CompAbilityUserMagic>().FirstOrDefault();
         static MagicPower Owner(Pawn pawn, bool ignite) => Magic(pawn)?.MagicData.MagicPowersBM.FirstOrDefault(p => p.learned && p.TMabilityDefs.Contains(ignite ? TorannMagicDefOf.TM_IgniteBlood : TorannMagicDefOf.TM_BloodShield));
+        private static Pawn ShieldBody(Pawn owner)
+        {
+            if (!SpiritRebirthState.TryGet(owner,out var state)) return owner?.Spawned == true ? owner : null;
+            return !state.DepletionPending && state.HasValidHost(owner) && state.Host.Spawned ? state.Host : null;
+        }
         static DisciplineProgress Owned(Pawn pawn, bool ignite)
         {
-            if (pawn == null || pawn.Dead || !pawn.Spawned || pawn.Faction == null
+            if (pawn == null || pawn.Dead || (ignite ? !pawn.Spawned : ShieldBody(pawn) == null) || pawn.Faction == null
                 || pawn.story?.traits?.HasTrait(TorannMagicDefOf.Faceless) == true
                 || !ClassIdentity.TryGetState(pawn, out var state) || (state.Vocation & Vocation.Mage) == 0) return null;
             var path = state.Find("rwom.bloodmage");
@@ -41,7 +46,7 @@ namespace TorannMagic.ClassProgression
         static Hediff Shield(Pawn pawn) => pawn.health.hediffSet.hediffs.FirstOrDefault(h => h.def.defName == "TM_BloodShieldHD");
         public sealed class ShieldSnapshot
         {
-            internal Pawn caster, target;
+            internal Pawn caster, target, body;
             internal PawnAbility ability;
             internal MagicPower owner;
             internal DisciplineProgress path;
@@ -52,20 +57,20 @@ namespace TorannMagic.ClassProgression
         {
             var caster = ability?.Pawn;
             var path = Owned(caster, false);
-            if (path == null || !RuntimeOwned(ability, caster, false) || !Ally(caster, target)
+            if (path == null || !RuntimeOwned(ability, caster, false) || !Ally(ShieldBody(caster), target)
                 || !target.health.hediffSet.hediffs.OfType<Hediff_Injury>().Any(h => Finite(h.Severity) && h.Severity > 0)) return null;
             float before = Shield(target)?.Severity ?? 0;
-            return Finite(before) ? new ShieldSnapshot { caster = caster, target = target, ability = ability, owner = Owner(caster, false), path = path, severity = before } : null;
+            return Finite(before) ? new ShieldSnapshot { caster = caster, body = ShieldBody(caster), target = target, ability = ability, owner = Owner(caster, false), path = path, severity = before } : null;
         }
         public static bool CompleteShield(ShieldSnapshot snapshot)
         {
             if (snapshot == null || snapshot.used) return false;
             snapshot.used = true;
             if (Owned(snapshot.caster, false) != snapshot.path || Owner(snapshot.caster, false) != snapshot.owner
-                || !RuntimeOwned(snapshot.ability, snapshot.caster, false) || !Ally(snapshot.caster, snapshot.target)) return false;
+                || !RuntimeOwned(snapshot.ability, snapshot.caster, false) || ShieldBody(snapshot.caster) != snapshot.body || !Ally(snapshot.body, snapshot.target)) return false;
             var shield = Shield(snapshot.target);
             return shield != null && Finite(shield.Severity) && shield.Severity > 0 && shield.Severity > snapshot.severity
-                && shield.TryGetComp<HediffComp_BloodShield>()?.linkedPawn == snapshot.caster && snapshot.path.RecordCompletedTrial(FoundationTrialId);
+                && shield.TryGetComp<HediffComp_BloodShield>()?.linkedPawn == snapshot.body && snapshot.path.RecordCompletedTrial(FoundationTrialId);
         }
         public sealed class Tag : IExposable
         {

@@ -84,6 +84,7 @@ namespace TorannMagic.ClassProgression
             ("TM_SpiritLullaby_I", () => TorannMagicDefOf.TM_Lullaby_I, typeof(Verb_Lullaby)),
             ("TM_SpiritLullaby_II", () => TorannMagicDefOf.TM_Lullaby_II, typeof(Verb_Lullaby)),
             ("TM_SpiritLullaby_III", () => TorannMagicDefOf.TM_Lullaby_III, typeof(Verb_Lullaby)),
+            ("TM_SpiritBloodShield", () => TorannMagicDefOf.TM_BloodShield, typeof(Verb_BloodShield)),
             ("TM_SpiritBattleHymn", () => TorannMagicDefOf.TM_BattleHymn, typeof(Verb_BattleHymn)),
             ("TM_SpiritEntertain", () => TorannMagicDefOf.TM_Entertain, typeof(Verb_Entertain)),
             ("TM_SpiritSoL_CreateLight", () => TorannMagicDefOf.TM_SoL_CreateLight, typeof(Verb_SoL_CreateLight)),
@@ -180,8 +181,14 @@ namespace TorannMagic.ClassProgression
                     def.MainVerb.verbClass == typeof(Verb_UseAbility_TrueBurst)) &&
                     f.effect == def.MainVerb.defaultProjectile?.thingClass &&
                     (typeof(Projectile_SpiritNativeAbility).IsAssignableFrom(f.effect) || typeof(Projectile_SpiritBolt).IsAssignableFrom(f.effect) || typeof(Projectile_SpiritRay).IsAssignableFrom(f.effect) || SpiritHostedSummons.IsProjectile(f.effect))))) ||
-                (def.MainVerb.burstShotCount != 1 && !IsBurst(def)) || def.bloodCost != 0 || def.chiCost != 0 || def.requiredNeed != null ||
+                (def.MainVerb.burstShotCount != 1 && !IsBurst(def)) || def.bloodCost != 0 && def != TorannMagicDefOf.TM_BloodShield || def.chiCost != 0 || def.requiredNeed != null ||
                 def.requiredHediff != null || !def.consumeEnergy || power.MagicUser.Mana == null) return false;
+            if (def.bloodCost != 0)
+            {
+                float required = power.ActualBloodCost * 100f;
+                var meter = body.health.hediffSet.GetFirstHediffOfDef(HediffDef.Named("TM_BloodHD"));
+                if (meter == null || !float.IsFinite(required) || required < 0 || meter.Severity < required) return false;
+            }
             float cost = power.MagicUser.ActualManaCost(def);
             if (def == TorannMagicDefOf.TM_SoL_CreateLight && (power.MagicUser.SoL?.Spawned != true ||
                 power.MagicUser.SoL.Map != body.Map || power.MagicUser.SoL.OwnerPawn != power.Pawn)) return false;
@@ -201,6 +208,7 @@ namespace TorannMagic.ClassProgression
                 !Projectile_RaiseUndead.HasHostedTarget(body.Map, target.Cell, power.magicDef.MainVerb.defaultProjectile)) return false;
             if (power.magicDef.MainVerb.defaultProjectile?.thingClass == typeof(Projectile_CorpseExplosion) &&
                 !Projectile_CorpseExplosion.HasTarget(body.Map,target.Cell)) return false;
+            if (power.magicDef == TorannMagicDefOf.TM_BloodShield && (target.Pawn == null || target.Pawn == body || target.Pawn.Dead)) return false;
             if (power.magicDef == TorannMagicDefOf.TM_Teleport && !Projectile_Teleport.HasSpace(body.Map, target.Cell)) return false;
             if (!SpiritHostedSummons.CanPlace(power.magicDef, body.Map, target.Cell)) return false;
             var verb = PhysicalVerb(body, power);
