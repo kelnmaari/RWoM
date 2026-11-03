@@ -4,4 +4,8 @@
   <TM_SpiritAlterFate.reportString>змінює долю.</TM_SpiritAlterFate.reportString>
   <TM_SpiritAccelerateTime.reportString>прискорює час.</TM_SpiritAccelerateTime.reportString>
   <TM_SpiritReverseTime.reportString>повертає час назад.</TM_SpiritReverseTime.reportString>
+  <TM_SpiritChronostaticField.reportString>створює поле часового стазису.</TM_SpiritChronostaticField.reportString>
+  <TM_SpiritChronostaticField_I.reportString>створює поле часового стазису.</TM_SpiritChronostaticField_I.reportString>
+  <TM_SpiritChronostaticField_II.reportString>створює поле часового стазису.</TM_SpiritChronostaticField_II.reportString>
+  <TM_SpiritChronostaticField_III.reportString>створює поле часового стазису.</TM_SpiritChronostaticField_III.reportString>
 </LanguageData>

@@ -4,4 +4,8 @@
   <TM_SpiritAlterFate.reportString>изменяет судьбу.</TM_SpiritAlterFate.reportString>
   <TM_SpiritAccelerateTime.reportString>ускоряет время.</TM_SpiritAccelerateTime.reportString>
   <TM_SpiritReverseTime.reportString>обращает время вспять.</TM_SpiritReverseTime.reportString>
+  <TM_SpiritChronostaticField.reportString>создаёт поле остановки времени.</TM_SpiritChronostaticField.reportString>
+  <TM_SpiritChronostaticField_I.reportString>создаёт поле остановки времени.</TM_SpiritChronostaticField_I.reportString>
+  <TM_SpiritChronostaticField_II.reportString>создаёт поле остановки времени.</TM_SpiritChronostaticField_II.reportString>
+  <TM_SpiritChronostaticField_III.reportString>создаёт поле остановки времени.</TM_SpiritChronostaticField_III.reportString>
 </LanguageData>

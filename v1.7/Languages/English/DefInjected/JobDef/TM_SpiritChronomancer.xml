@@ -4,4 +4,8 @@
   <TM_SpiritAlterFate.reportString>altering fate.</TM_SpiritAlterFate.reportString>
   <TM_SpiritAccelerateTime.reportString>accelerating time.</TM_SpiritAccelerateTime.reportString>
   <TM_SpiritReverseTime.reportString>reversing time.</TM_SpiritReverseTime.reportString>
+  <TM_SpiritChronostaticField.reportString>creating a chronostatic field.</TM_SpiritChronostaticField.reportString>
+  <TM_SpiritChronostaticField_I.reportString>creating a chronostatic field.</TM_SpiritChronostaticField_I.reportString>
+  <TM_SpiritChronostaticField_II.reportString>creating a chronostatic field.</TM_SpiritChronostaticField_II.reportString>
+  <TM_SpiritChronostaticField_III.reportString>creating a chronostatic field.</TM_SpiritChronostaticField_III.reportString>
 </LanguageData>
