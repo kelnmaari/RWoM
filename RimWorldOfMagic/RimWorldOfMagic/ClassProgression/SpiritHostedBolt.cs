@@ -74,6 +74,7 @@ namespace TorannMagic.ClassProgression
             ("TM_SpiritOrbitalStrike_III", () => TorannMagicDefOf.TM_OrbitalStrike_III, typeof(Projectile_OrbitalStrike)),
             ("TM_SpiritOverdrive", () => TorannMagicDefOf.TM_Overdrive, typeof(Verb_Overdrive)),
             ("TM_SpiritSabotage", () => TorannMagicDefOf.TM_Sabotage, typeof(Projectile_Sabotage)),
+            ("TM_SpiritTechnoTurret", () => TorannMagicDefOf.TM_TechnoTurret, typeof(Projectile_TechnoTurret)),
             ("TM_SpiritTechnoShield", () => TorannMagicDefOf.TM_TechnoShield, typeof(Verb_TechnoShield)),
             ("TM_SpiritFoldReality", () => TorannMagicDefOf.TM_FoldReality, typeof(Verb_FoldReality)),
             ("TM_SpiritTeleport", () => TorannMagicDefOf.TM_Teleport, typeof(Projectile_Teleport)),

@@ -35,4 +35,9 @@
     <driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass>
     <reportString>calling an orbital strike through a spirit host.</reportString>
   </JobDef>
+  <JobDef>
+    <defName>TM_SpiritTechnoTurret</defName>
+    <driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass>
+    <reportString>deploying a Mark-IV turret through a spirit host.</reportString>
+  </JobDef>
 </Defs>

@@ -32,8 +32,10 @@ internal static class TechnomancerLifecycleTests
     {
         string path = Path.Combine(f.WorkingDirectory, name + ".xml");
         Envelope.Target = target; Envelope.Method = method; var envelope = new Envelope();
+        var culture = System.Globalization.CultureInfo.CurrentCulture;
+        System.Globalization.CultureInfo.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
         try { Scribe.saver.InitSaving(path, "regression"); Scribe_Deep.Look(ref envelope, "native"); Scribe.saver.FinalizeSaving(); }
-        finally { Scribe.ForceStop(); Envelope.Target = null!; }
+        finally { Scribe.ForceStop(); Envelope.Target = null!; System.Globalization.CultureInfo.CurrentCulture = culture; }
         return path;
     }
     static void Load(string path, object target, string method, params ILoadReferenceable[] refs)
@@ -126,6 +128,7 @@ internal static class TechnomancerLifecycleTests
     {
         LoadBaseDefinitions(f); var p = PawnWithComps(true, false); p.pawn.thingIDNumber = 74101;
         foreach (var skill in p.magic.MagicData.MagicPowerSkill_TechnoTurret) skill.level = 12;
+        p.magic.arcaneDmg = 1.75f;
         var turret = new Building_TechnoTurret { manPawn = p.pawn };
         Call(turret, "InitializeTechnoTurret");
         Check.Equal(7200, turret.duration, "native efficiency sets fresh lifetime");
@@ -135,6 +138,7 @@ internal static class TechnomancerLifecycleTests
         string path = Save(f, turret, "ExposeTechnoTurretData", "techno-turret");
         var loaded = new Building_TechnoTurret(); Load(path, loaded, "ExposeTechnoTurretData", p.pawn);
         Check.Same(p.pawn, loaded.manPawn, "real Scribe resolves original owner");
+        p.magic.arcaneDmg = .7f;
         foreach (var skill in p.magic.MagicData.MagicPowerSkill_TechnoTurret) skill.level = 15;
         Call(loaded, "InitializeTechnoTurret"); Call(loaded, "InitializeTechnoTurret");
         Check.Equal(1700, loaded.age, "age preserved"); Check.Equal(6800, loaded.duration, "remaining lifetime not recalculated from changed owner skill");
@@ -142,6 +146,8 @@ internal static class TechnomancerLifecycleTests
         Check.Equal(1777, Get<int>(loaded, "nextRocketFireTick"), "rocket deadline preserved");
         Check.Equal(2100, Get<int>(loaded, "mortarTicksToFire"), "mortar deadline preserved");
         Check.Equal(range, Get<int>(loaded, "mortarMaxRange"), "range never compounds on load");
+        Check.Equal(1.75f, Get<float>(loaded, "capturedScale"), "saved gun keeps its own range and burst scaling");
+        Check.Equal(4.5f - .1f * 12, (float)Call(loaded, "BurstCooldownTime")!, "individual turret burst delay");
         Check.Equal(12, Get<int>(loaded, "effVal"), "destruction efficiency remains original");
     }
     static void TurretLegacy(RuntimeFixture f)

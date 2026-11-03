@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -29,6 +29,10 @@ namespace TorannMagic
         private int verVal = 0;
         private int pwrVal = 0;
         private int effVal = 0;
+
+        private float capturedScale = 1f;
+        internal int SkillPower => pwrVal;
+        internal int SkillEfficiency => effVal;
 
         public int age = 0;
         public int duration = 3600;
@@ -114,7 +118,12 @@ namespace TorannMagic
             Scribe_Values.Look(ref this.initialized, "technoTurretInitialized", this.age > 0);
             Scribe_Values.Look(ref this.effVal, "effVal", 0);
             Scribe_Values.Look(ref this.nextRocketFireTick, "nextRocketFireTick", 0);
-            if (Scribe.mode == LoadSaveMode.PostLoadInit) comp = null;
+            Scribe_Values.Look(ref capturedScale, "TM_turretScale", -1f);
+            if (Scribe.mode == LoadSaveMode.PostLoadInit)
+            {
+                comp = null;
+                if (capturedScale < 0f) capturedScale = manPawn?.GetCompAbilityUserMagic()?.arcaneDmg ?? 1f;
+            }
         }
 
         internal void InitializeTechnoTurret()
@@ -127,9 +136,15 @@ namespace TorannMagic
             var power = skills.FirstOrDefault(x => x.label == "TM_TechnoTurret_pwr");
             var efficiency = skills.FirstOrDefault(x => x.label == "TM_TechnoTurret_eff");
             if (versatility == null || power == null || efficiency == null) return;
-            verVal = versatility.level;
-            pwrVal = power.level;
-            effVal = efficiency.level;
+            Configure(power.level, versatility.level, efficiency.level, comp.arcaneDmg);
+        }
+
+        private void Configure(int power, int versatility, int efficiency, float scale)
+        {
+            pwrVal = power;
+            verVal = versatility;
+            effVal = efficiency;
+            capturedScale = scale;
             duration = 3600 + (300 * effVal);
             if (verVal >= 5)
             {
@@ -145,6 +160,33 @@ namespace TorannMagic
             }
             initialized = true;
         }
+
+        internal void Deploy(Pawn owner, IntVec3 interaction, int power, int versatility, int efficiency, float scale)
+        {
+            manPawn = owner;
+            iCell = interaction;
+            Configure(power, versatility, efficiency, scale);
+            var summoned = this.TryGetComp<CompSummoned>();
+            summoned.Temporary = true;
+            summoned.TicksToDestroy = duration;
+            StatDefOf.MaxHitPoints.Worker.ClearCacheForThing(this);
+            HitPoints = MaxHitPoints;
+        }
+
+        public override void SpawnSetup(Map map, bool respawningAfterLoad)
+        {
+            base.SpawnSetup(map, respawningAfterLoad);
+            InitializeTechnoTurret();
+            if (!initialized || gun == null) return;
+            var verb = AttackVerb;
+            var props = verb.verbProps.MemberwiseClone();
+            props.burstShotCount = Mathf.RoundToInt((6 + .4f * pwrVal) * capturedScale);
+            props.warmupTime = 1.5f - .03f * pwrVal;
+            props.range = Mathf.RoundToInt((35 + verVal) * capturedScale);
+            verb.verbProps = props;
+        }
+
+        protected override float BurstCooldownTime() => initialized ? 4.5f - .1f * pwrVal : base.BurstCooldownTime();
 
         protected override void Tick()
         {
@@ -331,12 +373,15 @@ namespace TorannMagic
 
         public override void Destroy(DestroyMode mode = DestroyMode.Vanish)
         {
-            if (this.HitPoints < 1 && manPawn != null && !manPawn.Dead)
+            var feedbackTarget = manPawn;
+            if (ClassProgression.SpiritRebirthState.TryGet(manPawn, out var state))
+                feedbackTarget = state.HasValidHost(manPawn) ? state.Host : null;
+            if (this.HitPoints < 1 && feedbackTarget != null && !feedbackTarget.Dead)
             {
                 int rnd = Mathf.RoundToInt(Rand.Range(3, 5) - (.2f * this.effVal));
                 for (int i = 0; i < rnd; i++)
                 {
-                    TM_Action.DamageEntities(manPawn, null, Rand.Range(4f, 8f), DamageDefOf.Burn, this);
+                    TM_Action.DamageEntities(feedbackTarget, null, Rand.Range(4f, 8f), DamageDefOf.Burn, this);
                 }
             }
             base.Destroy(mode);            
