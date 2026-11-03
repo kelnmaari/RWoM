@@ -19,6 +19,15 @@ internal static class GolemancerLifecycleTests
         yield return new("GolemancerLifecycle.DespawnedWallAndClassicStatePreserved", Wall);
         yield return new("GolemancerLifecycle.NativeScribePreservesBrandsWallAndDormantGolem", Save);
         yield return new("GolemancerLifecycle.ExactNativeOwnershipAndMissingMasterOwner", Owners);
+        yield return new("GolemancerLifecycle.WorkstationFramesMatchAssetCase", r =>
+        {
+            string textures = Path.Combine(r.Repository,"Textures");
+            var files = Directory.EnumerateFiles(Path.Combine(textures,"Golems"),"*.png",SearchOption.AllDirectories)
+                .Select(f => Path.GetRelativePath(textures,f).Replace('\\','/')).ToHashSet(StringComparer.Ordinal);
+            var defs = System.Xml.Linq.XDocument.Load(Path.Combine(r.Repository,"v1.7","Defs","GolemDefs","TM_GolemDef.xml"));
+            foreach (var frame in defs.Descendants("golemFramePath"))
+                Check.Equal(true,files.Contains(frame.Value+".png"),"exact frame texture: "+frame.Value);
+        });
     }
     sealed class Fixture : IDisposable
     {

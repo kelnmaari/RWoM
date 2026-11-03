@@ -620,61 +620,34 @@ namespace TorannMagic.Golems
 
         public void UpdateGolemancerStatus()
         {
-            if(!pawnMaster.DestroyedOrNull() && !pawnMaster.Dead)
+            if (pawnMaster.DestroyedOrNull() || pawnMaster.Dead) pawnMaster = null;
+            var body = ClassProgression.GolemancerLifecycle.MasterBody(pawnMaster);
+            var magic = body != null && ClassProgression.GolemancerLifecycle.KnowsGolemancy(pawnMaster)
+                ? pawnMaster.GetCompAbilityUserMagic() : null;
+            var ability = TorannMagicDefOf.TM_Golemancy;
+            UpdateAugment(TorannMagicDefOf.TM_GolemancyPowerHD, magic?.MagicData.GetSkill_Power(ability));
+            UpdateAugment(TorannMagicDefOf.TM_GolemancyEfficiencyHD, magic?.MagicData.GetSkill_Efficiency(ability));
+            if (magic != null)
             {
-                CompAbilityUserMagic masterComp = pawnMaster.GetCompAbilityUserMagic();
-                MagicPower owner = masterComp == null ? null :
-                    ClassProgression.ClassIdentity.TryGetState(pawnMaster, out _)
-                    ? ClassProgression.GolemancerLifecycle.GetLearnedNativeOwner(masterComp, TorannMagicDefOf.TM_Golemancy)
-                    : masterComp.MagicData.AllMagicPowersWithSkills.FirstOrDefault(x => x.abilityDef == TorannMagicDefOf.TM_Golemancy);
-                if(TM_Calc.IsMagicUser(pawnMaster) && owner?.learned == true)
+                var link = body.health.hediffSet.GetFirstHediffOfDef(TorannMagicDefOf.TM_GolemancyVersatilityHD);
+                if (link == null)
                 {
-                    float pSev = .5f + masterComp.MagicData.GetSkill_Power(TorannMagicDefOf.TM_Golemancy).level;
-                    float eSev = .5f + masterComp.MagicData.GetSkill_Efficiency(TorannMagicDefOf.TM_Golemancy).level;
-                    float vSev = .5f + masterComp.MagicData.GetSkill_Versatility(TorannMagicDefOf.TM_Golemancy).level;
-                    Hediff hd = pawnMaster.health.hediffSet.GetFirstHediffOfDef(TorannMagicDefOf.TM_GolemancyVersatilityHD);
-                    if(hd != null)
-                    {
-                        if (hd.Severity != vSev)
-                        {
-                            hd.Severity = vSev;
-                        }
-                    }
-                    else
-                    {
-                        HealthUtility.AdjustSeverity(pawnMaster, TorannMagicDefOf.TM_GolemancyVersatilityHD, vSev);
-                    }
-                    hd = Pawn.health.hediffSet.GetFirstHediffOfDef(TorannMagicDefOf.TM_GolemancyPowerHD);
-                    if(hd != null)
-                    {
-                        if (hd.Severity != pSev)
-                        {
-                            hd.Severity = pSev;
-                        }
-                    }
-                    else
-                    {
-                        HealthUtility.AdjustSeverity(Pawn, TorannMagicDefOf.TM_GolemancyPowerHD, pSev);
-                    }
-                    hd = Pawn.health.hediffSet.GetFirstHediffOfDef(TorannMagicDefOf.TM_GolemancyEfficiencyHD);
-                    if (hd != null)
-                    {
-                        if (hd.Severity != eSev)
-                        {
-                            hd.Severity = eSev;
-                        }
-                    }
-                    else
-                    {
-                        HealthUtility.AdjustSeverity(Pawn, TorannMagicDefOf.TM_GolemancyEfficiencyHD, eSev);
-                    }
-
+                    link = HediffMaker.MakeHediff(TorannMagicDefOf.TM_GolemancyVersatilityHD, body);
+                    body.health.AddHediff(link);
                 }
+                link.TryGetComp<HediffComp_GolemBond>()?.Register(Pawn);
             }
-            else
+        }
+
+        private void UpdateAugment(HediffDef def, MagicPowerSkill rank)
+        {
+            var effect = Pawn.health.hediffSet.GetFirstHediffOfDef(def);
+            if (rank == null)
             {
-                pawnMaster = null;
+                if (effect != null) Pawn.health.RemoveHediff(effect);
             }
+            else if (effect == null) HealthUtility.AdjustSeverity(Pawn, def, .5f + rank.level);
+            else if (effect.Severity != .5f + rank.level) effect.Severity = .5f + rank.level;
         }
 
         public void UseAbility()

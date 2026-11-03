@@ -38,6 +38,24 @@ internal static partial class SpiritMapCollapseTests
                 }
                 Check.Equal(true,find.Invoke(null,[body,body,def])==null,"physical body cannot impersonate the soul");
             }));
+        yield return new("GolemancerLifecycle.MasterChoicesKeepBothOwnersAndFilterFaction", r =>
+            SpiritRebirthRitualTransactionTests.Run(r,c => {
+                using var fixture = new Fixture(r,c);
+                var body=c.Creator;
+                var soul=c.Original;
+                var candidates=typeof(GolemancerLifecycle).GetMethod("Masters",BindingFlags.Static|BindingFlags.NonPublic)!;
+                var physical=typeof(GolemancerLifecycle).GetMethod("MasterBody",BindingFlags.Static|BindingFlags.NonPublic)!;
+                foreach(var p in new[]{body,soul})
+                    p.GetCompAbilityUserMagic().MagicData.MagicPowersGolemancer.Single(x=>x.TMabilityDefs.Contains(TorannMagicDefOf.TM_Golemancy)).learned=true;
+                var masters=((IEnumerable<Pawn>)candidates.Invoke(null,[new[]{body},body.Faction])!).ToArray();
+                Check.Equal(2,masters.Length,"host and held master may own separate golems");
+                Check.Same(body,masters[0],"body's own mastery");
+                Check.Same(soul,masters[1],"soul is the other permanent master");
+                Check.Same(body,physical.Invoke(null,[soul]),"assigned soul follows through its host");
+                Check.Equal(false,((IEnumerable<Pawn>)candidates.Invoke(null,[new[]{body},new Faction()])!).Any(),"foreign golem cannot claim either pawn");
+                soul.GetCompAbilityUserMagic().MagicData.MagicPowersGolemancer.Single(x=>x.TMabilityDefs.Contains(TorannMagicDefOf.TM_Golemancy)).learned=false;
+                Check.Equal(1,((IEnumerable<Pawn>)candidates.Invoke(null,[new[]{body},body.Faction])!).Count(),"unlearned soul not offered");
+            }));
         yield return new("GolemancerTrial.PossessedSurgeonUsesOneLearnedRuneOwner", r =>
             SpiritRebirthRitualTransactionTests.Run(r,c => {
                 using var fixture = new Fixture(r,c);

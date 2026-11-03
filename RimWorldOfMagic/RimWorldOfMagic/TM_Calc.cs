@@ -810,28 +810,8 @@ namespace TorannMagic
 
         public static List<Pawn> GolemancersInFaction(Faction faction)
         {
-            if (faction == null)
-            {
-                return null;
-            }
-            List<Pawn> tmpList = new List<Pawn>();
-            tmpList.Clear();
-            foreach (Pawn p in PawnsFinder.AllMapsCaravansAndTravellingTransporters_AliveSpawned_FreeColonists)
-            {
-                if (IsMagicUser(p))
-                {
-                    CompAbilityUserMagic comp = p.GetCompAbilityUserMagic();
-                    if (comp != null && comp.MagicData != null)
-                    {
-                        MagicPower mp = ClassProgression.GolemancerLifecycle.GetLearnedNativeOwner(comp, TorannMagicDefOf.TM_Golemancy);
-                        if (mp != null && mp.learned)
-                        {
-                            tmpList.Add(p);
-                        }
-                    }
-                }
-            }
-            return tmpList;
+            return ClassProgression.GolemancerLifecycle.Masters(
+                PawnsFinder.AllMapsCaravansAndTravellingTransporters_AliveSpawned_FreeColonists, faction).Distinct().ToList();
         }
 
         public static int GetFightersInFactionCount(Faction faction, bool countSlaves = false)

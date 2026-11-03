@@ -1,4 +1,6 @@
 using System.Linq;
+using System.Collections.Generic;
+using RimWorld;
 using Verse;
 
 namespace TorannMagic.ClassProgression
@@ -12,6 +14,31 @@ namespace TorannMagic.ClassProgression
                 ? comp.MagicData.MagicPowersGolemancer.FirstOrDefault(p => p.TMabilityDefs.Contains(ability))
                 : comp.MagicData.ReturnMatchingMagicPower(ability);
             return owner?.learned == true ? owner : null;
+        }
+
+        internal static Pawn MasterBody(Pawn master)
+        {
+            if (master.DestroyedOrNull() || master.Dead) return null;
+            if (!SpiritRebirthState.TryGet(master, out var state)) return master;
+            return !state.DepletionPending && state.HasValidHost(master) ? state.Host : null;
+        }
+
+        internal static bool KnowsGolemancy(Pawn owner)
+        {
+            var magic = owner?.GetCompAbilityUserMagic();
+            return magic?.ExistingMagicData != null && GetLearnedNativeOwner(magic, TorannMagicDefOf.TM_Golemancy) != null;
+        }
+
+        internal static IEnumerable<Pawn> Masters(IEnumerable<Pawn> candidates, Faction faction)
+        {
+            if (faction == null) yield break;
+            foreach (var body in candidates)
+            {
+                if (body.Faction != faction || body.Destroyed || body.Dead) continue;
+                if (ReferenceEquals(MasterBody(body), body) && KnowsGolemancy(body)) yield return body;
+                if (SpiritRebirthState.TryGetPossessingSpirit(body, out var soul) && soul.Faction == faction &&
+                    ReferenceEquals(MasterBody(soul), body) && KnowsGolemancy(soul)) yield return soul;
+            }
         }
 
         internal static CompAbilityUserMagic RuneOwner(Pawn surgeon)
