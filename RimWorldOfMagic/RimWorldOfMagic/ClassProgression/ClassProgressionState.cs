@@ -155,6 +155,19 @@ namespace TorannMagic.ClassProgression
         }
         public ServantControlProgress ServantControl => servantControl;
         public ServantControlProgress EnsureServantControl() => servantControl ?? (servantControl = new ServantControlProgress());
+        internal bool RangerTrailLore;
+        internal List<int> RangerTrapVictims;
+        internal Dictionary<string,int> RangerClearanceTimes;
+        internal int RangerClearances;
+        internal RangerUltimate RangerUltimate;
+        internal int RangerHuntReadyAt;
+        internal int RangerRetreats;
+        internal int RangerCares;
+        internal int RangerNextCareShift;
+        internal Dictionary<int,int> RangerRetreatTimes;
+        internal int RangerPetId;
+        internal int RangerCareDays;
+        internal int RangerCareReadyAt;
         internal bool BladeMemory;
         internal int BladeLastTargetId;
         internal int BladeMemoryReadyAt;
@@ -206,6 +219,19 @@ namespace TorannMagic.ClassProgression
 
         public void ExposeData()
         {
+            Scribe_Values.Look(ref RangerTrailLore, "rangerTrailLore");
+            Scribe_Collections.Look(ref RangerTrapVictims, "rangerTrapVictims", LookMode.Value);
+            Scribe_Collections.Look(ref RangerClearanceTimes, "rangerClearanceTimes", LookMode.Value, LookMode.Value);
+            Scribe_Values.Look(ref RangerClearances, "rangerClearances");
+            Scribe_Values.Look(ref RangerUltimate, "rangerUltimate");
+            Scribe_Values.Look(ref RangerHuntReadyAt, "rangerHuntReadyAt");
+            Scribe_Values.Look(ref RangerRetreats, "rangerRetreats");
+            Scribe_Values.Look(ref RangerCares, "rangerCares");
+            Scribe_Values.Look(ref RangerNextCareShift, "rangerNextCareShift");
+            Scribe_Collections.Look(ref RangerRetreatTimes, "rangerRetreatTimes", LookMode.Value, LookMode.Value);
+            Scribe_Values.Look(ref RangerPetId, "rangerPetId");
+            Scribe_Values.Look(ref RangerCareDays, "rangerCareDays");
+            Scribe_Values.Look(ref RangerCareReadyAt, "rangerCareReadyAt");
             Scribe_Values.Look(ref BladeMemory, "bladeMemory");
             Scribe_Values.Look(ref BladeLastTargetId, "bladeLastTargetId");
             Scribe_Values.Look(ref BladeMemoryReadyAt, "bladeMemoryReadyAt");

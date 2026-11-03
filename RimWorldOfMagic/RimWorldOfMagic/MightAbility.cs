@@ -16,6 +16,12 @@ namespace TorannMagic
 
         public override Verse.AI.Job GetJob(AbilityContext context, LocalTargetInfo target)
         {
+            if (mightDef!=null && mightDef==TorannMagicDefOf.TM_PoisonTrap)
+            {
+                var trap=Verb_PoisonTrap.MakeOrder(Pawn,target);
+                trap.playerForced=context==AbilityContext.Player;
+                return trap;
+            }
             string order;
             if (mightDef?.MainVerb?.verbClass == typeof(ClassProgression.Verb_GladiatorSweep)) order=ClassProgression.SpiritHostedMartial.Sweep;
             else if (ClassProgression.SpiritHostedMartial.GrappleRank(mightDef)) order=ClassProgression.SpiritHostedMartial.Grapple;

@@ -18,7 +18,7 @@ namespace TorannMagic.ClassProgression
         internal const string Grapple = "TM_SpiritCastGrapple";
         internal static bool GrappleRank(TMAbilityDef def) => def != null && (def == TorannMagicDefOf.TM_Grapple ||
             def == TorannMagicDefOf.TM_Grapple_I || def == TorannMagicDefOf.TM_Grapple_II || def == TorannMagicDefOf.TM_Grapple_III);
-        internal static bool HasNativeOrder(string job) => job == Sweep || job == Grapple || job == GladiatorWhirlwind.JobName || BladeMartialCast.Handles(job) || job==Verb_AnimalFriend.Order;
+        internal static bool HasNativeOrder(string job) => job == Sweep || job == Grapple || job == GladiatorWhirlwind.JobName || BladeMartialCast.Handles(job) || job==Verb_AnimalFriend.Order || job==Verb_PoisonTrap.Order;
         internal static bool IsSniperShot(string job) => job==Headshot || job==DisablingShot || job==AntiArmor || job==Aimed || job==Fracture;
         internal static bool CanFire(Pawn body, MightAbility owner, Pawn target) =>
             Verb_SniperBallisticShot.FromHost(body, owner) is Verb_SniperBallisticShot ballistic
@@ -50,6 +50,7 @@ namespace TorannMagic.ClassProgression
             else if (job == BladeMartialCast.Slash) def = TorannMagicDefOf.TM_SeismicSlash;
             else if (job == BladeMartialCast.Passage) def=DefDatabase<TMAbilityDef>.GetNamedSilentFail("TM_BladePassage");
             else if (job == BladeMartialCast.Phase) def=TorannMagicDefOf.TM_PhaseStrike;
+            else if (job == Verb_PoisonTrap.Order) def=TorannMagicDefOf.TM_PoisonTrap;
             else if (job == Verb_AnimalFriend.Order) def=TorannMagicDefOf.TM_AnimalFriend ?? DefDatabase<TMAbilityDef>.GetNamedSilentFail("TM_AnimalFriend");
             else if (job == BladeFormAbility.JobName && BladeAscension.HasForm(soul)) def = DefDatabase<TMAbilityDef>.GetNamedSilentFail("TM_BladeSevenSteps");
             else if (job == SniperOpeningAbility.JobName) def = DefDatabase<TMAbilityDef>.GetNamedSilentFail("TM_SniperSingleOpening");
@@ -94,6 +95,7 @@ namespace TorannMagic.ClassProgression
             if (job == Grapple) return !body.WorkTagIsDisabled(WorkTags.Violent) && ClassIdentity.Component(body)?.Circle == null;
             if (job == GladiatorWhirlwind.JobName) return !body.WorkTagIsDisabled(WorkTags.Violent) && ClassIdentity.Component(body)?.Circle == null;
             if (BladeMartialCast.Handles(job)) return !body.WorkTagIsDisabled(WorkTags.Violent) && BladeMartialCast.HasWeapon(body);
+            if (job==Verb_PoisonTrap.Order) return !body.WorkTagIsDisabled(WorkTags.Violent);
             if (job==Verb_AnimalFriend.Order) return !might.animalBondingDisabled;
             if (job == Pommel) return !body.WorkTagIsDisabled(WorkTags.Violent) && body.health.capacities.CapableOf(PawnCapacityDefOf.Manipulation);
             if (job == SelfAid) return Verb_FirstAid.EligibleWounds(body).Any();
@@ -231,7 +233,7 @@ namespace TorannMagic.ClassProgression
                         GladiatorMastery.AutomaticSource(body,body.GetCompAbilityUserMight()) == cleave)
                         cleave.useCleaveToggle = !cleave.useCleaveToggle;
                 });
-            foreach (var name in new[] { Maneuver, SelfAid, Pommel, Sweep, Grapple, GladiatorWhirlwind.JobName, BladeMartialCast.Spin, BladeMartialCast.Slash, BladeMartialCast.Passage, BladeMartialCast.Phase, BladeFormAbility.JobName, Verb_AnimalFriend.Order, Headshot, DisablingShot, AntiArmor, Aimed, Fracture, ShadowSlayer, SniperOpeningAbility.JobName, SpiritHostedStance.Job, SpiritHostedStance.StrongBack, SpiritHostedStance.HeavyBlow,
+            foreach (var name in new[] { Maneuver, SelfAid, Pommel, Sweep, Grapple, GladiatorWhirlwind.JobName, BladeMartialCast.Spin, BladeMartialCast.Slash, BladeMartialCast.Passage, BladeMartialCast.Phase, BladeFormAbility.JobName, Verb_AnimalFriend.Order, Verb_PoisonTrap.Order, Headshot, DisablingShot, AntiArmor, Aimed, Fracture, ShadowSlayer, SniperOpeningAbility.JobName, SpiritHostedStance.Job, SpiritHostedStance.StrongBack, SpiritHostedStance.HeavyBlow,
                 SpiritHostedStance.ThickSkin, SpiritHostedStance.FightersFocus, SpiritHostedStance.GearRepair, SpiritHostedStance.InnerHealing })
             {
                 var owner = Find(body, soul, name);
@@ -243,6 +245,7 @@ namespace TorannMagic.ClassProgression
                         if (name == GladiatorWhirlwind.JobName) GladiatorWhirlwind.ChooseDestination(body,soul,owner);
                         else if (name==BladeMartialCast.Slash || name==BladeMartialCast.Passage || name==BladeMartialCast.Phase) BladeMartialCast.ChooseTarget(body,soul,owner,name);
                         else if (name == BladeFormAbility.JobName && owner is BladeFormAbility form) form.ChooseRoute(body);
+                        else if (name==Verb_PoisonTrap.Order) Verb_PoisonTrap.Choose(body,owner);
                         else if (name==Verb_AnimalFriend.Order) FindTarget(body,soul,job,target => Ready(body,Find(body,soul,name),name) && Verb_AnimalFriend.ValidTarget(body,target,body.Position,owner.mightDef.MainVerb.range));
                         else if (name == SniperOpeningAbility.JobName && owner is SniperOpeningAbility opening)
                             FindTarget(body,soul,job,target => target!=null && Ready(body,Find(body,soul,name),name) &&

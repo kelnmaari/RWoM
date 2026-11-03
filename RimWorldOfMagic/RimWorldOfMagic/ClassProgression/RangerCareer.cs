@@ -14,6 +14,17 @@ namespace TorannMagic.ClassProgression
         internal static DisciplineProgress Path(Pawn pawn) =>
             ClassIdentity.TryGetState(pawn, out var state) ? state.Find(Id) : null;
 
+        internal static DisciplineProgress ActivePath(Pawn body,out Pawn owner)
+        {
+            owner=body;
+            var path=Path(body);
+            if (path!=null || body==null || !SpiritRebirthState.TryGetPossessingSpirit(body,out var soul) ||
+                !SpiritRebirthState.TryGet(soul,out var state) || state.DepletionPending) return path;
+            path=Path(soul);
+            if (path!=null) owner=soul;
+            return path;
+        }
+
         internal static Pawn Companion(Pawn ranger) => ranger.GetCompAbilityUserMight()?.bondedPet;
         internal static bool Ready(Pawn ranger)
         {

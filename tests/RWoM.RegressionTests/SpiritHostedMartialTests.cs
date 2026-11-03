@@ -146,6 +146,48 @@ internal static partial class SpiritMapCollapseTests
                     var local=c.Creator.GetCompAbilityUserMight();local.AbilityData.Powers.Add(new MightAbility(local){Def=def});local.AbilityData.AllPowers=null;
                     Check.Equal(true,Power()==null,"the host's own technique has priority");
                 }));
+        foreach (bool treatment in new[]{false,true})
+            yield return new("RangerProjection."+ (treatment?"VeterinaryShift":"StockpileFire"), f =>
+                SpiritRebirthRitualTransactionTests.Run(f,c => {
+                    using var held=new Fixture(f,c);
+                    var state=new ClassProgressionState(Vocation.Warrior);
+                    Set(ClassIdentity.Component(c.Original),"state",state);
+                    state.TryAddFoundation("rwom.ranger",DisciplineDomain.Might);
+                    Set(state.Find("rwom.ranger"),"stage",treatment?InitiationStage.Master:InitiationStage.Adept);
+                    if(treatment)RangerAnimalCareTrialTests.Verify(c.Creator,c.Original);
+                    else RangerFireTrialTests.Verify(f,c.Creator,c.Original);
+                }));
+        yield return new("RangerProjection.RetainedTrapPlanter", f =>
+            SpiritRebirthRitualTransactionTests.Run(f,c => {
+                using var held=new Fixture(f,c);
+                var state=new ClassProgressionState(Vocation.Warrior);
+                Set(ClassIdentity.Component(c.Original),"state",state);
+                state.TryAddFoundation("rwom.ranger",DisciplineDomain.Might);
+                Set(state.Find("rwom.ranger"),"stage",InitiationStage.Adept);
+                var foe=new Faction{def=new FactionDef()};
+                Set(foe,"relations",new List<FactionRelation>{new(){other=c.Creator.Faction,kind=FactionRelationKind.Hostile}});
+                var old=typeof(Faction).GetField("relations",BindingFlags.Instance|BindingFlags.NonPublic)!.GetValue(c.Creator.Faction);
+                Set(c.Creator.Faction,"relations",new List<FactionRelation>{new(){other=foe,kind=FactionRelationKind.Hostile}});
+                try
+                {
+                    var victim=PawnWithComps(false,false).pawn;
+                    victim.kindDef=new PawnKindDef{race=victim.def};victim.mindState=new Pawn_MindState(victim);victim.guest=new Pawn_GuestTracker(victim);
+                    Set(victim,"mapIndexOrState",(sbyte)0);Set(victim,"factionInt",foe);
+                    RangerTrailTests.Trap(c.Creator,victim,c.Original.GetCompAbilityUserMight());
+                }
+                finally { Set(c.Creator.Faction,"relations",old!); }
+            }));
+        yield return new("RangerProjection.PoisonTrapOrder", f =>
+            SpiritRebirthRitualTransactionTests.Run(f,c => {
+                using var held=new Fixture(f,c);
+                var comp=c.Original.GetCompAbilityUserMight();
+                var power=new MightAbility(comp){Def=TorannMagicDefOf.TM_PoisonTrap,CooldownTicksLeft=45};
+                comp.AbilityData.Powers.Add(power);comp.AbilityData.AllPowers=null;
+                const string job="TM_SpiritCastPoisonTrap";
+                var find=Production("SpiritHostedMartial").GetMethod("Find",BindingFlags.NonPublic|BindingFlags.Static)!;
+                Check.Same(power,find.Invoke(null,[c.Creator,c.Original,job])!,"learned trap gets an order bound to the original");
+                Check.Equal(45,power.CooldownTicksLeft,"no payment when displaying the trap");
+            }));
         yield return new("RangerProjection.AnimalFriendOwner", f =>
             SpiritRebirthRitualTransactionTests.Run(f,c => {
                 using var held=new Fixture(f,c);

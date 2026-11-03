@@ -4,4 +4,9 @@
     <driverClass>TorannMagic.ClassProgression.JobDriver_SpiritHostedMartial</driverClass>
     <reportString>bonding with TargetB.</reportString>
   </JobDef>
+  <JobDef>
+    <defName>TM_SpiritCastPoisonTrap</defName>
+    <driverClass>TorannMagic.JobDriver_PlacePoisonTrap</driverClass>
+    <reportString>placing a poison trap at TargetA.</reportString>
+  </JobDef>
 </Defs>
