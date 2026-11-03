@@ -192,7 +192,13 @@ namespace TorannMagic
                         if (pod.innerContainer.Count == 0) pod.parent.Destroy();
                     }
                     pods.Clear();
-                    if (sent) ManualTravelSafety.SettleHosted((MagicAbility)Ability,body);
+                    if (sent)
+                    {
+                        // The off-map cooldown still ticks, but its completed selection verb is not a saved object.
+                        if (body.stances?.curStance is Stance_Cooldown cooldown && ReferenceEquals(cooldown.verb, this))
+                            cooldown.verb = null;
+                        ManualTravelSafety.SettleHosted((MagicAbility)Ability,body);
+                    }
                 }
                 if (sent) CheckAbandoned(origin);
             }
