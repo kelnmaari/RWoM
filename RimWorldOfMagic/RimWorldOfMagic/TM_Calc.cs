@@ -1879,9 +1879,14 @@ namespace TorannMagic
 
         public static Thing GetTransmutableThingFromCell(IntVec3 cell, Pawn enchanter, out bool flagRawResource, out bool flagStuffItem, out bool flagNoStuffItem, out bool flagNutrition, out bool flagCorpse, bool manualCast = false)
         {
-            CompAbilityUserMagic comp = enchanter.GetCompAbilityUserMagic();
-            int pwrVal = enchanter.GetCompAbilityUserMagic().MagicData.MagicPowerSkill_Transmutate.FirstOrDefault((MagicPowerSkill x) => x.label == "TM_Transmutate_pwr").level;
-            int verVal = enchanter.GetCompAbilityUserMagic().MagicData.MagicPowerSkill_Transmutate.FirstOrDefault((MagicPowerSkill x) => x.label == "TM_Transmutate_ver").level;
+            return FindTransmutationSource(cell, enchanter, enchanter, null, out flagRawResource, out flagStuffItem,
+                out flagNoStuffItem, out flagNutrition, out flagCorpse, manualCast);
+        }
+
+        internal static Thing FindTransmutationSource(IntVec3 cell, Pawn enchanter, Pawn owner, Thing selected,
+            out bool flagRawResource, out bool flagStuffItem, out bool flagNoStuffItem, out bool flagNutrition, out bool flagCorpse, bool manualCast)
+        {
+            int verVal = owner.GetCompAbilityUserMagic().MagicData.MagicPowerSkill_Transmutate.FirstOrDefault((MagicPowerSkill x) => x.label == "TM_Transmutate_ver").level;
 
             List<Thing> thingList = cell.GetThingList(enchanter.Map);
             Thing transmutateThing = null;
@@ -1894,7 +1899,7 @@ namespace TorannMagic
 
             for (int i = 0; i < thingList.Count; i++)
             {
-                if (thingList[i] != null && !(thingList[i] is Pawn) && !(thingList[i] is Building) && (manualCast || !thingList[i].IsForbidden(enchanter)))
+                if ((selected == null || thingList[i] == selected) && thingList[i] != null && !(thingList[i] is Pawn) && !(thingList[i] is Building) && (manualCast || !thingList[i].IsForbidden(enchanter)))
                 {
                     //if (thingList[i].def.thingCategories != null && thingList[i].def.thingCategories.Count > 0 && (thingList[i].def.thingCategories.Contains(ThingCategoryDefOf.ResourcesRaw) || thingList[i].def.thingCategories.Contains(ThingCategoryDefOf.StoneBlocks) || thingList[i].def.defName == "RawMagicyte"))                    
                     if (thingList[i].def.MadeFromStuff && verVal >= 3)

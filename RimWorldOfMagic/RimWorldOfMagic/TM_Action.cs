@@ -2053,7 +2053,12 @@ namespace TorannMagic
 
         public static void DoTransmutate(Pawn caster, Thing transmutateThing, bool flagNoStuffItem, bool flagRawResource, bool flagStuffItem, bool flagNutrition, bool flagCorpse)
         {
-            CompAbilityUserMagic comp = caster.GetCompAbilityUserMagic();
+            TransmutateFrom(caster, caster, transmutateThing, flagNoStuffItem, flagRawResource, flagStuffItem, flagNutrition, flagCorpse);
+        }
+
+        internal static bool TransmutateFrom(Pawn caster, Pawn owner, Thing transmutateThing, bool flagNoStuffItem, bool flagRawResource, bool flagStuffItem, bool flagNutrition, bool flagCorpse)
+        {
+            CompAbilityUserMagic comp = owner.GetCompAbilityUserMagic();
             int pwrVal = comp.MagicData.MagicPowerSkill_Transmutate.FirstOrDefault((MagicPowerSkill x) => x.label == "TM_Transmutate_pwr").level;
             int verVal = comp.MagicData.MagicPowerSkill_Transmutate.FirstOrDefault((MagicPowerSkill x) => x.label == "TM_Transmutate_ver").level;
 
@@ -2099,63 +2104,26 @@ namespace TorannMagic
                 //    }
                 //}
 
-                var trial = ClassProgression.EnchanterTrials.CaptureRawConversion(caster, transmutateThing);
-                int transStackCount = 0;
-                if (transmutateThing.stackCount > 250)
-                {
-                    transStackCount = 250;
-                }
-                else
-                {
-                    transStackCount = transmutateThing.stackCount;
-                }
-                int transStackValue = Mathf.RoundToInt(transStackCount * transmutateThing.def.BaseMarketValue);
-                float newMatCount = 0;
-                IEnumerable<ThingDef> enumerable = from def in DefDatabase<ThingDef>.AllDefs.InRandomOrder()
-                                                   where (def.BaseMarketValue >= 1f && def.BaseMarketValue <= 200 && def != transmutateThing.def && ((def.stuffProps != null && def.stuffProps.categories != null && def.stuffProps.categories.Count > 0) || def.defName == "RawMagicyte") || def.IsWithinCategory(ThingCategoryDefOf.ResourcesRaw) || def.IsWithinCategory(ThingCategoryDefOf.Leathers))
-                                                   select def;
-                ThingDef newThingDef = null;
-                foreach (ThingDef current in enumerable)
-                {
-                    if (current != null && current.defName != null)
-                    {
-                        float newThingValue = current.BaseMarketValue < 1f ? 1f : current.BaseMarketValue;
-                        newMatCount = transStackValue / newThingValue;
-                        newThingDef = current;
-                        break;
-                        //Log.Message("transumtation resource " + current.defName + " base value " + current.BaseMarketValue + " value count converts to " + newMatCount);
-                    }
-                }
-                bool trialPaymentDestroyed = false;
-                if (!transmutateThing.DestroyedOrNull() && transStackCount <= 0)
-                {
-                    transmutateThing.Destroy(DestroyMode.Vanish);
-                }
-                else
-                {
-                    Thing payment = transmutateThing.SplitOff(transStackCount);
-                    payment.Destroy(DestroyMode.Vanish);
-                    trialPaymentDestroyed = payment.Destroyed;
-                }
-                ClassProgression.EnchanterTrials.RawResourceConsumed(trial, transStackCount, trialPaymentDestroyed);
-                Thing thing = null;
-                if (newThingDef != null)
-                {
-                    thing = ThingMaker.MakeThing(newThingDef);
-                    thing.stackCount = Mathf.RoundToInt((.7f + (.05f * pwrVal)) * newMatCount);
-                    if (newMatCount < 1)
-                    {
-                        newMatCount = 1;
-                    }
-                }
-
-                if (thing != null)
-                {
-                    int trialOutputCount = thing.stackCount;
-                    bool placed = GenPlace.TryPlaceThing(thing, transmutateThing.Position, caster.Map, ThingPlaceMode.Near, null);
-                    ClassProgression.EnchanterTrials.CompleteRawConversion(trial, newThingDef, trialOutputCount, placed);
-                    TM_Action.TransmutateEffects(transmutateThing.Position, caster);
-                }
+                var trial = ClassProgression.EnchanterTrials.CaptureRawConversion(owner, transmutateThing);
+                var position = transmutateThing.Position;
+                int count = Math.Min(250, transmutateThing.stackCount);
+                if (count <= 0) return false;
+                int value = Mathf.RoundToInt(count * transmutateThing.def.BaseMarketValue);
+                float budget = (.7f + .05f * pwrVal) * value;
+                var output = DefDatabase<ThingDef>.AllDefs.InRandomOrder().FirstOrDefault(def =>
+                    def != transmutateThing.def && def.BaseMarketValue >= 1f && def.BaseMarketValue <= 200f && Mathf.RoundToInt(budget / def.BaseMarketValue) > 0 &&
+                    (def.stuffProps?.categories?.Count > 0 || def.defName == "RawMagicyte" ||
+                     def.IsWithinCategory(ThingCategoryDefOf.ResourcesRaw) || def.IsWithinCategory(ThingCategoryDefOf.Leathers)));
+                if (output == null) return false;
+                var product = ThingMaker.MakeThing(output);
+                int produced = Mathf.RoundToInt(budget / output.BaseMarketValue);
+                product.stackCount = produced;
+                if (!GenPlace.TryPlaceThing(product, position, caster.Map, ThingPlaceMode.Near, null)) return false;
+                var payment = transmutateThing.SplitOff(count);
+                payment.Destroy(DestroyMode.Vanish);
+                ClassProgression.EnchanterTrials.RawResourceConsumed(trial, count, payment.Destroyed);
+                ClassProgression.EnchanterTrials.CompleteRawConversion(trial, output, produced, true);
+                TM_Action.TransmutateEffects(position, caster);
             }
             else if (flagStuffItem)
             {
@@ -2334,7 +2302,9 @@ namespace TorannMagic
                     caster.LabelShort,
                     transmutateThing.LabelShort
                 ), MessageTypeDefOf.RejectInput);
+                return false;
             }
+            return true;
         }
 
         public static void CreateMagicDeathEffect(Pawn pawn, IntVec3 pos, bool canCauseDeath = true, bool friendlyFire = false)

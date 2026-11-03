@@ -11,9 +11,15 @@ namespace TorannMagic.ClassProgression
         public const string FoundationTrialId = "rwom.enchanter.foundation", MasteryTrialId = "rwom.enchanter.mastery";
         static CompAbilityUserMagic Magic(Pawn pawn) => pawn?.AllComps.OfType<CompAbilityUserMagic>().FirstOrDefault();
         static MagicPower Owner(Pawn pawn, bool enchant) => Magic(pawn)?.MagicData.MagicPowersE.FirstOrDefault(p => p.learned && p.TMabilityDefs.Contains(enchant ? TorannMagicDefOf.TM_EnchantWeapon : TorannMagicDefOf.TM_Transmutate));
+        static Pawn CastingBody(Pawn owner)
+        {
+            if (!SpiritRebirthState.TryGet(owner, out var state)) return owner?.Spawned == true ? owner : null;
+            return !state.DepletionPending && state.HasValidHost(owner) && state.Host.Spawned ? state.Host : null;
+        }
+
         static DisciplineProgress Owned(Pawn pawn, bool enchant)
         {
-            if (pawn == null || pawn.Dead || !pawn.Spawned || pawn.Faction == null
+            if (pawn == null || pawn.Dead || CastingBody(pawn) == null || pawn.Faction == null
                 || pawn.story?.traits?.HasTrait(TorannMagicDefOf.Faceless) == true
                 || !ClassIdentity.TryGetState(pawn, out var state) || (state.Vocation & Vocation.Mage) == 0) return null;
             var path = state.Find("rwom.enchanter");
@@ -38,7 +44,7 @@ namespace TorannMagic.ClassProgression
             transmutating = null;
             var caster = ability?.Pawn;
             var path = Owned(caster, false);
-            if (path != null && RuntimeOwned(ability, caster, false) && source != null && source.Spawned && source.Map == caster.Map && source.stackCount > 0)
+            if (path != null && RuntimeOwned(ability, caster, false) && source != null && source.Spawned && source.Map == CastingBody(caster)?.Map && source.stackCount > 0)
                 transmutating = new TransmutationScope { caster = caster, ability = ability, source = source, path = path, owner = Owner(caster, false) };
             return previous;
         }
