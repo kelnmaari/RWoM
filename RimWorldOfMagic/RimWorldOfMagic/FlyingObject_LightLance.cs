@@ -100,8 +100,10 @@ namespace TorannMagic
         {
             base.ExposeData();
             Scribe_Deep.Look(ref trialSource, "rwomLightLanceTrialSource");
-            Scribe_Values.Look<Vector3>(ref this.origin, "origin", default(Vector3), false);
-            Scribe_Values.Look<Vector3>(ref this.destination, "destination", default(Vector3), false);
+            // Projectile already serializes the origin and destination. Older emitters
+            // obtained their speed directly from their def at launch.
+            Scribe_Values.Look(ref speed, "TM_lanceSpeed", def.projectile.speed);
+            Scribe_Values.Look(ref lightPotency, "TM_lanceLightPotency", .5f);
             Scribe_Values.Look<int>(ref this.ticksToImpact, "ticksToImpact", 0, false);
             Scribe_Values.Look<int>(ref this.pwrVal, "pwrVal", 0, false);
             Scribe_Values.Look<int>(ref this.verVal, "verVal", 0, false);

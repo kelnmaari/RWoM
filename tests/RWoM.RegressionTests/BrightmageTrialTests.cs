@@ -125,23 +125,56 @@ internal static class BrightmageTrialTests
     }
     static void Save(RuntimeFixture f)
     {
-        using var w = new Fixture(f); var emitter = w.Emitter(); w.Hit(emitter, 7);
-        emitter.usedTarget = emitter.intendedTarget = IntVec3.Zero;
-        var envelope = new Envelope { state = w.Progression.State, emitter = emitter }; var file = Path.Combine(f.WorkingDirectory, "bright-lance.xml");
-        try { Scribe.saver.InitSaving(file, "trial"); Scribe_Deep.Look(ref envelope, "data"); Scribe.saver.FinalizeSaving(); } finally { Scribe.ForceStop(); }
-        Envelope loaded = null!;
+        var culture = System.Globalization.CultureInfo.CurrentCulture;
         try
         {
-            Scribe.loader.InitLoading(file); Scribe_Deep.Look(ref loaded, "data");
-            var directory = (LoadedObjectDirectory)typeof(CrossRefHandler).GetField("loadedObjectDirectory", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(Scribe.loader.crossRefs)!;
-            directory.RegisterLoaded(w.Caster); Scribe.loader.FinalizeLoading();
+            System.Globalization.CultureInfo.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
+            SaveLance(f);
         }
-        finally { Scribe.ForceStop(); }
+        finally { System.Globalization.CultureInfo.CurrentCulture = culture; }
+    }
+    static void SaveLance(RuntimeFixture f)
+    {
+        using var w = new Fixture(f); var emitter = w.Emitter(); w.Hit(emitter, 7);
+        emitter.usedTarget = emitter.intendedTarget = IntVec3.Zero;
+        emitter.def.projectile.speed = 200f;
+        Set(emitter, "origin", new UnityEngine.Vector3(5, 0, 5));
+        Set(emitter, "destination", new UnityEngine.Vector3(25, 0, 5));
+        Set(emitter, "ticksToImpact", 6);
+        Set(emitter, "speed", emitter.def.projectile.speed);
+        Set(emitter, "lightPotency", 1.6f);
+        var positionBeforeSave = emitter.ExactPosition;
+        var envelope = new Envelope { state = w.Progression.State, emitter = emitter }; var file = Path.Combine(f.WorkingDirectory, "bright-lance.xml");
+        try { Scribe.saver.InitSaving(file, "trial"); Scribe_Deep.Look(ref envelope, "data"); Scribe.saver.FinalizeSaving(); } finally { Scribe.ForceStop(); }
+        Envelope Load(string path)
+        {
+            Envelope result = null!;
+            try
+            {
+                Scribe.loader.InitLoading(path); Scribe_Deep.Look(ref result, "data");
+                var directory = (LoadedObjectDirectory)typeof(CrossRefHandler).GetField("loadedObjectDirectory", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(Scribe.loader.crossRefs)!;
+                directory.RegisterLoaded(w.Caster); Scribe.loader.FinalizeLoading();
+            }
+            finally { Scribe.ForceStop(); }
+            return result;
+        }
+        var loaded = Load(file);
         Check.Same(w.Caster, loaded.emitter.TrialCaster, "native saved pawn reference resolves to exact caster");
+        Check.Equal(positionBeforeSave, loaded.emitter.ExactPosition, "moving lance resumes from the same point");
+        Check.Equal(1.6f, (float)typeof(FlyingObject_LightLance).GetField("lightPotency", BindingFlags.NonPublic | BindingFlags.Instance)!.GetValue(loaded.emitter)!, "moving lance keeps the paid light potency");
         Set(w.Progression, "state", loaded.state); Set(loaded.emitter, "mapIndexOrState", (sbyte)0);
         Check.Equal(7f, w.Path.BrightmageTrials.LanceDamage, "counter survives native Scribe");
         Check.Equal(w.Caster.thingIDNumber, loaded.emitter.trialSource.casterId, "real emitter saved source survives");
         w.Hit(loaded.emitter, 13); Check.Equal(20f, w.Path.BrightmageTrials.LanceDamage, "saved source contributes after load");
+        var xml = System.Xml.Linq.XDocument.Load(file);
+        var row = xml.Descendants("emitter").Single();
+        row.Element("TM_lanceLightPotency")!.Remove();
+        foreach (var name in new[]{"origin","destination"}) row.Add(new System.Xml.Linq.XElement(row.Elements(name).Single()));
+        string oldFile = Path.Combine(f.WorkingDirectory, "bright-lance-old.xml");
+        xml.Save(oldFile);
+        var old = Load(oldFile).emitter;
+        Check.Equal(positionBeforeSave, old.ExactPosition, "original duplicated coordinates resume using the authored speed");
+        Check.Equal(.5f, (float)typeof(FlyingObject_LightLance).GetField("lightPotency", BindingFlags.NonPublic | BindingFlags.Instance)!.GetValue(old)!, "historical save did not record light potency");
     }
     static void Blindness(RuntimeFixture f)
     {
@@ -166,7 +199,14 @@ internal static class BrightmageTrialTests
             var hook = Activator.CreateInstance(type.Assembly.GetType("HarmonyLib.HarmonyMethod")!, typeof(BrightmageTrialTests).GetMethod(nameof(Skip), BindingFlags.Static | BindingFlags.NonPublic)!)!;
             foreach (var method in typeof(MaterialPool).GetMethods().Where(m => m.Name == nameof(MaterialPool.MatFrom)))
                 type.GetMethod("Patch")!.Invoke(harmony, [method, hook, null, null, null]);
-            RuntimeHelpers.RunClassConstructor(typeof(FlyingObject_LightLance).TypeHandle);
+            var packs = LoadedModManager.RunningModsListForReading.ToArray();
+            try
+            {
+                LoadedModManager.RunningModsListForReading.Clear();
+                RuntimeHelpers.RunClassConstructor(typeof(Projectile).TypeHandle);
+                RuntimeHelpers.RunClassConstructor(typeof(FlyingObject_LightLance).TypeHandle);
+            }
+            finally { LoadedModManager.RunningModsListForReading.AddRange(packs); }
         }
         finally { type.GetMethod("UnpatchAll")!.Invoke(harmony, [id]); }
     }
