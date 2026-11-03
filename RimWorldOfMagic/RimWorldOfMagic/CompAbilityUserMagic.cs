@@ -6671,11 +6671,19 @@ namespace TorannMagic
                 _maxMPUpkeep += TorannMagicDefOf.TM_Recall.upkeepEnergyCost * (1 - (TorannMagicDefOf.TM_Recall.upkeepEfficiencyPercent * (applyOriginalBody ? this.MagicData.MagicPowerSkill_Recall.FirstOrDefault((MagicPowerSkill x) => x.label == "TM_Recall_eff").level : ClassProgression.SpiritRebirthRuntime.SavedRank(this.MagicData, "TM_Recall_eff"))));
                 _mpRegenRateUpkeep += TorannMagicDefOf.TM_Recall.upkeepRegenCost * (1 - (TorannMagicDefOf.TM_Recall.upkeepEfficiencyPercent * (applyOriginalBody ? this.MagicData.MagicPowerSkill_Recall.FirstOrDefault((MagicPowerSkill x) => x.label == "TM_Recall_eff").level : ClassProgression.SpiritRebirthRuntime.SavedRank(this.MagicData, "TM_Recall_eff"))));
             }
+            if (!applyOriginalBody && ClassProgression.ChronomancerPrediction.CastingBody(Pawn) is Pawn predictionBody &&
+                ClassProgression.ChronomancerPrediction.Predictor(predictionBody) == Pawn)
+            {
+                var def = TorannMagicDefOf.TM_Prediction;
+                int rank = ClassProgression.SpiritRebirthRuntime.SavedRank(MagicData,"TM_Prediction_eff");
+                _mpRegenRateUpkeep += def.upkeepRegenCost * (1f - def.upkeepEfficiencyPercent * rank);
+            }
             using (IEnumerator<Hediff> enumerator = this.Pawn.health.hediffSet.hediffs.GetEnumerator())
             {
                 while (enumerator.MoveNext())
                 {
                     Hediff rec = enumerator.Current;
+                    if (rec.def == TorannMagicDefOf.TM_PredictionHD && rec.TryGetComp<HediffComp_Prediction>()?.projectedOwner != null) continue;
                     TMAbilityDef ability = applyOriginalBody ? this.MagicData.GetHediffAbility(rec) : ClassProgression.SpiritRebirthRuntime.SavedHediffAbility(this.MagicData, rec);
                     if (ability != null)
                     {

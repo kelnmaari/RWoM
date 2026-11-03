@@ -172,6 +172,7 @@ namespace TorannMagic.ClassProgression
                 comp.SyncStoneskinControl();
                 comp.SyncEarthSpriteControl();
                 comp.SyncSentinelControl();
+                if (comp.predictionIncidentDef != null && now > comp.predictionTick + 30) ChronomancerPrediction.Expire(comp,Find.Storyteller?.incidentQueue);
             }
             if (now % 100 == 0) BardTrials.TickHostedInspiration(pawn);
             if (now % 30 == 0) BardTrials.TickHostedHymn(pawn);

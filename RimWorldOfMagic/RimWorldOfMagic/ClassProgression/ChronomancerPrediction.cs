@@ -16,6 +16,19 @@ namespace TorannMagic.ClassProgression
         static readonly System.Reflection.FieldInfo queueField = AccessTools.Field(typeof(IncidentQueue), "queuedIncidents");
         static List<QueuedIncident> Entries(IncidentQueue queue) => queue == null ? null : queueField.GetValue(queue) as List<QueuedIncident>;
 
+        internal static Pawn CastingBody(Pawn owner)
+        {
+            if (SpiritRebirthState.TryGet(owner,out var state))
+                return !state.DepletionPending && state.HasValidHost(owner) && state.Host.Spawned ? state.Host : null;
+            return owner?.Spawned == true ? owner : null;
+        }
+
+        internal static Pawn Predictor(Pawn body)
+        {
+            var effect = body?.health?.hediffSet?.GetFirstHediffOfDef(TorannMagicDefOf.TM_PredictionHD);
+            return effect?.TryGetComp<HediffComp_Prediction>() is { removeNow: false } prediction ? prediction.Owner : null;
+        }
+
         public static void ExposeComp(CompAbilityUserMagic comp)
         {
             Scribe_Values.Look(ref comp.predictionToken, "rwomPredictionToken", null);

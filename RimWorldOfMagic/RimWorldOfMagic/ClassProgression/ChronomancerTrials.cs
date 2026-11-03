@@ -12,7 +12,7 @@ namespace TorannMagic.ClassProgression
         static MagicPower Owner(Pawn pawn, bool reverse) => Magic(pawn)?.MagicData.MagicPowersC.FirstOrDefault(p => p.learned && p.TMabilityDefs.Contains(reverse ? TorannMagicDefOf.TM_ReverseTime : TorannMagicDefOf.TM_Prediction));
         static DisciplineProgress Owned(Pawn pawn, bool reverse)
         {
-            if (pawn == null || pawn.Dead || !pawn.Spawned || pawn.Faction == null
+            if (pawn == null || pawn.Dead || (reverse ? !pawn.Spawned : ChronomancerPrediction.CastingBody(pawn) == null) || pawn.Faction == null
                 || pawn.story?.traits?.HasTrait(TorannMagicDefOf.Faceless) == true
                 || !ClassIdentity.TryGetState(pawn, out var state) || (state.Vocation & Vocation.Mage) == 0) return null;
             var path = state.Find("rwom.chronomancer");
@@ -24,7 +24,7 @@ namespace TorannMagic.ClassProgression
             && ability.AbilityUser == Magic(caster) && Magic(caster)?.AbilityData.Powers.Any(p => ReferenceEquals(p, ability)) == true;
         public sealed class PredictionActivation
         {
-            internal Pawn caster;
+            internal Pawn caster, body;
             internal PawnAbility ability;
             internal MagicPower owner;
             internal DisciplineProgress path;
@@ -34,9 +34,9 @@ namespace TorannMagic.ClassProgression
         {
             var caster = ability?.Pawn;
             var path = Owned(caster, false);
-            return path != null && caster == target && RuntimeOwned(ability, caster, false)
-                && caster.health?.hediffSet != null && !caster.health.hediffSet.HasHediff(TorannMagicDefOf.TM_PredictionHD)
-                ? new PredictionActivation { caster = caster, ability = ability, owner = Owner(caster, false), path = path } : null;
+            return path != null && ChronomancerPrediction.CastingBody(caster) == target && RuntimeOwned(ability, caster, false)
+                && target?.health?.hediffSet != null && !target.health.hediffSet.HasHediff(TorannMagicDefOf.TM_PredictionHD)
+                ? new PredictionActivation { caster = caster, body = target, ability = ability, owner = Owner(caster, false), path = path } : null;
         }
         public static bool CompletePrediction(PredictionActivation activation)
         {
@@ -44,7 +44,8 @@ namespace TorannMagic.ClassProgression
             activation.used = true;
             if (Owned(activation.caster, false) != activation.path || Owner(activation.caster, false) != activation.owner
                 || !RuntimeOwned(activation.ability, activation.caster, false)) return false;
-            var hd = activation.caster.health.hediffSet.GetFirstHediffOfDef(TorannMagicDefOf.TM_PredictionHD);
+            if (ChronomancerPrediction.CastingBody(activation.caster) != activation.body || ChronomancerPrediction.Predictor(activation.body) != activation.caster) return false;
+            var hd = activation.body.health.hediffSet.GetFirstHediffOfDef(TorannMagicDefOf.TM_PredictionHD);
             var comp = hd?.TryGetComp<HediffComp_Prediction>();
             if (hd == null || !Finite(hd.Severity) || hd.Severity <= 0 || comp == null || comp.removeNow) return false;
             comp.ownPredictionTrialSource = true;
@@ -55,14 +56,15 @@ namespace TorannMagic.ClassProgression
         {
             var caster = comp?.Pawn;
             var path = Owned(caster, false);
-            if (path == null || comp != Magic(caster) || entry?.FiringIncident?.parms == null
-                || entry.FiringIncident.parms.target != caster.Map || comp.predictionIncidentDef != entry.FiringIncident.def
+            var body = ChronomancerPrediction.CastingBody(caster);
+            if (path == null || body == null || comp != Magic(caster) || entry?.FiringIncident?.parms == null
+                || entry.FiringIncident.parms.target != body.Map || comp.predictionIncidentDef != entry.FiringIncident.def
                 || comp.predictionTick != entry.FireTick || comp.predictionHash != entry.FiringIncident.parms.GetHashCode()
                 || ChronomancerPrediction.ResolveOwned(comp, Find.Storyteller?.incidentQueue) != entry
                 || !comp.AbilityData.Powers.Any(a => RuntimeOwned(a, caster, false))) return false;
-            var hd = caster.health?.hediffSet?.GetFirstHediffOfDef(TorannMagicDefOf.TM_PredictionHD);
+            var hd = body.health?.hediffSet?.GetFirstHediffOfDef(TorannMagicDefOf.TM_PredictionHD);
             var source = hd?.TryGetComp<HediffComp_Prediction>();
-            return hd != null && hd.pawn == caster && Finite(hd.Severity) && hd.Severity > 0
+            return hd != null && hd.pawn == body && source?.Owner == caster && Finite(hd.Severity) && hd.Severity > 0
                 && source != null && source.ownPredictionTrialSource && !source.removeNow && path.RecordCompletedTrial(FoundationTrialId);
         }
         static bool Finite(float value) => !float.IsNaN(value) && !float.IsInfinity(value);

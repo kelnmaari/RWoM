@@ -91,6 +91,7 @@ namespace TorannMagic.ClassProgression
             ("TM_SpiritRend_III", () => TorannMagicDefOf.TM_Rend_III, typeof(Verb_Rend)),
             ("TM_SpiritEarthSprites", () => TorannMagicDefOf.TM_EarthSprites, typeof(Verb_EarthSprites)),
             ("TM_SpiritDismissEarthSprites", () => TorannMagicDefOf.TM_DismissEarthSprites, typeof(Verb_DismissEarthSprites)),
+            ("TM_SpiritPrediction", () => TorannMagicDefOf.TM_Prediction, typeof(Verb_Prediction)),
             ("TM_SpiritMeteor", () => TorannMagicDefOf.TM_Meteor, typeof(Verb_Meteor)),
             ("TM_SpiritMeteor_I", () => TorannMagicDefOf.TM_Meteor_I, typeof(Verb_Meteor)),
             ("TM_SpiritMeteor_II", () => TorannMagicDefOf.TM_Meteor_II, typeof(Verb_Meteor)),

@@ -2993,7 +2993,7 @@ namespace TorannMagic
                                         {
                                             if (mapPawns[j].health != null && mapPawns[j].health.hediffSet != null && mapPawns[j].health.hediffSet.HasHediff(TorannMagicDefOf.TM_PredictionHD, false) && mapPawns[j].IsColonist)
                                             {
-                                                CompAbilityUserMagic comp = mapPawns[j].GetCompAbilityUserMagic();
+                                                CompAbilityUserMagic comp = ClassProgression.ChronomancerPrediction.Predictor(mapPawns[j])?.GetCompAbilityUserMagic();
                                                 if (comp != null && comp.MagicData != null)
                                                 {
                                                     if (comp.predictionIncidentDef != null)
@@ -3025,7 +3025,8 @@ namespace TorannMagic
                                         if (returningPrediction) return true;
                                         for (int j = 0; j < predictingPawnsAvailable.Count; j++)
                                         {
-                                            CompAbilityUserMagic comp = predictingPawnsAvailable[j].GetCompAbilityUserMagic();
+                                            CompAbilityUserMagic comp = ClassProgression.ChronomancerPrediction.Predictor(predictingPawnsAvailable[j])?.GetCompAbilityUserMagic();
+                                            if (comp == null) continue;
                                             MagicPowerSkill ver = comp.MagicData.MagicPowerSkill_Prediction.FirstOrDefault((MagicPowerSkill x) => x.label == "TM_Prediction_ver");
                                             if (__instance.CanFireNow(parms) && !ModOptions.Constants.GetBypassPrediction() && Rand.Chance(.25f + (.05f * ver.level))) //up to 40% chance to predict, per chronomancer
                                             {
@@ -3046,7 +3047,7 @@ namespace TorannMagic
                                                     Find.LetterStack.ReceiveLetter(labelText, text, LetterDefOf.NeutralEvent);
                                                     int xpNum = Rand.Range(60, 120);
                                                     comp.MagicUserXP += xpNum;
-                                                    MoteMaker.ThrowText(comp.Pawn.DrawPos, comp.Pawn.Map, "XP +" + xpNum, -1f);
+                                                    MoteMaker.ThrowText(predictingPawnsAvailable[j].DrawPos, predictingPawnsAvailable[j].Map, "XP +" + xpNum, -1f);
                                                     __result = true;
                                                     return false;
                                                 }
@@ -5391,9 +5392,9 @@ namespace TorannMagic
                                 //Chronomancer foresees attack and evades
                                 if (hd.def == TorannMagicDefOf.TM_PredictionHD)
                                 {
-                                    if (Rand.Chance(hd.Severity / 10f))
+                                    if (hd.TryGetComp<HediffComp_Prediction>() is { Owner: not null, removeNow: false } prediction && Rand.Chance(hd.Severity / 10f))
                                     {
-                                        hd.TryGetComp<HediffComp_Prediction>().blurTick = Find.TickManager.TicksGame;
+                                        prediction.blurTick = Find.TickManager.TicksGame;
                                         absorbed = true;
                                         return false;
                                     }
