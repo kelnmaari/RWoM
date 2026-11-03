@@ -9,4 +9,9 @@
     <driverClass>TorannMagic.ClassProgression.JobDriver_SpiritHostedMartial</driverClass>
     <reportString>using a borrowed technique on TargetB.</reportString>
   </JobDef>
+  <JobDef>
+    <defName>TM_SpiritCastReversal</defName>
+    <driverClass>TorannMagic.ClassProgression.JobDriver_SpiritHostedMartial</driverClass>
+    <reportString>entering reversal stance.</reportString>
+  </JobDef>
 </Defs>

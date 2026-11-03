@@ -11,6 +11,12 @@ namespace RWoM.RegressionTests;
 
 internal static partial class SpiritMapCollapseTests
 {
+    private sealed class ReversalSave : IExposable
+    {
+        public HediffComp Effect=(HediffComp)Activator.CreateInstance(typeof(MightAbility).Assembly.GetType("TorannMagic.HediffComp_Reversal",true)!,true)!;
+        public void ExposeData() => Effect.CompExposeData();
+    }
+
     private sealed class TestMartialTend : HediffComp_TendDuration
     {
         public float RequestedQuality;
@@ -161,28 +167,38 @@ internal static partial class SpiritMapCollapseTests
                     host.AbilityData.AllPowers=null;
                     Check.Equal(true,Owner()==null,"a lower native rank takes priority");
                 }));
+        yield return new("FacelessProjection.ReversalOwner",f=>
+            SpiritRebirthRitualTransactionTests.Run(f,c=>{
+                using var held=new Fixture(f,c);
+                var source=c.Original.GetCompAbilityUserMight();
+                var def=TorannMagicDefOf.TM_Reversal;
+                var power=new MightAbility(source){Def=def};
+                source.AbilityData.Powers.Add(power);source.AbilityData.AllPowers=null;
+                var find=Production("SpiritHostedMartial").GetMethod("Find",BindingFlags.Static|BindingFlags.NonPublic)!;
+                Check.Same(power,find.Invoke(null,[c.Creator,c.Original,"TM_SpiritCastReversal"])!,"original exact Reversal owner");
+                var marker=(HediffComp)Activator.CreateInstance(typeof(MightAbility).Assembly.GetType("TorannMagic.HediffComp_Reversal",true)!,true)!;
+                marker.parent=new HediffWithComps{pawn=c.Creator};
+                var tracker=(HediffComp_SpiritCastOrigin)marker;
+                typeof(HediffComp_SpiritCastOrigin).GetMethod("Bind",BindingFlags.NonPublic|BindingFlags.Instance)!.Invoke(tracker,[c.Original]);
+                var resolver=marker.GetType().GetProperty("SkillOwner",BindingFlags.NonPublic|BindingFlags.Instance)!;
+                Check.Same(c.Original,resolver.GetValue(marker)!,"hosted reversal siphons the soul");
+                var host=c.Creator.GetCompAbilityUserMight();host.AbilityData.Powers.Add(new MightAbility(host){Def=def});
+                host.AbilityData.AllPowers=null;
+                Check.Equal(true,find.Invoke(null,[c.Creator,c.Original,"TM_SpiritCastReversal"])==null,"local Reversal takes priority");
+            }));
         yield return new("FacelessProjection.ReversalDecayAfterReload", f =>
             SpiritRebirthRitualTransactionTests.Run(f,c => {
                 using var held=new Fixture(f,c);
                 var hediff=new HediffWithComps {pawn=c.Creator};
-                HediffComp Make()
-                {
-                    var tracker=(HediffComp)Activator.CreateInstance(typeof(MightAbility).Assembly.GetType("TorannMagic.HediffComp_Reversal",true)!,true)!;
-                    tracker.parent=hediff;
-                    return tracker;
-                }
-                var effect=Make();
+                var saved=new ReversalSave();
+                saved.Effect.parent=hediff;
                 float delta=0;
-                for(int i=0;i<58;i++)effect.CompPostTick(ref delta);
+                for(int i=0;i<58;i++)saved.Effect.CompPostTick(ref delta);
                 Check.Equal(0f,delta,"no decay before sixty ticks");
-                var file=Path.Combine(f.WorkingDirectory,"faceless-reversal-phase.xml");
-                try { Scribe.saver.InitSaving(file,"test");effect.CompExposeData();Scribe.saver.FinalizeSaving(); }
-                finally { Scribe.ForceStop(); }
-                var loaded=Make();
-                try { Scribe.loader.InitLoading(file);loaded.CompExposeData();Scribe.loader.FinalizeLoading(); }
-                finally { Scribe.ForceStop(); }
+                var loaded=RoundTripSummon(f,"faceless-reversal-phase",saved);
+                loaded.Effect.parent=hediff;
                 float after=0;
-                for(int i=0;i<3;i++){effect.CompPostTick(ref delta);loaded.CompPostTick(ref after);}
+                for(int i=0;i<3;i++){saved.Effect.CompPostTick(ref delta);loaded.Effect.CompPostTick(ref after);}
                 Check.Equal(-1f,delta,"ordinary decay after sixty ticks");
                 Check.Equal(delta,after,"loaded shield decays on the same tick");
             }));

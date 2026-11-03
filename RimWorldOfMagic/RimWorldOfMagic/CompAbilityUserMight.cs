@@ -2603,13 +2603,12 @@ namespace TorannMagic
             TM_Action.DoReversal(dinfo, this.Pawn);       
         }
 
-        public void SiphonReversal(int verVal)
+        public void SiphonReversal(int verVal) => SiphonReversal(verVal,Pawn);
+
+        internal void SiphonReversal(int verVal, Pawn pawn)
         {
-            Pawn pawn = this.Pawn;
-            CompAbilityUserMight comp = pawn.GetCompAbilityUserMight();
-            comp.Stamina.CurLevel += (.015f * verVal);         
-            int num = 1 + verVal;
-            
+            if (Stamina != null) Stamina.CurLevel += .015f * verVal;
+
             int numberOfInjuriesPerPart = !pawn.IsColonist && ModOptions.Settings.Instance.AIHardMode ? 5 : 1 + verVal;
 
             IEnumerable<Hediff_Injury> injuries = pawn.health.hediffSet.hediffs

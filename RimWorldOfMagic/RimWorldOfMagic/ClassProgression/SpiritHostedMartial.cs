@@ -57,6 +57,7 @@ namespace TorannMagic.ClassProgression
             else if (job == BladeFormAbility.JobName && BladeAscension.HasForm(soul)) def = DefDatabase<TMAbilityDef>.GetNamedSilentFail("TM_BladeSevenSteps");
             else if (FacelessImitation.Handles(job) && FacelessMartialPath.ActivePath(body,out var artist)!=null && artist==soul)
                 def=job==FacelessImitation.StudyOrder ? TorannMagicDefOf.TM_Mimic : DefDatabase<TMAbilityDef>.GetNamedSilentFail(FacelessMartialPath.Echo);
+            else if (job == Verb_Reversal.Order) def=TorannMagicDefOf.TM_Reversal;
             else if (job == RangerHuntAbility.JobName) def = DefDatabase<TMAbilityDef>.GetNamedSilentFail("TM_RangerBreakthrough");
             else if (job == SniperOpeningAbility.JobName) def = DefDatabase<TMAbilityDef>.GetNamedSilentFail("TM_SniperSingleOpening");
             else if (job == Aimed || job == Fracture) def = DefDatabase<TMAbilityDef>.GetNamedSilentFail(job == Aimed ? "TM_SniperAimedShot" : "TM_SniperArmorFracture");
@@ -94,6 +95,8 @@ namespace TorannMagic.ClassProgression
             if (!def.consumeEnergy || def.staminaCost <= 0 || def.chiCost != 0 || def.bloodCost != 0 || def.manaCost != 0 ||
                 def.requiredNeed != null || def.requiredHediff != null || might.ExistingMightData == null ||
                 might.Stamina == null || might.Stamina.CurLevel < might.ActualStaminaCost(def)) return false;
+            if (job==Verb_Reversal.Order) return !body.WorkTagIsDisabled(WorkTags.Violent) &&
+                TorannMagicDefOf.TM_ReversalHD!=null && !body.health.hediffSet.HasHediff(TorannMagicDefOf.TM_ReversalHD);
             if (FacelessImitation.Handles(job)) return true;
             if (IsSniperShot(job)) return !body.WorkTagIsDisabled(WorkTags.Violent) &&
                 (Verb_SniperBallisticShot.FromHost(body, ability)?.HasCompatibleWeapon ?? (Verb_SniperShot.WeaponVerb(body) != null));
@@ -154,6 +157,10 @@ namespace TorannMagic.ClassProgression
             if (job == ShadowSlayer)
             {
                 if (!Verb_ShadowSlayerCloak.Activate(body,soul)) return false;
+            }
+            else if (job == Verb_Reversal.Order)
+            {
+                if (!Verb_Reversal.Apply(body,soul)) return false;
             }
             else if (job == SelfAid)
             {
@@ -255,7 +262,7 @@ namespace TorannMagic.ClassProgression
                         GladiatorMastery.AutomaticSource(body,body.GetCompAbilityUserMight()) == cleave)
                         cleave.useCleaveToggle = !cleave.useCleaveToggle;
                 });
-            foreach (var name in new[] { Maneuver, SelfAid, Pommel, Sweep, Grapple, GladiatorWhirlwind.JobName, BladeMartialCast.Spin, BladeMartialCast.Slash, BladeMartialCast.Passage, BladeMartialCast.Phase, BladeFormAbility.JobName, Verb_AnimalFriend.Order, Verb_PoisonTrap.Order, Verb_RangerSafeTrail.Order, Verb_RangerShot.Order, RangerHuntAbility.JobName, FacelessImitation.StudyOrder, FacelessImitation.EchoOrder, Headshot, DisablingShot, AntiArmor, Aimed, Fracture, ShadowSlayer, SniperOpeningAbility.JobName, SpiritHostedStance.Job, SpiritHostedStance.StrongBack, SpiritHostedStance.HeavyBlow,
+            foreach (var name in new[] { Maneuver, SelfAid, Pommel, Sweep, Grapple, GladiatorWhirlwind.JobName, BladeMartialCast.Spin, BladeMartialCast.Slash, BladeMartialCast.Passage, BladeMartialCast.Phase, BladeFormAbility.JobName, Verb_AnimalFriend.Order, Verb_PoisonTrap.Order, Verb_RangerSafeTrail.Order, Verb_RangerShot.Order, RangerHuntAbility.JobName, FacelessImitation.StudyOrder, FacelessImitation.EchoOrder, Verb_Reversal.Order, Headshot, DisablingShot, AntiArmor, Aimed, Fracture, ShadowSlayer, SniperOpeningAbility.JobName, SpiritHostedStance.Job, SpiritHostedStance.StrongBack, SpiritHostedStance.HeavyBlow,
                 SpiritHostedStance.ThickSkin, SpiritHostedStance.FightersFocus, SpiritHostedStance.GearRepair, SpiritHostedStance.InnerHealing })
             {
                 var owner = Find(body, soul, name);

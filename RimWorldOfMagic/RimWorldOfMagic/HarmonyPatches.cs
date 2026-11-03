@@ -4878,9 +4878,10 @@ namespace TorannMagic
                     }
                     //pseudo magical ability to deflect attacks without taking damage but may not work well if damage is otherwise magically mitigated
                     //placed here to act before other physical damage mitigation
-                    if (__instance.health.hediffSet.HasHediff(TorannMagicDefOf.TM_ReversalHD) && instigator is Pawn pinstigator)
+                    if (instigator is Pawn pinstigator &&
+                        __instance.health.hediffSet.GetFirstHediffOfDef(TorannMagicDefOf.TM_ReversalHD)?.TryGetComp<HediffComp_Reversal>()?.SkillOwner is Pawn reversalOwner)
                     {
-                        CompAbilityUserMight comp = __instance.GetCompAbilityUserMight();
+                        CompAbilityUserMight comp = reversalOwner.GetCompAbilityUserMight();
                         if (pinstigator.equipment?.PrimaryEq?.PrimaryVerb != null)
                         {
                             absorbed = true;
@@ -4893,10 +4894,10 @@ namespace TorannMagic
                                 TM_Action.DoReversal(dinfo, __instance);
                             }
 
-                            MightPowerSkill ver = comp.MightData.MightPowerSkill_Reversal.FirstOrDefault((MightPowerSkill x) => x.label == "TM_Reversal_ver");
-                            if (ver.level > 0)
+                            MightPowerSkill ver = comp?.MightData.MightPowerSkill_Reversal.FirstOrDefault((MightPowerSkill x) => x.label == "TM_Reversal_ver");
+                            if (ver?.level > 0)
                             {
-                                comp.SiphonReversal(ver.level);
+                                comp.SiphonReversal(ver.level,__instance);
                             }
                             return false;
 
@@ -4911,12 +4912,12 @@ namespace TorannMagic
                                 drawPos.z += ((instigator.DrawPos.z - drawPos.z) / 20f) + Rand.Range(-.2f, .2f);
                                 TM_MoteMaker.ThrowSparkFlashMote(drawPos, __instance.Map, 2f);
                             }
-                            comp.DoMeleeReversal(dinfo);
+                            TM_Action.DoMeleeReversal(dinfo,__instance);
                             dinfo.SetAmount(0);
-                            MightPowerSkill ver = comp.MightData.MightPowerSkill_Reversal.FirstOrDefault((MightPowerSkill x) => x.label == "TM_Reversal_ver");
-                            if (ver.level > 0)
+                            MightPowerSkill ver = comp?.MightData.MightPowerSkill_Reversal.FirstOrDefault((MightPowerSkill x) => x.label == "TM_Reversal_ver");
+                            if (ver?.level > 0)
                             {
-                                comp.SiphonReversal(ver.level);
+                                comp.SiphonReversal(ver.level,__instance);
                             }
                             return false;
                         }
@@ -4936,10 +4937,10 @@ namespace TorannMagic
                                 }
                                 comp.DoReversal(dinfo);
                                 dinfo.SetAmount(0);
-                                MightPowerSkill ver = comp.MightData.MightPowerSkill_Reversal.FirstOrDefault((MightPowerSkill x) => x.label == "TM_Reversal_ver");
-                                if (ver.level > 0)
+                                MightPowerSkill ver = comp?.MightData.MightPowerSkill_Reversal.FirstOrDefault((MightPowerSkill x) => x.label == "TM_Reversal_ver");
+                                if (ver?.level > 0)
                                 {
-                                    comp.SiphonReversal(ver.level);
+                                    comp.SiphonReversal(ver.level,__instance);
                                 }
                                 return false;
                             }
