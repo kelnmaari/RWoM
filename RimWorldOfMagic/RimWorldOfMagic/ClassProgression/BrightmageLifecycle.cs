@@ -5,6 +5,14 @@ namespace TorannMagic.ClassProgression
 {
     public static class BrightmageLifecycle
     {
+        internal static FlyingObject_SpiritOfLight GuardFor(Pawn body)
+        {
+            var local = body.GetCompAbilityUserMagic()?.SoL;
+            if (local?.Spawned == true && local.Map == body.Map) return local;
+            if (!SpiritRebirthState.TryGetPossessingSpirit(body,out var soul)) return null;
+            var spirit = soul.GetCompAbilityUserMagic()?.SoL;
+            return spirit?.Spawned == true && spirit.Map == body.Map && spirit.OwnerPawn == soul ? spirit : null;
+        }
         internal static void TickHostedLight(Pawn soul, int now)
         {
             if (!SpiritRebirthState.TryGet(soul, out var state) || !state.HasValidHost(soul)
@@ -16,6 +24,8 @@ namespace TorannMagic.ClassProgression
                 (!ClassIdentity.TryGetState(soul, out _) || ClassIdentity.Profile("rwom.brightmage")?.domain == DisciplineDomain.Magic))
                 resource = soul.health.AddHediff(def);
             resource?.TryGetComp<HediffComp_LightCapacitance>()?.TickCharge(now);
+            var comp = soul.GetCompAbilityUserMagic();
+            if (comp?.SoL != null || comp?.spell_EqualizeLight == true) SynchronizeControl(comp);
         }
 
         // True means new-model maintenance handled this pawn; classic paths remain native.
@@ -34,6 +44,12 @@ namespace TorannMagic.ClassProgression
                 HealthUtility.AdjustSeverity(comp.Pawn, TorannMagicDefOf.TM_LightCapacitanceHD, 1f);
             }
 
+            SynchronizeControl(comp);
+            return true;
+        }
+
+        internal static void SynchronizeControl(CompAbilityUserMagic comp)
+        {
             // A saved entity owns this control even after class changes or missing profiles.
             // A despawned entity may be in transit; only destroyed entities are discarded.
             if (comp.SoL != null && comp.SoL.Destroyed) comp.SoL = null;
@@ -47,7 +63,6 @@ namespace TorannMagic.ClassProgression
                 comp.RemovePawnAbility(TorannMagicDefOf.TM_SoL_Equalize);
                 comp.spell_EqualizeLight = false;
             }
-            return true;
         }
     }
 }

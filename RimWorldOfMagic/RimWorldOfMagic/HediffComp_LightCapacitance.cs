@@ -69,10 +69,12 @@ namespace TorannMagic
         {
             get
             {
-                if (base.Pawn.Spawned && base.Pawn.Map != null)
+                var body = Pawn;
+                if (ClassProgression.SpiritRebirthState.TryGet(Pawn,out var state) && state.HasValidHost(Pawn)) body = state.Host;
+                if (body?.Spawned == true)
                 {
                     CompAbilityUserMagic comp = base.Pawn.GetCompAbilityUserMagic();
-                    if (comp != null && comp.SoL != null)
+                    if (comp?.SoL?.Spawned == true && comp.SoL.Map == body.Map)
                     {
                         return comp.SoL;
                     }

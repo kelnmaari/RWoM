@@ -10,4 +10,7 @@
   <TM_SpiritLightSkip.reportString>正通过灵魂宿主借光跃迁。</TM_SpiritLightSkip.reportString>
   <TM_SpiritLightSkipMass.reportString>正通过灵魂宿主使队伍借光跃迁。</TM_SpiritLightSkipMass.reportString>
   <TM_SpiritLightSkipGlobal.reportString>正在世界地图上选择光跃迁目的地。</TM_SpiritLightSkipGlobal.reportString>
+  <TM_SpiritSoL_CreateLight.reportString>正在指引光之灵照亮目标区域。</TM_SpiritSoL_CreateLight.reportString>
+  <TM_SpiritSoL_Equalize.reportString>正在与光之灵分享光能。</TM_SpiritSoL_Equalize.reportString>
+  <TM_SpiritSpiritOfLight.reportString>正通过宿主召唤光之灵。</TM_SpiritSpiritOfLight.reportString>
 </LanguageData>

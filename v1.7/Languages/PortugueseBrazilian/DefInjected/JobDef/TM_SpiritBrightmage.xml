@@ -10,4 +10,7 @@
   <TM_SpiritLightSkip.reportString>viaja pela luz através do hospedeiro do espírito.</TM_SpiritLightSkip.reportString>
   <TM_SpiritLightSkipMass.reportString>transporta o grupo pela luz através do hospedeiro do espírito.</TM_SpiritLightSkipMass.reportString>
   <TM_SpiritLightSkipGlobal.reportString>escolhe um destino no mapa para viajar pela luz.</TM_SpiritLightSkipGlobal.reportString>
+  <TM_SpiritSoL_CreateLight.reportString>direcionando um espírito de luz.</TM_SpiritSoL_CreateLight.reportString>
+  <TM_SpiritSoL_Equalize.reportString>compartilha luz com um espírito de luz.</TM_SpiritSoL_Equalize.reportString>
+  <TM_SpiritSpiritOfLight.reportString>invoca um espírito de luz através do hospedeiro.</TM_SpiritSpiritOfLight.reportString>
 </LanguageData>

@@ -216,6 +216,11 @@ internal static class BrightmageLifecycleTests
         BrightmageLifecycle.Restore(p.magic);
         Check.Equal(31f, spirit.LightEnergy, "maintenance does not repay or refill spirit");
         Check.Equal(40f, energy.LightEnergy, "maintenance does not equalize again");
+        spirit.verVal = 3;
+        energy.LightEnergy = 100f; spirit.LightEnergy = 112f;
+        typeof(Verb_SoL_Equalize).GetMethod("TryCastShot", Fields)!.Invoke(verb,null);
+        Check.Equal(100f,energy.LightEnergy,"personal reservoir remains capped");
+        Check.Equal(112f,spirit.LightEnergy,"surplus stays in the larger reservoir");
     }
     public sealed class SpiritEnvelope : IExposable
     {

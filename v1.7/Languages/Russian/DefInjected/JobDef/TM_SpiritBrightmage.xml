@@ -10,4 +10,7 @@
   <TM_SpiritLightSkip.reportString>перемещается со светом через носителя духа.</TM_SpiritLightSkip.reportString>
   <TM_SpiritLightSkipMass.reportString>переносит группу светом через носителя духа.</TM_SpiritLightSkipMass.reportString>
   <TM_SpiritLightSkipGlobal.reportString>выбирает место светового перехода на карте мира.</TM_SpiritLightSkipGlobal.reportString>
+  <TM_SpiritSoL_CreateLight.reportString>указывает духу света место для освещения.</TM_SpiritSoL_CreateLight.reportString>
+  <TM_SpiritSoL_Equalize.reportString>делится светом с духом света.</TM_SpiritSoL_Equalize.reportString>
+  <TM_SpiritSpiritOfLight.reportString>призывает духа света через носителя.</TM_SpiritSpiritOfLight.reportString>
 </LanguageData>

@@ -38,4 +38,7 @@
   <JobDef><defName>TM_SpiritLightSkip</defName><driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass><reportString>traveling by light through a spirit host.</reportString></JobDef>
   <JobDef><defName>TM_SpiritLightSkipMass</defName><driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass><reportString>traveling by light through a spirit host.</reportString></JobDef>
   <JobDef><defName>TM_SpiritLightSkipGlobal</defName><driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass><reportString>choosing a world destination for light travel.</reportString></JobDef>
+  <JobDef><defName>TM_SpiritSoL_CreateLight</defName><driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass><reportString>directing a spirit of light.</reportString></JobDef>
+  <JobDef><defName>TM_SpiritSoL_Equalize</defName><driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass><reportString>sharing light with a spirit of light.</reportString></JobDef>
+  <JobDef><defName>TM_SpiritSpiritOfLight</defName><driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass><reportString>summoning a spirit of light through a host.</reportString></JobDef>
 </Defs>

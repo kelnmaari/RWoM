@@ -5275,10 +5275,9 @@ namespace TorannMagic
                         }
 
                         //Unique placement for SoL deflection
-                        CompAbilityUserMagic compMagic = __instance.GetCompAbilityUserMagic();
-                        if (compMagic != null && compMagic.SoL != null && compMagic.SoL.solAction == SoLAction.Hovering)
+                        FlyingObject_SpiritOfLight sol = ClassProgression.BrightmageLifecycle.GuardFor(__instance);
+                        if (sol?.solAction == SoLAction.Hovering)
                         {
-                            FlyingObject_SpiritOfLight sol = compMagic.SoL;
                             if (sol.LightEnergy > (dinfo.Amount / 10f) && Rand.Chance(sol.LightEnergy / 100f))
                             {
                                 if (instigator != null)

@@ -80,6 +80,9 @@ namespace TorannMagic.ClassProgression
             ("TM_SpiritLightSkip", () => TorannMagicDefOf.TM_LightSkip, typeof(Projectile_LightSkip)),
             ("TM_SpiritLightSkipMass", () => TorannMagicDefOf.TM_LightSkipMass, typeof(Projectile_LightSkipMass)),
             ("TM_SpiritRefraction", () => TorannMagicDefOf.TM_Refraction, typeof(Projectile_Refraction)),
+            ("TM_SpiritSoL_CreateLight", () => TorannMagicDefOf.TM_SoL_CreateLight, typeof(Verb_SoL_CreateLight)),
+            ("TM_SpiritSoL_Equalize", () => TorannMagicDefOf.TM_SoL_Equalize, typeof(Verb_SoL_Equalize)),
+            ("TM_SpiritSpiritOfLight", () => TorannMagicDefOf.TM_SpiritOfLight, typeof(Effect_SpiritOfLight)),
             ("TM_SpiritSunfire_I", () => TorannMagicDefOf.TM_Sunfire_I, typeof(Projectile_Sunfire)),
             ("TM_SpiritSunfire_II", () => TorannMagicDefOf.TM_Sunfire_II, typeof(Projectile_Sunfire)),
             ("TM_SpiritSunfire_III", () => TorannMagicDefOf.TM_Sunfire_III, typeof(Projectile_Sunfire)),
@@ -174,6 +177,9 @@ namespace TorannMagic.ClassProgression
                 (def.MainVerb.burstShotCount != 1 && !IsBurst(def)) || def.bloodCost != 0 || def.chiCost != 0 || def.requiredNeed != null ||
                 def.requiredHediff != null || !def.consumeEnergy || power.MagicUser.Mana == null) return false;
             float cost = power.MagicUser.ActualManaCost(def);
+            if (def == TorannMagicDefOf.TM_SoL_CreateLight && (power.MagicUser.SoL?.Spawned != true ||
+                power.MagicUser.SoL.Map != body.Map || power.MagicUser.SoL.OwnerPawn != power.Pawn)) return false;
+            if (def == TorannMagicDefOf.TM_SoL_Equalize && !Verb_SoL_Equalize.Available(power.MagicUser, body)) return false;
             if (def.MainVerb.verbClass == typeof(Verb_ApplyAura) && !SpiritHostedAura.CanToggle(body, power.Pawn, def)) return false;
             return cost >= 0 && (paidBurst ? IsBurst(def) : power.MagicUser.Mana.CurLevel >= cost);
         }
