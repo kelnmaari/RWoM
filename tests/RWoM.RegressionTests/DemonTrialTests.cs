@@ -12,6 +12,8 @@ internal static class DemonTrialTests
     public static IEnumerable<TestCase> Cases()
     {
         yield return new("DemonTrials.ReciprocalNewBondAndOneShot", Bond);
+        yield return new("DemonTrials.RejectOccupiedBranchBeforeChangingCurrentBond", Occupied);
+        yield return new("DemonTrials.RefreshKeepsEffectInstancesAndRejectsForeignBond", Refresh);
         yield return new("DemonTrials.OwnershipStageAndTargetGuards", Guards);
         yield return new("DemonTrials.AttractionActualSeverityAndSavedSource", Attraction);
         yield return new("DemonTrials.RepulsionActualFlyingLaunch", Repulsion);
@@ -64,6 +66,72 @@ internal static class DemonTrialTests
     }
     public sealed class TestProjectile : Projectile_AbilityBase { public void Seed(Pawn p) => launcher = p; }
     public sealed class SourceEnvelope : IExposable { public Projectile_AbilityBase shot = null!; public void ExposeData() => DemonTrials.ExposeProjectile(shot); }
+    static void Refresh(RuntimeFixture f)
+    {
+        foreach (bool warlock in new[] { true, false })
+        {
+            using var w = new Fixture(f,warlock);
+            w.Pair();
+            var recipient = w.Target.health.hediffSet.hediffs.Last();
+            var host = ((HediffWithComps)recipient).comps.Single();
+            var old = w.Caster.health.hediffSet.hediffs.Last();
+            var source = new HediffWithComps { def = old.def, pawn = w.Caster };
+            source.def.maxSeverity = recipient.def.maxSeverity = 4f;
+            w.Caster.health.hediffSet.hediffs.Remove(old);
+            w.Caster.health.hediffSet.hediffs.Add(source);
+            var emitter = (HediffComp)Activator.CreateInstance(typeof(MagicAbility).Assembly.GetType("TorannMagic.HediffComp_SoulBond")!)!;
+            source.comps = new List<HediffComp>{emitter}; emitter.parent = source;
+            Set(emitter,"initializing",false);
+            Set(Find.TickManager,"ticksGameInt",600);
+            var skills = w.Magic.MagicData.MagicPowerSkill_SoulBond;
+            skills.Single(s=>s.label=="TM_SoulBond_pwr").level=2;
+            skills.Single(s=>s.label=="TM_SoulBond_ver").level=3;
+            float adjustment=0;
+            emitter.CompPostTick(ref adjustment);
+            Check.Same(recipient,w.Target.health.hediffSet.hediffs.Last(),"partner instance survives rank refresh");
+            Check.Same(source,w.Caster.health.hediffSet.hediffs.Last(),"source instance survives rank refresh");
+            Check.Equal(3.5f,recipient.Severity,"recipient uses versatility");
+            Check.Equal(2.5f,source.Severity,"source uses power");
+            var other=PawnWithComps(false,false).pawn;
+            // The other caster has a source marker of the same kind, but its partner is not this pawn.
+            other.GetCompAbilityUserMagic().soulBondPawn = w.Caster;
+            other.health.hediffSet.hediffs.Add(new Hediff { pawn=other, def=source.def });
+            Set(host,"initialized",true);
+            Set(host,"bonderPawn",other);
+            host.CompPostTick(ref adjustment);
+            Check.Equal(true,host.CompShouldRemove,"recipient cannot survive on another partner's source marker");
+            emitter.CompPostTick(ref adjustment);
+            Check.Equal(true,emitter.CompShouldRemove,"stale source releases its own effect");
+            Check.Same(other,host.GetType().GetField("bonderPawn")!.GetValue(host)!,"refresh cannot steal another caster's link");
+        }
+    }
+
+    static void Occupied(RuntimeFixture f)
+    {
+        foreach (bool warlock in new[] { true, false })
+        {
+            using var w = new Fixture(f, warlock);
+            w.Pair();
+            var originalCaster = w.Caster.health.hediffSet.hediffs.Last();
+            var originalHost = w.Target.health.hediffSet.hediffs.Last();
+            var other = PawnWithComps(false, false).pawn;
+            var occupied = new Hediff { pawn = other, def = originalHost.def };
+            other.health.hediffSet.hediffs.Add(occupied);
+            var allows = typeof(CompAbilityUserMagic).Assembly.GetType("TorannMagic.Verb_SoulBond")!.GetMethod("CanReplace", BindingFlags.Static | BindingFlags.NonPublic);
+            Check.Equal(true, allows != null, "native bond checks the new recipient before old effects are removed");
+            bool Allowed(Pawn target) => (bool)allows!.Invoke(null, [w.Magic, target, !warlock, warlock])!;
+            Check.Equal(false, Allowed(other), "reject an occupied recipient of this branch");
+            Check.Equal(true, Allowed(w.Target), "casting on the same partner is a release");
+            Check.Same(w.Target, w.Magic.soulBondPawn, "prior partner is retained");
+            Check.Same(originalCaster, w.Caster.health.hediffSet.hediffs.Last(), "prior caster effect retained");
+            Check.Same(originalHost, w.Target.health.hediffSet.hediffs.Last(), "prior partner effect retained");
+            Check.Same(occupied, other.health.hediffSet.hediffs.Last(), "foreign effect retained");
+            other.health.hediffSet.hediffs.Remove(occupied);
+            Check.Equal(true, Allowed(other), "a free recipient can replace the old partner");
+            other.health.hediffSet.hediffs.Add(new Hediff { pawn = other, def = new HediffDef { defName = warlock ? "TM_SoulBondPhysicalHD" : "TM_SoulBondMentalHD" } });
+            Check.Equal(true, Allowed(other), "the other branch does not conflict");
+        }
+    }
     static void Bond(RuntimeFixture f)
     {
         foreach (bool warlock in new[] { true, false }) {

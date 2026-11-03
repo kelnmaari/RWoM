@@ -1,4 +1,4 @@
-﻿using RimWorld;
+using RimWorld;
 using System;
 using Verse;
 using AbilityUser;
@@ -73,50 +73,32 @@ namespace TorannMagic
                     {
                         flagSD = ClassProgression.ClassIdentity.DemonEffect(caster, false, caster.gender == Gender.Female);
                         flagWD = ClassProgression.ClassIdentity.DemonEffect(caster, true, caster.gender == Gender.Male);                        
-                        if (comp.soulBondPawn != null)
+                        if (!CanReplace(comp, pawn, flagSD, flagWD))
                         {
-                            oldBondPawn = comp.soulBondPawn;
-                            RemoveHediffs();
-                            if (oldBondPawn == pawn)
-                            {
-                                comp.soulBondPawn = null;
-                                comp.spell_ShadowCall = false;
-                                comp.spell_ShadowStep = false;
-                                comp.RemovePawnAbility(TorannMagicDefOf.TM_ShadowCall);
-                                comp.RemovePawnAbility(TorannMagicDefOf.TM_ShadowStep);
-                            }
-                            else
-                            {
-                                if (pawn.health.hediffSet.HasHediff(HediffDef.Named("TM_SoulBondPhysicalHD")) && flagSD)
-                                {
-                                    Messages.Message("TM_CannotSoulBondAnother".Translate(
-                                        caster.LabelShort,
-                                        pawn.LabelShort
-                                    ), MessageTypeDefOf.RejectInput);
-                                }
-                                else if(pawn.health.hediffSet.HasHediff(HediffDef.Named("TM_SoulBondMentalHD")) && flagWD)
-                                {
-                                    Messages.Message("TM_CannotSoulBondAnother".Translate(
-                                        caster.LabelShort,
-                                        pawn.LabelShort
-                                    ), MessageTypeDefOf.RejectInput);
-                                }
-                                else
-                                {
-                                    ApplyHediffs();
-                                    comp.soulBondPawn = pawn;
-                                }
-                                
-                            }
+                            Messages.Message("TM_CannotSoulBondAnother".Translate(caster.LabelShort,pawn.LabelShort), MessageTypeDefOf.RejectInput);
+                            return false;
+                        }
+                        oldBondPawn = comp.soulBondPawn;
+                        if (oldBondPawn != null) RemoveHediffs();
+                        if (oldBondPawn == pawn)
+                        {
+                            comp.soulBondPawn = null;
+                            comp.spell_ShadowCall = false;
+                            comp.spell_ShadowStep = false;
+                            comp.RemovePawnAbility(TorannMagicDefOf.TM_ShadowCall);
+                            comp.RemovePawnAbility(TorannMagicDefOf.TM_ShadowStep);
                         }
                         else
                         {
                             ApplyHediffs();
-                            comp.spell_ShadowCall = true;
-                            comp.spell_ShadowStep = true;
-                            comp.AddPawnAbility(TorannMagicDefOf.TM_ShadowCall);
-                            comp.AddPawnAbility(TorannMagicDefOf.TM_ShadowStep);                            
                             comp.soulBondPawn = pawn;
+                            if (oldBondPawn == null)
+                            {
+                                comp.spell_ShadowCall = true;
+                                comp.spell_ShadowStep = true;
+                                comp.AddPawnAbility(TorannMagicDefOf.TM_ShadowCall);
+                                comp.AddPawnAbility(TorannMagicDefOf.TM_ShadowStep);
+                            }
                         }
                     }
                 }
@@ -136,6 +118,14 @@ namespace TorannMagic
             }
             ClassProgression.DemonTrials.AfterBond(bondObservation);
             return true;
+        }
+
+        internal static bool CanReplace(CompAbilityUserMagic magic, Pawn target, bool physical, bool mental)
+        {
+            if (magic == null || target?.health?.hediffSet == null || (!physical && !mental)) return false;
+            if (magic.soulBondPawn == target) return true;
+            return !target.health.hediffSet.hediffs.Any(h =>
+                (physical && h.def.defName == "TM_SoulBondPhysicalHD") || (mental && h.def.defName == "TM_SoulBondMentalHD"));
         }
 
         private void ApplyHediffs()
@@ -163,8 +153,8 @@ namespace TorannMagic
             Hediff hediff = new Hediff();
             if (flagSD)
             {
-                hediff = oldBondPawn.health.hediffSet.GetFirstHediffOfDef(HediffDef.Named("TM_SoulBondPhysicalHD"));
-                if (hediff != null)
+                hediff = oldBondPawn.health?.hediffSet?.GetFirstHediffOfDef(HediffDef.Named("TM_SoulBondPhysicalHD"));
+                if (hediff?.TryGetComp<HediffComp_SoulBondHost>()?.BonderPawn == caster)
                 {
                     oldBondPawn.health.RemoveHediff(hediff);
                     hediff = null;
@@ -178,8 +168,8 @@ namespace TorannMagic
             }
             if (flagWD)
             {
-                hediff = oldBondPawn.health.hediffSet.GetFirstHediffOfDef(HediffDef.Named("TM_SoulBondMentalHD"));
-                if (hediff != null)
+                hediff = oldBondPawn.health?.hediffSet?.GetFirstHediffOfDef(HediffDef.Named("TM_SoulBondMentalHD"));
+                if (hediff?.TryGetComp<HediffComp_SoulBondHost>()?.BonderPawn == caster)
                 {
                     oldBondPawn.health.RemoveHediff(hediff);
                     hediff = null;
