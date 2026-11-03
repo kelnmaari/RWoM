@@ -26,16 +26,17 @@ namespace TorannMagic.ClassProgression
         // Called only after an actual successful application, never for resisted casts.
         public static void Applied(Pawn caster, Pawn victim, PawnAbility ability, float appliedSeverity)
         {
-            if (Eligible(caster) == null || !Enemy(caster, victim) || victim.Dead
+            var owner = SpiritRebirthCasting.SkillOwner(caster, ability);
+            if (Eligible(owner) == null || !Enemy(owner, victim) || victim.Dead
                 || !caster.Spawned || !victim.Spawned || caster.Map != victim.Map || Current.Game == null
                 || float.IsNaN(appliedSeverity) || float.IsInfinity(appliedSeverity) || appliedSeverity <= 0) return;
-            var magic = caster.AllComps.OfType<CompAbilityUserMagic>().FirstOrDefault();
+            var magic = owner.AllComps.OfType<CompAbilityUserMagic>().FirstOrDefault();
             if (magic == null || ability?.AbilityUser != magic || !magic.AbilityData.Powers.Any(p => ReferenceEquals(p, ability))
                 || !magic.MagicData.MagicPowersN.Any(p => p.TMabilityDefs.Contains(TorannMagicDefOf.TM_DeathMark) && p.TMabilityDefs.Contains(ability.Def))) return;
             var curse = victim.health?.hediffSet?.hediffs.FirstOrDefault(h => h.def.defName == "TM_DeathMarkCurse");
             var tracker = curse?.TryGetComp<HediffComp_DeathMarkTrial>();
             if (tracker == null) return;
-            tracker.Record(caster);
+            tracker.Record(owner);
         }
     }
 
@@ -46,6 +47,7 @@ namespace TorannMagic.ClassProgression
     public sealed class HediffComp_DeathMarkTrial : HediffComp
     {
         private List<Pawn> sources = new List<Pawn>();
+        private List<Pawn> hostileAtDeath;
         public void Record(Pawn caster)
         {
             sources.RemoveAll(p => p == null || p.Destroyed);
@@ -57,15 +59,21 @@ namespace TorannMagic.ClassProgression
             Scribe_Collections.Look(ref sources, "TM_trialSources", LookMode.Reference);
             if (Scribe.mode == LoadSaveMode.PostLoadInit && sources == null) sources = new List<Pawn>();
         }
+        public override void Notify_PawnKilled()
+        {
+            base.Notify_PawnKilled();
+            // RimWorld marks the victim destroyed before Notify_PawnDied, when HostileTo always returns false.
+            hostileAtDeath = sources.Where(source => NecromancerDeathMarkTrial.Enemy(source, Pawn)).ToList();
+        }
         public override void Notify_PawnDied(DamageInfo? dinfo, Hediff culprit = null)
         {
             base.Notify_PawnDied(dinfo, culprit);
-            if (Current.Game == null || Pawn?.Dead != true || parent.Severity <= 0
-                || parent.ShouldRemove || !Pawn.health.hediffSet.hediffs.Contains(parent)) return;
-            foreach (var source in sources)
-                if (source != null
-                    && NecromancerDeathMarkTrial.Enemy(source, Pawn))
+            if (Pawn?.Dead != true) return;
+            if (hostileAtDeath != null && Current.Game != null && parent.Severity > 0
+                && !parent.ShouldRemove && Pawn.health.hediffSet.hediffs.Contains(parent))
+                foreach (var source in hostileAtDeath)
                     NecromancerDeathMarkTrial.Eligible(source)?.RecordCompletedTrial(NecromancerDeathMarkTrial.TrialId);
+            hostileAtDeath = null;
             sources.Clear();
         }
     }

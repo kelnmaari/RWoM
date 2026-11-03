@@ -89,7 +89,13 @@ internal static class NecromancerDeathMarkTrialTests
             return (p.pawn, p.magic, path, ability);
         }
         public void Apply(float severity = 8f) => NecromancerDeathMarkTrial.Applied(Caster, Target, Ability, severity);
-        public void Die() { Set(Target.health, "healthState", PawnHealthState.Dead); Tracker.Notify_PawnDied(null); }
+        public void Die()
+        {
+            Tracker.Notify_PawnKilled();
+            Set(Target.health, "healthState", PawnHealthState.Dead);
+            Set(Target, "mapIndexOrState", (sbyte)-2);
+            Tracker.Notify_PawnDied(null);
+        }
         public void AssertComplete(bool expected, string message) => Check.Equal(expected, Path.CompletedTrials.Contains(NecromancerDeathMarkTrial.TrialId), message);
         public void Dispose()
         {
