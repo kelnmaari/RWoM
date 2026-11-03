@@ -36,6 +36,13 @@ namespace TorannMagic
             }
         }
 
+        public override void CompExposeData()
+        {
+            base.CompExposeData();
+            Scribe_Values.Look(ref initialized, "reversalInitialized");
+            Scribe_Values.Look(ref age, "reversalDecayTicks");
+        }
+
         public override void CompPostTick(ref float severityAdjustment)
         {
             base.CompPostTick(ref severityAdjustment);

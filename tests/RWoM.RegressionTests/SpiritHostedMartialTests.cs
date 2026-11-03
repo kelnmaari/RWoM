@@ -161,6 +161,31 @@ internal static partial class SpiritMapCollapseTests
                     host.AbilityData.AllPowers=null;
                     Check.Equal(true,Owner()==null,"a lower native rank takes priority");
                 }));
+        yield return new("FacelessProjection.ReversalDecayAfterReload", f =>
+            SpiritRebirthRitualTransactionTests.Run(f,c => {
+                using var held=new Fixture(f,c);
+                var hediff=new HediffWithComps {pawn=c.Creator};
+                HediffComp Make()
+                {
+                    var tracker=(HediffComp)Activator.CreateInstance(typeof(MightAbility).Assembly.GetType("TorannMagic.HediffComp_Reversal",true)!,true)!;
+                    tracker.parent=hediff;
+                    return tracker;
+                }
+                var effect=Make();
+                float delta=0;
+                for(int i=0;i<58;i++)effect.CompPostTick(ref delta);
+                Check.Equal(0f,delta,"no decay before sixty ticks");
+                var file=Path.Combine(f.WorkingDirectory,"faceless-reversal-phase.xml");
+                try { Scribe.saver.InitSaving(file,"test");effect.CompExposeData();Scribe.saver.FinalizeSaving(); }
+                finally { Scribe.ForceStop(); }
+                var loaded=Make();
+                try { Scribe.loader.InitLoading(file);loaded.CompExposeData();Scribe.loader.FinalizeLoading(); }
+                finally { Scribe.ForceStop(); }
+                float after=0;
+                for(int i=0;i<3;i++){effect.CompPostTick(ref delta);loaded.CompPostTick(ref after);}
+                Check.Equal(-1f,delta,"ordinary decay after sixty ticks");
+                Check.Equal(delta,after,"loaded shield decays on the same tick");
+            }));
         yield return new("FacelessProjection.StudyOwner", f =>
             SpiritRebirthRitualTransactionTests.Run(f,c => {
                 using var held=new Fixture(f,c);
