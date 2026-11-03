@@ -16,8 +16,7 @@ namespace TorannMagic
         protected override bool TryCastShot()
         {
             bool result = false;
-            CompAbilityUserMagic comp = this.CasterPawn.GetCompAbilityUserMagic();
-            Pawn soulPawn = comp.soulBondPawn;
+            Pawn soulPawn = ClassProgression.DemonSoulBond.TravelPartner(CasterPawn);
 
             if(soulPawn != null && !soulPawn.Dead && !soulPawn.Destroyed)
             {
@@ -30,29 +29,6 @@ namespace TorannMagic
                 Map map = soulPawn.Map;
                 if(map == null)
                 {
-                    Hediff bondHediff = null;
-                    bondHediff = soulPawn.health.hediffSet.GetFirstHediffOfDef(HediffDef.Named("TM_SoulBondPhysicalHD"), false);
-                    if (bondHediff != null)
-                    {
-                        HediffComp_SoulBondHost compS = bondHediff.TryGetComp<HediffComp_SoulBondHost>();
-                        if (compS != null && compS.polyHost != null && !compS.polyHost.DestroyedOrNull() && !compS.polyHost.Dead)
-                        {
-                            soulPawnSpawned = true;
-                            soulPawn = compS.polyHost;
-                        }
-                    }
-                    bondHediff = null;
-
-                    bondHediff = soulPawn.health.hediffSet.GetFirstHediffOfDef(HediffDef.Named("TM_SoulBondMentalHD"), false);
-                    if (bondHediff != null)
-                    {
-                        HediffComp_SoulBondHost compS = bondHediff.TryGetComp<HediffComp_SoulBondHost>();
-                        if (compS != null && compS.polyHost != null && !compS.polyHost.DestroyedOrNull() && !compS.polyHost.Dead)
-                        {
-                            soulPawnSpawned = true;
-                            soulPawn = compS.polyHost;
-                        }
-                    }
                     if (soulPawn.ParentHolder != null && soulPawn.ParentHolder is Caravan van)
                     {
                         van.RemovePawn(soulPawn);

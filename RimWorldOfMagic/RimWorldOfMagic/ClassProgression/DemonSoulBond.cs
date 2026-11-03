@@ -8,6 +8,22 @@ namespace TorannMagic.ClassProgression
         internal static HediffDef Sender(bool mental) => DefDatabase<HediffDef>.GetNamedSilentFail(mental ? "TM_WDSoulBondMentalHD" : "TM_SDSoulBondPhysicalHD");
         internal static HediffDef Receiver(bool mental) => DefDatabase<HediffDef>.GetNamedSilentFail(mental ? "TM_SoulBondMentalHD" : "TM_SoulBondPhysicalHD");
 
+        internal static Pawn TravelPartner(Pawn owner)
+        {
+            var original = owner?.GetCompAbilityUserMagic()?.soulBondPawn;
+            if (original == null || original.Destroyed || original.Dead) return null;
+            foreach (var effect in original.health.hediffSet.hediffs)
+            {
+                var link = effect.TryGetComp<HediffComp_SoulBondHost>();
+                if (link?.BonderPawn != owner) continue;
+                if (original.Spawned || original.ParentHolder is RimWorld.Planet.Caravan) return original;
+                var body = link.polyHost;
+                if (body != null && !body.Destroyed && !body.Dead &&
+                    (body.Spawned || body.ParentHolder is RimWorld.Planet.Caravan)) return body;
+            }
+            return null;
+        }
+
         internal static bool SourceAvailable(Pawn body, Pawn owner, bool mental)
         {
             var sender = Sender(mental);

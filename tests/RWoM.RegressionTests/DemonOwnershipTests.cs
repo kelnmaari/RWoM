@@ -155,6 +155,8 @@ internal static class DemonOwnershipTests
     static void NativeBond(RuntimeFixture f)
     {
         LoadBaseDefinitions(f);
+        var rootField = typeof(Current).GetField("rootInt", BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public)!;
+        var oldRoot = rootField.GetValue(null);
         var oldGame = Current.Game;
         var oldDefs = DefDatabase<HediffDef>.AllDefsListForReading.ToArray();
         var capacities = DefDatabase<PawnCapacityDef>.AllDefsListForReading.ToArray();
@@ -172,6 +174,12 @@ internal static class DemonOwnershipTests
             harmonyType.GetMethod("Patch")!.Invoke(harmony, [typeof(Pawn_HealthTracker).GetMethod("CheckForStateChange"), prefix, null, null, null]);
             Current.Game = (Game)RuntimeHelpers.GetUninitializedObject(typeof(Game));
             Set(Current.Game, "tickManager", new TickManager()); Set(Current.Game, "uniqueIDsManager", new UniqueIDsManager());
+            var root = (Root_Play)RuntimeHelpers.GetUninitializedObject(typeof(Root_Play));
+            var ui = (UIRoot_Play)RuntimeHelpers.GetUninitializedObject(typeof(UIRoot_Play));
+            ui.mapUI = (MapInterface)RuntimeHelpers.GetUninitializedObject(typeof(MapInterface));
+            Set(ui.mapUI, "colonistBar", RuntimeHelpers.GetUninitializedObject(typeof(ColonistBar)));
+            root.uiRoot = ui;
+            rootField.SetValue(null, root);
             foreach (var child in children) child.abilityClass = typeof(AbilityUser.PawnAbility);
             DefDatabase<HediffDef>.Clear();
             var hostType = typeof(MagicAbility).Assembly.GetType("TorannMagic.HediffComp_SoulBondHost")!;
@@ -203,6 +211,22 @@ internal static class DemonOwnershipTests
                 var host = (HediffWithComps)target.health.hediffSet.hediffs.Single(h => h.def.defName == hostName);
                 Check.Same(p.pawn, hostType.GetProperty("BonderPawn")!.GetValue(host.comps.Single())!, "native host references caster");
                 Check.Same(target, p.magic.soulBondPawn, "native bond stores target");
+                var substitute = PawnWithComps(false, false).pawn;
+                var replacement = hostType.GetField("polyHost")!;
+                TM_Action.TransferSoulBond(target, substitute);
+                Check.Same(substitute, replacement.GetValue(host.comps.Single())!, "polymorph updates the receiving half of the bond");
+                var resolve = typeof(TM_Action).Assembly.GetType("TorannMagic.ClassProgression.DemonSoulBond")!
+                    .GetMethod("TravelPartner", BindingFlags.Static | BindingFlags.NonPublic)!;
+                Check.Same(null!, resolve.Invoke(null, [p.pawn])!, "unplaced polymorph cannot be a landing target");
+                var caravan = new RimWorld.Planet.Caravan();
+                Check.Equal(true, caravan.pawns.TryAdd(substitute, false), "caravan owns the replacement pawn");
+                Check.Same(substitute, resolve.Invoke(null, [p.pawn])!, "bond resolves the caravan passenger");
+                Check.Equal(true, caravan.pawns.TryAdd(target, false), "original partner rejoins the caravan");
+                Check.Same(target, resolve.Invoke(null, [p.pawn])!, "original takes priority after returning");
+                p.magic.soulBondPawn = null;
+                TM_Action.TransferSoulBond(target, p.pawn);
+                Check.Same(substitute, replacement.GetValue(host.comps.Single())!, "stale one-sided bond cannot redirect travel");
+                p.magic.soulBondPawn = target;
                 Check.Equal(true, p.magic.spell_ShadowCall && p.magic.spell_ShadowStep, "native children granted");
                 try { cast.Invoke(verb, null); } catch (TargetInvocationException e) { System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(e.InnerException!).Throw(); throw; }
                 Check.Same(null!, p.magic.soulBondPawn!, "native recast toggles off");
@@ -214,6 +238,7 @@ internal static class DemonOwnershipTests
         {
             harmonyType.GetMethod("UnpatchAll")!.Invoke(harmony, [harmonyId]);
             DefDatabase<PawnCapacityDef>.Clear(); foreach (var capacity in capacities) DefDatabase<PawnCapacityDef>.Add(capacity);
+            rootField.SetValue(null, oldRoot);
             Current.Game = oldGame;
             DefDatabase<HediffDef>.Clear(); foreach (var def in oldDefs) DefDatabase<HediffDef>.Add(def);
             for (int i = 0; i < children.Length; i++) children[i].abilityClass = oldTypes[i];

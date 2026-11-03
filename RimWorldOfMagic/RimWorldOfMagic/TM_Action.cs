@@ -1262,26 +1262,11 @@ namespace TorannMagic
 
         public static void TransferSoulBond(Pawn bondedPawn, Pawn polymorphedPawn)
         {
-            Hediff bondHediff = null;
-            bondHediff = bondedPawn.health.hediffSet.GetFirstHediffOfDef(TorannMagicDefOf.TM_SDSoulBondPhysicalHD, false);
-            if (bondHediff != null)
+            foreach (var effect in bondedPawn.health.hediffSet.hediffs)
             {
-                HediffComp_SoulBondHost comp = bondHediff.TryGetComp<HediffComp_SoulBondHost>();
-                if (comp != null)
-                {
-                    comp.polyHost = polymorphedPawn;
-                }
-            }
-            bondHediff = null;
-
-            bondHediff = bondedPawn.health.hediffSet.GetFirstHediffOfDef(TorannMagicDefOf.TM_WDSoulBondMentalHD, false);
-            if (bondHediff != null)
-            {
-                HediffComp_SoulBondHost comp = bondHediff.TryGetComp<HediffComp_SoulBondHost>();
-                if (comp != null)
-                {
-                    comp.polyHost = polymorphedPawn;
-                }
+                var link = effect.TryGetComp<HediffComp_SoulBondHost>();
+                if (link?.BonderPawn != null && link.BonderPawn.GetCompAbilityUserMagic()?.soulBondPawn == bondedPawn)
+                    link.polyHost = polymorphedPawn;
             }
         }
 
