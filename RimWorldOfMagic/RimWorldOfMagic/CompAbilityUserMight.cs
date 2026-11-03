@@ -4460,7 +4460,7 @@ namespace TorannMagic
                 }
                 else if(!this.bondedPet.health.hediffSet.HasHediff(TorannMagicDefOf.TM_RangerBondHD))
                 {
-                    HealthUtility.AdjustSeverity(this.bondedPet, TorannMagicDefOf.TM_RangerBondHD, .5f);
+                    HediffComp_RangerBond.ApplyPetBond(Pawn,bondedPet,.5f);
                 }
             }
             if (this.Pawn.needs?.mood?.thoughts?.memories != null)

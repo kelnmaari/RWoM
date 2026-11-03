@@ -146,6 +146,90 @@ internal static partial class SpiritMapCollapseTests
                     var local=c.Creator.GetCompAbilityUserMight();local.AbilityData.Powers.Add(new MightAbility(local){Def=def});local.AbilityData.AllPowers=null;
                     Check.Equal(true,Power()==null,"the host's own technique has priority");
                 }));
+        yield return new("RangerProjection.AnimalFriendOwner", f =>
+            SpiritRebirthRitualTransactionTests.Run(f,c => {
+                using var held=new Fixture(f,c);
+                const string job="TM_SpiritCastAnimalFriend";
+                var def=TorannMagicDefOf.TM_AnimalFriend ?? f.AddAbility("TM_AnimalFriend");
+                var source=c.Original.GetCompAbilityUserMight();
+                var power=new MightAbility(source){Def=def,CooldownTicksLeft=73};
+                source.AbilityData.Powers.Add(power);source.AbilityData.AllPowers=null;
+                var find=Production("SpiritHostedMartial").GetMethod("Find",BindingFlags.NonPublic|BindingFlags.Static)!;
+                object? FindPower()=>find.Invoke(null,[c.Creator,c.Original,job]);
+                Check.Same(power,FindPower()!,"original's bond ability supplies the command");
+                Check.Equal(73,power.CooldownTicksLeft,"command enumeration preserves cooldown");
+                const string file="TM_SpiritRanger.xml";
+                var jobs=System.Xml.Linq.XDocument.Load(Path.Combine(f.Repository,"v1.7/Defs/JobDefs",file));
+                var order=jobs.Root!.Elements().Single(node=>(string?)node.Element("defName")==job);
+                Check.Equal(typeof(JobDriver_SpiritHostedMartial).FullName,(string?)order.Element("driverClass"),"bond order uses the saved job");
+                foreach(var language in new[]{"English","Russian","Spanish","Portuguese","PortugueseBrazilian","Ukrainian","ChineseSimplified"})
+                {
+                    var strings=System.Xml.Linq.XDocument.Load(Path.Combine(f.Repository,"v1.7/Languages",language,"DefInjected/JobDef",file));
+                    Check.Equal(true,strings.Root!.Element(job+".reportString")?.Value.Contains("TargetB")==true,"animal remains named in "+language);
+                }
+                var host=c.Creator.GetCompAbilityUserMight();
+                host.AbilityData.Powers.Add(new MightAbility(host){Def=def});host.AbilityData.AllPowers=null;
+                Check.Equal(true,FindPower()==null,"host's own bond takes precedence");
+            }));
+        yield return new("RangerProjection.CareFromHost", f =>
+            SpiritRebirthRitualTransactionTests.Run(f,c => {
+                using var held=new Fixture(f,c);
+                var state=new ClassProgressionState(Vocation.WarriorMage);
+                Set(ClassIdentity.Component(c.Original),"state",state);
+                state.TryAddFoundation("rwom.ranger",DisciplineDomain.Might);
+                var might=c.Original.GetCompAbilityUserMight();
+                var previous=TorannMagicDefOf.TM_RangerBondHD;
+                try
+                {
+                    var pet=PawnWithComps(false,false).pawn;
+                    pet.thingIDNumber=78124;
+                    pet.def=(ThingDef)RuntimeHelpers.GetUninitializedObject(typeof(ThingDef));
+                    pet.def.category=ThingCategory.Pawn; pet.def.size=new IntVec2(1,1);
+                    pet.def.race=new RaceProperties {intelligence=Intelligence.Animal};
+                    pet.kindDef=new PawnKindDef {race=pet.def};
+                    Set(pet.def.race,"fleshType",new FleshTypeDef {isOrganic=true});
+                    Set(pet,"mapIndexOrState",(sbyte)0); Set(pet,"positionInt",c.Creator.Position);
+                    Set(pet,"factionInt",c.Creator.Faction);
+                    TorannMagicDefOf.TM_RangerBondHD=new HediffDef {defName="RangerCareTrialBond"};
+                    pet.health.hediffSet.hediffs.Add(new Hediff {def=TorannMagicDefOf.TM_RangerBondHD,pawn=pet});
+                    might.bondedPet=pet;
+                    var job=new Job {def=new JobDef{defName="TM_RangerCompanionCare"},targetA=pet,targetB=c.Original,targetC=c.Creator.Position};
+                    var driver=new JobDriver_RangerCompanionCare {job=job,pawn=c.Creator};
+                    var toils=(IEnumerable<Toil>)driver.GetType().GetMethod("MakeNewToils",BindingFlags.NonPublic|BindingFlags.Instance)!.Invoke(driver,null)!;
+                    var finish=toils.Last();
+                    finish.initAction();
+                    int Visits() => (int)Production("RangerCareer").GetMethod("Days",BindingFlags.NonPublic|BindingFlags.Static)!.Invoke(null,[c.Original])!;
+                    Check.Equal(1,Visits(),"physical care by host advances retained bond");
+                    finish.initAction();
+                    Check.Equal(1,Visits(),"same-day repeated completion cannot double count");
+                    int now=Find.TickManager.TicksGame;
+                    var markerHediff=held.Possession.parent;
+                    Set(Find.TickManager,"ticksGameInt",now+GenDate.TicksPerDay);
+                    c.Creator.health.hediffSet.hediffs.Remove(markerHediff);
+                    try
+                    {
+                        finish.initAction();
+                        Check.Equal(1,Visits(),"a former host cannot earn the next daily visit");
+                    }
+                    finally { c.Creator.health.hediffSet.hediffs.Add(markerHediff); Set(Find.TickManager,"ticksGameInt",now); }
+                    Check.Same(pet,might.bondedPet,"the same original still owns the pet");
+                    Check.Equal(true,c.Creator.GetCompAbilityUserMight().bondedPet==null,"host did not acquire the soul's companion");
+                    var bondType=typeof(CompAbilityUserMight).Assembly.GetType("TorannMagic.HediffComp_RangerBond",true)!;
+                    var marker=new HediffWithComps{pawn=pet,def=TorannMagicDefOf.TM_RangerBondHD};
+                    var bond=(HediffComp)Activator.CreateInstance(bondType)!;bond.parent=marker;marker.comps=[bond];
+                    using var draw=new Patch(typeof(Pawn).GetProperty(nameof(Pawn.DrawPos))!.GetMethod!,nameof(CancelNative));
+                    using var glow=new Patch(typeof(FleckMaker).GetMethods().Single(m=>m.Name=="ThrowHeatGlow" && m.GetParameters()[0].ParameterType==typeof(IntVec3)),nameof(CancelNative));
+                    var roster=(IList<Pawn>)c.Map.mapPawns.AllPawnsSpawned;
+                    if(!roster.Contains(c.Creator))roster.Add(c.Creator);
+                    bondType.GetMethod("Initialize",BindingFlags.NonPublic|BindingFlags.Instance)!.Invoke(bond,null);
+                    Check.Same(c.Original,bondType.GetField("bonderPawn")!.GetValue(bond)!,"old unlinked marker finds the held ranger with this exact pet");
+                    var versatility=might.MightData.MightPowerSkill_AnimalFriend.Single(s=>s.label=="TM_AnimalFriend_ver");
+                    versatility.level=2;
+                    bondType.GetMethod("UpdateBond",BindingFlags.NonPublic|BindingFlags.Instance)!.Invoke(bond,null);
+                    Check.Equal(2.5f,marker.Severity,"the retained pet uses Animal Friend training even if the original also has a magic component");
+                }
+                finally { TorannMagicDefOf.TM_RangerBondHD=previous; }
+            }));
         yield return new("BladeProjection.SevenStepsOrder", f =>
             SpiritRebirthRitualTransactionTests.Run(f,c => {
                 using var held = new Fixture(f,c);

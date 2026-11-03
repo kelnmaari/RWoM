@@ -23,6 +23,7 @@ namespace TorannMagic
             else if (mightDef != null && mightDef==TorannMagicDefOf.TM_BladeSpin) order=ClassProgression.BladeMartialCast.Spin;
             else if (mightDef != null && mightDef==TorannMagicDefOf.TM_SeismicSlash) order=ClassProgression.BladeMartialCast.Slash;
             else if (mightDef?.defName=="TM_BladePassage") order=ClassProgression.BladeMartialCast.Passage;
+            else if (mightDef!=null && mightDef==TorannMagicDefOf.TM_AnimalFriend) order=Verb_AnimalFriend.Order;
             else if (ClassProgression.BladeMartialCast.PhaseRank(mightDef)) order=ClassProgression.BladeMartialCast.Phase;
             else return base.GetJob(context,target);
             var job = JobMaker.MakeJob(DefDatabase<JobDef>.GetNamed(order), Pawn, target);
