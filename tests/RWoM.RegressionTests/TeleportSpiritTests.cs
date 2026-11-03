@@ -36,6 +36,16 @@ internal static partial class TeleportSpiritTests
         foreach (var test in TravelEnvironmentAutoCases()) yield return test;
         foreach (var test in FlightCases()) yield return test;
         foreach (var test in TravelCases()) yield return test;
+        yield return new("ShamanChain.EdgeSearchRejectsSceneryAndAlreadyStruckPawn", f => World(f,w =>
+        {
+            var shot = new Projectile_ChainLightning();
+            Set(shot,"mapIndexOrState",(sbyte)0);
+            var search = new IntVec3(-1,0,4);
+            w.Building(new IntVec3(1,0,4));
+            Check.Same(w.Caster,shot.GetTargetAroundCell(search,6),"edge search finds the pawn among unfactioned scenery");
+            ((HashSet<int>)Get(shot,"struckIds")!).Add(w.Caster.thingIDNumber);
+            Check.Equal(true,shot.GetTargetAroundCell(search,6)==null,"empty remaining set ends the fork without selecting scenery or hitting twice");
+        }));
         yield return new("ChronomancerRecall.UnloadedMapAndBlockedMarkLeavePawnInPlace", f => World(f, w =>
         {
             Set(Current.Game, "tickManager", new TickManager());

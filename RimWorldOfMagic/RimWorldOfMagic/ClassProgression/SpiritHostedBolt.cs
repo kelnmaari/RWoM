@@ -95,6 +95,7 @@ namespace TorannMagic.ClassProgression
             ("TM_SpiritChronostaticField_I", () => TorannMagicDefOf.TM_ChronostaticField_I, typeof(Projectile_ChronostaticField)),
             ("TM_SpiritChronostaticField_II", () => TorannMagicDefOf.TM_ChronostaticField_II, typeof(Projectile_ChronostaticField)),
             ("TM_SpiritChronostaticField_III", () => TorannMagicDefOf.TM_ChronostaticField_III, typeof(Projectile_ChronostaticField)),
+            ("TM_SpiritChainLightning", () => TorannMagicDefOf.TM_ChainLightning, typeof(Projectile_ChainLightning)),
             ("TM_SpiritTimeMark", () => TorannMagicDefOf.TM_TimeMark, typeof(Verb_TimeMark)),
             ("TM_SpiritRecall", () => TorannMagicDefOf.TM_Recall, typeof(Verb_Recall)),
             ("TM_SpiritReverseTime", () => TorannMagicDefOf.TM_ReverseTime, typeof(Verb_ReverseTime)),
