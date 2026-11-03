@@ -329,22 +329,16 @@ namespace TorannMagic
         {
             get
             {
-                if(stoneskinPawns == null)
-                {
-                    stoneskinPawns = new List<Pawn>();
-                }
-                List<Pawn> tmpList = new List<Pawn>();
-                foreach(Pawn p in stoneskinPawns)
-                {
-                    if(p.DestroyedOrNull() || p.Dead)
+                stoneskinPawns ??= new List<Pawn>();
+                var def = TorannMagicDefOf.TM_StoneskinHD;
+                if (def != null)
+                    stoneskinPawns.RemoveAll(target =>
                     {
-                        tmpList.Add(p);
-                    }
-                }
-                for(int i = 0; i < tmpList.Count; i++)
-                {
-                    stoneskinPawns.Remove(tmpList[i]);
-                }
+                        if (target.DestroyedOrNull() || target.Dead) return true;
+                        var ward = target.health?.hediffSet?.GetFirstHediffOfDef(def);
+                        var owner = ward?.TryGetComp<HediffComp_Stoneskin>()?.Owner;
+                        return ward == null || owner != null && owner != Pawn;
+                    });
                 return stoneskinPawns;
             }
         }
@@ -5793,33 +5787,7 @@ namespace TorannMagic
             }
             }
 
-            if (this.stoneskinPawns.Count() > 0)
-            {
-                if (!this.dispelStoneskin)
-                {
-                    this.dispelStoneskin = true;
-                    this.AddPawnAbility(TorannMagicDefOf.TM_DispelStoneskin);
-                }
-                for (int i = 0; i < this.stoneskinPawns.Count(); i++)
-                {
-                    if (this.stoneskinPawns[i].DestroyedOrNull() || this.stoneskinPawns[i].Dead)
-                    {
-                        this.stoneskinPawns.Remove(this.stoneskinPawns[i]);
-                    }
-                    else
-                    {
-                        if (!this.stoneskinPawns[i].health.hediffSet.HasHediff(HediffDef.Named("TM_StoneskinHD"), false))
-                        {
-                            this.stoneskinPawns.Remove(this.stoneskinPawns[i]);
-                        }
-                    }
-                }
-            }
-            else if (this.dispelStoneskin)
-            {
-                this.dispelStoneskin = false;
-                this.RemovePawnAbility(TorannMagicDefOf.TM_DispelStoneskin);
-            }
+            SyncStoneskinControl();
 
             if(this.bondedSpirit != null && !this.dismissGuardianSpirit)
             {
@@ -6547,7 +6515,7 @@ namespace TorannMagic
             {
                 _maxMPUpkeep += (this.weaponEnchants.Count * ActualManaCost(TorannMagicDefOf.TM_EnchantWeapon, !applyOriginalBody));
             }
-            if (this.stoneskinPawns != null && this.stoneskinPawns.Count > 0)
+            if (this.stoneskinPawns?.Count > 0 && StoneskinPawns.Count > 0)
             {
                 _maxMPUpkeep += (this.stoneskinPawns.Count * (TorannMagicDefOf.TM_Stoneskin.upkeepEnergyCost - (.02f * (applyOriginalBody ? this.MagicData.GetSkill_Efficiency(TorannMagicDefOf.TM_Stoneskin).level : ClassProgression.SpiritRebirthRuntime.SavedRank(this.MagicData, TorannMagicDefOf.TM_Stoneskin, "_eff")))));
             }
@@ -6872,8 +6840,29 @@ namespace TorannMagic
             }
         }
 
+        internal void SyncStoneskinControl()
+        {
+            var def = TorannMagicDefOf.TM_DispelStoneskin;
+            if (def == null) return;
+            if (StoneskinPawns.Count != 0)
+            {
+                if (!AbilityData.Powers.Any(p => p.Def == def))
+                {
+                    AddPawnAbility(def);
+                    AbilityData.AllPowers = null;
+                }
+                dispelStoneskin = true;
+            }
+            else if (dispelStoneskin)
+            {
+                RemovePawnAbility(def);
+                dispelStoneskin = false;
+            }
+        }
+
         internal void RestoreSavedCooldowns()
         {
+            if (stoneskinPawns?.Count > 0) SyncStoneskinControl();
             if (SoL != null && ClassProgression.SpiritRebirthState.TryGet(Pawn,out var state) && state.HasValidHost(Pawn))
                 ClassProgression.BrightmageLifecycle.SynchronizeControl(this);
             spiritRuntimeClock?.RestoreCooldowns(this);

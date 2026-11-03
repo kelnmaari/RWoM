@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+  <JobDef><defName>TM_SpiritStoneskin</defName><driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass><reportString>casting stoneskin.</reportString></JobDef>
+  <JobDef><defName>TM_SpiritDispelStoneskin</defName><driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass><reportString>dispelling stoneskin.</reportString></JobDef>
+</Defs>

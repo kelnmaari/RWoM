@@ -164,7 +164,11 @@ namespace TorannMagic.ClassProgression
             if (comp.overdriveBuilding != null && now % Math.Max(1, comp.overdriveFrequency) == 0)
                 comp.ResolveTechnomancerOverdrive();
             SpiritHostedTechnoBit.Tick(comp);
-            if (now % 60 == 0) BrightmageLifecycle.TickHostedLight(pawn, now);
+            if (now % 60 == 0)
+            {
+                BrightmageLifecycle.TickHostedLight(pawn,now);
+                comp.SyncStoneskinControl();
+            }
             if (now % 100 == 0) BardTrials.TickHostedInspiration(pawn);
             if (now % 30 == 0) BardTrials.TickHostedHymn(pawn);
             TickAbilities(comp, true);

@@ -10,6 +10,7 @@ internal static class GeomancerTrialTests
 {
     public static IEnumerable<TestCase> Cases()
     {
+        yield return new("GeomancerTrial.RecastingTransfersOneWardAndItsUpkeep", TransferUpkeep);
         yield return new("GeomancerTrial.DamagedStoneskinRetainsMaximumAfterLoad", WardSave);
         yield return new("GeomancerTrial.FreshWardOwnershipAndNoops", Ward);
         yield return new("GeomancerTrial.EncaseDistinctCellsAndRankedSources", Encase);
@@ -54,6 +55,35 @@ internal static class GeomancerTrialTests
         public void Adept() { Path.RecordCompletedTrial(GeomancerTrials.FoundationTrialId); Progression.State.TryAdvanceAfterTrial("rwom.geomancer", InitiationStage.Foundation, GeomancerTrials.FoundationTrialId); }
         public void Dispose() { GeomancerTrials.EndLaunch(null!); Current.Game = previous; DefDatabase<ClassDisciplineDef>.Clear(); foreach(var def in profiles) DefDatabase<ClassDisciplineDef>.Add(def); }
     }
+    static void TransferUpkeep(RuntimeFixture f)
+    {
+        using var w = new Fixture(f);
+        var old = TorannMagicDefOf.TM_StoneskinHD;
+        var type = typeof(GeomancerTrials).Assembly.GetType("TorannMagic.HediffComp_Stoneskin",true)!;
+        try
+        {
+            var def = new HediffDef { defName="TM_StoneskinHD" };
+            TorannMagicDefOf.TM_StoneskinHD=def;
+            var ward = new HediffWithComps { def=def,pawn=w.Target };
+            var component = (HediffComp)Activator.CreateInstance(type)!;
+            component.parent=ward;ward.comps=[component];w.Target.health.hediffSet.hediffs.Add(ward);
+            var other = PawnWithComps(true,false);
+            var bind = type.GetMethod("Bind",System.Reflection.BindingFlags.NonPublic|System.Reflection.BindingFlags.Instance)!;
+            w.Magic.stoneskinPawns.Add(w.Target);
+            Check.Equal(1,w.Magic.StoneskinPawns.Count,"legacy unbound ward remains with recorded payer");
+            bind.Invoke(component,[w.Caster,7]);
+            bind.Invoke(component,[other.pawn,5]);
+            other.magic.stoneskinPawns.Add(w.Target);
+            Check.Equal(0,w.Magic.StoneskinPawns.Count,"old payer no longer reserves mana");
+            w.Magic.stoneskinPawns.Add(w.Target);
+            Check.Equal(0,w.Magic.StoneskinPawns.Count,"stale legacy listing cannot reclaim another caster's ward");
+            Check.Same(w.Target,other.magic.StoneskinPawns.Single(),"replacement has exactly one owned ward");
+            w.Target.health.hediffSet.hediffs.Remove(ward);
+            Check.Equal(0,other.magic.StoneskinPawns.Count,"depleted ward releases upkeep");
+        }
+        finally { TorannMagicDefOf.TM_StoneskinHD=old; }
+    }
+
     public sealed class StoneskinEnvelope : IExposable
     {
         public static HediffComp current = null!;

@@ -13,9 +13,14 @@ namespace TorannMagic.ClassProgression
         static bool Matches(AbilityUser.AbilityDef def, bool encase) => def != null && (encase
             ? def == TorannMagicDefOf.TM_Encase || def == TorannMagicDefOf.TM_Encase_I || def == TorannMagicDefOf.TM_Encase_II || def == TorannMagicDefOf.TM_Encase_III
             : def == TorannMagicDefOf.TM_Stoneskin);
+        static Pawn WardBody(Pawn caster)
+        {
+            if (!SpiritRebirthState.TryGet(caster,out var state)) return caster?.Spawned == true ? caster : null;
+            return !state.DepletionPending && state.HasValidHost(caster) && state.Host.Spawned ? state.Host : null;
+        }
         static DisciplineProgress Owned(Pawn caster, AbilityUser.AbilityDef def, bool encase)
         {
-            if (!Matches(def, encase) || caster == null || caster.Dead || !caster.Spawned || caster.Faction == null
+            if (!Matches(def, encase) || caster == null || caster.Dead || (encase ? !caster.Spawned : WardBody(caster) == null) || caster.Faction == null
                 || caster.story?.traits?.HasTrait(TorannMagicDefOf.Faceless) == true
                 || !ClassIdentity.TryGetState(caster, out var state) || (state.Vocation & Vocation.Mage) == 0) return null;
             var path = state.Find("rwom.geomancer");
@@ -35,19 +40,20 @@ namespace TorannMagic.ClassProgression
             && target.Map == caster.Map && target.RaceProps?.Humanlike == true && target.Faction == caster.Faction
             && !target.IsPrisoner && !target.IsSlave && !TM_Calc.IsUndead(target) && target.health?.hediffSet != null;
         static Hediff Ward(Pawn target) => target.health.hediffSet.hediffs.FirstOrDefault(h => h.def.defName == "TM_StoneskinHD");
-        public sealed class Snapshot { internal PawnAbility ability; internal Pawn target; internal DisciplineProgress path; internal bool used; }
+        public sealed class Snapshot { internal PawnAbility ability; internal Pawn target, body; internal DisciplineProgress path; internal bool used; }
         public static Snapshot CaptureStoneskin(PawnAbility ability, Pawn target)
         {
             var path = Owned(ability, false);
-            return path != null && Ally(ability.Pawn, target) && Ward(target) == null
-                ? new Snapshot { ability = ability, target = target, path = path } : null;
+            var body = WardBody(ability?.Pawn);
+            return path != null && body != null && Ally(body, target) && Ward(target) == null
+                ? new Snapshot { ability = ability, target = target, body = body, path = path } : null;
         }
         public static bool CompleteStoneskin(Snapshot snapshot)
         {
             if (snapshot == null || snapshot.used) return false;
             snapshot.used = true;
             var caster = snapshot.ability.Pawn;
-            var ward = Ally(caster, snapshot.target) ? Ward(snapshot.target) : null;
+            var ward = WardBody(caster) == snapshot.body && Ally(snapshot.body, snapshot.target) ? Ward(snapshot.target) : null;
             return Owned(snapshot.ability, false) == snapshot.path && ward != null && ward.Severity > 0 && !float.IsInfinity(ward.Severity)
                 && caster.AllComps.OfType<CompAbilityUserMagic>().First().stoneskinPawns.Contains(snapshot.target)
                 && snapshot.path.RecordCompletedTrial(FoundationTrialId);

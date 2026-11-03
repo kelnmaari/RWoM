@@ -89,6 +89,8 @@ namespace TorannMagic.ClassProgression
             ("TM_SpiritRend_I", () => TorannMagicDefOf.TM_Rend_I, typeof(Verb_Rend)),
             ("TM_SpiritRend_II", () => TorannMagicDefOf.TM_Rend_II, typeof(Verb_Rend)),
             ("TM_SpiritRend_III", () => TorannMagicDefOf.TM_Rend_III, typeof(Verb_Rend)),
+            ("TM_SpiritStoneskin", () => TorannMagicDefOf.TM_Stoneskin, typeof(Verb_Stoneskin)),
+            ("TM_SpiritDispelStoneskin", () => TorannMagicDefOf.TM_DispelStoneskin, typeof(Verb_DispelStoneskin)),
             ("TM_SpiritBloodMoon", () => TorannMagicDefOf.TM_BloodMoon, typeof(Projectile_BloodMoon)),
             ("TM_SpiritBloodMoon_I", () => TorannMagicDefOf.TM_BloodMoon_I, typeof(Projectile_BloodMoon)),
             ("TM_SpiritBloodMoon_II", () => TorannMagicDefOf.TM_BloodMoon_II, typeof(Projectile_BloodMoon)),
@@ -200,6 +202,7 @@ namespace TorannMagic.ClassProgression
                 if (meter == null || !float.IsFinite(required) || required < 0 || meter.Severity < required) return false;
             }
             float cost = power.MagicUser.ActualManaCost(def);
+            if (def == TorannMagicDefOf.TM_DispelStoneskin && power.MagicUser.StoneskinPawns.Count == 0) return false;
             if (def == TorannMagicDefOf.TM_SoL_CreateLight && (power.MagicUser.SoL?.Spawned != true ||
                 power.MagicUser.SoL.Map != body.Map || power.MagicUser.SoL.OwnerPawn != power.Pawn)) return false;
             if (def == TorannMagicDefOf.TM_SoL_Equalize && !Verb_SoL_Equalize.Available(power.MagicUser, body)) return false;

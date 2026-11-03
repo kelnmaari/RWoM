@@ -13,10 +13,20 @@ namespace TorannMagic
     {
         private bool initializing = true;
         public int maxSev = 4;
+        private Pawn owner;
+        internal Pawn Owner => owner;
+        internal void Bind(Pawn source,int capacity)
+        {
+            if (owner != source) owner?.GetCompAbilityUserMagic()?.stoneskinPawns?.RemoveAll(p => p == Pawn);
+            owner = source;
+            maxSev = capacity;
+            initializing = false;
+        }
 
         public override void CompExposeData()
         {
             base.CompExposeData();
+            Scribe_References.Look(ref owner,"TM_stoneskinOwner");
             Scribe_Values.Look(ref maxSev, "maxSev", 4);
             Scribe_Values.Look(ref initializing, "TM_stoneskinInitializing", false, true);
             if (Scribe.mode == LoadSaveMode.PostLoadInit && !initializing)
@@ -84,6 +94,7 @@ namespace TorannMagic
 
         public override void CompPostPostRemoved()
         {
+            owner?.GetCompAbilityUserMagic()?.stoneskinPawns?.RemoveAll(p => p == Pawn);
             if (Pawn?.Spawned == true)
             {
                 SoundInfo info = SoundInfo.InMap(new TargetInfo(this.Pawn.Position, this.Pawn.Map, false), MaintenanceType.None);
