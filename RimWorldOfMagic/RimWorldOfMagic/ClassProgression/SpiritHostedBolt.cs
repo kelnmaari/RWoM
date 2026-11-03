@@ -110,6 +110,7 @@ namespace TorannMagic.ClassProgression
             ("TM_SpiritVitalityBrand", () => TorannMagicDefOf.TM_VitalityBrand, typeof(Verb_BrandVitality)),
             ("TM_SpiritSiphonBrand", () => TorannMagicDefOf.TM_SiphonBrand, typeof(Verb_BrandSiphon)),
             ("TM_SpiritSuppressiveAura", () => TorannMagicDefOf.TM_SuppressiveAura, typeof(Verb_ToggleHediff)),
+            ("TM_SpiritIncitePassion", () => TorannMagicDefOf.TM_IncitePassion, typeof(Verb_IncitePassion)),
             ("TM_SpiritMindKiller", () => TorannMagicDefOf.TM_MindKiller, typeof(Verb_MindKiller)),
             ("TM_SpiritLivingWall", () => TorannMagicDefOf.TM_LivingWall, typeof(Verb_LivingWall)),
             ("TM_SpiritDispelLivingWall", () => TorannMagicDefOf.TM_DispelLivingWall, typeof(Verb_DispelLivingWall)),
@@ -257,8 +258,9 @@ namespace TorannMagic.ClassProgression
                     f.effect == def.MainVerb.defaultProjectile?.thingClass &&
                     (typeof(Projectile_SpiritNativeAbility).IsAssignableFrom(f.effect) || typeof(Projectile_SpiritBolt).IsAssignableFrom(f.effect) || typeof(Projectile_SpiritRay).IsAssignableFrom(f.effect) || f.effect == typeof(Projectile_ChronostaticField) || f.effect == typeof(Projectile_AccelerateTime) || f.effect == typeof(Projectile_Sentinel) || f.effect == typeof(Projectile_EarthernHammer) || f.effect == typeof(Projectile_Encase) || f.effect == typeof(Projectile_IgniteBlood) || f.effect == typeof(Projectile_BloodMoon) || SpiritHostedSummons.IsProjectile(f.effect))))) ||
                 (def.MainVerb.burstShotCount != 1 && !IsBurst(def)) || def.bloodCost != 0 && def != TorannMagicDefOf.TM_BloodShield && def != TorannMagicDefOf.TM_IgniteBlood && def != TorannMagicDefOf.TM_BloodForBlood && def.MainVerb.verbClass != typeof(Verb_Rend) && def.MainVerb.defaultProjectile?.thingClass != typeof(Projectile_BloodMoon) || def.chiCost != 0 ||
-                (def.requiredNeed != null && def != TorannMagicDefOf.TM_MindKiller && def != TorannMagicDefOf.TM_SuppressiveAura) ||
+                (def.requiredNeed != null && def != TorannMagicDefOf.TM_MindKiller && def != TorannMagicDefOf.TM_SuppressiveAura && def != TorannMagicDefOf.TM_IncitePassion) ||
                 def.requiredHediff != null || !def.consumeEnergy || power.MagicUser.Mana == null) return false;
+            if (def == TorannMagicDefOf.TM_IncitePassion && (body.IsSlave || power.Pawn.IsSlave)) return false;
             if (def == TorannMagicDefOf.TM_SuppressiveAura)
             {
                 var aura = body.health.hediffSet.GetFirstHediffOfDef(def.abilityHediff);
@@ -371,6 +373,7 @@ namespace TorannMagic.ClassProgression
                     return;
                 }
                 var order = JobMaker.MakeJob(job, target, soul);
+                if (def == TorannMagicDefOf.TM_IncitePassion) Verb_IncitePassion.BindSelection(order, power.MagicUser.incitePassionSkill?.def.defName);
                 if (def == TorannMagicDefOf.TM_EnchantWeapon) order.targetC = target.Pawn.equipment.Primary;
                 if (def == TorannMagicDefOf.TM_LivingWall) order.targetC = Verb_LivingWall.Segment(body,target);
                 if (def == TorannMagicDefOf.TM_EnchanterStone) order.targetC = Verb_EnchanterStone.Source(body, soul, target);
@@ -380,30 +383,51 @@ namespace TorannMagic.ClassProgression
                     Odyssey.ManualTravelSafety.Submit(body, order, map, target.Cell, true, Valid, Submit);
                 else Submit();
             }
-            var command = new Command_Action {
-                defaultLabel = def.LabelCap, defaultDesc = def.description, icon = def.uiIcon,
-                action = () => {
-                    if (def.MainVerb.AbilityTargetCategory == AbilityTargetCategory.TargetSelf) { Order(body); return; }
-                    var field = def.MainVerb.verbClass == typeof(Effect_ValiantCharge) || def.MainVerb.verbClass == typeof(Verb_FogOfTorment) || def.MainVerb.verbClass == typeof(Verb_LightningCloud) || typeof(Verb_RankedStormField).IsAssignableFrom(def.MainVerb.verbClass)
-                        ? PhysicalVerb(body, power) : null;
-                    Verse.Find.Targeter.BeginTargeting(def.MainVerb.targetParams, Order, highlightAction: target => {
-                        if (!body.Spawned) return;
-                        GenDraw.DrawRadiusRing(body.Position, def.MainVerb.range);
-                        if (!target.IsValid || !target.Cell.InBounds(body.Map)) return;
-                        var area = def.MainVerb.TargetAoEProperties;
-                        if (area?.showRangeOnSelect == true)
-                            GenDraw.DrawRadiusRing(area.startsFromCaster ? body.Position : target.Cell, area.range);
-                        else if (field != null)
-                        {
-                            float radius = field.HighlightFieldRadiusAroundTarget(out _);
-                            if (radius > 0f) GenDraw.DrawRadiusRing(target.Cell, radius);
-                        }
-                    },
-                    targetValidator: target => CanTarget(body, Find(body,soul,def), target), caster: body);
-                }
+            Command_Action command = def == TorannMagicDefOf.TM_IncitePassion
+                ? new IncitePassionCommand { owner = power.MagicUser } : new Command_Action();
+            command.defaultLabel = def.LabelCap;
+            command.defaultDesc = def.description;
+            command.icon = def.uiIcon;
+            command.action = () => {
+                if (def.MainVerb.AbilityTargetCategory == AbilityTargetCategory.TargetSelf) { Order(body); return; }
+                var field = def.MainVerb.verbClass == typeof(Effect_ValiantCharge) || def.MainVerb.verbClass == typeof(Verb_FogOfTorment) || def.MainVerb.verbClass == typeof(Verb_LightningCloud) || typeof(Verb_RankedStormField).IsAssignableFrom(def.MainVerb.verbClass)
+                    ? PhysicalVerb(body, power) : null;
+                Verse.Find.Targeter.BeginTargeting(def.MainVerb.targetParams, Order, highlightAction: target => {
+                    if (!body.Spawned) return;
+                    GenDraw.DrawRadiusRing(body.Position, def.MainVerb.range);
+                    if (!target.IsValid || !target.Cell.InBounds(body.Map)) return;
+                    var area = def.MainVerb.TargetAoEProperties;
+                    if (area?.showRangeOnSelect == true)
+                        GenDraw.DrawRadiusRing(area.startsFromCaster ? body.Position : target.Cell, area.range);
+                    else if (field != null)
+                    {
+                        float radius = field.HighlightFieldRadiusAroundTarget(out _);
+                        if (radius > 0f) GenDraw.DrawRadiusRing(target.Cell, radius);
+                    }
+                },
+                targetValidator: target => CanTarget(body, Find(body,soul,def), target), caster: body);
             };
             if (body.CurJobDef == job || !Ready(body, power)) command.Disable("TM_SpiritRebirthCastUnavailable".Translate());
             return command;
+        }
+
+        private sealed class IncitePassionCommand : Command_Action
+        {
+            internal CompAbilityUserMagic owner;
+            public override IEnumerable<FloatMenuOption> RightClickFloatMenuOptions
+            {
+                get
+                {
+                    foreach (var skill in owner.Pawn.skills.skills.Where(s => s.passion != Passion.None))
+                    {
+                        yield return new FloatMenuOption(skill.def.LabelCap + " (" + skill.passion + ")", () =>
+                        {
+                            owner.incitePassionSkill = skill;
+                            Messages.Message("TM_IncitePassionSelection".Translate(skill.def.label), MessageTypeDefOf.NeutralEvent);
+                        });
+                    }
+                }
+            }
         }
 
         internal static bool Launch(Pawn body, Pawn soul, TMAbilityDef def, LocalTargetInfo target, bool paidBurst = false)

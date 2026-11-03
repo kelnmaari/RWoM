@@ -7062,6 +7062,10 @@ namespace TorannMagic
             Scribe_References.Look<FlyingObject_SpiritOfLight>(ref SoL, "SoL", false);
             Scribe_Defs.Look<ThingDef>(ref this.guardianSpiritType, "guardianSpiritType");
             Scribe_References.Look<Pawn>(ref this.bondedSpirit, "bondedSpirit", false);
+            SkillDef selectedPassion = incitePassionSkill?.def;
+            Scribe_Defs.Look(ref selectedPassion, "TM_incitePassionChoice");
+            if (Scribe.mode == LoadSaveMode.LoadingVars && selectedPassion != null)
+                LongEventHandler.ExecuteWhenFinished(() => incitePassionSkill = Pawn.skills?.GetSkill(selectedPassion));
             Scribe_Collections.Look<Pawn>(ref this.brands, "brands", LookMode.Reference);
             Scribe_Collections.Look<HediffDef>(ref this.brandDefs, "brandDefs", LookMode.Def);
             Scribe_Values.Look<bool>(ref this.sigilSurging, "sigilSurging", false, false);
