@@ -30,4 +30,9 @@
     <driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass>
     <reportString>casting light lance through a spirit host.</reportString>
   </JobDef>
+  <JobDef>
+    <defName>TM_SpiritRefraction</defName>
+    <driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass>
+    <reportString>casting refraction through a spirit host.</reportString>
+  </JobDef>
 </Defs>

@@ -77,6 +77,7 @@ namespace TorannMagic.ClassProgression
             ("TM_SpiritSunfire", () => TorannMagicDefOf.TM_Sunfire, typeof(Projectile_Sunfire)),
             ("TM_SpiritLightBurst", () => TorannMagicDefOf.TM_LightBurst, typeof(Verb_LightBurst)),
             ("TM_SpiritLightLance", () => TorannMagicDefOf.TM_LightLance, typeof(Effect_LightLance)),
+            ("TM_SpiritRefraction", () => TorannMagicDefOf.TM_Refraction, typeof(Projectile_Refraction)),
             ("TM_SpiritSunfire_I", () => TorannMagicDefOf.TM_Sunfire_I, typeof(Projectile_Sunfire)),
             ("TM_SpiritSunfire_II", () => TorannMagicDefOf.TM_Sunfire_II, typeof(Projectile_Sunfire)),
             ("TM_SpiritSunfire_III", () => TorannMagicDefOf.TM_Sunfire_III, typeof(Projectile_Sunfire)),
