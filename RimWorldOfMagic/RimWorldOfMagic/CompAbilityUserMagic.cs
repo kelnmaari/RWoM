@@ -194,6 +194,7 @@ namespace TorannMagic
         public List<float> recallHediffDefSeverityList = null;
         public List<int> recallHediffDefTicksRemainingList = null;
         public List<Hediff_Injury> recallInjuriesList = null;
+        internal int recallBodyId;
         public bool recallSet = false;
         public int recallExpiration = 0;
         public bool recallSpell = false;
@@ -7039,6 +7040,7 @@ namespace TorannMagic
             Scribe_Values.Look<float>(ref this.maxMP, "maxMP", 1f, false);
             Scribe_Values.Look<int>(ref this.lastChaosTraditionTick, "lastChaosTraditionTick", 0);
             //Scribe_Collections.Look<TM_ChaosPowers>(ref this.chaosPowers, "chaosPowers", LookMode.Deep, new object[0]);
+            Scribe_Values.Look(ref recallBodyId, "TM_recallBodyId");
             //Recall variables 
             Scribe_Values.Look<bool>(ref this.recallSet, "recallSet", false, false);
             Scribe_Values.Look<bool>(ref this.recallSpell, "recallSpell", false, false);

@@ -8,4 +8,6 @@
   <TM_SpiritChronostaticField_I.reportString>створює поле часового стазису.</TM_SpiritChronostaticField_I.reportString>
   <TM_SpiritChronostaticField_II.reportString>створює поле часового стазису.</TM_SpiritChronostaticField_II.reportString>
   <TM_SpiritChronostaticField_III.reportString>створює поле часового стазису.</TM_SpiritChronostaticField_III.reportString>
+  <TM_SpiritTimeMark.reportString>ставить часову мітку.</TM_SpiritTimeMark.reportString>
+  <TM_SpiritRecall.reportString>повертається до часової мітки.</TM_SpiritRecall.reportString>
 </LanguageData>

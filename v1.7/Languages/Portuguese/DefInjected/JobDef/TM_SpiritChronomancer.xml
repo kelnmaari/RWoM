@@ -8,4 +8,6 @@
   <TM_SpiritChronostaticField_I.reportString>a criar um campo de estase temporal.</TM_SpiritChronostaticField_I.reportString>
   <TM_SpiritChronostaticField_II.reportString>a criar um campo de estase temporal.</TM_SpiritChronostaticField_II.reportString>
   <TM_SpiritChronostaticField_III.reportString>a criar um campo de estase temporal.</TM_SpiritChronostaticField_III.reportString>
+  <TM_SpiritTimeMark.reportString>a criar uma marca temporal.</TM_SpiritTimeMark.reportString>
+  <TM_SpiritRecall.reportString>a regressar à marca temporal.</TM_SpiritRecall.reportString>
 </LanguageData>

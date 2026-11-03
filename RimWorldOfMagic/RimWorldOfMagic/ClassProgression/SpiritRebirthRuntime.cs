@@ -172,6 +172,12 @@ namespace TorannMagic.ClassProgression
                 comp.SyncStoneskinControl();
                 comp.SyncEarthSpriteControl();
                 comp.SyncSentinelControl();
+                if (comp.recallSet && comp.recallExpiration <= now)
+                {
+                    comp.recallSet = comp.recallSpell = false;
+                    comp.recallBodyId = 0;
+                    comp.RemovePawnAbility(TorannMagicDefOf.TM_Recall);
+                }
                 if (comp.predictionIncidentDef != null && now > comp.predictionTick + 30) ChronomancerPrediction.Expire(comp,Find.Storyteller?.incidentQueue);
             }
             if (now % 100 == 0) BardTrials.TickHostedInspiration(pawn);

@@ -95,6 +95,8 @@ namespace TorannMagic.ClassProgression
             ("TM_SpiritChronostaticField_I", () => TorannMagicDefOf.TM_ChronostaticField_I, typeof(Projectile_ChronostaticField)),
             ("TM_SpiritChronostaticField_II", () => TorannMagicDefOf.TM_ChronostaticField_II, typeof(Projectile_ChronostaticField)),
             ("TM_SpiritChronostaticField_III", () => TorannMagicDefOf.TM_ChronostaticField_III, typeof(Projectile_ChronostaticField)),
+            ("TM_SpiritTimeMark", () => TorannMagicDefOf.TM_TimeMark, typeof(Verb_TimeMark)),
+            ("TM_SpiritRecall", () => TorannMagicDefOf.TM_Recall, typeof(Verb_Recall)),
             ("TM_SpiritReverseTime", () => TorannMagicDefOf.TM_ReverseTime, typeof(Verb_ReverseTime)),
             ("TM_SpiritAccelerateTime", () => TorannMagicDefOf.TM_AccelerateTime, typeof(Projectile_AccelerateTime)),
             ("TM_SpiritAlterFate", () => TorannMagicDefOf.TM_AlterFate, typeof(Verb_AlterFate)),
@@ -223,6 +225,7 @@ namespace TorannMagic.ClassProgression
                 if (meter == null || !float.IsFinite(required) || required < 0 || meter.Severity < required) return false;
             }
             float cost = power.MagicUser.ActualManaCost(def);
+            if (def == TorannMagicDefOf.TM_Recall && (!TM_Action.RecallMatches(body,power.MagicUser) || power.MagicUser.recallExpiration <= Verse.Find.TickManager.TicksGame)) return false;
             if (def == TorannMagicDefOf.TM_AlterFate && !Verb_AlterFate.Available(body,power)) return false;
             if (def == TorannMagicDefOf.TM_ShatterSentinel && !power.MagicUser.summonedSentinels.Any(t => t?.Spawned == true)) return false;
             if (def == TorannMagicDefOf.TM_DismissEarthSprites && power.MagicUser.earthSpriteType == 0) return false;

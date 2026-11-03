@@ -1415,9 +1415,27 @@ namespace TorannMagic
         public static void DoRecall(Pawn pawn, CompAbilityUserMagic comp, bool deathTrigger)
             => TryRecall(pawn, comp, deathTrigger);
 
+        internal static CompAbilityUserMagic RecallOwner(Pawn body, CompAbilityUserMagic local)
+        {
+            bool Active(CompAbilityUserMagic candidate) => RecallMatches(body,candidate) && candidate.IsMagicUser &&
+                candidate.recallExpiration > Find.TickManager.TicksGame;
+            if (Active(local)) return local;
+            if (!ClassProgression.SpiritRebirthState.TryGetPossessingSpirit(body,out var soul)) return null;
+            var hosted = soul.GetCompAbilityUserMagic();
+            return Active(hosted) ? hosted : null;
+        }
+
+        internal static bool RecallMatches(Pawn body, CompAbilityUserMagic comp)
+        {
+            if (body == null || comp?.Pawn == null || !comp.recallSet) return false;
+            if (comp.recallBodyId == 0) return comp.Pawn == body; // Marks written before host casting existed.
+            return comp.recallBodyId == body.thingIDNumber && (comp.Pawn == body ||
+                ClassProgression.SpiritRebirthState.TryGetPossessingSpirit(body, out var soul) && soul == comp.Pawn);
+        }
+
         internal static bool TryRecall(Pawn pawn, CompAbilityUserMagic comp, bool deathTrigger)
         {
-            if (pawn?.Spawned != true || comp?.recallSet != true || comp.recallExpiration <= Find.TickManager.TicksGame ||
+            if (pawn?.Spawned != true || !RecallMatches(pawn,comp) || comp.recallExpiration <= Find.TickManager.TicksGame ||
                 !TryRecallCell(pawn, comp, out var destination)) return false;
             try
             {
@@ -1439,6 +1457,7 @@ namespace TorannMagic
             // Health callbacks may re-enter the death/downing patch during restoration.
             comp.recallSet = false;
             comp.recallSpell = false;
+            comp.recallBodyId = 0;
             comp.recallPosition = default;
             RecallHediffs(pawn, comp);
             RecallNeeds(pawn, comp);
@@ -1525,9 +1544,9 @@ namespace TorannMagic
             var names = comp.recallNeedDefnames;
             var values = comp.recallNeedValues;
             int count = Math.Min(names?.Count ?? 0, values?.Count ?? 0);
-            foreach (var need in pawn.needs.AllNeeds)
+            void Restore(Need need)
             {
-                if (need.def.defName == "Chemical_Luciferium") continue;
+                if (need == null || need.def.defName == "Chemical_Luciferium") return;
                 for (int i = 0; i < count; i++)
                 {
                     if (names[i] != need.def.defName || float.IsNaN(values[i]) || float.IsInfinity(values[i])) continue;
@@ -1535,6 +1554,9 @@ namespace TorannMagic
                     break;
                 }
             }
+            foreach (var need in pawn.needs.AllNeeds)
+                if (pawn == comp.Pawn || need is not Need_Mana) Restore(need);
+            if (pawn != comp.Pawn) Restore(comp.Mana);
             names?.Clear();
             values?.Clear();
         }

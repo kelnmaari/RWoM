@@ -8,4 +8,6 @@
   <JobDef><defName>TM_SpiritChronostaticField_I</defName><driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass><reportString>creating a chronostatic field.</reportString></JobDef>
   <JobDef><defName>TM_SpiritChronostaticField_II</defName><driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass><reportString>creating a chronostatic field.</reportString></JobDef>
   <JobDef><defName>TM_SpiritChronostaticField_III</defName><driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass><reportString>creating a chronostatic field.</reportString></JobDef>
+  <JobDef><defName>TM_SpiritTimeMark</defName><driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass><reportString>setting a time mark.</reportString></JobDef>
+  <JobDef><defName>TM_SpiritRecall</defName><driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass><reportString>returning to a time mark.</reportString></JobDef>
 </Defs>

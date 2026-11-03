@@ -14,7 +14,7 @@ internal static partial class SpiritMapCollapseTests
     internal static Type Production(string name) => Check.NotNull(typeof(SpiritRebirthState).Assembly.GetType("TorannMagic.ClassProgression." + name), "map collapse " + name + " exists");
     public static IEnumerable<TestCase> Cases()
     {
-        foreach(var spell in new[]{"Firebolt","Icebolt","Fireball","Snowball","Heal","AdvancedHeal","Purify","Regenerate","Fireclaw","Poison","CureDisease","SootheAnimal","SootheAnimal_I","SootheAnimal_II","SootheAnimal_III","Rainmaker","Resurrection","HealingCircle","HealingCircle_I","HealingCircle_II","HealingCircle_III","RaiseUndead","Blink","Blink_I","Blink_II","Blink_III","Summon","Summon_I","Summon_II","Summon_III","Stoneskin","DispelStoneskin","EarthSprites","DismissEarthSprites","Encase","Encase_I","Encase_II","Encase_III","EarthernHammer","Sentinel","ShatterSentinel","Meteor","Meteor_I","Meteor_II","Meteor_III","Prediction","AlterFate","AccelerateTime","ReverseTime","ChronostaticField","ChronostaticField_I","ChronostaticField_II","ChronostaticField_III","BloodMoon","BloodMoon_I","BloodMoon_II","BloodMoon_III","Rend","Rend_I","Rend_II","Rend_III","BloodForBlood","IgniteBlood","BloodShield","Entertain","BattleHymn","Lullaby","Lullaby_I","Lullaby_II","Lullaby_III","MagicMissile","MagicMissile_I","MagicMissile_II","MagicMissile_III","LightningBolt","LightningCloud","LightningStorm","Firestorm","SpiritOfLight","SoL_Equalize","SoL_CreateLight","LightSkip","LightSkipMass","LightSkipGlobal","Refraction","LightLance","LightBurst","Sunfire","Sunfire_I","Sunfire_II","Sunfire_III","NanoStimulant","TechnoWeapon","TechnoTurret","TechnoShield","Overdrive","OrbitalStrike","OrbitalStrike_I","OrbitalStrike_II","OrbitalStrike_III","Sabotage","FoldReality","Teleport","ValiantCharge","Overwhelm","BestowMight","BestowMight_I","BestowMight_II","BestowMight_III","DeathBolt","DeathBolt_I","DeathBolt_II","DeathBolt_III","FogOfTorment","CorpseExplosion","CorpseExplosion_I","CorpseExplosion_II","CorpseExplosion_III","ConsumeCorpse","ConsumeCorpse_I","ConsumeCorpse_II","ConsumeCorpse_III","ConsumeCorpse_Mass","DeathMark","DeathMark_I","DeathMark_II","DeathMark_III","FrostRay","FrostRay_I","FrostRay_II","FrostRay_III","AMP","AMP_I","AMP_II","AMP_III"})
+        foreach(var spell in new[]{"Firebolt","Icebolt","Fireball","Snowball","Heal","AdvancedHeal","Purify","Regenerate","Fireclaw","Poison","CureDisease","SootheAnimal","SootheAnimal_I","SootheAnimal_II","SootheAnimal_III","Rainmaker","Resurrection","HealingCircle","HealingCircle_I","HealingCircle_II","HealingCircle_III","RaiseUndead","Blink","Blink_I","Blink_II","Blink_III","Summon","Summon_I","Summon_II","Summon_III","Stoneskin","DispelStoneskin","EarthSprites","DismissEarthSprites","Encase","Encase_I","Encase_II","Encase_III","EarthernHammer","Sentinel","ShatterSentinel","Meteor","Meteor_I","Meteor_II","Meteor_III","Prediction","AlterFate","AccelerateTime","ReverseTime","TimeMark","Recall","ChronostaticField","ChronostaticField_I","ChronostaticField_II","ChronostaticField_III","BloodMoon","BloodMoon_I","BloodMoon_II","BloodMoon_III","Rend","Rend_I","Rend_II","Rend_III","BloodForBlood","IgniteBlood","BloodShield","Entertain","BattleHymn","Lullaby","Lullaby_I","Lullaby_II","Lullaby_III","MagicMissile","MagicMissile_I","MagicMissile_II","MagicMissile_III","LightningBolt","LightningCloud","LightningStorm","Firestorm","SpiritOfLight","SoL_Equalize","SoL_CreateLight","LightSkip","LightSkipMass","LightSkipGlobal","Refraction","LightLance","LightBurst","Sunfire","Sunfire_I","Sunfire_II","Sunfire_III","NanoStimulant","TechnoWeapon","TechnoTurret","TechnoShield","Overdrive","OrbitalStrike","OrbitalStrike_I","OrbitalStrike_II","OrbitalStrike_III","Sabotage","FoldReality","Teleport","ValiantCharge","Overwhelm","BestowMight","BestowMight_I","BestowMight_II","BestowMight_III","DeathBolt","DeathBolt_I","DeathBolt_II","DeathBolt_III","FogOfTorment","CorpseExplosion","CorpseExplosion_I","CorpseExplosion_II","CorpseExplosion_III","ConsumeCorpse","ConsumeCorpse_I","ConsumeCorpse_II","ConsumeCorpse_III","ConsumeCorpse_Mass","DeathMark","DeathMark_I","DeathMark_II","DeathMark_III","FrostRay","FrostRay_I","FrostRay_II","FrostRay_III","AMP","AMP_I","AMP_II","AMP_III"})
         yield return new("SpiritProjectedCast."+spell+"RemainsPhysicalWithOriginalOwner", r =>
             SpiritRebirthRitualTransactionTests.Run(r,c=>{
                 using var fixture=new Fixture(r,c);
@@ -54,6 +54,22 @@ internal static partial class SpiritMapCollapseTests
                 Check.Equal(2.5f,(float)dmg.GetValue(blood)!,"physical blood accrues with the original's potency");
                 Check.Equal(false,blood.CompShouldRemove,"non-blood-mage carrier holds physical blood");
                 Check.Same(body,meter.pawn,"blood remains on host");
+            }));
+        yield return new("ChronomancerRecall.HostMarkRejectsAnotherBodyAndDetachedOwner", r =>
+            SpiritRebirthRitualTransactionTests.Run(r,c=>{
+                using var fixture = new Fixture(r,c);
+                var body=c.Creator; var soul=c.Original; var magic=soul.GetCompAbilityUserMagic();
+                var matches=typeof(TM_Action).GetMethod("RecallMatches",BindingFlags.NonPublic|BindingFlags.Static)!;
+                bool Match(Pawn pawn)=>(bool)matches.Invoke(null,[pawn,magic])!;
+                magic.recallSet=true;
+                Check.Equal(true,Match(soul),"old marks without a body ID belong to their original pawn");
+                Check.Equal(false,Match(body),"old marks cannot restore bodily health onto a host");
+                Set(magic,"recallBodyId",body.thingIDNumber);
+                Check.Equal(true,Match(body),"current host owns physical snapshot");
+                Check.Equal(false,Match(soul),"cannot apply a host's snapshot to the soul");
+                var holder=body.health.hediffSet.hediffs.Select(h=>h.TryGetComp<HediffComp_SpiritPossession>()).First(h=>h!=null);
+                holder.GetDirectlyHeldThings().Remove(soul);
+                Check.Equal(false,Match(body),"losing custody invalidates old body immediately");
             }));
         yield return new("ChronomancerTrial.PredictionFollowsOnlyItsAttachedOwner", r =>
             SpiritRebirthRitualTransactionTests.Run(r,c => {

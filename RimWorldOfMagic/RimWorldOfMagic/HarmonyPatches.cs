@@ -4588,7 +4588,8 @@ namespace TorannMagic
                         return true;
                     }
                     CompAbilityUserMagic comp = pawn.GetCompAbilityUserMagic();
-                    bool flagChrono = comp != null && comp.IsMagicUser && comp.recallSet;
+                    var recallOwner = TM_Action.RecallOwner(pawn, comp);
+                    bool flagChrono = recallOwner != null;
                     if (flagChrono || (dinfo.Value.Def == TMDamageDefOf.DamageDefOf.TM_DisablingBlow || dinfo.Value.Def == TMDamageDefOf.DamageDefOf.TM_Whirlwind || 
                         dinfo.Value.Def == TMDamageDefOf.DamageDefOf.TM_GrapplingHook || dinfo.Value.Def == TMDamageDefOf.DamageDefOf.TM_DisablingShot || 
                         dinfo.Value.Def == TMDamageDefOf.DamageDefOf.TM_Tranquilizer) || TM_Calc.IsUndeadNotVamp(pawn) || TM_Calc.IsPolymorphed(pawn))
@@ -4608,10 +4609,10 @@ namespace TorannMagic
                             {
                                 if (!pawn.Destroyed)
                                 {
-                                    if (comp != null && comp.IsMagicUser && comp.recallSet)
+                                    if (flagChrono)
                                     {
-                                        int pwrVal = comp.MagicData.MagicPowerSkill_Recall.FirstOrDefault((MagicPowerSkill x) => x.label == "TM_Recall_pwr").level;
-                                        if ((pwrVal == 3 || (pwrVal >= 1 && Rand.Chance(.5f))) && TM_Action.TryRecall(pawn, comp, true))
+                                        int pwrVal = ClassProgression.SpiritRebirthRuntime.SavedRank(recallOwner.MagicData,"TM_Recall_pwr");
+                                        if ((pwrVal == 3 || (pwrVal >= 1 && Rand.Chance(.5f))) && TM_Action.TryRecall(pawn, recallOwner, true))
                                         {
                                             result = false;
                                             return false;
@@ -4627,10 +4628,10 @@ namespace TorannMagic
                                 bool flag6 = traverse.Method("ShouldBeDowned").GetValue<bool>(); //, new object[0]).GetValue<bool>() && CheckForStateChange_Patch.pawn != null;
                                 if (flag6)
                                 {
-                                    if (comp != null && comp.IsMagicUser && comp.recallSet)
+                                    if (flagChrono)
                                     {
-                                        int pwrVal = comp.MagicData.MagicPowerSkill_Recall.FirstOrDefault((MagicPowerSkill x) => x.label == "TM_Recall_pwr").level;
-                                        if ((pwrVal == 3 || (pwrVal >= 2 && Rand.Chance(.5f))) && TM_Action.TryRecall(pawn, comp, false))
+                                        int pwrVal = ClassProgression.SpiritRebirthRuntime.SavedRank(recallOwner.MagicData,"TM_Recall_pwr");
+                                        if ((pwrVal == 3 || (pwrVal >= 2 && Rand.Chance(.5f))) && TM_Action.TryRecall(pawn, recallOwner, false))
                                         {
                                             result = false;
                                             return false;
