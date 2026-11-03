@@ -672,7 +672,7 @@ namespace TorannMagic
             // Order is not guaranteed (.OrderBy(injury => injury.Part) if needed for both enumerables)
             IEnumerable<Hediff_Injury> bleedingInjuries = pawn.health.hediffSet.hediffs
                 .OfType<Hediff_Injury>()
-                .Where(injury => injury.Bleeding);
+                .Where(injury => injury.Bleeding).ToList();
 
             int healedInjuries = 0;
             HashSet<BodyPartRecord> bleedingBodyParts = new HashSet<BodyPartRecord>();
@@ -687,7 +687,7 @@ namespace TorannMagic
 
             IEnumerable<Hediff_Injury> injuriesFromNonBleedingParts = pawn.health.hediffSet.hediffs
                 .OfType<Hediff_Injury>()
-                .Where(injury => !bleedingBodyParts.Contains(injury.Part));
+                .Where(injury => !bleedingBodyParts.Contains(injury.Part)).ToList();
 
             foreach (Hediff_Injury injury in injuriesFromNonBleedingParts)
             {

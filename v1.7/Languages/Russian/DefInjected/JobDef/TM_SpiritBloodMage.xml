@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LanguageData>
   <TM_SpiritBloodShield.reportString>создаёт кровавый щит.</TM_SpiritBloodShield.reportString>
+  <TM_SpiritBloodForBlood.reportString>переливает кровь.</TM_SpiritBloodForBlood.reportString>
   <TM_SpiritIgniteBlood.reportString>поджигает кровь.</TM_SpiritIgniteBlood.reportString>
 </LanguageData>

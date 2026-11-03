@@ -85,6 +85,7 @@ namespace TorannMagic.ClassProgression
             ("TM_SpiritLullaby_II", () => TorannMagicDefOf.TM_Lullaby_II, typeof(Verb_Lullaby)),
             ("TM_SpiritLullaby_III", () => TorannMagicDefOf.TM_Lullaby_III, typeof(Verb_Lullaby)),
             ("TM_SpiritIgniteBlood", () => TorannMagicDefOf.TM_IgniteBlood, typeof(Projectile_IgniteBlood)),
+            ("TM_SpiritBloodForBlood", () => TorannMagicDefOf.TM_BloodForBlood, typeof(Verb_BloodForBlood)),
             ("TM_SpiritBloodShield", () => TorannMagicDefOf.TM_BloodShield, typeof(Verb_BloodShield)),
             ("TM_SpiritBattleHymn", () => TorannMagicDefOf.TM_BattleHymn, typeof(Verb_BattleHymn)),
             ("TM_SpiritEntertain", () => TorannMagicDefOf.TM_Entertain, typeof(Verb_Entertain)),
@@ -182,7 +183,7 @@ namespace TorannMagic.ClassProgression
                     def.MainVerb.verbClass == typeof(Verb_UseAbility_TrueBurst)) &&
                     f.effect == def.MainVerb.defaultProjectile?.thingClass &&
                     (typeof(Projectile_SpiritNativeAbility).IsAssignableFrom(f.effect) || typeof(Projectile_SpiritBolt).IsAssignableFrom(f.effect) || typeof(Projectile_SpiritRay).IsAssignableFrom(f.effect) || f.effect == typeof(Projectile_IgniteBlood) || SpiritHostedSummons.IsProjectile(f.effect))))) ||
-                (def.MainVerb.burstShotCount != 1 && !IsBurst(def)) || def.bloodCost != 0 && def != TorannMagicDefOf.TM_BloodShield && def != TorannMagicDefOf.TM_IgniteBlood || def.chiCost != 0 || def.requiredNeed != null ||
+                (def.MainVerb.burstShotCount != 1 && !IsBurst(def)) || def.bloodCost != 0 && def != TorannMagicDefOf.TM_BloodShield && def != TorannMagicDefOf.TM_IgniteBlood && def != TorannMagicDefOf.TM_BloodForBlood || def.chiCost != 0 || def.requiredNeed != null ||
                 def.requiredHediff != null || !def.consumeEnergy || power.MagicUser.Mana == null) return false;
             if (def.bloodCost != 0)
             {
@@ -209,6 +210,7 @@ namespace TorannMagic.ClassProgression
                 !Projectile_RaiseUndead.HasHostedTarget(body.Map, target.Cell, power.magicDef.MainVerb.defaultProjectile)) return false;
             if (power.magicDef.MainVerb.defaultProjectile?.thingClass == typeof(Projectile_CorpseExplosion) &&
                 !Projectile_CorpseExplosion.HasTarget(body.Map,target.Cell)) return false;
+            if (power.magicDef == TorannMagicDefOf.TM_BloodForBlood && !Verb_BloodForBlood.ValidVictim(body,target.Pawn)) return false;
             if (power.magicDef == TorannMagicDefOf.TM_BloodShield && (target.Pawn == null || target.Pawn == body || target.Pawn.Dead)) return false;
             if (power.magicDef == TorannMagicDefOf.TM_Teleport && !Projectile_Teleport.HasSpace(body.Map, target.Cell)) return false;
             if (!SpiritHostedSummons.CanPlace(power.magicDef, body.Map, target.Cell)) return false;
