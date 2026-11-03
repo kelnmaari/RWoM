@@ -4,6 +4,8 @@ param(
     [string]$JecsDir = 'C:/Program Files (x86)/Steam/steamapps/workshop/content/294100/3312959701/1.7/Assemblies',
     [string]$HarmonyDir = 'C:/Program Files (x86)/Steam/steamapps/workshop/content/294100/2009463077/1.7/Assemblies',
     [string]$ModAssembly,
+    [string]$CoreAssembly,
+    [switch]$WithoutCore,
     [string]$VgeDir = 'C:/Program Files (x86)/Steam/steamapps/workshop/content/294100/3609835606/1.7/Assemblies',
     [string]$ArtifactsDir = (Join-Path ([IO.Path]::GetTempPath()) ('rwom-regression-' + [Guid]::NewGuid().ToString('N'))),
     [string]$Filter = '',
@@ -11,6 +13,8 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
+if ($CoreAssembly -and $WithoutCore) { throw "Select a Core assembly or -WithoutCore, not both." }
+$coreForTests = if ($CoreAssembly) { (Resolve-Path -LiteralPath $CoreAssembly).Path } elseif ($WithoutCore) { "disabled" } else { $null }
 $repo = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
 $refs = [IO.Path]::GetFullPath((Join-Path $repo '../refs/out'))
 $ArtifactsDir = [IO.Path]::GetFullPath($ArtifactsDir)
@@ -59,12 +63,22 @@ if ($Reverse) { $testArgs += '--reverse' }
 # same case fail only late in a run. Keep interception stable in this child process;
 # do not change the game's runtime, production build, or the caller's environment.
 $previousNoInline = $env:COMPlus_JitNoInline
+$previousTiering = $env:COMPlus_TieredCompilation
+$previousCore = $env:RWOM_TEST_CORE_ASSEMBLY
 try {
+    $env:RWOM_TEST_CORE_ASSEMBLY = $coreForTests
     $env:COMPlus_JitNoInline = '1'
-    Write-Host 'Harness runtime: COMPlus_JitNoInline=1 (scoped late Harmony interception)'
+    # On .NET 10 a hot method can acquire a new native entry point while a
+    # short-lived test patch is installed. Keep the harness on one code version.
+    $env:COMPlus_TieredCompilation = '0'
+    Write-Host 'Harness runtime: COMPlus_JitNoInline=1, COMPlus_TieredCompilation=0 (scoped Harmony interception)'
     & dotnet (Join-Path $ArtifactsDir 'harness/out/RWoM.RegressionTests.dll') @testArgs 2>&1 | Tee-Object -FilePath (Join-Path $ArtifactsDir 'test-results.log')
     $testExit = $LASTEXITCODE
 }
-finally { $env:COMPlus_JitNoInline = $previousNoInline }
+finally {
+    $env:COMPlus_JitNoInline = $previousNoInline
+    $env:COMPlus_TieredCompilation = $previousTiering
+    $env:RWOM_TEST_CORE_ASSEMBLY = $previousCore
+}
 Write-Host "Regression exit code: $testExit; logs and Scribe XML: $ArtifactsDir"
 exit $testExit
