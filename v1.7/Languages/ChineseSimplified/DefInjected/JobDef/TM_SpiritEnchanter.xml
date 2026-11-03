@@ -1,3 +1,5 @@
 <LanguageData>
   <TM_SpiritTransmutate.reportString>正在嬗变材料。</TM_SpiritTransmutate.reportString>
+  <TM_SpiritEnchantedBody.reportString>正在附魔身体。</TM_SpiritEnchantedBody.reportString>
+  <TM_SpiritEnchantedAura.reportString>正在附魔灵气。</TM_SpiritEnchantedAura.reportString>
 </LanguageData>

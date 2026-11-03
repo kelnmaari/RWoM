@@ -1,3 +1,5 @@
 <LanguageData>
   <TM_SpiritTransmutate.reportString>трансмутирует материал.</TM_SpiritTransmutate.reportString>
+  <TM_SpiritEnchantedBody.reportString>зачаровывает тело.</TM_SpiritEnchantedBody.reportString>
+  <TM_SpiritEnchantedAura.reportString>зачаровывает ауру.</TM_SpiritEnchantedAura.reportString>
 </LanguageData>

@@ -1,3 +1,5 @@
 <LanguageData>
   <TM_SpiritTransmutate.reportString>transmuting a material.</TM_SpiritTransmutate.reportString>
+  <TM_SpiritEnchantedBody.reportString>enchanting the body.</TM_SpiritEnchantedBody.reportString>
+  <TM_SpiritEnchantedAura.reportString>enchanting the aura.</TM_SpiritEnchantedAura.reportString>
 </LanguageData>

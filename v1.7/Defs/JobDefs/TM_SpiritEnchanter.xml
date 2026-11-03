@@ -1,3 +1,5 @@
 <Defs>
   <JobDef><defName>TM_SpiritTransmutate</defName><driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass><reportString>transmuting a material.</reportString></JobDef>
+  <JobDef><defName>TM_SpiritEnchantedBody</defName><driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass><reportString>enchanting the body.</reportString></JobDef>
+  <JobDef><defName>TM_SpiritEnchantedAura</defName><driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass><reportString>enchanting the aura.</reportString></JobDef>
 </Defs>

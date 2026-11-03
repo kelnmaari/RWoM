@@ -20,13 +20,13 @@ namespace TorannMagic.Thoughts
                 {
                     return false;
                 }
-                if (pawn.story.traits.HasTrait(TorannMagicDefOf.Undead) || ClassProgression.ClassIdentity.IsLich(pawn) || pawn.story.traits.HasTrait(TorannMagicDefOf.Enchanter))
+                if (pawn.story.traits.HasTrait(TorannMagicDefOf.Undead) || ClassProgression.ClassIdentity.IsLich(pawn) || ClassProgression.ClassIdentity.IsEnchanter(pawn))
                 {
                     return false;
                 }
                 if (other.health.hediffSet.HasHediff(TorannMagicDefOf.TM_EnchantedAuraHD, false))
                 {
-                    CompAbilityUserMagic comp = other.GetCompAbilityUserMagic();
+                    CompAbilityUserMagic comp = HediffComp_EnchanterAspect.Owner(other.health.hediffSet.GetFirstHediffOfDef(TorannMagicDefOf.TM_EnchantedAuraHD))?.GetCompAbilityUserMagic();
 
                     if (comp != null)
                     {

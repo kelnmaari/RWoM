@@ -6687,11 +6687,25 @@ namespace TorannMagic
                 int rank = ClassProgression.SpiritRebirthRuntime.SavedRank(MagicData,"TM_Prediction_eff");
                 _mpRegenRateUpkeep += def.upkeepRegenCost * (1f - def.upkeepEfficiencyPercent * rank);
             }
+            if (!applyOriginalBody && ClassProgression.SpiritRebirthState.TryGet(Pawn, out var aspectState) &&
+                aspectState.HasValidHost(Pawn))
+            {
+                foreach (var effect in aspectState.Host.health.hediffSet.hediffs)
+                {
+                    if (effect.TryGetComp<HediffComp_EnchanterAspect>()?.projectedOwner != Pawn) continue;
+                    var aspect = effect.def == TorannMagicDefOf.TM_EnchantedBodyHD ? TorannMagicDefOf.TM_EnchantedBody : TorannMagicDefOf.TM_EnchantedAura;
+                    int efficiency = ClassProgression.SpiritRebirthRuntime.SavedRank(MagicData, "TM_EnchantedBody_eff");
+                    int versatility = ClassProgression.SpiritRebirthRuntime.SavedRank(MagicData, "TM_EnchantedBody_ver");
+                    _maxMPUpkeep += aspect.upkeepEnergyCost * (1f - aspect.upkeepEfficiencyPercent * efficiency);
+                    _mpRegenRateUpkeep += aspect.upkeepRegenCost * (1f - aspect.upkeepEfficiencyPercent * versatility);
+                }
+            }
             using (IEnumerator<Hediff> enumerator = this.Pawn.health.hediffSet.hediffs.GetEnumerator())
             {
                 while (enumerator.MoveNext())
                 {
                     Hediff rec = enumerator.Current;
+                    if (rec.TryGetComp<HediffComp_EnchanterAspect>()?.projectedOwner != null) continue;
                     if (rec.def == TorannMagicDefOf.TM_PredictionHD && rec.TryGetComp<HediffComp_Prediction>()?.projectedOwner != null) continue;
                     TMAbilityDef ability = applyOriginalBody ? this.MagicData.GetHediffAbility(rec) : ClassProgression.SpiritRebirthRuntime.SavedHediffAbility(this.MagicData, rec);
                     if (ability != null)
