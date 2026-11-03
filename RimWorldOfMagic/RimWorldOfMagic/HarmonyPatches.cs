@@ -4876,75 +4876,10 @@ namespace TorannMagic
                             }
                         }
                     }
-                    //pseudo magical ability to deflect attacks without taking damage but may not work well if damage is otherwise magically mitigated
-                    //placed here to act before other physical damage mitigation
-                    if (instigator is Pawn pinstigator &&
-                        __instance.health.hediffSet.GetFirstHediffOfDef(TorannMagicDefOf.TM_ReversalHD)?.TryGetComp<HediffComp_Reversal>()?.SkillOwner is Pawn reversalOwner)
+                    if (Verb_Reversal.TryReflect(__instance,dinfo))
                     {
-                        CompAbilityUserMight comp = reversalOwner.GetCompAbilityUserMight();
-                        if (pinstigator.equipment?.PrimaryEq?.PrimaryVerb != null)
-                        {
-                            absorbed = true;
-                            if (__instance.Map != null)
-                            {
-                                Vector3 drawPos = __instance.DrawPos;
-                                drawPos.x += ((pinstigator.DrawPos.x - drawPos.x) / 20f) + Rand.Range(-.2f, .2f);
-                                drawPos.z += ((pinstigator.DrawPos.z - drawPos.z) / 20f) + Rand.Range(-.2f, .2f);
-                                TM_MoteMaker.ThrowSparkFlashMote(drawPos, __instance.Map, 2f);
-                                TM_Action.DoReversal(dinfo, __instance);
-                            }
-
-                            MightPowerSkill ver = comp?.MightData.MightPowerSkill_Reversal.FirstOrDefault((MightPowerSkill x) => x.label == "TM_Reversal_ver");
-                            if (ver?.level > 0)
-                            {
-                                comp.SiphonReversal(ver.level,__instance);
-                            }
-                            return false;
-
-                        }
-                        else if (pinstigator.RaceProps.Animal && dinfo.Amount != 0 && (pinstigator.Position - __instance.Position).LengthHorizontal <= 2)
-                        {
-                            absorbed = true;
-                            if (__instance.Map != null)
-                            {
-                                Vector3 drawPos = __instance.DrawPos;
-                                drawPos.x += ((instigator.DrawPos.x - drawPos.x) / 20f) + Rand.Range(-.2f, .2f);
-                                drawPos.z += ((instigator.DrawPos.z - drawPos.z) / 20f) + Rand.Range(-.2f, .2f);
-                                TM_MoteMaker.ThrowSparkFlashMote(drawPos, __instance.Map, 2f);
-                            }
-                            TM_Action.DoMeleeReversal(dinfo,__instance);
-                            dinfo.SetAmount(0);
-                            MightPowerSkill ver = comp?.MightData.MightPowerSkill_Reversal.FirstOrDefault((MightPowerSkill x) => x.label == "TM_Reversal_ver");
-                            if (ver?.level > 0)
-                            {
-                                comp.SiphonReversal(ver.level,__instance);
-                            }
-                            return false;
-                        }
-
-                        Building instigatorBldg = dinfo.Instigator as Building;
-                        if (instigatorBldg != null)
-                        {
-                            if (instigatorBldg.def.Verbs != null)
-                            {
-                                absorbed = true;
-                                if (__instance.Map != null)
-                                {
-                                    Vector3 drawPos = __instance.DrawPos;
-                                    drawPos.x += ((instigatorBldg.DrawPos.x - drawPos.x) / 20f) + Rand.Range(-.2f, .2f);
-                                    drawPos.z += ((instigatorBldg.DrawPos.z - drawPos.z) / 20f) + Rand.Range(-.2f, .2f);
-                                    TM_MoteMaker.ThrowSparkFlashMote(drawPos, __instance.Map, 2f);
-                                }
-                                comp.DoReversal(dinfo);
-                                dinfo.SetAmount(0);
-                                MightPowerSkill ver = comp?.MightData.MightPowerSkill_Reversal.FirstOrDefault((MightPowerSkill x) => x.label == "TM_Reversal_ver");
-                                if (ver?.level > 0)
-                                {
-                                    comp.SiphonReversal(ver.level,__instance);
-                                }
-                                return false;
-                            }
-                        }
+                        absorbed = true;
+                        return false;
                     }
                     //checks pawn that dealt damage for damage increases, must apply before damage absorption
                     if (dinfo.Instigator.Map != null && dinfo.Instigator is Pawn)

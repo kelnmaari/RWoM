@@ -167,6 +167,26 @@ internal static partial class SpiritMapCollapseTests
                     host.AbilityData.AllPowers=null;
                     Check.Equal(true,Owner()==null,"a lower native rank takes priority");
                 }));
+        yield return new("FacelessProjection.ReversalHitKinds",f=>{
+            var martial=typeof(MightAbility).Assembly.GetType("TorannMagic.Verb_Reversal",true)!;
+            var round=martial.GetMethod("IncomingRound",BindingFlags.Static|BindingFlags.NonPublic);
+            Check.Equal(true,round!=null,"resolve the incoming round using the recorded weapon");
+            var physical=new DamageDef{defName="ReversalTestBullet"};
+            var magic=new DamageDef{defName="ReversalTestDirect"};
+            var explosive=new DamageDef{defName="ReversalTestExplosion",isExplosive=true};
+            var bullet=(ThingDef)RuntimeHelpers.GetUninitializedObject(typeof(ThingDef));
+            bullet.thingClass=typeof(Bullet);bullet.projectile=new ProjectileProperties{damageDef=physical};
+            var weapon=(ThingDef)RuntimeHelpers.GetUninitializedObject(typeof(ThingDef));
+            weapon.defName="ReversalTestGun";
+            Set(weapon,"verbs",new List<VerbProperties>{new(){defaultProjectile=bullet}});
+            object? Incoming(DamageDef damage,ThingDef? recorded)=>round!.Invoke(null,[new DamageInfo(damage,12,weapon:recorded)]);
+            Check.Same(bullet,Incoming(physical,weapon)!,"use recorded bullet even after a weapon swap");
+            Check.Equal(true,Incoming(physical,null)==null,"direct damage or a reflected round cannot bounce again");
+            Check.Equal(true,Incoming(magic,weapon)==null,"direct effect does not copy an unrelated projectile");
+            Check.Equal(true,Incoming(explosive,weapon)==null,"explosion passes through");
+            bullet.projectile.explosionRadius=2;
+            Check.Equal(true,Incoming(physical,weapon)==null,"exclude explosive ammunition");
+        });
         yield return new("FacelessProjection.ReversalOwner",f=>
             SpiritRebirthRitualTransactionTests.Run(f,c=>{
                 using var held=new Fixture(f,c);
