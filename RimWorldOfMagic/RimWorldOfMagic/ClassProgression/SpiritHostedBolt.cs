@@ -91,6 +91,7 @@ namespace TorannMagic.ClassProgression
             ("TM_SpiritRend_III", () => TorannMagicDefOf.TM_Rend_III, typeof(Verb_Rend)),
             ("TM_SpiritEarthSprites", () => TorannMagicDefOf.TM_EarthSprites, typeof(Verb_EarthSprites)),
             ("TM_SpiritDismissEarthSprites", () => TorannMagicDefOf.TM_DismissEarthSprites, typeof(Verb_DismissEarthSprites)),
+            ("TM_SpiritReverseTime", () => TorannMagicDefOf.TM_ReverseTime, typeof(Verb_ReverseTime)),
             ("TM_SpiritAccelerateTime", () => TorannMagicDefOf.TM_AccelerateTime, typeof(Projectile_AccelerateTime)),
             ("TM_SpiritAlterFate", () => TorannMagicDefOf.TM_AlterFate, typeof(Verb_AlterFate)),
             ("TM_SpiritPrediction", () => TorannMagicDefOf.TM_Prediction, typeof(Verb_Prediction)),
@@ -364,7 +365,7 @@ namespace TorannMagic.ClassProgression
             if (verb is Verb_SpiritTargetable direct && Families.Any(f => f.spell() == def && f.effect == props.verbClass))
             {
                 bool travel = Odyssey.ManualTravelSafety.IsTravel(power);
-                if (!travel && !(verb is Verb_EarthSprites) && !(verb is Verb_Summon) && !(verb is Verb_SummonSpiritWolves) && !(verb is Verb_RegrowLimb) && !(verb is ISpiritCorpseConsumer) && !(verb is Verb_Overdrive) && !(verb is Verb_TechnoWeapon) &&
+                if (!travel && !(verb is Verb_ReverseTime) && !(verb is Verb_EarthSprites) && !(verb is Verb_Summon) && !(verb is Verb_SummonSpiritWolves) && !(verb is Verb_RegrowLimb) && !(verb is ISpiritCorpseConsumer) && !(verb is Verb_Overdrive) && !(verb is Verb_TechnoWeapon) &&
                     props.AbilityTargetCategory != AbilityTargetCategory.TargetAoE && !(target.Thing is Pawn { Dead: false }))
                     return false;
                 if (!direct.CastFromHost(target)) return false;

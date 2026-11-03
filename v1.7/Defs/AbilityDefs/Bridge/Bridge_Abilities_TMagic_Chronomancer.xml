@@ -155,6 +155,8 @@ Reverse Time can be dispelled/countered with Accelerate Time.</description>
       <isViolent>false</isViolent>
       <targetParams>
         <canTargetItems>true</canTargetItems>
+        <mapObjectTargetsMustBeAutoAttackable>false</mapObjectTargetsMustBeAutoAttackable>
+        <canTargetCorpses>true</canTargetCorpses>
         <canTargetPawns>true</canTargetPawns>
         <canTargetBuildings>true</canTargetBuildings>
         <canTargetSelf>true</canTargetSelf>

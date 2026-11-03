@@ -3,4 +3,5 @@
   <JobDef><defName>TM_SpiritPrediction</defName><driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass><reportString>predicting the future.</reportString></JobDef>
   <JobDef><defName>TM_SpiritAlterFate</defName><driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass><reportString>altering fate.</reportString></JobDef>
   <JobDef><defName>TM_SpiritAccelerateTime</defName><driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass><reportString>accelerating time.</reportString></JobDef>
+  <JobDef><defName>TM_SpiritReverseTime</defName><driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass><reportString>reversing time.</reportString></JobDef>
 </Defs>

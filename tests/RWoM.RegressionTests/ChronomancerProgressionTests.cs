@@ -13,13 +13,14 @@ internal static class ChronomancerProgressionTests
 {
     public static IEnumerable<TestCase> Cases()
     {
-        yield return new("ChronomancerProgression.AccelerateTimeTargetsOrdinaryItems", f => {
+        foreach (string spell in new[] { "AccelerateTime", "ReverseTime" })
+        yield return new("ChronomancerProgression."+spell+"TargetsOrdinaryItems", f => {
             var def=(ThingDef)RuntimeHelpers.GetUninitializedObject(typeof(ThingDef));
             def.defName="ChronomancerTestTool";def.category=ThingCategory.Item;
             var target=new TargetInfo(new Thing { def=def });
             foreach (var (file,name) in new[] {
-                ("Abilities_TMagic_Chronomancer.xml","TM_AccelerateTime"),
-                ("Bridge/Bridge_Abilities_TMagic_Chronomancer.xml","TM_Bridge_Acceleratetime") })
+                ("Abilities_TMagic_Chronomancer.xml","TM_"+spell),
+                ("Bridge/Bridge_Abilities_TMagic_Chronomancer.xml","TM_Bridge_"+spell.Replace("Time","time")) })
             {
                 var root=XDocument.Load(System.IO.Path.Combine(f.Repository,"v1.7/Defs/AbilityDefs",file)).Root!;
                 var node=root.Elements().Single(n=>(string?)n.Element("defName")==name).Descendants("targetParams").Single();
@@ -27,6 +28,7 @@ internal static class ChronomancerProgressionTests
                     canTargetItems=(bool?)node.Element("canTargetItems") ?? false,
                     mapObjectTargetsMustBeAutoAttackable=(bool?)node.Element("mapObjectTargetsMustBeAutoAttackable") ?? true };
                 Check.Equal(true,parameters.CanTarget(target),name+" selects a normal noncombat item");
+                if (spell=="ReverseTime") Check.Equal(true,(bool?)node.Element("canTargetCorpses") ?? false,name+" accepts corpses");
             }
         });
         yield return new("ChronomancerProgression.NativeBooksAndStageGates", Books);

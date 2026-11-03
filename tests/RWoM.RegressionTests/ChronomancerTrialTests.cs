@@ -11,6 +11,24 @@ internal static class ChronomancerTrialTests
 {
     public static IEnumerable<TestCase> Cases()
     {
+        yield return new("ChronomancerTrial.ReverseCorpseNeverAddsRotOrChargesFailedRevival", f => {
+            using var w=new Fixture(f);
+            var verb=new Verb_ReverseTime();Set(verb,"pwrVal",1);Set(verb,"verVal",0);
+            var corpse=new Corpse();
+            var rot=new CompRottable { parent=corpse };
+            rot.Initialize(new CompProperties_Rottable { daysToRotStart=5 });
+            Set(corpse,"comps",new List<ThingComp> { rot });
+            var apply=typeof(Verb_ReverseTime).GetMethod("AgeCorpse",BindingFlags.NonPublic|BindingFlags.Instance)!;
+            bool Reverse(float amount) {
+                Set(rot,"rotProgressInt",amount);
+                return (bool)apply.Invoke(verb,[corpse,w.Caster])!;
+            }
+            Check.Equal(false,Reverse(100),"insufficient versatility cannot revive");
+            Check.Equal(false,Reverse(12000),"no forced increase to the minimum retained rot");
+            Check.Equal(12000f,rot.RotProgress,"failed cast leaves corpse untouched");
+            Check.Equal(true,Reverse(100000),"decayed corpse can be partially restored");
+            Check.Equal(27500f,rot.RotProgress,"one useful rot reduction");
+        });
         yield return new("ChronomancerTrial.AccelerationAgeDoesNotOverflow", f => {
             var next=typeof(HediffComp_AccelerateTime).GetMethod("NextAge",BindingFlags.Static|BindingFlags.NonPublic)!;
             long Step(long ticks,int years,bool bad)=>(long)next.Invoke(null,[ticks,years,3.5f,bad])!;

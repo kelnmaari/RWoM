@@ -12,7 +12,7 @@ namespace TorannMagic.ClassProgression
         static MagicPower Owner(Pawn pawn, bool reverse) => Magic(pawn)?.MagicData.MagicPowersC.FirstOrDefault(p => p.learned && p.TMabilityDefs.Contains(reverse ? TorannMagicDefOf.TM_ReverseTime : TorannMagicDefOf.TM_Prediction));
         static DisciplineProgress Owned(Pawn pawn, bool reverse)
         {
-            if (pawn == null || pawn.Dead || (reverse ? !pawn.Spawned : ChronomancerPrediction.CastingBody(pawn) == null) || pawn.Faction == null
+            if (pawn == null || pawn.Dead || ChronomancerPrediction.CastingBody(pawn) == null || pawn.Faction == null
                 || pawn.story?.traits?.HasTrait(TorannMagicDefOf.Faceless) == true
                 || !ClassIdentity.TryGetState(pawn, out var state) || (state.Vocation & Vocation.Mage) == 0) return null;
             var path = state.Find("rwom.chronomancer");
@@ -68,12 +68,12 @@ namespace TorannMagic.ClassProgression
                 && source != null && source.ownPredictionTrialSource && !source.removeNow && path.RecordCompletedTrial(FoundationTrialId);
         }
         static bool Finite(float value) => !float.IsNaN(value) && !float.IsInfinity(value);
-        static bool Item(Pawn caster, Thing target) => target != null && !target.Destroyed && target.Spawned && target.Map == caster.Map
+        static bool Item(Pawn body, Thing target) => body != null && target != null && !target.Destroyed && target.Spawned && target.Map == body.Map
             && target.def?.category == ThingCategory.Item && !(target is Corpse) && !(target is Pawn)
-            && (target.Faction == null || !target.Faction.HostileTo(caster.Faction));
+            && (target.Faction == null || !target.Faction.HostileTo(body.Faction));
         public sealed class ReverseSnapshot
         {
-            internal Pawn caster;
+            internal Pawn caster, body;
             internal PawnAbility ability;
             internal Thing target;
             internal MagicPower owner;
@@ -87,10 +87,11 @@ namespace TorannMagic.ClassProgression
         {
             var caster = ability?.Pawn;
             var path = Owned(caster, true);
-            if (path == null || !RuntimeOwned(ability, caster, true) || !Item(caster, target)) return null;
+            var body = ChronomancerPrediction.CastingBody(caster);
+            if (path == null || !RuntimeOwned(ability, caster, true) || !Item(body, target)) return null;
             var rot = food ? target.TryGetComp<CompRottable>() : null;
             if (food ? rot == null || !Finite(rot.RotProgress) || rot.RotProgress <= 0 : !target.def.useHitPoints || target.HitPoints <= 0) return null;
-            return new ReverseSnapshot { caster = caster, ability = ability, target = target, owner = Owner(caster, true), path = path,
+            return new ReverseSnapshot { caster = caster, body = body, ability = ability, target = target, owner = Owner(caster, true), path = path,
                 food = food, rottable = rot, rot = rot?.RotProgress ?? 0, hp = target.HitPoints };
         }
         public static bool CompleteReverse(ReverseSnapshot snapshot)
@@ -98,7 +99,7 @@ namespace TorannMagic.ClassProgression
             if (snapshot == null || snapshot.used) return false;
             snapshot.used = true;
             if (Owned(snapshot.caster, true) != snapshot.path || Owner(snapshot.caster, true) != snapshot.owner
-                || !RuntimeOwned(snapshot.ability, snapshot.caster, true) || !Item(snapshot.caster, snapshot.target)) return false;
+                || !RuntimeOwned(snapshot.ability, snapshot.caster, true) || ChronomancerPrediction.CastingBody(snapshot.caster) != snapshot.body || !Item(snapshot.body, snapshot.target)) return false;
             bool improved = snapshot.food
                 ? snapshot.target.TryGetComp<CompRottable>() == snapshot.rottable && Finite(snapshot.rottable.RotProgress)
                     && snapshot.rottable.RotProgress >= 0 && snapshot.rottable.RotProgress < snapshot.rot
