@@ -11,6 +11,7 @@ internal static class DemonTrialTests
 {
     public static IEnumerable<TestCase> Cases()
     {
+        yield return new("DemonTrials.SharedSummonRequiresTwoReciprocalOwners", RitualPair);
         yield return new("DemonTrials.RankedRepulsionUsesExactProjectileAndDisjointRings", RankedRepulsion);
         yield return new("DemonTrials.ReciprocalNewBondAndOneShot", Bond);
         yield return new("DemonTrials.RejectOccupiedBranchBeforeChangingCurrentBond", Occupied);
@@ -172,6 +173,58 @@ internal static class DemonTrialTests
         var snapshot = DemonTrials.BeforeEffect(shot, w.Target, false); Check.Equal(true, snapshot != null, "saved branch source valid"); Set(slow, "severityInt", .8f);
         Check.Equal(true, DemonTrials.AfterEffect(snapshot), "actual severity increase qualifies"); Check.Equal(false, DemonTrials.AfterEffect(snapshot), "one effect consumed once");
     }
+    static void RitualPair(RuntimeFixture f)
+    {
+        using var w = new Fixture(f,true);
+        var oldDefs=DefDatabase<HediffDef>.AllDefsListForReading.ToArray();
+        var spell=TorannMagicDefOf.TM_SummonDemon;
+        var oldType=spell.abilityClass;
+        var refresh=typeof(TM_Action).Assembly.GetType("TorannMagic.ClassProgression.DemonRitual")!
+            .GetMethod("RefreshControl",BindingFlags.Static|BindingFlags.NonPublic)!;
+        try
+        {
+            DefDatabase<HediffDef>.Clear();
+            spell.abilityClass=typeof(PawnAbility);
+            var other=PawnWithComps(true,false);
+            var state=new CompClassProgression {parent=other.pawn};other.pawn.AllComps.Add(state);
+            state.BeginNewProgression(Vocation.Mage);state.State.TryAddFoundation("rwom.succubus",DisciplineDomain.Magic);
+            void Link(string name,Pawn owner)
+            {
+                var def=new HediffDef {defName=name};
+                DefDatabase<HediffDef>.Add(def);
+                var effect=new HediffWithComps {def=def,pawn=w.Target};
+                var comp=(HediffComp)Activator.CreateInstance(typeof(TM_Action).Assembly.GetType("TorannMagic.HediffComp_SoulBondHost")!)!;
+                comp.parent=effect;Set(comp,"bonderPawn",owner);effect.comps=[comp];
+                w.Target.health.hediffSet.hediffs.Add(effect);
+            }
+            w.Magic.soulBondPawn=w.Target;
+            Link("TM_SoulBondMentalHD",w.Caster);
+            refresh.Invoke(null,[w.Magic]);
+            Check.Equal(false,w.Magic.spell_SummonDemon,"one bond cannot unlock the joint ritual");
+            Link("TM_SoulBondPhysicalHD",other.pawn);
+            refresh.Invoke(null,[w.Magic]);
+            Check.Equal(false,w.Magic.spell_SummonDemon,"one-sided receiver cannot unlock the joint ritual");
+            other.magic.soulBondPawn=w.Target;
+            refresh.Invoke(null,[w.Magic]);refresh.Invoke(null,[other.magic]);
+            var power=w.Magic.AbilityData.Powers.Single(a=>a.Def==spell);power.CooldownTicksLeft=89;
+            refresh.Invoke(null,[w.Magic]);
+            Check.Same(power,w.Magic.AbilityData.Powers.Single(a=>a.Def==spell),"rechecking preserves the runtime spell");
+            Check.Equal(89,power.CooldownTicksLeft,"rechecking preserves the cooldown");
+            Check.Equal(true,other.magic.spell_SummonDemon,"both actual owners gain the command");
+            var debt=new HediffDef {defName="TM_DemonicPriceHD"};
+            DefDatabase<HediffDef>.Add(debt);
+            w.Target.health.hediffSet.hediffs.Add(new Hediff {def=debt,pawn=w.Target});
+            refresh.Invoke(null,[w.Magic]);refresh.Invoke(null,[other.magic]);
+            Check.Equal(false,w.Magic.AbilityData.Powers.Any(a=>a.Def==spell)||other.magic.AbilityData.Powers.Any(a=>a.Def==spell),"demonic price revokes both ritual commands");
+        }
+        finally
+        {
+            spell.abilityClass=oldType;
+            DefDatabase<HediffDef>.Clear();
+            foreach(var def in oldDefs)DefDatabase<HediffDef>.Add(def);
+        }
+    }
+
     static void RankedRepulsion(RuntimeFixture f)
     {
         using var w = new Fixture(f,true,true);

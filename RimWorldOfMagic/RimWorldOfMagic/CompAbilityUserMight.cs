@@ -5175,6 +5175,8 @@ namespace TorannMagic
 
         public void LoadCustomClassAbilities(TMDefs.TM_CustomClass cc, Pawn fromPawn = null)
         {
+            var powers = MightData?.AllMightPowers;
+            if (powers == null) return;
             for (int i = 0; i < cc.classFighterAbilities.Count; i++)
             {
                 TMAbilityDef ability = cc.classFighterAbilities[i];
@@ -5189,7 +5191,7 @@ namespace TorannMagic
                     {
                         if (fp.learned && cc.classFighterAbilities.Contains(fp.abilityDef))
                         {
-                            MightPower mp = this.MightData.AllMightPowers.FirstOrDefault((MightPower x) => x.abilityDef == fp.TMabilityDefs[0]);
+                            MightPower mp = powers.FirstOrDefault((MightPower x) => x.abilityDef == fp.TMabilityDefs[0]);
                             if (mp != null)
                             {
                                 mp.learned = true;
@@ -5199,14 +5201,14 @@ namespace TorannMagic
                     }
                 }
 
-                for (int j = 0; j < this.MightData.AllMightPowers.Count; j++)
+                for (int j = 0; j < powers.Count; j++)
                 {
-                    if (this.MightData.AllMightPowers[j].TMabilityDefs.Contains(ability) && this.MightData.AllMightPowers[j].learned)
+                    if (powers[j].TMabilityDefs.Contains(ability) && powers[j].learned)
                     {
                         if (ability.shouldInitialize)
                         {
-                            int level = this.MightData.AllMightPowers[j].level;
-                            base.AddPawnAbility(this.MightData.AllMightPowers[j].TMabilityDefs[level]);
+                            int level = powers[j].level;
+                            base.AddPawnAbility(powers[j].TMabilityDefs[level]);
                         }
                         if (ability.childAbilities != null && ability.childAbilities.Count > 0)
                         {

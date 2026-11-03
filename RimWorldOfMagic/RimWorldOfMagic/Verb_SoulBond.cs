@@ -99,6 +99,7 @@ namespace TorannMagic
                     comp.AddPawnAbility(TorannMagicDefOf.TM_ShadowStep);
                 }
             }
+            ClassProgression.DemonRitual.BondChanged(comp,flagWD,oldBondPawn,comp.soulBondPawn);
             ClassProgression.DemonTrials.AfterBond(bondObservation);
             return true;
         }

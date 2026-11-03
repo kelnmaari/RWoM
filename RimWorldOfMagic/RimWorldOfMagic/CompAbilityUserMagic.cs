@@ -6325,46 +6325,8 @@ namespace TorannMagic
                     }
                 }
 
-                if (ClassProgression.ClassIdentity.IsSuccubus(this.Pawn) || ClassProgression.ClassIdentity.IsWarlock(this.Pawn))
-                {
-                    if (this.soulBondPawn != null)
-                    {
-                        if (!this.soulBondPawn.Spawned)
-                        {
-                            this.RemovePawnAbility(TorannMagicDefOf.TM_SummonDemon);
-                            this.spell_SummonDemon = false;
-                        }
-                        else if (this.soulBondPawn.health.hediffSet.HasHediff(HediffDef.Named("TM_DemonicPriceHD"), false))
-                        {
-                            if (this.spell_SummonDemon == true)
-                            {
-                                this.RemovePawnAbility(TorannMagicDefOf.TM_SummonDemon);
-                                this.spell_SummonDemon = false;
-                            }
-                        }
-                        else if (this.soulBondPawn.health.hediffSet.HasHediff(HediffDef.Named("TM_SoulBondMentalHD")) && this.soulBondPawn.health.hediffSet.HasHediff(HediffDef.Named("TM_SoulBondPhysicalHD")))
-                        {
-                            if (this.spell_SummonDemon == false)
-                            {
-                                this.AddPawnAbility(TorannMagicDefOf.TM_SummonDemon);
-                                this.spell_SummonDemon = true;
-                            }
-                        }
-                        else
-                        {
-                            if (this.spell_SummonDemon == true)
-                            {
-                                this.RemovePawnAbility(TorannMagicDefOf.TM_SummonDemon);
-                                this.spell_SummonDemon = false;
-                            }
-                        }
-                    }
-                    else if (this.spell_SummonDemon == true)
-                    {
-                        this.RemovePawnAbility(TorannMagicDefOf.TM_SummonDemon);
-                        this.spell_SummonDemon = false;
-                    }
-                }
+                if (spell_SummonDemon || ClassProgression.ClassIdentity.IsSuccubus(Pawn) || ClassProgression.ClassIdentity.IsWarlock(Pawn))
+                    ClassProgression.DemonRitual.RefreshControl(this);
             }
 
             if (this.IsMagicUser && !this.Pawn.Dead & !this.Pawn.Downed && (ClassProgression.ClassIdentity.IsBard(this.Pawn) || (isCustom && this.customClass.classMageAbilities.Contains(TorannMagicDefOf.TM_Inspire))))
@@ -7078,7 +7040,10 @@ namespace TorannMagic
                 TM_PawnTracker.ResolveMagicComp(this);
                 RecoverMissingProgression();
                 if (soulBondPawn != null)
-                    LongEventHandler.ExecuteWhenFinished(() => ClassProgression.DemonSoulBond.RestoreTravelControls(this));
+                    LongEventHandler.ExecuteWhenFinished(() => {
+                        ClassProgression.DemonSoulBond.RestoreTravelControls(this);
+                        ClassProgression.DemonRitual.RefreshControl(this);
+                    });
                 if (livingWall != null && ClassProgression.SpiritRebirthEnergy.Marked(Pawn))
                     LongEventHandler.ExecuteWhenFinished(() => ClassProgression.GolemancerLifecycle.SyncWallControl(this));
                 if (brands?.Count > 0 && ClassProgression.SpiritRebirthEnergy.Marked(Pawn))

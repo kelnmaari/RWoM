@@ -75,6 +75,7 @@ namespace TorannMagic.ClassProgression
                 var effect = partner.health?.hediffSet?.GetFirstHediffOfDef(Receiver(mental));
                 if (effect?.TryGetComp<HediffComp_SoulBondHost>()?.BonderPawn == owner) partner.health.RemoveHediff(effect);
             }
+            DemonRitual.BondChanged(magic,mental,partner,null);
         }
 
         internal static void RestoreTravelControls(CompAbilityUserMagic magic)
@@ -99,6 +100,7 @@ namespace TorannMagic.ClassProgression
                 RemoveSource(body,soul,false,true);
                 return;
             }
+            DemonRitual.RefreshControl(magic);
             var partner = magic?.soulBondPawn;
             if (partner == null || state.DepletionPending || !state.HasValidHost(soul)) return;
             if (partner.Destroyed || partner.Dead)

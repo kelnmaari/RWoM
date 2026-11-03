@@ -124,6 +124,7 @@ namespace TorannMagic.ClassProgression
             ("TM_SpiritAttraction_I", () => TorannMagicDefOf.TM_Attraction_I, typeof(Projectile_Attraction)),
             ("TM_SpiritAttraction_II", () => TorannMagicDefOf.TM_Attraction_II, typeof(Projectile_Attraction)),
             ("TM_SpiritAttraction_III", () => TorannMagicDefOf.TM_Attraction_III, typeof(Projectile_Attraction)),
+            ("TM_SpiritSummonDemon", () => TorannMagicDefOf.TM_SummonDemon, typeof(Verb_SummonDemon)),
             ("TM_SpiritScorn", () => TorannMagicDefOf.TM_Scorn, typeof(Projectile_Scorn)),
             ("TM_SpiritPsychicShock", () => TorannMagicDefOf.TM_PsychicShock, typeof(Projectile_PsychicShock)),
             ("TM_SpiritDominate", () => TorannMagicDefOf.TM_Dominate, typeof(Verb_Dominate)),
@@ -281,6 +282,7 @@ namespace TorannMagic.ClassProgression
                 (def.MainVerb.burstShotCount != 1 && !IsBurst(def)) || def.bloodCost != 0 && def != TorannMagicDefOf.TM_BloodShield && def != TorannMagicDefOf.TM_IgniteBlood && def != TorannMagicDefOf.TM_BloodForBlood && def.MainVerb.verbClass != typeof(Verb_Rend) && def.MainVerb.defaultProjectile?.thingClass != typeof(Projectile_BloodMoon) || def.chiCost != 0 ||
                 (def.requiredNeed != null && def != TorannMagicDefOf.TM_MindKiller && def != TorannMagicDefOf.TM_SuppressiveAura && def != TorannMagicDefOf.TM_IncitePassion && def != TorannMagicDefOf.TM_HarvestPassion && def != TorannMagicDefOf.TM_FadeEmotions && def != TorannMagicDefOf.TM_Symbiosis) ||
                 def.requiredHediff != null || !def.consumeEnergy || power.MagicUser.Mana == null) return false;
+            if (def == TorannMagicDefOf.TM_SummonDemon && !DemonRitual.CanStart(body,power.Pawn,out _,out _,out _)) return false;
             if (def == TorannMagicDefOf.TM_HarvestPassion && !body.Inspired) return false;
             if (def == TorannMagicDefOf.TM_IncitePassion && (body.IsSlave || power.Pawn.IsSlave)) return false;
             if (def == TorannMagicDefOf.TM_SuppressiveAura)
@@ -513,7 +515,7 @@ namespace TorannMagic.ClassProgression
                     return false;
                 var soundPosition = new TargetInfo(body.Position, body.Map);
                 if (!direct.CastFromHost(target)) return false;
-                if (!travel && !DemonBondTravel.Applies(power) && !(direct is Verb_FoldReality) && !(direct is Verb_LightSkipGlobal)) power.PayForAttempt(body);
+                if (!travel && !(direct is Verb_SummonDemon) && !DemonBondTravel.Applies(power) && !(direct is Verb_FoldReality) && !(direct is Verb_LightSkipGlobal)) power.PayForAttempt(body);
                 props.soundCast?.PlayOneShot(soundPosition);
                 return true;
             }
