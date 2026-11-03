@@ -19,10 +19,13 @@ namespace TorannMagic.ClassProgression
         internal static int Cares(Pawn ranger) => RangerCareer.Path(ranger)?.RangerCares ?? 0;
 
         internal static void Retreat(Pawn ranger, Pawn ally)
+            => RetreatFrom(ranger,ranger,ally);
+
+        internal static void RetreatFrom(Pawn body,Pawn owner,Pawn ally)
         {
-            var path = RangerCareer.Path(ranger);
-            if (!Training(path) || ranger?.Spawned != true || ally == null || ally == ranger || ally.thingIDNumber <= 0 ||
-                !ally.Spawned || ally.Map != ranger.Map || ally.Faction == null || ally.Faction != ranger.Faction) return;
+            var path=RangerCareer.ActivePath(body,out var current);
+            if (current!=owner || !Training(path) || body?.Spawned != true || ally == null || ally == body || ally.thingIDNumber <= 0 ||
+                !ally.Spawned || ally.Map != body.Map || ally.Faction == null || ally.Faction != body.Faction) return;
             int now = Find.TickManager.TicksGame;
             path.RangerRetreatTimes ??= new Dictionary<int,int>();
             if (path.RangerRetreatTimes.TryGetValue(ally.thingIDNumber, out int last) && (long)now - last < GenDate.TicksPerDay) return;

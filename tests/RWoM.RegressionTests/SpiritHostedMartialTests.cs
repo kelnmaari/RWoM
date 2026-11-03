@@ -146,6 +146,38 @@ internal static partial class SpiritMapCollapseTests
                     var local=c.Creator.GetCompAbilityUserMight();local.AbilityData.Powers.Add(new MightAbility(local){Def=def});local.AbilityData.AllPowers=null;
                     Check.Equal(true,Power()==null,"the host's own technique has priority");
                 }));
+        yield return new("RangerProjection.SafeTrailAfterLoad", f =>
+            SpiritRebirthRitualTransactionTests.Run(f,c => {
+                using var held=new Fixture(f,c);
+                var state=new ClassProgressionState(Vocation.Warrior);
+                Set(ClassIdentity.Component(c.Original),"state",state);
+                state.TryAddFoundation("rwom.ranger",DisciplineDomain.Might);
+                var path=state.Find("rwom.ranger");Set(path,"stage",InitiationStage.Master);
+                path.RecordCompletedTrial("rwom.ranger.routes");
+                var might=c.Original.GetCompAbilityUserMight();
+                var def=DefDatabase<TMAbilityDef>.GetNamedSilentFail("TM_RangerSafeTrail")??f.AddAbility("TM_RangerSafeTrail");
+                var power=new MightAbility(might){Def=def};might.AbilityData.Powers.Add(power);might.AbilityData.AllPowers=null;
+                var foe=new Faction{def=new FactionDef()};
+                Set(foe,"relations",new List<FactionRelation>{new(){other=c.Creator.Faction,kind=FactionRelationKind.Hostile}});
+                var rel=typeof(Faction).GetField("relations",BindingFlags.Instance|BindingFlags.NonPublic)!;
+                var previous=rel.GetValue(c.Creator.Faction);
+                var pos=c.Creator.Position;
+                Set(c.Creator.Faction,"relations",new List<FactionRelation>{new(){other=foe,kind=FactionRelationKind.Hostile}});
+                try
+                {
+                    Pawn Traveler(int id,Faction faction)
+                    {
+                        var pawn=PawnWithComps(false,false).pawn;
+                        pawn.kindDef=new PawnKindDef{race=pawn.def};pawn.def.category=ThingCategory.Pawn;pawn.def.size=new IntVec2(1,1);
+                        pawn.mindState=new Pawn_MindState(pawn);pawn.guest=new Pawn_GuestTracker(pawn);pawn.thingIDNumber=id;
+                        Set(pawn,"mapIndexOrState",(sbyte)0);Set(pawn,"factionInt",faction);
+                        return pawn;
+                    }
+                    Set(c.Creator,"positionInt",new IntVec3(7,0,7));
+                    RangerTrailTests.Trail(f,c.Creator,Traveler(21924+1,c.Creator.Faction),Traveler(21926,foe),power);
+                }
+                finally { rel.SetValue(c.Creator.Faction,previous);Set(c.Creator,"positionInt",pos); }
+            }));
         foreach(bool trails in new[]{false,true})
             yield return new(trails?"RangerProjection.OutdoorHaul":"RangerProjection.ClassicTraining", f =>
                 SpiritRebirthRitualTransactionTests.Run(f,c => {

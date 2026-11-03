@@ -71,9 +71,9 @@ internal static class RangerTrailTests
 
     public static Pawn? KnownThreat;
     public static bool Threat(IAttackTarget target,ref bool __result) {__result=target.Thing==KnownThreat;return false;}
-    internal static void Trail(RuntimeFixture f,Pawn ranger,Pawn companion,Pawn victim)
+    internal static void Trail(RuntimeFixture f,Pawn ranger,Pawn companion,Pawn victim,MightAbility? power=null)
     {
-        var path=ClassIdentity.Component(ranger).State.Find("rwom.ranger")!;
+        var path=ClassIdentity.Component(power?.Pawn??ranger).State.Find("rwom.ranger")!;
         var fields=new[]{"RangerRetreats","RangerRetreatTimes"}.ToDictionary(k=>k,k=>path.GetType().GetField(k,Impl)!.GetValue(path));
         var map=ranger.Map;var oldPawns=map.mapPawns;var oldFog=map.fogGrid;var oldPos=companion.Position;var oldEnemyPos=victim.Position;
         var oldMind=companion.mindState;var oldPather=companion.pather;
@@ -101,6 +101,7 @@ internal static class RangerTrailTests
             }
             var second=SecondTraveler(21923,6);var third=SecondTraveler(21924,7);
             var verb=new Verb_RangerSafeTrail{caster=ranger,verbProps=new VerbProperties_Ability{range=8}};
+            if(power!=null)verb.Ability=power;
             Set(verb,"currentTarget",new LocalTargetInfo(end));var cast=typeof(Verb_RangerSafeTrail).GetMethod("TryCastShot",Impl)!;
             Check.Equal(false,verb.CanHitTargetFrom(start,start),"no zero-cell trail");
             Check.Equal(false,verb.CanHitTargetFrom(start,end+IntVec3.East),"eight actual cells maximum");
@@ -117,9 +118,17 @@ internal static class RangerTrailTests
             try {Scribe.loader.InitLoading(file);Scribe_Deep.Look(ref trails,"mapComp",map);
                 var directory=(LoadedObjectDirectory)typeof(CrossRefHandler).GetField("loadedObjectDirectory",Impl)!.GetValue(Scribe.loader.crossRefs)!;
                 directory.RegisterLoaded(ranger);directory.RegisterLoaded(companion);directory.RegisterLoaded(victim);directory.RegisterLoaded(second);
+                if(power!=null)directory.RegisterLoaded(power.Pawn);
                 Scribe.loader.FinalizeLoading();
             }finally{Scribe.ForceStop();}
             Check.Equal(1.15f,Speed(companion),"loaded route and participant restored");
+            if(power!=null)
+            {
+                var mark=ranger.health.hediffSet.GetFirstHediffOfDef(TorannMagicDefOf.TM_SpiritPossessionHD);
+                ranger.health.hediffSet.hediffs.Remove(mark);
+                try { Check.Equal(1f,Speed(companion),"former host cannot sustain a loaded route"); }
+                finally { ranger.health.hediffSet.hediffs.Add(mark); }
+            }
             void Walk(IntVec3 pos)
             {
                 map.thingGrid.Deregister(companion);Set(companion,"positionInt",pos);map.thingGrid.Register(companion);
