@@ -27,9 +27,9 @@ namespace TorannMagic.ClassProgression
             if (!SpiritRebirthState.TryGet(owner,out var state)) return owner?.Spawned == true ? owner : null;
             return !state.DepletionPending && state.HasValidHost(owner) && state.Host.Spawned ? state.Host : null;
         }
-        static DisciplineProgress Owned(Pawn pawn, bool ignite)
+        static DisciplineProgress Owned(Pawn pawn, bool ignite, Map effectMap = null)
         {
-            if (pawn == null || pawn.Dead || (ignite ? !pawn.Spawned : ShieldBody(pawn) == null) || pawn.Faction == null
+            if (pawn == null || pawn.Dead || (ignite ? !pawn.Spawned && (effectMap == null || !SpiritRebirthState.TryGet(pawn,out _)) : ShieldBody(pawn) == null) || pawn.Faction == null
                 || pawn.story?.traits?.HasTrait(TorannMagicDefOf.Faceless) == true
                 || !ClassIdentity.TryGetState(pawn, out var state) || (state.Vocation & Vocation.Mage) == 0) return null;
             var path = state.Find("rwom.bloodmage");
@@ -40,8 +40,8 @@ namespace TorannMagic.ClassProgression
             && ability.Def == (ignite ? TorannMagicDefOf.TM_IgniteBlood : TorannMagicDefOf.TM_BloodShield)
             && ability.AbilityUser == Magic(caster) && Magic(caster)?.AbilityData.Powers.Any(p => ReferenceEquals(p, ability)) == true;
         static bool Finite(float value) => !float.IsNaN(value) && !float.IsInfinity(value);
-        static bool Living(Pawn caster, Pawn target) => target != null && target != caster && !target.Dead && target.Spawned
-            && target.Map == caster.Map && !target.IsPrisoner && !target.IsSlave && !TM_Calc.IsUndead(target) && target.health?.hediffSet != null;
+        static bool Living(Pawn caster, Pawn target, Map map = null) => target != null && target != caster && !target.Dead && target.Spawned
+            && target.Map == (map ?? caster.Map) && !target.IsPrisoner && !target.IsSlave && !TM_Calc.IsUndead(target) && target.health?.hediffSet != null;
         static bool Ally(Pawn caster, Pawn target) => Living(caster, target) && target.RaceProps?.Humanlike == true && target.Faction == caster.Faction;
         static Hediff Shield(Pawn pawn) => pawn.health.hediffSet.hediffs.FirstOrDefault(h => h.def.defName == "TM_BloodShieldHD");
         public sealed class ShieldSnapshot
@@ -76,8 +76,9 @@ namespace TorannMagic.ClassProgression
         {
             public int casterId;
             public string abilityId;
+            internal bool projected;
             internal MagicPower owner;
-            public void ExposeData() { Scribe_Values.Look(ref casterId, "casterId", 0); Scribe_Values.Look(ref abilityId, "abilityId"); }
+            public void ExposeData() { Scribe_Values.Look(ref casterId, "casterId", 0); Scribe_Values.Look(ref abilityId, "abilityId"); Scribe_Values.Look(ref projected,"TM_projected"); }
         }
         static bool Valid(Tag tag) => tag != null && tag.casterId > 0 && tag.abilityId == "TM_IgniteBlood";
         static readonly ConditionalWeakTable<Projectile_AbilityBase, Tag> projectileTags = new ConditionalWeakTable<Projectile_AbilityBase, Tag>();
@@ -97,13 +98,21 @@ namespace TorannMagic.ClassProgression
             if (Valid(tag) && projectile is Projectile_IgniteBlood && projectile.def?.defName == "Projectile_IgniteBlood"
                 && caster?.thingIDNumber == tag.casterId && ability == TorannMagicDefOf.TM_IgniteBlood) projectileTags.Add(projectile, tag);
         }
+        internal static void StampHosted(Projectile_IgniteBlood field, MagicAbility ability)
+        {
+            var owner = ability.Pawn;
+            if (field.SpellOwner != owner || !SpiritRebirthState.TryGetPossessingSpirit(field.Caster, out var held) ||
+                held != owner || !RuntimeOwned(ability,owner,true) || Owned(owner,true,field.Map) == null) return;
+            projectileTags.Remove(field);
+            projectileTags.Add(field,new Tag { casterId=owner.thingIDNumber, abilityId=ability.Def.defName, owner=Owner(owner,true), projected=true });
+        }
         static Tag Source(Projectile_AbilityBase projectile)
         {
             if (projectile == null) return null;
             projectileTags.TryGetValue(projectile, out var tag);
-            return Valid(tag) && projectile is Projectile_IgniteBlood && projectile.Caster?.thingIDNumber == tag.casterId
+            return Valid(tag) && projectile is Projectile_IgniteBlood field && field.SpellOwner?.thingIDNumber == tag.casterId
                 && projectile.def?.defName == "Projectile_IgniteBlood" && projectile.localAbilityDef == TorannMagicDefOf.TM_IgniteBlood
-                && (tag.owner == null || tag.owner == Owner(projectile.Caster, true)) ? tag : null;
+                && (tag.owner == null || tag.owner == Owner(field.SpellOwner, true)) ? tag : null;
         }
         public static void ExposeProjectile(Projectile_AbilityBase projectile)
         {
@@ -117,7 +126,8 @@ namespace TorannMagic.ClassProgression
         public static CreationScope BeginExplosion(Projectile_AbilityBase projectile, IntVec3 center)
         {
             var previous = creating; var tag = Source(projectile);
-            creating = tag != null && Owned(projectile.Caster, true) != null ? new CreationScope { tag = tag, map = projectile.Map, center = center, caster = projectile.Caster } : null;
+            var caster = (projectile as Projectile_IgniteBlood)?.SpellOwner;
+            creating = tag != null && Owned(caster,true,projectile.Map) != null ? new CreationScope { tag = tag, map = projectile.Map, center = center, caster = caster } : null;
             return previous;
         }
         public static void EndExplosion(CreationScope previous) => creating = previous;
@@ -152,8 +162,8 @@ namespace TorannMagic.ClassProgression
             if (scope.used || scope.victim != victim || damage.Instigator != scope.explosion.instigator || damage.Instigator?.thingIDNumber != scope.tag.casterId
                 || damage.Def != scope.explosion.damType || damage.Def != TMDamageDefOf.DamageDefOf.TM_BloodBurn) return hit;
             scope.used = true;
-            var caster = damage.Instigator as Pawn; var target = victim as Pawn; var path = Owned(caster, true);
-            if (path == null || (scope.tag.owner != null && scope.tag.owner != Owner(caster, true)) || !Living(caster, target) || !target.HostileTo(caster)
+            var caster = damage.Instigator as Pawn; var target = victim as Pawn; var map = scope.tag.projected ? scope.explosion.Map : null; var path = Owned(caster, true, map);
+            if (path == null || (scope.tag.owner != null && scope.tag.owner != Owner(caster, true)) || !Living(caster, target, map) || !target.HostileTo(caster)
                 || (target.Faction == null ? !target.InAggroMentalState : target.Faction == caster.Faction || !target.Faction.HostileTo(caster.Faction))) return hit;
             hit.caster = caster; hit.owner = Owner(caster, true); hit.path = path; return hit;
         }
@@ -162,7 +172,7 @@ namespace TorannMagic.ClassProgression
             if (hit == null || hit.consumed) return;
             hit.consumed = true;
             float damage = result?.totalDamageDealt ?? 0;
-            if (hit.path == null || !Finite(damage) || damage <= 0 || Owned(hit.caster, true) != hit.path || Owner(hit.caster, true) != hit.owner) return;
+            if (hit.path == null || !Finite(damage) || damage <= 0 || Owned(hit.caster, true, hit.previous.tag.projected ? hit.previous.explosion.Map : null) != hit.path || Owner(hit.caster, true) != hit.owner) return;
             var progress = hit.path.BloodMageTrials;
             progress.IgniteDamage = Math.Min(20, progress.IgniteDamage + damage);
             if (progress.IgniteDamage >= 20) hit.path.RecordCompletedTrial(MasteryTrialId);

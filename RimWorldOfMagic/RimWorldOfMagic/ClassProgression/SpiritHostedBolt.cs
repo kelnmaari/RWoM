@@ -84,6 +84,7 @@ namespace TorannMagic.ClassProgression
             ("TM_SpiritLullaby_I", () => TorannMagicDefOf.TM_Lullaby_I, typeof(Verb_Lullaby)),
             ("TM_SpiritLullaby_II", () => TorannMagicDefOf.TM_Lullaby_II, typeof(Verb_Lullaby)),
             ("TM_SpiritLullaby_III", () => TorannMagicDefOf.TM_Lullaby_III, typeof(Verb_Lullaby)),
+            ("TM_SpiritIgniteBlood", () => TorannMagicDefOf.TM_IgniteBlood, typeof(Projectile_IgniteBlood)),
             ("TM_SpiritBloodShield", () => TorannMagicDefOf.TM_BloodShield, typeof(Verb_BloodShield)),
             ("TM_SpiritBattleHymn", () => TorannMagicDefOf.TM_BattleHymn, typeof(Verb_BattleHymn)),
             ("TM_SpiritEntertain", () => TorannMagicDefOf.TM_Entertain, typeof(Verb_Entertain)),
@@ -180,8 +181,8 @@ namespace TorannMagic.ClassProgression
                     def.MainVerb.verbClass == typeof(Verb_LightSkip) || def.MainVerb.verbClass == typeof(Verb_BLOS) || def.MainVerb.verbClass == typeof(Verb_FogOfTorment) || def.MainVerb.verbClass == typeof(Verb_LightningCloud) || typeof(Verb_RankedStormField).IsAssignableFrom(def.MainVerb.verbClass) ||
                     def.MainVerb.verbClass == typeof(Verb_UseAbility_TrueBurst)) &&
                     f.effect == def.MainVerb.defaultProjectile?.thingClass &&
-                    (typeof(Projectile_SpiritNativeAbility).IsAssignableFrom(f.effect) || typeof(Projectile_SpiritBolt).IsAssignableFrom(f.effect) || typeof(Projectile_SpiritRay).IsAssignableFrom(f.effect) || SpiritHostedSummons.IsProjectile(f.effect))))) ||
-                (def.MainVerb.burstShotCount != 1 && !IsBurst(def)) || def.bloodCost != 0 && def != TorannMagicDefOf.TM_BloodShield || def.chiCost != 0 || def.requiredNeed != null ||
+                    (typeof(Projectile_SpiritNativeAbility).IsAssignableFrom(f.effect) || typeof(Projectile_SpiritBolt).IsAssignableFrom(f.effect) || typeof(Projectile_SpiritRay).IsAssignableFrom(f.effect) || f.effect == typeof(Projectile_IgniteBlood) || SpiritHostedSummons.IsProjectile(f.effect))))) ||
+                (def.MainVerb.burstShotCount != 1 && !IsBurst(def)) || def.bloodCost != 0 && def != TorannMagicDefOf.TM_BloodShield && def != TorannMagicDefOf.TM_IgniteBlood || def.chiCost != 0 || def.requiredNeed != null ||
                 def.requiredHediff != null || !def.consumeEnergy || power.MagicUser.Mana == null) return false;
             if (def.bloodCost != 0)
             {
@@ -362,6 +363,7 @@ namespace TorannMagic.ClassProgression
             if (shot is Projectile_SpiritBolt bolt) bolt.PrepareProjection(power);
             else if (shot is Projectile_SpiritNativeAbility native) native.SetSource(power.Pawn);
             else if (shot is Projectile_SpiritRay laser) laser.PrepareProjection(power);
+            else if (shot is Projectile_IgniteBlood ignite) ignite.PrepareHosted(power);
             else if (!SpiritHostedSummons.Prepare(shot, power)) return false;
             var map = body.Map;
             var start = body.Position;
@@ -375,6 +377,7 @@ namespace TorannMagic.ClassProgression
             var flags = ProjectileHitFlags.IntendedTarget | ProjectileHitFlags.NonTargetPawns;
             if (!target.HasThing || target.Thing.def.Fillage == FillCategory.Full) flags |= ProjectileHitFlags.NonTargetWorld;
             shot.Launch(body,power.Def,drawPos,target,flags,false,null,props.hediffsToApply,props.mentalStatesToApply,props.thingsToSpawn);
+            if (shot is Projectile_IgniteBlood fire) BloodMageTrials.StampHosted(fire, power);
             if (shot is Projectile_HostedDeathBolt) Effect_DeathBolt.SpawnOrb(body, power.Pawn, target);
             if (shot is Projectile_SpiritMissile) ArcanistTrials.StampHostedMissile(shot, power);
             if (shot is Projectile_LightningCloud) LightningTrials.StampHosted(shot, power, LightningTrials.Spell.Cloud);

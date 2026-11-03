@@ -264,12 +264,30 @@ internal static class BloodMageTrialTests
 
     static void Save(RuntimeFixture f)
     {
+        var culture = System.Globalization.CultureInfo.CurrentCulture;
+        try
+        {
+            System.Globalization.CultureInfo.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
+            SaveFieldAndTrial(f);
+        }
+        finally { System.Globalization.CultureInfo.CurrentCulture = culture; }
+    }
+
+    static void SaveFieldAndTrial(RuntimeFixture f)
+    {
         using var w = new Fixture(f); using var hooks = new Hooks(); w.Adept(); var projectile = w.Launch(); var e = w.Explosion(projectile); w.Hit(e, 11);
+        Set(projectile,"arcaneDmg",2.75f);
+        Set(projectile,"BF",new List<BloodFire>{new(new IntVec3(3,0,4),2)});
         projectile.SeedCaster(null); projectile.usedTarget = projectile.intendedTarget = IntVec3.Zero; e.instigator = null;
         var data = new Envelope { state = w.Progression.State, projectile = projectile, explosion = e }; var file = System.IO.Path.Combine(f.WorkingDirectory, "blood-trial.xml");
         try { Scribe.saver.InitSaving(file, "regression"); Scribe_Deep.Look(ref data, "data"); Scribe.saver.FinalizeSaving(); } finally { Scribe.ForceStop(); }
         Envelope loaded = null!;
         try { Scribe.loader.InitLoading(file); Scribe_Deep.Look(ref loaded, "data"); Scribe.loader.FinalizeLoading(); } finally { Scribe.ForceStop(); }
+        var flags=BindingFlags.Instance|BindingFlags.NonPublic;
+        Check.Equal(2.75f,(float)typeof(Projectile_IgniteBlood).GetField("arcaneDmg",flags)!.GetValue(loaded.projectile)!,"active field potency survives Scribe");
+        var cell=((List<BloodFire>)typeof(Projectile_IgniteBlood).GetField("BF",flags)!.GetValue(loaded.projectile)!).Single();
+        Check.Equal(new IntVec3(3,0,4),cell.position,"saved flame cell");
+        Check.Equal(2,cell.pulseCount,"saved pulse is not replayed");
         Set(w.Progression, "state", loaded.state); loaded.projectile.SeedCaster(w.Caster); Set(loaded.projectile, "mapIndexOrState", (sbyte)0); loaded.explosion.instigator = w.Caster;
         Check.Equal(11f, w.Path.BloodMageTrials.IgniteDamage, "bounded progress survives Scribe");
         w.Hit(loaded.explosion, 4); Check.Equal(15f, w.Path.BloodMageTrials.IgniteDamage, "saved explosion source survives Scribe");
