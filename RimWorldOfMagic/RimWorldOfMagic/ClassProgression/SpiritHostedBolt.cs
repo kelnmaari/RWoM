@@ -89,6 +89,10 @@ namespace TorannMagic.ClassProgression
             ("TM_SpiritRend_I", () => TorannMagicDefOf.TM_Rend_I, typeof(Verb_Rend)),
             ("TM_SpiritRend_II", () => TorannMagicDefOf.TM_Rend_II, typeof(Verb_Rend)),
             ("TM_SpiritRend_III", () => TorannMagicDefOf.TM_Rend_III, typeof(Verb_Rend)),
+            ("TM_SpiritBloodMoon", () => TorannMagicDefOf.TM_BloodMoon, typeof(Projectile_BloodMoon)),
+            ("TM_SpiritBloodMoon_I", () => TorannMagicDefOf.TM_BloodMoon_I, typeof(Projectile_BloodMoon)),
+            ("TM_SpiritBloodMoon_II", () => TorannMagicDefOf.TM_BloodMoon_II, typeof(Projectile_BloodMoon)),
+            ("TM_SpiritBloodMoon_III", () => TorannMagicDefOf.TM_BloodMoon_III, typeof(Projectile_BloodMoon)),
             ("TM_SpiritBloodForBlood", () => TorannMagicDefOf.TM_BloodForBlood, typeof(Verb_BloodForBlood)),
             ("TM_SpiritBloodShield", () => TorannMagicDefOf.TM_BloodShield, typeof(Verb_BloodShield)),
             ("TM_SpiritBattleHymn", () => TorannMagicDefOf.TM_BattleHymn, typeof(Verb_BattleHymn)),
@@ -186,8 +190,8 @@ namespace TorannMagic.ClassProgression
                     def.MainVerb.verbClass == typeof(Verb_LightSkip) || def.MainVerb.verbClass == typeof(Verb_BLOS) || def.MainVerb.verbClass == typeof(Verb_FogOfTorment) || def.MainVerb.verbClass == typeof(Verb_LightningCloud) || typeof(Verb_RankedStormField).IsAssignableFrom(def.MainVerb.verbClass) ||
                     def.MainVerb.verbClass == typeof(Verb_UseAbility_TrueBurst)) &&
                     f.effect == def.MainVerb.defaultProjectile?.thingClass &&
-                    (typeof(Projectile_SpiritNativeAbility).IsAssignableFrom(f.effect) || typeof(Projectile_SpiritBolt).IsAssignableFrom(f.effect) || typeof(Projectile_SpiritRay).IsAssignableFrom(f.effect) || f.effect == typeof(Projectile_IgniteBlood) || SpiritHostedSummons.IsProjectile(f.effect))))) ||
-                (def.MainVerb.burstShotCount != 1 && !IsBurst(def)) || def.bloodCost != 0 && def != TorannMagicDefOf.TM_BloodShield && def != TorannMagicDefOf.TM_IgniteBlood && def != TorannMagicDefOf.TM_BloodForBlood && def.MainVerb.verbClass != typeof(Verb_Rend) || def.chiCost != 0 || def.requiredNeed != null ||
+                    (typeof(Projectile_SpiritNativeAbility).IsAssignableFrom(f.effect) || typeof(Projectile_SpiritBolt).IsAssignableFrom(f.effect) || typeof(Projectile_SpiritRay).IsAssignableFrom(f.effect) || f.effect == typeof(Projectile_IgniteBlood) || f.effect == typeof(Projectile_BloodMoon) || SpiritHostedSummons.IsProjectile(f.effect))))) ||
+                (def.MainVerb.burstShotCount != 1 && !IsBurst(def)) || def.bloodCost != 0 && def != TorannMagicDefOf.TM_BloodShield && def != TorannMagicDefOf.TM_IgniteBlood && def != TorannMagicDefOf.TM_BloodForBlood && def.MainVerb.verbClass != typeof(Verb_Rend) && def.MainVerb.defaultProjectile?.thingClass != typeof(Projectile_BloodMoon) || def.chiCost != 0 || def.requiredNeed != null ||
                 def.requiredHediff != null || !def.consumeEnergy || power.MagicUser.Mana == null) return false;
             if (def.bloodCost != 0)
             {
@@ -369,6 +373,7 @@ namespace TorannMagic.ClassProgression
             if (shot is Projectile_SpiritBolt bolt) bolt.PrepareProjection(power);
             else if (shot is Projectile_SpiritNativeAbility native) native.SetSource(power.Pawn);
             else if (shot is Projectile_SpiritRay laser) laser.PrepareProjection(power);
+            else if (shot is Projectile_BloodMoon moon) moon.PrepareHosted(power);
             else if (shot is Projectile_IgniteBlood ignite) ignite.PrepareHosted(power);
             else if (!SpiritHostedSummons.Prepare(shot, power)) return false;
             var map = body.Map;
