@@ -6,4 +6,6 @@
   <JobDef><defName>TM_SpiritVitalityBrand</defName><driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass><reportString>applying a vitality brand.</reportString></JobDef>
   <JobDef><defName>TM_SpiritSiphonBrand</defName><driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass><reportString>applying a siphon brand.</reportString></JobDef>
   <JobDef><defName>TM_SpiritDispelBranding</defName><driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass><reportString>dispelling brands.</reportString></JobDef>
+  <JobDef><defName>TM_SpiritSigilSurge</defName><driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass><reportString>surging the brands.</reportString></JobDef>
+  <JobDef><defName>TM_SpiritSigilDrain</defName><driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass><reportString>inverting the brands.</reportString></JobDef>
 </Defs>

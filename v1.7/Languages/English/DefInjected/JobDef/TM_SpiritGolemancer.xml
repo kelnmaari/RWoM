@@ -6,4 +6,6 @@
   <TM_SpiritVitalityBrand.reportString>applying a brand of vitality.</TM_SpiritVitalityBrand.reportString>
   <TM_SpiritSiphonBrand.reportString>applying a brand of siphon.</TM_SpiritSiphonBrand.reportString>
   <TM_SpiritDispelBranding.reportString>dispelling brands.</TM_SpiritDispelBranding.reportString>
+  <TM_SpiritSigilSurge.reportString>surging the brands.</TM_SpiritSigilSurge.reportString>
+  <TM_SpiritSigilDrain.reportString>inverting the brands.</TM_SpiritSigilDrain.reportString>
 </LanguageData>

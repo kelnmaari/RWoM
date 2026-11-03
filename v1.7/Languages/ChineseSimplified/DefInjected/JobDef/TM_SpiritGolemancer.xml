@@ -6,4 +6,6 @@
   <TM_SpiritVitalityBrand.reportString>正在施加活力烙印。</TM_SpiritVitalityBrand.reportString>
   <TM_SpiritSiphonBrand.reportString>正在施加虹吸烙印。</TM_SpiritSiphonBrand.reportString>
   <TM_SpiritDispelBranding.reportString>正在驱散烙印。</TM_SpiritDispelBranding.reportString>
+  <TM_SpiritSigilSurge.reportString>正在强化烙印。</TM_SpiritSigilSurge.reportString>
+  <TM_SpiritSigilDrain.reportString>正在反转烙印。</TM_SpiritSigilDrain.reportString>
 </LanguageData>

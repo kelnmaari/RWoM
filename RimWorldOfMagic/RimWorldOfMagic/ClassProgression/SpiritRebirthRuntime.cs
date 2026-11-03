@@ -158,6 +158,17 @@ namespace TorannMagic.ClassProgression
         {
             var pawn = comp.Pawn;
             if (!SpiritRebirthEnergy.Marked(pawn)) return false;
+            if (comp.sigilSurging || comp.sigilDraining)
+            {
+                var body = GolemancerLifecycle.MasterBody(pawn);
+                if (body == null || body.Downed)
+                {
+                    comp.sigilSurging = false;
+                    comp.sigilDraining = false;
+                }
+                else if (comp.sigilSurging && comp.BrandPawns.Count > 0 && comp.Mana?.CurLevel <= .01f)
+                    comp.sigilSurging = false;
+            }
             int now = Find.TickManager.TicksGame;
             if (!SpiritRebirthBody.RetainsNeeds(pawn) || !clock.Observe(now)) return true;
             SpiritRebirthHealthForm.TryRefreshPending(pawn);

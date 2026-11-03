@@ -6,4 +6,6 @@
   <TM_SpiritVitalityBrand.reportString>накладає клеймо життєвої сили.</TM_SpiritVitalityBrand.reportString>
   <TM_SpiritSiphonBrand.reportString>накладає клеймо сифона.</TM_SpiritSiphonBrand.reportString>
   <TM_SpiritDispelBranding.reportString>знімає клейма.</TM_SpiritDispelBranding.reportString>
+  <TM_SpiritSigilSurge.reportString>підсилює клейма.</TM_SpiritSigilSurge.reportString>
+  <TM_SpiritSigilDrain.reportString>обертає дію клейм.</TM_SpiritSigilDrain.reportString>
 </LanguageData>

@@ -109,6 +109,8 @@ namespace TorannMagic.ClassProgression
             ("TM_SpiritProtectionBrand", () => TorannMagicDefOf.TM_ProtectionBrand, typeof(Verb_BrandProtection)),
             ("TM_SpiritVitalityBrand", () => TorannMagicDefOf.TM_VitalityBrand, typeof(Verb_BrandVitality)),
             ("TM_SpiritSiphonBrand", () => TorannMagicDefOf.TM_SiphonBrand, typeof(Verb_BrandSiphon)),
+            ("TM_SpiritSigilSurge", () => TorannMagicDefOf.TM_SigilSurge, typeof(Verb_SigilSurge)),
+            ("TM_SpiritSigilDrain", () => TorannMagicDefOf.TM_SigilDrain, typeof(Verb_SigilDrain)),
             ("TM_SpiritDispelBranding", () => TorannMagicDefOf.TM_DispelBranding, typeof(Verb_DispelBranding)),
             ("TM_SpiritEnchantWeapon", () => TorannMagicDefOf.TM_EnchantWeapon, typeof(Verb_EnchantWeapon)),
             ("TM_SpiritDispelEnchantWeapon", () => TorannMagicDefOf.TM_DispelEnchantWeapon, typeof(Verb_DispelEnchantWeapon)),
