@@ -36,16 +36,20 @@ namespace TorannMagic.ClassProgression
         private SpiritRebirthHealthPlan(Pawn pawn, Hediff[] original, Hediff[] physical)
         { this.pawn = pawn; this.original = original; this.physical = physical; }
 
+        private static bool CanPrepareBody(Pawn pawn) => pawn?.Dead == true && !pawn.Discarded &&
+            (!pawn.Destroyed || pawn.ParentHolder is Corpse corpse && !corpse.Destroyed && corpse.InnerPawn == pawn);
+
         internal static bool TryPrepare(Pawn pawn, out SpiritRebirthHealthPlan plan, out Hediff unsupported)
         {
             plan = null;
             unsupported = null;
-            if (pawn == null || pawn.Destroyed || !pawn.Dead || pawn.health?.hediffSet?.hediffs == null) return false;
+            if (!CanPrepareBody(pawn) || pawn.health?.hediffSet?.hediffs == null) return false;
             var snapshot = pawn.health.hediffSet.hediffs.ToArray();
             var removals = new List<Hediff>();
             foreach (var effect in snapshot)
             {
                 if (effect == null || effect.pawn != pawn || effect.def == null) { unsupported = effect; return false; }
+                if (IsClassResourceMarker(effect)) continue;
                 if (effect.GetType() == typeof(Hediff_ClassDiscipline)
                     && ReferenceEquals(effect.def, DefDatabase<HediffDef>.GetNamedSilentFail("TM_ClassDiscipline"))
                     && effect.def.hediffClass == typeof(Hediff_ClassDiscipline)
@@ -57,6 +61,19 @@ namespace TorannMagic.ClassProgression
             }
             plan = new SpiritRebirthHealthPlan(pawn, snapshot, removals.ToArray());
             return true;
+        }
+
+        private static bool IsClassResourceMarker(Hediff effect)
+        {
+            var def = effect.def;
+            if (effect.GetType() != typeof(HediffWithComps) || def.hediffClass != typeof(HediffWithComps) ||
+                def.forceRemoveOnResurrection || def.lethalSeverity > 0f || def.comps?.Count != 1 ||
+                !ReferenceEquals(DefDatabase<HediffDef>.GetNamedSilentFail(def.defName), def)) return false;
+            var component = def.comps[0]?.compClass;
+            if (def.defName == "TM_MagicUserHD" || def.defName == "TM_MightUserHD")
+                return component == typeof(HediffComp_SeverityPerDay);
+            return def.defName.StartsWith("TM_HediffEnchantment_", StringComparison.Ordinal)
+                && component == typeof(Enchantment.HediffComp_Enchantment);
         }
 
         private static bool IsKnownPhysical(Hediff effect)
@@ -78,7 +95,7 @@ namespace TorannMagic.ClassProgression
         // validation or ritual work. Removal callbacks are native and not rolled back.
         internal bool Apply()
         {
-            if (attempted || pawn.Destroyed || !pawn.Dead || pawn.health?.hediffSet?.hediffs == null
+            if (attempted || !CanPrepareBody(pawn) || pawn.health?.hediffSet?.hediffs == null
                 || !pawn.health.hediffSet.hediffs.SequenceEqual(original)
                 || physical.Any(h => h.pawn != pawn || !IsKnownPhysical(h))) return false;
             attempted = true;

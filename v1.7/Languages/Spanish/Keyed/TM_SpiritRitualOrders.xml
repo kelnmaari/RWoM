@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+  <TM_SpiritBeginRitual>Renacer a {0} como espíritu (300 de magicita, 50 de plata, 4 horas)</TM_SpiritBeginRitual>
+  <TM_SpiritFinishRitual>Completar el renacimiento interrumpido de {0}</TM_SpiritFinishRitual>
+  <TM_SpiritRitualUnreachable>El nigromante necesita un cadáver, un círculo mayor, 300 de magicita y 50 de plata a su alcance.</TM_SpiritRitualUnreachable>
+  <TM_SpiritRitualUnsafeEffect>{0} — no se puede separar {1} del cuerpo</TM_SpiritRitualUnsafeEffect>
+</LanguageData>

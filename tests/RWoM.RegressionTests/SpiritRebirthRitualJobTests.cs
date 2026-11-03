@@ -19,6 +19,31 @@ internal static class SpiritRebirthRitualJobTests
     }
     public static IEnumerable<TestCase> Cases()
     {
+        yield return new("SpiritRitualJob.PlayerCircleOffersEligibleCorpse", r => SpiritRebirthRitualTransactionTests.Run(r, c =>
+        {
+            using var setup=new Fixture(c);
+            using var language=new SpellItemEffectTests.LanguageScope(r.Repository);
+            foreach (var text in System.Xml.Linq.XDocument.Load(Path.Combine(r.Repository,"v1.7/Languages/English/Keyed/TM_SpiritRitualOrders.xml")).Root!.Elements())
+                LanguageDatabase.activeLanguage.keyedReplacements[text.Name.LocalName]=new LoadedLanguage.KeyedReplacement {key=text.Name.LocalName,value=text.Value};
+            c.Map.mapPawns=new MapPawns(c.Map);
+            var lib=Assembly.Load("0Harmony");var harmonyType=lib.GetType("HarmonyLib.Harmony")!;
+            var id="rwom.regression.spiritmenu."+Guid.NewGuid();var harmony=Activator.CreateInstance(harmonyType,id)!;
+            try
+            {
+                var prefix=Activator.CreateInstance(lib.GetType("HarmonyLib.HarmonyMethod")!,typeof(SpiritRebirthRitualEligibilityTests).GetMethod(nameof(SpiritRebirthRitualEligibilityTests.SkipGraphics))!)!;
+                harmonyType.GetMethod("Patch")!.Invoke(harmony,[typeof(FloatMenuOption).GetMethod("SetSizeMode",BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic),prefix,null,null,null]);
+                var options=c.Circle.GetFloatMenuOptions(c.Creator).ToList();
+                Check.Equal(true,c.Map.listerThings.ThingsInGroup(ThingRequestGroup.Corpse).Contains(c.Corpse),"corpse present in native request group");
+                Check.Equal(true,options.Any(x=>x.Label.Contains(c.Original.LabelShort) && x.Label.Contains("300") && !x.Disabled),"large circle offers the original's ritual with visible cost; options "+string.Join("|",options.Select(x=>x.Label)));
+                Check.Equal(true,c.Original.Dead,"opening menu does not revive the original");
+                var bond=new Hediff_PsychicBond{def=new HediffDef{defName="PsychicBond",label="psychic bond"},pawn=c.Original,target=c.Creator};
+                c.Original.health.hediffSet.hediffs.Add(bond);
+                var refused=c.Circle.GetFloatMenuOptions(c.Creator).Single(x=>x.Label.Contains(c.Original.LabelShort) && x.Label.Contains("300"));
+                Check.Equal(true,refused.Disabled && refused.Label.Contains("psychic bond",StringComparison.OrdinalIgnoreCase),"unsupported link explained before hauling or ritual work");
+                Check.Equal(350,c.Magicyte.stackCount+c.Silver.stackCount,"viewing menu spends nothing");
+            }
+            finally {harmonyType.GetMethod("UnpatchAll")!.Invoke(harmony,[id]);}
+        }));
         foreach (string scenario in new[] { "NativeObservedWorkAndCompletion", "CancelledWorkSave", "InterruptedReleaseCleanup", "ReleaseCircleChanged", "ReleaseJobReplaced", "RevivalJobReplaced" })
         yield return new("SpiritRitualJob." + scenario, r => SpiritRebirthRitualTransactionTests.Run(r, c =>
         {

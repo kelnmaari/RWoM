@@ -21,6 +21,7 @@ namespace TorannMagic
             foreach (var option in base.GetFloatMenuOptions(myPawn)) yield return option;
             foreach (var option in ClassProgression.ClassAscensionMenu.Options(myPawn, this)) yield return option;
             foreach (var option in ClassProgression.IceAttunement.Options(myPawn, this)) yield return option;
+            foreach (var option in ClassProgression.SpiritRebirthRitualJob.Options(myPawn, this)) yield return option;
         }
 
         public override IntVec3 GetCircleCenter

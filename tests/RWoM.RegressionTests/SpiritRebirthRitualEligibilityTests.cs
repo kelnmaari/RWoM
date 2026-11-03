@@ -137,6 +137,9 @@ internal static class SpiritRebirthRitualEligibilityTests
     {
         using var f = new Fixture(r); var owner = f.Corpse.GetDirectlyHeldThings(); var data = f.Magic.MagicData;
         Check.Equal(SpiritRebirthRitualRejection.None, f.Rejection(), "actual dead colonist in native corpse accepted");
+        Set(f.Dead, "mapIndexOrState", (sbyte)-2);
+        Check.Equal(true, f.Dead.Destroyed && !f.Dead.Discarded, "native KillFinalize keeps recoverable identity");
+        Check.Equal(SpiritRebirthRitualRejection.None, f.Rejection(), "native kill-finalized colonist remains eligible inside exact corpse");
         Check.Equal(SpiritRebirthRitualRejection.CorpseIdentityChanged, SpiritRebirthRitualEligibility.Rejection(f.Caster, f.Circle, f.Corpse, f.Caster), "selected identity cannot be substituted");
         Set(f.Dead.health, "healthState", PawnHealthState.Mobile);
         Check.Equal(SpiritRebirthRitualRejection.CorpseNotDeadColonist, f.Rejection(), "living pawn rejected"); Set(f.Dead.health, "healthState", PawnHealthState.Dead);

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+  <TM_SpiritBeginRitual>将{0}重生为灵体（300魔晶、50白银、4小时）</TM_SpiritBeginRitual>
+  <TM_SpiritFinishRitual>完成{0}中断的重生仪式</TM_SpiritFinishRitual>
+  <TM_SpiritRitualUnreachable>死灵法师必须能到达遗体、大型法阵、300魔晶和50白银。</TM_SpiritRitualUnreachable>
+  <TM_SpiritRitualUnsafeEffect>{0} — 无法将「{1}」与肉身分离</TM_SpiritRitualUnsafeEffect>
+</LanguageData>

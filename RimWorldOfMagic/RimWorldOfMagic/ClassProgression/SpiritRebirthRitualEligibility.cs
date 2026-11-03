@@ -66,7 +66,9 @@ namespace TorannMagic.ClassProgression
                     : creator.carryTracker == null || !ReferenceEquals(corpse.ParentHolder, creator.carryTracker)
                         || !ReferenceEquals(creator.carryTracker.CarriedThing, corpse)))
                 return SpiritRebirthRitualRejection.CorpseWrongCustody;
-            if (original.Destroyed || original.Discarded || !original.Dead
+            // Pawn.Kill finalizes the held pawn as Destroyed. Discarded specifically
+            // means the identity can no longer be recovered from this exact corpse.
+            if (original.Discarded || !original.Dead
                 || original.RaceProps?.Humanlike != true || !original.RaceProps.IsFlesh
                 || original.Faction != creator.Faction || !original.IsColonist)
                 return SpiritRebirthRitualRejection.CorpseNotDeadColonist;

@@ -21,6 +21,7 @@ internal static class SpiritRebirthHealthPlanTests
 
     public static IEnumerable<TestCase> Cases()
     {
+        yield return new("SpiritRebirthHealthPlan.NativeResourceAndEnchantmentMarkers", NativeMarkers);
         yield return new("SpiritRebirthHealthPlan.UnsupportedLinkLeavesOriginalGraph", Unsupported);
         yield return new("SpiritRebirthHealthPlan.NativePhysicalRemovalKeepsExactClassMarker", PhysicalRemoval);
         yield return new("SpiritRebirthHealthPlan.StaleSnapshotCannotApply", Stale);
@@ -47,6 +48,23 @@ internal static class SpiritRebirthHealthPlanTests
     }
     static BodyPartRecord Part() => new() { def = new BodyPartDef { defName = "SpiritHealthFixturePart" } };
     static void Dead(Pawn pawn) => Set(pawn.health, "healthState", PawnHealthState.Dead);
+    static void NativeMarkers(RuntimeFixture r)
+    {
+        using var f = new SpiritRebirthStateTests.Fixture(r); Dead(f.Original);
+        using var defs = new HealthDefinitions();
+        var markers = new List<Hediff>();
+        foreach (var name in new[] {"TM_MagicUserHD", "TM_MightUserHD", "TM_HediffEnchantment_dmgBonus"})
+        {
+            var type = name.StartsWith("TM_HediffEnchantment") ? typeof(CompClassProgression).Assembly.GetType("TorannMagic.Enchantment.HediffComp_Enchantment", true)! : typeof(HediffComp_SeverityPerDay);
+            var def = new HediffDef {defName=name, hediffClass=typeof(HediffWithComps), comps=[new HediffCompProperties {compClass=type}]};
+            DefDatabase<HediffDef>.Add(def);
+            markers.Add(new HediffWithComps {def=def,pawn=f.Original});
+        }
+        f.Original.health.hediffSet.hediffs.AddRange(markers);
+        Check.Equal(true, Prepare(f.Original, out var plan, out _), "native class resource markers accepted");
+        Check.Equal(true, Apply(plan!), "resource markers preserved at payment");
+        SameGraph(f.Original, markers.ToArray(), "existing resource markers retained");
+    }
     static void SameGraph(Pawn pawn, Hediff[] before, string reason)
     {
         Check.Equal(before.Length, pawn.health.hediffSet.hediffs.Count, reason + " count");
@@ -78,6 +96,9 @@ internal static class SpiritRebirthHealthPlanTests
     static void PhysicalRemoval(RuntimeFixture r)
     {
         using var f = new SpiritRebirthStateTests.Fixture(r); Dead(f.Original);
+        var corpse = new Corpse { InnerPawn = f.Original };
+        Set(f.Original, "mapIndexOrState", (sbyte)-2);
+        Check.Same(corpse, f.Original.ParentHolder, "kill-finalized body held by exact corpse");
         using var defs = new HealthDefinitions();
         using var capacities = (IDisposable)Activator.CreateInstance(typeof(SpiritNativeResurrectionTests)
             .GetNestedType("CapacityDefinitions", BindingFlags.NonPublic)!, true)!;
