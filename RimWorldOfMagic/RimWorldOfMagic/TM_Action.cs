@@ -3638,46 +3638,15 @@ namespace TorannMagic
 
         public static void UpdateBrand(Pawn hitPawn, Pawn caster, CompAbilityUserMagic casterComp, HediffDef brandDef)
         {
-            if (hitPawn.health.hediffSet.HasHediff(brandDef))
-            {
-                ClearExistingBrander(hitPawn, brandDef);
-            }
-            else
-            {
-                HealthUtility.AdjustSeverity(hitPawn, brandDef, .05f);
-            }
-
-            if (casterComp.BrandPawns != null && casterComp.BrandDefs != null)
-            {
-                casterComp.BrandPawns.Add(hitPawn);
-                casterComp.BrandDefs.Add(brandDef);
-            }
-        }
-
-        private static void ClearExistingBrander(Pawn hitPawn, HediffDef brandDef)
-        {
-            Hediff hd_br = hitPawn.health.hediffSet.GetFirstHediffOfDef(brandDef);
-            if (hd_br != null)
-            {
-                HediffComp_BrandingBase hdc = hd_br.TryGetComp<HediffComp_BrandingBase>();
-                if (hdc != null && hdc.BranderPawn != null)
-                {
-                    CompAbilityUserMagic branderComp = hdc.BranderPawn.GetCompAbilityUserMagic();
-                    if (branderComp != null)
-                    {
-                        TMDefs.TM_Branding tmpBranding = null;
-                        for(int i = 0; i < branderComp.BrandPawns.Count; i++)
-                        {
-                            if(branderComp.BrandPawns[i] == hitPawn && branderComp.BrandDefs[i] == brandDef)
-                            {
-                                branderComp.BrandPawns.Remove(branderComp.BrandPawns[i]);
-                                branderComp.BrandDefs.Remove(branderComp.BrandDefs[i]);
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
+            if (casterComp == null || casterComp.Pawn != caster || hitPawn?.health?.hediffSet == null || brandDef == null) return;
+            var effect = hitPawn.health.hediffSet.GetFirstHediffOfDef(brandDef);
+            var previous = effect?.TryGetComp<HediffComp_BrandingBase>()?.BranderPawn;
+            if (previous != null && previous != caster)
+                ClassProgression.GolemancerLifecycle.RemoveBrandPair(previous.GetCompAbilityUserMagic(), hitPawn, brandDef);
+            if (effect == null) HealthUtility.AdjustSeverity(hitPawn, brandDef, .05f);
+            ClassProgression.GolemancerLifecycle.RemoveBrandPair(casterComp, hitPawn, brandDef);
+            casterComp.BrandPawns.Add(hitPawn);
+            casterComp.BrandDefs.Add(brandDef);
         }
     }
 }

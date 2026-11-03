@@ -63,6 +63,27 @@ namespace TorannMagic.ClassProgression
             return spell.manaCost - skill.level * spell.efficiencyReductionPercent * spell.manaCost;
         }
 
+        internal static int AlignBrandPairs(CompAbilityUserMagic comp)
+        {
+            var pawns = comp.BrandPawns;
+            var defs = comp.BrandDefs;
+            int paired = System.Math.Min(pawns.Count, defs.Count);
+            if (pawns.Count > paired) pawns.RemoveRange(paired, pawns.Count - paired);
+            if (defs.Count > paired) defs.RemoveRange(paired, defs.Count - paired);
+            return paired;
+        }
+
+        internal static void RemoveBrandPair(CompAbilityUserMagic comp, Pawn pawn, HediffDef def)
+        {
+            if (comp == null) return;
+            for (int i = AlignBrandPairs(comp) - 1; i >= 0; i--)
+            {
+                if (comp.BrandPawns[i] != pawn || comp.BrandDefs[i] != def) continue;
+                comp.BrandPawns.RemoveAt(i);
+                comp.BrandDefs.RemoveAt(i);
+            }
+        }
+
         public static bool Restore(CompAbilityUserMagic comp)
         {
             if (SpiritRebirthBodyEffects.SuppressFormerBodyEffects(comp?.Pawn)) return true;
@@ -71,9 +92,7 @@ namespace TorannMagic.ClassProgression
             var defs = comp.BrandDefs;
             // Keep native pairs together. Never infer a missing association or alter
             // another caster's hediff when a saved pair is stale after transfer.
-            int paired = System.Math.Min(pawns.Count, defs.Count);
-            if (pawns.Count > paired) pawns.RemoveRange(paired, pawns.Count - paired);
-            if (defs.Count > paired) defs.RemoveRange(paired, defs.Count - paired);
+            int paired = AlignBrandPairs(comp);
             for (int i = paired - 1; i >= 0; i--)
             {
                 var pawn = pawns[i];

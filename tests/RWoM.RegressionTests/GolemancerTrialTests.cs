@@ -15,6 +15,7 @@ internal static class GolemancerTrialTests
         yield return new("GolemancerTrial.RuneBypassOwnershipAndDrift", RuneBoundaries);
         yield return new("GolemancerTrial.BrandSourcePairAndRefresh", Brand);
         yield return new("GolemancerTrial.NativeFiveBeneficialBrands", NativeBrands);
+        yield return new("GolemancerTrial.TransferKeepsExactPairsAndRejectsStaleDispel", Transfer);
         yield return new("GolemancerTrial.NativeRecipePaymentFailureAndBypass", NativeRecipe);
     }
     sealed class Fixture : IDisposable
@@ -132,6 +133,31 @@ internal static class GolemancerTrialTests
         w.Target.health.hediffSet.GetFirstHediffOfDef(TorannMagicDefOf.TM_AwarenessBrandHD).TryGetComp<HediffComp_BrandingBase>().BranderPawn = w.Caster;
         Check.Equal(true, GolemancerTrials.CompleteBrand(s), "new actual source and paired entry qualifies"); Check.Equal(false, GolemancerTrials.CompleteBrand(s), "repeat rejected");
     }
+    static void Transfer(RuntimeFixture f)
+    {
+        using var w = new Fixture(f); using var hooks = new Hooks();
+        var awareness = TorannMagicDefOf.TM_AwarenessBrandHD;
+        var fitness = TorannMagicDefOf.TM_FitnessBrandHD;
+        var other = PawnWithComps(true,false);
+        TM_Action.UpdateBrand(w.Target,w.Caster,w.Magic,awareness);
+        var marker = w.Target.health.hediffSet.GetFirstHediffOfDef(awareness);
+        marker.TryGetComp<HediffComp_BrandingBase>().BranderPawn = w.Caster;
+        // Both a recurring target and a recurring definition must move by index.
+        w.Magic.BrandPawns.InsertRange(0,[w.Target,other.pawn]);
+        w.Magic.BrandDefs.InsertRange(0,[fitness,awareness]);
+        w.Magic.BrandPawns.Add(w.Target); w.Magic.BrandDefs.Add(awareness);
+        w.Magic.BrandPawns.Add(other.pawn); // incomplete tail from an old save
+        TM_Action.UpdateBrand(w.Target,other.pawn,other.magic,awareness);
+        marker.TryGetComp<HediffComp_BrandingBase>().BranderPawn = other.pawn;
+        Check.Equal(true,w.Magic.BrandPawns.SequenceEqual([w.Target,other.pawn]) &&
+            w.Magic.BrandDefs.SequenceEqual([fitness,awareness]),"other target and other definition retain their pairs");
+        var remove = typeof(Verb_DispelBranding).GetMethod("RemoveOwnedBrand",BindingFlags.Static | BindingFlags.NonPublic)!;
+        Check.Equal(false,(bool)remove.Invoke(null,[w.Caster,w.Target,awareness])!,"stale prior caster cannot dispel the transferred mark");
+        Check.Same(marker,w.Target.health.hediffSet.GetFirstHediffOfDef(awareness),"foreign mark survives");
+        TM_Action.UpdateBrand(w.Target,other.pawn,other.magic,awareness);
+        Check.Equal(1,other.magic.BrandPawns.Count,"same-owner refresh leaves one upkeep entry");
+    }
+
     static void NativeBrands(RuntimeFixture f)
     {
         foreach (string name in Names.Take(5))

@@ -161,7 +161,7 @@ namespace TorannMagic
                         if(Rand.Chance(.05f))
                         {
                             bool non = false;
-                            for(int i =0; i < comp.BrandPawns.Count; i++)
+                            for(int i =0; i < System.Math.Min(comp.BrandPawns.Count, comp.BrandDefs.Count); i++)
                             {
                                 if(comp.BrandPawns[i] == this.Pawn && comp.BrandDefs[i] == this.parent.def)
                                 {

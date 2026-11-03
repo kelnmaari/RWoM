@@ -21,13 +21,12 @@ namespace TorannMagic
             {
                 if (comp.BrandPawns.Count > 0)
                 {
-                    for(int i=0; i < comp.BrandPawns.Count; i++)
+                    for(int i=ClassProgression.GolemancerLifecycle.AlignBrandPairs(comp)-1; i >= 0; i--)
                     {
                         Pawn br = comp.BrandPawns[i];
                         if (br != null && !br.DestroyedOrNull() && br.health != null && br.health.hediffSet != null)
                         {
-                            RemoveBrandHediff(comp, br, i);
-                            RemoveBrandHediffGraphics(br);
+                            if (RemoveOwnedBrand(comp.Pawn, br, comp.BrandDefs[i])) RemoveBrandHediffGraphics(br);
                         }
                     }
                     comp.BrandPawns.Clear();
@@ -71,16 +70,12 @@ namespace TorannMagic
             FleckMaker.ThrowLightningGlow(CasterPawn.DrawPos, CasterPawn.Map, 1.2f);
         }
 
-        private void RemoveBrandHediff(CompAbilityUserMagic comp, Pawn br, int i)
+        internal static bool RemoveOwnedBrand(Pawn caster, Pawn recipient, HediffDef def)
         {
-            if (comp.BrandPawns.Count == comp.BrandDefs.Count)
-            {
-                Hediff hd = br.health.hediffSet.GetFirstHediffOfDef(comp.BrandDefs[i]);
-                if (hd != null)
-                {
-                    br.health.RemoveHediff(hd);
-                }
-            }
+            var effect = def == null ? null : recipient?.health?.hediffSet?.GetFirstHediffOfDef(def);
+            if (caster == null || effect?.TryGetComp<HediffComp_BrandingBase>()?.BranderPawn != caster) return false;
+            recipient.health.RemoveHediff(effect);
+            return true;
         }
 
         private void RemoveBrandHediffGraphics(Pawn br)

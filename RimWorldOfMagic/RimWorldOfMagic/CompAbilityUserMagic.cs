@@ -5897,16 +5897,13 @@ namespace TorannMagic
                     this.AddPawnAbility(TorannMagicDefOf.TM_DispelBranding);
                     this.dispelBrandings = true;
                 }
-                List<Pawn> tmpBrands = new List<Pawn>();
-                tmpBrands.Clear();
-                for(int i = 0; i < BrandPawns.Count; i++)
+                for (int i = ClassProgression.GolemancerLifecycle.AlignBrandPairs(this) - 1; i >= 0; i--)
                 {
-                    Pawn p = BrandPawns[i];
-                    if(p != null && (p.Destroyed || p.Dead))
+                    Pawn recipient = BrandPawns[i];
+                    if (recipient.DestroyedOrNull() || recipient.Dead)
                     {
-                        BrandPawns.Remove(BrandPawns[i]);
-                        BrandDefs.Remove(BrandDefs[i]);
-                        break;
+                        BrandPawns.RemoveAt(i);
+                        BrandDefs.RemoveAt(i);
                     }
                 }
                 if(sigilSurging && this.Mana.CurLevel <= .01f)
