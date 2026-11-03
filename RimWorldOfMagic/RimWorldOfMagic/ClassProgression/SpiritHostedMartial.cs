@@ -1,0 +1,187 @@
+using System.Collections.Generic;
+using System.Linq;
+using AbilityUser;
+using RimWorld;
+using Verse;
+using Verse.AI;
+
+namespace TorannMagic.ClassProgression
+{
+    internal static class SpiritHostedMartial
+    {
+        internal const string Maneuver = "TM_SpiritCastManeuver", SelfAid = "TM_SpiritCastFirstAid", Pommel = "TM_SpiritCastPommelStrike";
+        internal const string Headshot = "TM_SpiritCastHeadshot";
+        internal const string DisablingShot = "TM_SpiritCastDisablingShot", AntiArmor = "TM_SpiritCastAntiArmor";
+        internal static bool IsSniperShot(string job) => job==Headshot || job==DisablingShot || job==AntiArmor;
+        private const string ManeuverEffect = "TM_GladiatorManeuverHD";
+
+        internal static MightAbility Find(Pawn body, Pawn soul, string job)
+        {
+            if (!SpiritRebirthState.TryGetPossessingSpirit(body, out var held) || held != soul ||
+                !SpiritRebirthState.TryGet(soul, out var state) || state.DepletionPending) return null;
+            bool sprint = job == SpiritHostedStance.Job;
+            TMAbilityDef def;
+            if (job == Headshot) def = TorannMagicDefOf.TM_Headshot;
+            else if (job == DisablingShot) def = TorannMagicDefOf.TM_DisablingShot;
+            else if (job == AntiArmor) def = TorannMagicDefOf.TM_AntiArmor;
+            else if (job == SelfAid) def = TorannMagicDefOf.TM_FirstAid;
+            else if (job == Pommel) def = TorannMagicDefOf.TM_PommelStrike;
+            else if (job == Maneuver && ClassIdentity.TryGetState(soul, out var path) &&
+                path.Find(JobDriver_GladiatorInitiation.ClassId)?.GladiatorManeuver == true)
+                def = DefDatabase<TMAbilityDef>.GetNamedSilentFail("TM_GladiatorManeuver");
+            else if (SpiritHostedStance.BaseAbility(job) is TMAbilityDef stance) def = stance;
+            else return null;
+
+            bool Match(PawnAbility power) => power != null && (sprint ? SpiritHostedStance.SprintFamily(power.Def as TMAbilityDef) : power.Def == def || job==DisablingShot &&
+                (power.Def==TorannMagicDefOf.TM_DisablingShot_I || power.Def==TorannMagicDefOf.TM_DisablingShot_II || power.Def==TorannMagicDefOf.TM_DisablingShot_III));
+            bool Local(CompAbilityUser comp) => comp?.AbilityData.AllPowers.Any(Match) == true;
+            if (def == null || Local(body.GetCompAbilityUserMagic()) || Local(body.GetCompAbilityUserMight())) return null;
+            var source = soul.GetCompAbilityUserMight();
+            var powers = source?.AbilityData.Powers.OfType<MightAbility>()
+                .Where(a => Match(a) && ReferenceEquals(a.AbilityUser, source)).Take(2).ToList();
+            return powers?.Count == 1 ? powers[0] : null;
+        }
+
+        internal static bool Ready(Pawn body, MightAbility ability, string job)
+        {
+            if (ability == null || !body.Spawned || body.Dead || body.Downed || body.InMentalState || body.IsPrisoner ||
+                body.Faction != Faction.OfPlayer || ability.CooldownTicksLeft > 0) return false;
+            var def = ability.mightDef;
+            var might = ability.MightUser;
+            if (SpiritHostedStance.BaseAbility(job) != null) return SpiritHostedStance.Ready(body,ability);
+            if (!def.consumeEnergy || def.staminaCost <= 0 || def.chiCost != 0 || def.bloodCost != 0 || def.manaCost != 0 ||
+                def.requiredNeed != null || def.requiredHediff != null || might.ExistingMightData == null ||
+                might.Stamina == null || might.Stamina.CurLevel < might.ActualStaminaCost(def)) return false;
+            if (IsSniperShot(job)) return !body.WorkTagIsDisabled(WorkTags.Violent) && Verb_SniperShot.WeaponVerb(body) != null;
+            if (job == Pommel) return !body.WorkTagIsDisabled(WorkTags.Violent) && body.health.capacities.CapableOf(PawnCapacityDefOf.Manipulation);
+            if (job == SelfAid) return Verb_FirstAid.EligibleWounds(body).Any();
+            var effect = DefDatabase<HediffDef>.GetNamedSilentFail(ManeuverEffect);
+            return job == Maneuver && ClassIdentity.Component(body)?.Circle == null &&
+                effect?.comps?.Any(c => c.compClass == typeof(HediffComp_SpiritCastOrigin)) == true &&
+                !body.health.hediffSet.HasHediff(effect);
+        }
+
+        internal static bool CanStrike(Pawn body, Pawn target, MightAbility ability) =>
+            target?.Spawned == true && !target.Dead && target != body && target.Map == body.Map && target.HostileTo(body) &&
+            body.Position.InHorDistOf(target.Position, ability.Def.MainVerb.range) &&
+            body.CanReachImmediate(target, PathEndMode.Touch);
+
+        internal static bool Strike(Pawn body, Pawn soul, Pawn target)
+        {
+            var ability = Find(body, soul, Pommel);
+            if (!Ready(body, ability, Pommel) || !CanStrike(body, target, ability)) return false;
+            Verb_PommelStrike.Strike(body, target, ability.MightUser);
+            ability.PostAbilityAttempt();
+            return true;
+        }
+
+        internal static bool Apply(Pawn body, Pawn soul, string job)
+        {
+            var ability = Find(body, soul, job);
+            if (job == Pommel || !Ready(body, ability, job)) return false;
+            if (SpiritHostedStance.BaseAbility(job) != null) return SpiritHostedStance.Toggle(body,ability);
+            if (job == SelfAid)
+            {
+                var skills = ability.MightUser.MightData.MightPowerSkill_FirstAid;
+                int Rank(string label) => skills.FirstOrDefault(s => s.label == label)?.level ?? 0;
+                if (!Verb_FirstAid.Tend(body, Rank("TM_FirstAid_pwr"), Rank("TM_FirstAid_ver"))) return false;
+            }
+            else
+            {
+                var effect = HediffMaker.MakeHediff(DefDatabase<HediffDef>.GetNamed(ManeuverEffect), body);
+                effect.TryGetComp<HediffComp_SpiritCastOrigin>().Bind(soul);
+                effect.Severity = 1f;
+                body.health.AddHediff(effect);
+                if (!body.health.hediffSet.hediffs.Contains(effect)) return false;
+            }
+            ability.PostAbilityAttempt();
+            return true;
+        }
+
+        private static void FindTarget(Pawn body, Pawn soul, JobDef job, System.Func<Pawn, bool> valid)
+        {
+            Verse.Find.Targeter.BeginTargeting(new TargetingParameters { canTargetPawns = true, canTargetBuildings = false,
+                canTargetItems = false, validator = t => valid(t.Thing as Pawn) }, target => {
+                if (body.CurJobDef != job && valid(target.Pawn))
+                    body.jobs.TryTakeOrderedJob(JobMaker.MakeJob(job, soul, target), JobTag.Misc);
+            }, highlightAction: target => {
+                if (IsSniperShot(job.defName) && Find(body,soul,job.defName) is MightAbility shot)
+                    GenDraw.DrawRadiusRing(body.Position,shot.mightDef.MainVerb.range);
+            }, targetValidator: target => valid(target.Pawn), caster: body);
+        }
+
+        internal static IEnumerable<Gizmo> Commands(IEnumerable<Gizmo> existing, Pawn body)
+        {
+            foreach (var command in existing) yield return command;
+            if (!SpiritRebirthState.TryGetPossessingSpirit(body, out var soul)) yield break;
+            foreach (var name in new[] { Maneuver, SelfAid, Pommel, Headshot, DisablingShot, AntiArmor, SpiritHostedStance.Job, SpiritHostedStance.StrongBack, SpiritHostedStance.HeavyBlow,
+                SpiritHostedStance.ThickSkin, SpiritHostedStance.FightersFocus, SpiritHostedStance.GearRepair, SpiritHostedStance.InnerHealing })
+            {
+                var owner = Find(body, soul, name);
+                var job = DefDatabase<JobDef>.GetNamedSilentFail(name);
+                if (owner == null || job == null) continue;
+                var cmd = new Command_Action { defaultLabel = owner.Def.LabelCap, defaultDesc = owner.Def.description,
+                    icon = owner.Def.uiIcon, action = () => {
+                        if (body.CurJobDef == job || !Ready(body, Find(body, soul, name), name)) return;
+                        if (IsSniperShot(name))
+                        {
+                            bool Valid(Pawn target) => Ready(body, Find(body,soul,name),name) && Verb_SniperShot.CanFire(body,owner,target);
+                            FindTarget(body,soul,job,Valid);
+                        }
+                        else if (name == Pommel)
+                        {
+                            bool Valid(Pawn target) => Ready(body, Find(body, soul, name), name) && CanStrike(body, target, owner);
+                            FindTarget(body, soul, job, Valid);
+                        }
+                        else
+                            body.jobs.TryTakeOrderedJob(JobMaker.MakeJob(job, soul), JobTag.Misc);
+                    } };
+                if (body.CurJobDef == job || !Ready(body, owner, name))
+                    cmd.Disable("TM_SpiritRebirthCastUnavailable".Translate());
+                yield return cmd;
+            }
+        }
+    }
+
+    public sealed class JobDriver_SpiritHostedMartial : JobDriver
+    {
+        private bool attempted;
+        public override void ExposeData()
+        {
+            base.ExposeData();
+            Scribe_Values.Look(ref attempted, "attempted");
+        }
+        public override bool TryMakePreToilReservations(bool errorOnFailed) => true;
+
+        protected override IEnumerable<Toil> MakeNewToils()
+        {
+            var soul = job.targetA.Thing as Pawn;
+            string name = job.def.defName;
+            this.FailOn(() => !SpiritRebirthState.TryGetPossessingSpirit(pawn, out var current) || current != soul);
+            var warmup = Toils_General.Wait(1);
+            warmup.initAction = () => {
+                var owner = SpiritHostedMartial.Find(pawn, soul, name);
+                if (!SpiritHostedMartial.Ready(pawn, owner, name) ||
+                    SpiritHostedMartial.IsSniperShot(name) && !Verb_SniperShot.CanFire(pawn,owner,job.targetB.Pawn) ||
+                    name == SpiritHostedMartial.Pommel && !SpiritHostedMartial.CanStrike(pawn, job.targetB.Pawn, owner)) { EndJobWith(JobCondition.Incompletable); return; }
+                ticksLeftThisToil = UnityEngine.Mathf.Max(1, GenTicks.SecondsToTicks(
+                    owner.Def.MainVerb.warmupTime * Compatibility.AbilityTiming.WarmupMultiplier));
+            };
+            yield return warmup;
+            yield return Toils_General.Do(() => {
+                if (attempted || pawn.CurJob != job || pawn.jobs.curDriver != this) { EndJobWith(JobCondition.Incompletable); return; }
+                attempted = true;
+                if (SpiritHostedMartial.IsSniperShot(name))
+                {
+                    var owner = SpiritHostedMartial.Find(pawn,soul,name);
+                    if (!SpiritHostedMartial.Ready(pawn,owner,name) || !Verb_SniperShot.FireFromHost(pawn,owner,job.targetB.Pawn))
+                        EndJobWith(JobCondition.Incompletable);
+                    return;
+                }
+                bool success = name == SpiritHostedMartial.Pommel ? SpiritHostedMartial.Strike(pawn, soul, job.targetB.Pawn)
+                    : SpiritHostedMartial.Apply(pawn, soul, name);
+                if (!success) EndJobWith(JobCondition.Incompletable);
+            });
+        }
+    }
+}
