@@ -5859,6 +5859,17 @@ namespace TorannMagic
             }
         }
 
+        internal void SyncEnchantWeaponControl()
+        {
+            weaponEnchants?.RemoveAll(p => p.DestroyedOrNull() || p.Dead);
+            var def = TorannMagicDefOf.TM_DispelEnchantWeapon;
+            if (def == null) return;
+            bool hasEnchantments = weaponEnchants?.Count > 0;
+            if (hasEnchantments && !AbilityData.Powers.Any(p => p?.Def == def)) AddPawnAbility(def);
+            else if (!hasEnchantments && (dispelEnchantWeapon || AbilityData.Powers.Any(p => p?.Def == def))) RemovePawnAbility(def);
+            dispelEnchantWeapon = hasEnchantments;
+        }
+
         internal void SyncEnchanterStoneControl()
         {
             enchanterStones?.RemoveAll(s => s.DestroyedOrNull());
@@ -6015,28 +6026,7 @@ namespace TorannMagic
                 }
             }
 
-            if (this.weaponEnchants != null && this.weaponEnchants.Count > 0)
-            {
-                for (int i = 0; i < this.weaponEnchants.Count; i++)
-                {
-                    Pawn ewPawn = weaponEnchants[i];
-                    if (ewPawn.DestroyedOrNull() || ewPawn.Dead)
-                    {
-                        this.weaponEnchants.Remove(ewPawn);
-                    }
-                }
-
-                if (this.dispelEnchantWeapon == false)
-                {
-                    this.dispelEnchantWeapon = true;
-                    this.AddPawnAbility(TorannMagicDefOf.TM_DispelEnchantWeapon);
-                }
-            }
-            else if (this.dispelEnchantWeapon == true)
-            {
-                this.dispelEnchantWeapon = false;
-                this.RemovePawnAbility(TorannMagicDefOf.TM_DispelEnchantWeapon);
-            }
+            SyncEnchantWeaponControl();
 
             if (this.mageLightActive)
             {
@@ -7086,6 +7076,7 @@ namespace TorannMagic
             {
                 TM_PawnTracker.ResolveMagicComp(this);
                 RecoverMissingProgression();
+                if (weaponEnchants?.Count > 0) LongEventHandler.ExecuteWhenFinished(SyncEnchantWeaponControl);
                 if (enchanterStones?.Count > 0) LongEventHandler.ExecuteWhenFinished(SyncEnchanterStoneControl);
                 TM_ClassState.RestoreSharedMagicProgression(this);
                 Pawn abilityUser = base.Pawn;

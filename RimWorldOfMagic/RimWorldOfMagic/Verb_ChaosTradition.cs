@@ -106,12 +106,7 @@ namespace TorannMagic
 
                 if(comp.weaponEnchants != null && comp.weaponEnchants.Count > 0)
                 {
-                    for(int i = 0; i < comp.weaponEnchants.Count; i++)
-                    {
-                        Verb_DispelEnchantWeapon.RemoveExistingEnchantment(comp.weaponEnchants[i]);
-                    }
-                    comp.weaponEnchants.Clear();
-                    comp.RemovePawnAbility(TorannMagicDefOf.TM_DispelEnchantWeapon);
+                    Verb_DispelEnchantWeapon.DispelOwned(comp);
                 }
 
                 if (comp.enchanterStones != null && comp.enchanterStones.Count > 0)

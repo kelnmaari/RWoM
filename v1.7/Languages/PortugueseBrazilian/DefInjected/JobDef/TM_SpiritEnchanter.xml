@@ -4,4 +4,6 @@
   <TM_SpiritEnchantedAura.reportString>encantando a aura.</TM_SpiritEnchantedAura.reportString>
   <TM_SpiritEnchanterStone.reportString>criando uma pedra encantada.</TM_SpiritEnchanterStone.reportString>
   <TM_SpiritDismissEnchanterStones.reportString>dissipando uma pedra encantada.</TM_SpiritDismissEnchanterStones.reportString>
+  <TM_SpiritEnchantWeapon.reportString>encantando uma arma.</TM_SpiritEnchantWeapon.reportString>
+  <TM_SpiritDispelEnchantWeapon.reportString>dissipando encantamentos de armas.</TM_SpiritDispelEnchantWeapon.reportString>
 </LanguageData>

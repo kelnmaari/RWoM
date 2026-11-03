@@ -5922,27 +5922,27 @@ namespace TorannMagic
                         if (instigator != null)
                         {
                             //Log.Message("checking enchantment damage");
-                            if (instigator.health.hediffSet.HasHediff(TorannMagicDefOf.TM_WeaponEnchantment_FireHD) && dinfo.Def != TMDamageDefOf.DamageDefOf.TM_Enchanted_Fire && Rand.Chance(.5f))
+                            if (HediffComp_EnchantedWeapon.ActiveOnHit(instigator, TorannMagicDefOf.TM_WeaponEnchantment_FireHD, dinfo.Weapon) is Hediff fireEnchant && dinfo.Def != TMDamageDefOf.DamageDefOf.TM_Enchanted_Fire && Rand.Chance(.5f))
                             {
-                                float sev = instigator.health.hediffSet.GetFirstHediffOfDef(TorannMagicDefOf.TM_WeaponEnchantment_FireHD).Severity;
+                                float sev = fireEnchant.Severity;
                                 DamageInfo dinfo3 = new DamageInfo(TMDamageDefOf.DamageDefOf.TM_Enchanted_Fire, Rand.Range(1f + sev, 5f + sev), 1, -1, instigator, dinfo.HitPart, dinfo.Weapon, dinfo.Category, dinfo.intendedTargetInt);
                                 ___pawn.TakeDamage(dinfo3);
                             }
-                            if (instigator.health.hediffSet.HasHediff(TorannMagicDefOf.TM_WeaponEnchantment_IceHD) && dinfo.Def != TMDamageDefOf.DamageDefOf.TM_Enchanted_Ice && Rand.Chance(.4f))
+                            if (HediffComp_EnchantedWeapon.ActiveOnHit(instigator, TorannMagicDefOf.TM_WeaponEnchantment_IceHD, dinfo.Weapon) is Hediff iceEnchant && dinfo.Def != TMDamageDefOf.DamageDefOf.TM_Enchanted_Ice && Rand.Chance(.4f))
                             {
-                                float sev = instigator.health.hediffSet.GetFirstHediffOfDef(TorannMagicDefOf.TM_WeaponEnchantment_IceHD).Severity;
+                                float sev = iceEnchant.Severity;
                                 DamageInfo dinfo3 = new DamageInfo(TMDamageDefOf.DamageDefOf.TM_Enchanted_Ice, Mathf.RoundToInt(Rand.Range(3f + sev, 5f + sev) / 2), 1, -1, instigator, dinfo.HitPart, dinfo.Weapon, dinfo.Category, dinfo.intendedTargetInt);
                                 ___pawn.TakeDamage(dinfo3);
                             }
-                            if (instigator.health.hediffSet.HasHediff(TorannMagicDefOf.TM_WeaponEnchantment_LitHD) && dinfo.Def != DamageDefOf.Stun && Rand.Chance(.3f))
+                            if (HediffComp_EnchantedWeapon.ActiveOnHit(instigator, TorannMagicDefOf.TM_WeaponEnchantment_LitHD, dinfo.Weapon) is Hediff litEnchant && dinfo.Def != DamageDefOf.Stun && Rand.Chance(.3f))
                             {
-                                float sev = instigator.health.hediffSet.GetFirstHediffOfDef(TorannMagicDefOf.TM_WeaponEnchantment_LitHD).Severity;
+                                float sev = litEnchant.Severity;
                                 DamageInfo dinfo3 = new DamageInfo(DamageDefOf.Stun, Rand.Range(1f + (.5f * sev), 3f + (.5f * sev)), 1, -1, instigator, dinfo.HitPart, dinfo.Weapon, dinfo.Category, dinfo.intendedTargetInt);
                                 ___pawn.TakeDamage(dinfo3);
                             }
-                            if (instigator.health.hediffSet.HasHediff(TorannMagicDefOf.TM_WeaponEnchantment_DarkHD))
+                            if (HediffComp_EnchantedWeapon.ActiveOnHit(instigator, TorannMagicDefOf.TM_WeaponEnchantment_DarkHD, dinfo.Weapon) is Hediff darkEnchant)
                             {
-                                float sev = instigator.health.hediffSet.GetFirstHediffOfDef(TorannMagicDefOf.TM_WeaponEnchantment_DarkHD).Severity;
+                                float sev = darkEnchant.Severity;
                                 if (Rand.Chance(.3f + (.1f * sev)))
                                 {
                                     HealthUtility.AdjustSeverity(___pawn, TorannMagicDefOf.TM_Blind, Rand.Range(.05f, .2f));

@@ -4,4 +4,6 @@
   <TM_SpiritEnchantedAura.reportString>зачаровує ауру.</TM_SpiritEnchantedAura.reportString>
   <TM_SpiritEnchanterStone.reportString>створює зачарований камінь.</TM_SpiritEnchanterStone.reportString>
   <TM_SpiritDismissEnchanterStones.reportString>розвіює зачарований камінь.</TM_SpiritDismissEnchanterStones.reportString>
+  <TM_SpiritEnchantWeapon.reportString>зачаровує зброю.</TM_SpiritEnchantWeapon.reportString>
+  <TM_SpiritDispelEnchantWeapon.reportString>знімає чари зі зброї.</TM_SpiritDispelEnchantWeapon.reportString>
 </LanguageData>

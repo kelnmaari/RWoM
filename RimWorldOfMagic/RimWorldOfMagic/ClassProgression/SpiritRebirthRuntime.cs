@@ -176,6 +176,7 @@ namespace TorannMagic.ClassProgression
                 comp.SyncSentinelControl();
                 comp.SyncGuardianControl();
                 comp.SyncEnchanterStoneControl();
+                comp.SyncEnchantWeaponControl();
                 if (comp.recallSet && comp.recallExpiration <= now)
                 {
                     comp.recallSet = comp.recallSpell = false;

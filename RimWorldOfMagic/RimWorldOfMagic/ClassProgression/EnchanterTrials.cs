@@ -79,8 +79,8 @@ namespace TorannMagic.ClassProgression
                 && Owned(scope.caster, false) == scope.path && Owner(scope.caster, false) == scope.owner
                 && RuntimeOwned(scope.ability, scope.caster, false) && scope.path.RecordCompletedTrial(FoundationTrialId);
         }
-        static bool Ally(Pawn caster, Pawn target) => target != null && target != caster && !target.Dead && target.Spawned
-            && target.Map == caster.Map && target.Faction == caster.Faction && !target.IsPrisoner && !target.IsSlave
+        static bool Ally(Pawn caster, Pawn target) => target != null && target != CastingBody(caster) && !target.Dead && target.Spawned
+            && target.Map == CastingBody(caster)?.Map && target.Faction == caster.Faction && !target.IsPrisoner && !target.IsSlave
             && target.RaceProps?.Humanlike == true && !TM_Calc.IsUndead(target) && target.health?.hediffSet != null
             && target.equipment?.Primary?.def.IsMeleeWeapon == true;
         static bool NativeEnchant(Hediff h) => h.def == TorannMagicDefOf.TM_WeaponEnchantment_FireHD

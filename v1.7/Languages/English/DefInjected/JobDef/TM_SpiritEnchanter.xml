@@ -4,4 +4,6 @@
   <TM_SpiritEnchantedAura.reportString>enchanting the aura.</TM_SpiritEnchantedAura.reportString>
   <TM_SpiritEnchanterStone.reportString>creating an enchanted stone.</TM_SpiritEnchanterStone.reportString>
   <TM_SpiritDismissEnchanterStones.reportString>dismissing an enchanted stone.</TM_SpiritDismissEnchanterStones.reportString>
+  <TM_SpiritEnchantWeapon.reportString>enchanting a weapon.</TM_SpiritEnchantWeapon.reportString>
+  <TM_SpiritDispelEnchantWeapon.reportString>dispelling weapon enchantments.</TM_SpiritDispelEnchantWeapon.reportString>
 </LanguageData>

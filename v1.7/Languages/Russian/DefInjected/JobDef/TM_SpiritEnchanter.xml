@@ -4,4 +4,6 @@
   <TM_SpiritEnchantedAura.reportString>зачаровывает ауру.</TM_SpiritEnchantedAura.reportString>
   <TM_SpiritEnchanterStone.reportString>создаёт зачарованный камень.</TM_SpiritEnchanterStone.reportString>
   <TM_SpiritDismissEnchanterStones.reportString>развеивает зачарованный камень.</TM_SpiritDismissEnchanterStones.reportString>
+  <TM_SpiritEnchantWeapon.reportString>зачаровывает оружие.</TM_SpiritEnchantWeapon.reportString>
+  <TM_SpiritDispelEnchantWeapon.reportString>снимает чары с оружия.</TM_SpiritDispelEnchantWeapon.reportString>
 </LanguageData>

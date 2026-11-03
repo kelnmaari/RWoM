@@ -17,9 +17,26 @@ internal static class EnchanterTrialTests
         yield return new("EnchanterTrial.EnchantmentProvenanceAndRecipients", Enchantment);
         yield return new("EnchanterTrial.NativeEnchantmentMutation", NativeEnchantment);
         yield return new("EnchanterTrial.EnchantmentOwnershipAndEquipmentDrift", EnchantmentDrift);
+        yield return new("EnchanterTrial.StaleDispelRetainsForeignEffectAndExactWeapon", r => {
+            using var w = new Fixture(r);
+            var ward = w.Ward();
+            var component = ward.TryGetComp<HediffComp_EnchantedWeapon>();
+            component.enchanterPawn = w.Target;
+            w.Magic.weaponEnchants.AddRange([w.Target, null!, w.Target]);
+            var dispel = typeof(Verb_DispelEnchantWeapon).GetMethod("DispelOwned",BindingFlags.NonPublic|BindingFlags.Static)!;
+            Check.Equal(true,(bool)dispel.Invoke(null,[w.Magic])!, "stale entries drained without relying on callbacks");
+            Check.Equal(true,w.Target.health.hediffSet.hediffs.Contains(ward) && w.Magic.weaponEnchants.Count==0,"other caster's enchantment untouched");
+            Check.Equal(false,(bool)dispel.Invoke(null,[w.Magic])!, "repeat has nothing to remove");
+            var hit = typeof(HediffComp_EnchantedWeapon).GetMethod("ActiveOnHit",BindingFlags.NonPublic|BindingFlags.Static)!;
+            Check.Same(ward,hit.Invoke(null,[w.Target,ward.def,w.Weapon.def]),"equipped weapon receives the effect");
+            Check.Equal(true,hit.Invoke(null,[w.Target,ward.def,w.Output])==null,"unrelated damage cannot trigger the enchantment");
+            w.Target.equipment.GetDirectlyHeldThings().Remove(w.Weapon);
+            Check.Equal(true,hit.Invoke(null,[w.Target,ward.def,w.Weapon.def])==null,"dropped weapon immediately loses the on-hit effect");
+        });
     }
     sealed class Fixture : IDisposable
     {
+        readonly Type? priorDispelType;
         readonly Game previous = Current.Game;
         readonly DesignationDef[] designations = DefDatabase<DesignationDef>.AllDefsListForReading.ToArray();
         readonly ClassDisciplineDef[] profiles = DefDatabase<ClassDisciplineDef>.AllDefsListForReading.ToArray();
@@ -35,6 +52,8 @@ internal static class EnchanterTrialTests
         public Fixture(RuntimeFixture f)
         {
             LoadBaseDefinitions(f);
+            priorDispelType = TorannMagicDefOf.TM_DispelEnchantWeapon.abilityClass;
+            TorannMagicDefOf.TM_DispelEnchantWeapon.abilityClass = typeof(PawnAbility);
             if (DefDatabase<DesignationDef>.DefCount == 0) DefDatabase<DesignationDef>.Add(new DesignationDef { defName = "EnchanterTrialDesignation" });
             Current.Game = (Game)RuntimeHelpers.GetUninitializedObject(typeof(Game));
             Set(Current.Game, "tickManager", new TickManager()); Set(Current.Game, "uniqueIDsManager", new UniqueIDsManager());
@@ -84,6 +103,7 @@ internal static class EnchanterTrialTests
         }
         public void Dispose()
         {
+            TorannMagicDefOf.TM_DispelEnchantWeapon.abilityClass = priorDispelType;
             EnchanterTrials.EndTransmutation(null!); Current.Game = previous;
             DefDatabase<DesignationDef>.Clear(); foreach (var d in designations) DefDatabase<DesignationDef>.Add(d);
             TorannMagicDefOf.TM_WeaponEnchantment_FireHD = saved[0]; TorannMagicDefOf.TM_WeaponEnchantment_IceHD = saved[1]; TorannMagicDefOf.TM_WeaponEnchantment_LitHD = saved[2]; TorannMagicDefOf.TM_WeaponEnchantment_DarkHD = saved[3];
