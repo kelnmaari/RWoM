@@ -161,6 +161,24 @@ internal static partial class SpiritMapCollapseTests
                     host.AbilityData.AllPowers=null;
                     Check.Equal(true,Owner()==null,"a lower native rank takes priority");
                 }));
+        yield return new("RangerProjection.BreakthroughOrder",f=>
+            SpiritRebirthRitualTransactionTests.Run(f,c=>{
+                using var held=new Fixture(f,c);
+                var source=c.Original.GetCompAbilityUserMight();
+                var def=DefDatabase<TMAbilityDef>.GetNamedSilentFail("TM_RangerBreakthrough") ?? f.AddAbility("TM_RangerBreakthrough");
+                if(DefDatabase<JobDef>.GetNamedSilentFail("TM_RangerBreakthroughCast")==null)
+                    DefDatabase<JobDef>.Add(new JobDef{defName="TM_RangerBreakthroughCast",driverClass=typeof(JobDriver_RangerBreakthrough)});
+                var ability=new RangerHuntAbility(source){Def=def};
+                source.AbilityData.Powers.Add(ability);source.AbilityData.AllPowers=null;
+                var find=Production("SpiritHostedMartial").GetMethod("Find",BindingFlags.Static|BindingFlags.NonPublic)!;
+                Check.Same(ability,find.Invoke(null,[c.Creator,c.Original,"TM_RangerBreakthroughCast"])!,"projected hunt belongs to the ranger");
+                var job=(Verse.AI.Job)typeof(RangerHuntAbility).GetMethod("MakeJobFor",BindingFlags.Instance|BindingFlags.NonPublic)!
+                    .Invoke(ability,[c.Creator,new LocalTargetInfo(c.Creator)])!;
+                Check.Same(c.Original,job.targetQueueB.Single().Pawn,"saved order identifies original ranger");
+                var host=c.Creator.GetCompAbilityUserMight();
+                host.AbilityData.Powers.Add(new RangerHuntAbility(host){Def=def});host.AbilityData.AllPowers=null;
+                Check.Equal(true,find.Invoke(null,[c.Creator,c.Original,"TM_RangerBreakthroughCast"])==null,"native hunt has precedence");
+            }));
         yield return new("RangerProjection.ArrowStormNoBow", f =>
         {
             var pawn=PawnWithComps(false,false).pawn;

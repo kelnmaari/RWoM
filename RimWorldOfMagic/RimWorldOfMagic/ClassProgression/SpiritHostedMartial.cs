@@ -55,6 +55,7 @@ namespace TorannMagic.ClassProgression
             else if (job == Verb_PoisonTrap.Order) def=TorannMagicDefOf.TM_PoisonTrap;
             else if (job == Verb_AnimalFriend.Order) def=TorannMagicDefOf.TM_AnimalFriend ?? DefDatabase<TMAbilityDef>.GetNamedSilentFail("TM_AnimalFriend");
             else if (job == BladeFormAbility.JobName && BladeAscension.HasForm(soul)) def = DefDatabase<TMAbilityDef>.GetNamedSilentFail("TM_BladeSevenSteps");
+            else if (job == RangerHuntAbility.JobName) def = DefDatabase<TMAbilityDef>.GetNamedSilentFail("TM_RangerBreakthrough");
             else if (job == SniperOpeningAbility.JobName) def = DefDatabase<TMAbilityDef>.GetNamedSilentFail("TM_SniperSingleOpening");
             else if (job == Aimed || job == Fracture) def = DefDatabase<TMAbilityDef>.GetNamedSilentFail(job == Aimed ? "TM_SniperAimedShot" : "TM_SniperArmorFracture");
             else if (job == SelfAid) def = TorannMagicDefOf.TM_FirstAid;
@@ -84,6 +85,7 @@ namespace TorannMagic.ClassProgression
             var def = ability.mightDef;
             var might = ability.MightUser;
             if (job == BladeFormAbility.JobName) return ability is BladeFormAbility && JobDriver_BladeSevenSteps.Ready(body,ability.Pawn);
+            if (job == RangerHuntAbility.JobName) return ability is RangerHuntAbility && JobDriver_RangerBreakthrough.Ready(body,ability.Pawn);
             if (job == SniperOpeningAbility.JobName) return ability is SniperOpeningAbility opening &&
                 JobDriver_SniperSingleOpening.Ready(body, opening.Pawn) && opening.VerbFor(body).HasCompatibleWeapon;
             if (SpiritHostedStance.BaseAbility(job) != null) return SpiritHostedStance.Ready(body,ability);
@@ -180,6 +182,11 @@ namespace TorannMagic.ClassProgression
                         if (!(Find(body,soul,job.defName) is SniperOpeningAbility opening)) return;
                         order = opening.MakeJobFor(body,target);
                     }
+                    else if (job.defName==RangerHuntAbility.JobName)
+                    {
+                        if (!(Find(body,soul,job.defName) is RangerHuntAbility hunt)) return;
+                        order=hunt.MakeJobFor(body,target);
+                    }
                     else if (job.defName==Verb_RangerShot.Order) order=Verb_RangerShot.MakeOrder(body,soul,target);
                     else order = JobMaker.MakeJob(job, soul, target);
                     body.jobs.TryTakeOrderedJob(order, JobTag.Misc);
@@ -187,6 +194,8 @@ namespace TorannMagic.ClassProgression
             }, highlightAction: target => {
                 if (IsSniperShot(job.defName) && Find(body,soul,job.defName) is MightAbility shot)
                     GenDraw.DrawRadiusRing(body.Position,Verb_SniperBallisticShot.FromHost(body,shot)?.EffectiveRange ?? shot.mightDef.MainVerb.range);
+                else if(job.defName==RangerHuntAbility.JobName && Find(body,soul,job.defName) is RangerHuntAbility hunt)
+                    GenDraw.DrawRadiusRing(body.Position,hunt.VerbFor(body).EffectiveRange);
                 else if(job.defName == SniperOpeningAbility.JobName && Find(body,soul,job.defName) is SniperOpeningAbility opening)
                     GenDraw.DrawRadiusRing(body.Position, opening.VerbFor(body).EffectiveRange);
                 else if(job.defName == Grapple && Find(body,soul,job.defName) is MightAbility hook)
@@ -241,7 +250,7 @@ namespace TorannMagic.ClassProgression
                         GladiatorMastery.AutomaticSource(body,body.GetCompAbilityUserMight()) == cleave)
                         cleave.useCleaveToggle = !cleave.useCleaveToggle;
                 });
-            foreach (var name in new[] { Maneuver, SelfAid, Pommel, Sweep, Grapple, GladiatorWhirlwind.JobName, BladeMartialCast.Spin, BladeMartialCast.Slash, BladeMartialCast.Passage, BladeMartialCast.Phase, BladeFormAbility.JobName, Verb_AnimalFriend.Order, Verb_PoisonTrap.Order, Verb_RangerSafeTrail.Order, Verb_RangerShot.Order, Headshot, DisablingShot, AntiArmor, Aimed, Fracture, ShadowSlayer, SniperOpeningAbility.JobName, SpiritHostedStance.Job, SpiritHostedStance.StrongBack, SpiritHostedStance.HeavyBlow,
+            foreach (var name in new[] { Maneuver, SelfAid, Pommel, Sweep, Grapple, GladiatorWhirlwind.JobName, BladeMartialCast.Spin, BladeMartialCast.Slash, BladeMartialCast.Passage, BladeMartialCast.Phase, BladeFormAbility.JobName, Verb_AnimalFriend.Order, Verb_PoisonTrap.Order, Verb_RangerSafeTrail.Order, Verb_RangerShot.Order, RangerHuntAbility.JobName, Headshot, DisablingShot, AntiArmor, Aimed, Fracture, ShadowSlayer, SniperOpeningAbility.JobName, SpiritHostedStance.Job, SpiritHostedStance.StrongBack, SpiritHostedStance.HeavyBlow,
                 SpiritHostedStance.ThickSkin, SpiritHostedStance.FightersFocus, SpiritHostedStance.GearRepair, SpiritHostedStance.InnerHealing })
             {
                 var owner = Find(body, soul, name);
@@ -257,6 +266,9 @@ namespace TorannMagic.ClassProgression
                         else if (name==Verb_RangerShot.Order) FindTarget(body,soul,job,t => Ready(body,Find(body,soul,name),name) && Verb_RangerShot.For(body,owner).CanVolley(t));
                         else if (name==Verb_PoisonTrap.Order) Verb_PoisonTrap.Choose(body,owner);
                         else if (name==Verb_AnimalFriend.Order) FindTarget(body,soul,job,target => Ready(body,Find(body,soul,name),name) && Verb_AnimalFriend.ValidTarget(body,target,body.Position,owner.mightDef.MainVerb.range));
+                        else if (name == RangerHuntAbility.JobName && owner is RangerHuntAbility hunt)
+                            FindTarget(body,soul,job,target => target!=null && Ready(body,Find(body,soul,name),name) &&
+                                hunt.VerbFor(body).CanHitTargetFrom(body.Position,target));
                         else if (name == SniperOpeningAbility.JobName && owner is SniperOpeningAbility opening)
                             FindTarget(body,soul,job,target => target!=null && Ready(body,Find(body,soul,name),name) &&
                                 opening.VerbFor(body).CanHitTargetFrom(body.Position,target));
