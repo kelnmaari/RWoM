@@ -208,11 +208,14 @@ namespace TorannMagic
                         }
                     }
                     this.modifiedStaminaGain = amount - this.baseStaminaGain;
-                    amount = Mathf.Min(amount, this.MaxLevel - this.CurLevel);
-                    this.curLevelInt += amount;
+                    // Upkeep can reduce capacity between need ticks (e.g. a new animal bond).
+                    // Clamp the excess once, before applying the ordinary regeneration rate.
+                    float maxLevel = Mathf.Max(0f, MaxLevel);
+                    curLevelInt = Mathf.Min(curLevelInt, maxLevel);
+                    amount = Mathf.Min(amount, maxLevel - curLevelInt);
                     this.lastGainPct = amount;
                     this.lastGainTick = Find.TickManager.TicksGame;
-                    comp.Stamina.curLevelInt = Mathf.Clamp(comp.Stamina.curLevelInt += amount, 0f, this.MaxLevel);
+                    curLevelInt = Mathf.Clamp(curLevelInt + 2f * amount, 0f, maxLevel);
 
                 }
                 AdjustThresh();
