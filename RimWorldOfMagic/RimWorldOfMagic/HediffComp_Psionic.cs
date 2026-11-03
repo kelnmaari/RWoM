@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Verse;
@@ -60,6 +60,8 @@ namespace TorannMagic
             }
         }
 
+        public override string CompLabelInBracketsExtra => parent.Severity.ToString("0.00")+"%";
+
         public string LabelCap
         {
             get
@@ -96,25 +98,26 @@ namespace TorannMagic
 
         public override void CompPostTick(ref float severityAdjustment)
         {
-            if (base.Pawn != null & base.parent != null && !this.Pawn.Dead)
+            if (base.Pawn != null && base.parent != null && !this.Pawn.Dead)
             {
                 if (!initialized)
                 {
                     initialized = true;
                     this.Initialize();
                 }
+                // The runtime component pointer is not scribed. A paid strike must resume
+                // on its next tick rather than waiting for the periodic rank refresh.
+                comp ??= Pawn.GetCompAbilityUserMight();
                 base.CompPostTick(ref severityAdjustment);
+                var career=ClassProgression.PsionicMartialPath.Path(Pawn);
+                if(career!=null && (Pawn.jobs?.curDriver is ClassProgression.JobDriver_PsionicCrucible || ClassProgression.PsionicMartialPath.Read(career)?.DisruptedUntil>Find.TickManager.TicksGame))
+                {doPsionicAttack=false;return;}
 
                 if (Find.TickManager.TicksGame % 60 == 0 && initialized)
                 {
                     DeterminePsionicHD();
-                    severityAdjustment += (this.Pawn.GetStatValue(StatDefOf.PsychicSensitivity, false) * Rand.Range(.04f, .12f));
-                    if (Find.Selector.FirstSelectedObject == this.Pawn)
-                    {
-                        HediffStage hediffStage = this.Pawn.health.hediffSet.GetFirstHediffOfDef(HediffDef.Named("TM_PsionicHD"), false).CurStage;
-                        hediffStage.label = this.parent.Severity.ToString("0.00") + "%";
-                    }
-
+                    if(career?.MartialAlternate!=true || Pawn.jobs?.curDriver is not JobDriver_PsionicBarrier)
+                        severityAdjustment += (this.Pawn.GetStatValue(StatDefOf.PsychicSensitivity, false) * Rand.Range(.04f, .12f));
                     Hediff hediff = this.Pawn.health.hediffSet.GetFirstHediffOfDef(TorannMagicDefOf.TM_Artifact_PsionicBoostHD);
                     float maxSev = 100;
                     if (hediff != null)
@@ -133,7 +136,7 @@ namespace TorannMagic
                         if (this.ticksTillPsionicStrike <= 0)
                         {
                             this.doPsionicAttack = false;
-                            if (threat != null && !threat.Destroyed && !threat.Dead && !threat.Downed)
+                            if (threat?.Spawned==true && threat.Map==Pawn.Map && !threat.Dead && !threat.Downed && threat.HostileTo(Pawn) && !threat.IsPrisoner)
                             {
                                 TM_MoteMaker.MakePowerBeamMotePsionic(threat.DrawPos.ToIntVec3(), threat.Map, 2f, 2f, .7f, .1f, .6f);
                                 DamageInfo dinfo2 = new DamageInfo(TMDamageDefOf.DamageDefOf.TM_PsionicInjury, Rand.Range(6, 12) * this.Pawn.GetStatValue(StatDefOf.PsychicSensitivity, false) + (2 * VerVal), 0, -1, this.Pawn, null, null, DamageInfo.SourceCategory.ThingOrUnknown, this.threat);
@@ -254,13 +257,13 @@ namespace TorannMagic
                                         {
                                             if (this.Pawn.equipment.Primary.def.IsRangedWeapon)
                                             {
-                                                StatModifier wpnMass = this.Pawn.equipment.Primary.def.statBases.FirstOrDefault((StatModifier x) => x.stat.defName == "Mass");
-                                                weaponModifier = Mathf.Clamp(wpnMass.value, .8f, 6);
+                                                StatModifier wpnMass = this.Pawn.equipment.Primary.def.statBases?.FirstOrDefault((StatModifier x) => x.stat.defName == "Mass");
+                                                weaponModifier = Mathf.Clamp(wpnMass?.value ?? 1f, .8f, 6);
                                             }
                                             else //assume melee weapon
                                             {
-                                                StatModifier wpnMass = this.Pawn.equipment.Primary.def.statBases.FirstOrDefault((StatModifier x) => x.stat.defName == "Mass");
-                                                weaponModifier = Mathf.Clamp(wpnMass.value, .6f, 4);
+                                                StatModifier wpnMass = this.Pawn.equipment.Primary.def.statBases?.FirstOrDefault((StatModifier x) => x.stat.defName == "Mass");
+                                                weaponModifier = Mathf.Clamp(wpnMass?.value ?? 1f, .6f, 4);
                                             }
                                         }
                                         else //unarmed
@@ -302,6 +305,10 @@ namespace TorannMagic
         public override void CompExposeData()
         {
             base.CompExposeData();
+            Scribe_Values.Look(ref doPsionicAttack,"psionicStrikePending");
+            Scribe_Values.Look(ref ticksTillPsionicStrike,"psionicStrikeDelay");
+            Scribe_Values.Look(ref nextPsionicAttack,"psionicStrikeReadyAt");
+            Scribe_References.Look(ref threat,"psionicStrikeTarget");
             Scribe_Values.Look<bool>(ref this.initialized, "initialized", false, false);
             Scribe_Values.Look<int>(ref this.pwrVal, "pwrVal", 0, false);
             Scribe_Values.Look<int>(ref this.effVal, "effVal", 0, false);

@@ -4671,6 +4671,8 @@ namespace TorannMagic
             Scribe_Values.Look<bool>(ref this.deathRetaliating, "deathRetaliating", false, false);
             Scribe_Values.Look<bool>(ref this.canDeathRetaliate, "canDeathRetaliate", false, false);
             Scribe_Values.Look<int>(ref this.ticksTillRetaliation, "ticksTillRetaliation", 600, false);
+            Scribe_Values.Look(ref usePsionicMindAttackToggle,"usePsionicMindAttackToggle",true);
+            Scribe_Values.Look(ref usePsionicAugmentationToggle,"usePsionicAugmentationToggle",true);
             Scribe_Values.Look<bool>(ref this.useCleaveToggle, "useCleaveToggle", true, false);
             Scribe_Values.Look<bool>(ref this.useCQCToggle, "useCQCToggle", true, false);
             Scribe_Defs.Look<TMAbilityDef>(ref this.mimicAbility, "mimicAbility");

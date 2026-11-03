@@ -17,6 +17,12 @@ internal static partial class SpiritMapCollapseTests
         public void ExposeData() => Effect.CompExposeData();
     }
 
+    private sealed class PsionicAttackSave : IExposable
+    {
+        public HediffComp Effect=(HediffComp)Activator.CreateInstance(typeof(MightAbility).Assembly.GetType("TorannMagic.HediffComp_Psionic",true)!,true)!;
+        public void ExposeData()=>Effect.CompExposeData();
+    }
+
     private sealed class TestMartialTend : HediffComp_TendDuration
     {
         public float RequestedQuality;
@@ -202,6 +208,37 @@ internal static partial class SpiritMapCollapseTests
             bullet.projectile.explosionRadius=2;
             Check.Equal(true,Incoming(physical,weapon)==null,"exclude explosive ammunition");
         });
+        yield return new("PsionicProjection.IndividualEnergyLabels",_=>{
+            var def=new HediffDef{minSeverity=0,maxSeverity=200,stages=[new HediffStage()]};
+            HediffComp Energy(float amount)
+            {
+                var effect=new PsionicAttackSave().Effect;
+                var energy=new HediffWithComps{def=def};
+                Set(energy,"severityInt",amount);effect.parent=energy;
+                return effect;
+            }
+            var one=Energy(12.5f);
+            var two=Energy(83.25f);
+            Check.Equal(12.5f.ToString("0.00")+"%",one.CompLabelInBracketsExtra,"first pawn's psi reading");
+            Check.Equal(83.25f.ToString("0.00")+"%",two.CompLabelInBracketsExtra,"second pawn's psi reading");
+            Check.Equal(true,string.IsNullOrEmpty(def.stages[0].label),"shared stage still has no pawn-specific text");
+        });
+        yield return new("PsionicProjection.PaidStrikeSave", f=>SpiritRebirthRitualTransactionTests.Run(f,c=>{
+            using var held=new Fixture(f,c);
+            var before=new PsionicAttackSave();
+            Set(before.Effect,"initialized",true);
+            Set(before.Effect,"doPsionicAttack",true);
+            Set(before.Effect,"ticksTillPsionicStrike",13);
+            Set(before.Effect,"nextPsionicAttack",7001);
+            Set(before.Effect,"threat",c.Creator);
+            var loaded=RoundTripSummon(f,"psionic-paid-strike",before,c.Creator).Effect;
+            var instance=BindingFlags.NonPublic|BindingFlags.Instance;
+            object? Value(string field)=>loaded.GetType().GetField(field,instance)!.GetValue(loaded);
+            Check.Equal(true,(bool)Value("doPsionicAttack")!,"a paid pending strike survives load");
+            Check.Equal(13,(int)Value("ticksTillPsionicStrike")!,"remaining windup retained");
+            Check.Equal(7001,(int)Value("nextPsionicAttack")!,"absolute cooldown retained");
+            Check.Same(c.Creator,Value("threat")!,"same target after references resolve");
+        }));
         foreach(bool rescue in new[]{false,true})
             yield return new(rescue?"PsionicProjection.RescueTrial":"PsionicProjection.RepairTrial",f=>
                 SpiritRebirthRitualTransactionTests.Run(f,c=>{
