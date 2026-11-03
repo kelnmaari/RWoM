@@ -110,6 +110,7 @@ namespace TorannMagic.ClassProgression
             ("TM_SpiritVitalityBrand", () => TorannMagicDefOf.TM_VitalityBrand, typeof(Verb_BrandVitality)),
             ("TM_SpiritSiphonBrand", () => TorannMagicDefOf.TM_SiphonBrand, typeof(Verb_BrandSiphon)),
             ("TM_SpiritSuppressiveAura", () => TorannMagicDefOf.TM_SuppressiveAura, typeof(Verb_ToggleHediff)),
+            ("TM_SpiritFadeEmotions", () => TorannMagicDefOf.TM_FadeEmotions, typeof(Verb_FadeEmotions)),
             ("TM_SpiritHarvestPassion", () => TorannMagicDefOf.TM_HarvestPassion, typeof(Verb_HarvestPassion)),
             ("TM_SpiritIncitePassion", () => TorannMagicDefOf.TM_IncitePassion, typeof(Verb_IncitePassion)),
             ("TM_SpiritMindKiller", () => TorannMagicDefOf.TM_MindKiller, typeof(Verb_MindKiller)),
@@ -259,7 +260,7 @@ namespace TorannMagic.ClassProgression
                     f.effect == def.MainVerb.defaultProjectile?.thingClass &&
                     (typeof(Projectile_SpiritNativeAbility).IsAssignableFrom(f.effect) || typeof(Projectile_SpiritBolt).IsAssignableFrom(f.effect) || typeof(Projectile_SpiritRay).IsAssignableFrom(f.effect) || f.effect == typeof(Projectile_ChronostaticField) || f.effect == typeof(Projectile_AccelerateTime) || f.effect == typeof(Projectile_Sentinel) || f.effect == typeof(Projectile_EarthernHammer) || f.effect == typeof(Projectile_Encase) || f.effect == typeof(Projectile_IgniteBlood) || f.effect == typeof(Projectile_BloodMoon) || SpiritHostedSummons.IsProjectile(f.effect))))) ||
                 (def.MainVerb.burstShotCount != 1 && !IsBurst(def)) || def.bloodCost != 0 && def != TorannMagicDefOf.TM_BloodShield && def != TorannMagicDefOf.TM_IgniteBlood && def != TorannMagicDefOf.TM_BloodForBlood && def.MainVerb.verbClass != typeof(Verb_Rend) && def.MainVerb.defaultProjectile?.thingClass != typeof(Projectile_BloodMoon) || def.chiCost != 0 ||
-                (def.requiredNeed != null && def != TorannMagicDefOf.TM_MindKiller && def != TorannMagicDefOf.TM_SuppressiveAura && def != TorannMagicDefOf.TM_IncitePassion && def != TorannMagicDefOf.TM_HarvestPassion) ||
+                (def.requiredNeed != null && def != TorannMagicDefOf.TM_MindKiller && def != TorannMagicDefOf.TM_SuppressiveAura && def != TorannMagicDefOf.TM_IncitePassion && def != TorannMagicDefOf.TM_HarvestPassion && def != TorannMagicDefOf.TM_FadeEmotions) ||
                 def.requiredHediff != null || !def.consumeEnergy || power.MagicUser.Mana == null) return false;
             if (def == TorannMagicDefOf.TM_HarvestPassion && !body.Inspired) return false;
             if (def == TorannMagicDefOf.TM_IncitePassion && (body.IsSlave || power.Pawn.IsSlave)) return false;
@@ -307,6 +308,7 @@ namespace TorannMagic.ClassProgression
                 (target.HasThing && target.Thing.Map != body.Map) ||
                 !power.magicDef.MainVerb.targetParams.CanTarget(target.ToTargetInfo(body.Map))) return false;
             if (power.magicDef == TorannMagicDefOf.TM_EnchantWeapon && target.Pawn?.equipment?.Primary?.def.IsMeleeWeapon != true) return false;
+            if (power.magicDef == TorannMagicDefOf.TM_FadeEmotions && !Verb_FadeEmotions.CanFade(body,target.Pawn)) return false;
             if (power.magicDef == TorannMagicDefOf.TM_HarvestPassion && !Verb_HarvestPassion.CanHarvest(body,power.Pawn,target.Pawn)) return false;
             if (power.magicDef == TorannMagicDefOf.TM_LivingWall && Verb_LivingWall.Segment(body,target) == null) return false;
             if (power.magicDef == TorannMagicDefOf.TM_EnchanterStone && Verb_EnchanterStone.Source(body, power.Pawn, target) == null) return false;

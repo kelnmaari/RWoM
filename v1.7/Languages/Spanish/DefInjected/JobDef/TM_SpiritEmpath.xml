@@ -3,4 +3,5 @@
   <TM_SpiritSuppressiveAura.reportString>canaliza un aura de supresión.</TM_SpiritSuppressiveAura.reportString>
   <TM_SpiritIncitePassion.reportString>transfiere una pasión.</TM_SpiritIncitePassion.reportString>
   <TM_SpiritHarvestPassion.reportString>absorbe una pasión.</TM_SpiritHarvestPassion.reportString>
+  <TM_SpiritFadeEmotions.reportString>atenúa los recuerdos dolorosos.</TM_SpiritFadeEmotions.reportString>
 </LanguageData>

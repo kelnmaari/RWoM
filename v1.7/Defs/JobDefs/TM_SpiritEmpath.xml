@@ -3,4 +3,5 @@
   <JobDef><defName>TM_SpiritSuppressiveAura</defName><driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass><reportString>channeling a suppressive aura.</reportString></JobDef>
   <JobDef><defName>TM_SpiritIncitePassion</defName><driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass><reportString>transferring a passion.</reportString></JobDef>
   <JobDef><defName>TM_SpiritHarvestPassion</defName><driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass><reportString>harvesting a passion.</reportString></JobDef>
+  <JobDef><defName>TM_SpiritFadeEmotions</defName><driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass><reportString>fading painful memories.</reportString></JobDef>
 </Defs>
