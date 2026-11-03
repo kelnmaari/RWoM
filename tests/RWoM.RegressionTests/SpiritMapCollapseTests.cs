@@ -104,6 +104,49 @@ internal static partial class SpiritMapCollapseTests
                 Check.Equal(UnityEngine.Vector3.zero,((List<UnityEngine.Vector3>)typeof(Projectile_Sunfire).GetField("sfBeamsCurve",flags)!.GetValue(legacy)!).Single(),"legacy positions are never interpreted as curvature");
                 Check.Equal(origin,((List<UnityEngine.Vector3>)typeof(Projectile_Sunfire).GetField("sfBeams",flags)!.GetValue(legacy)!).Single(),"old beam keeps its position without restarting");
             }));
+        yield return new("BrightmageLifecycle.ActiveLightLanceKeepsDurationAndOrigin", r =>
+            SpiritRebirthRitualTransactionTests.Run(r,c =>
+            {
+                using var fixture = new Fixture(r,c);
+                using var material = new Patch(typeof(MaterialPool).GetMethod("MatFrom",[typeof(string),typeof(UnityEngine.Shader),typeof(int)])!,nameof(CancelNative));
+                using var baseMaterial = new Patch(typeof(MaterialPool).GetMethod("MatFrom",[typeof(string),typeof(UnityEngine.Shader)])!,nameof(CancelNative));
+                var def = (ThingDef)RuntimeHelpers.GetUninitializedObject(typeof(ThingDef));
+                def.defName = "RegressionLanceBeam"; def.thingClass = typeof(Projectile_LightLance); def.comps = []; def.category = ThingCategory.Projectile;
+                DefDatabase<ThingDef>.Add(def);
+                var start = new IntVec3(7,0,12);
+                var beam = new Projectile_LightLance {def=def, thingIDNumber=19867, burnTime=244, usedTarget=IntVec3.Zero, intendedTarget=IntVec3.Zero};
+                Set(beam,"launcher",c.Creator); Set(beam,"launchPosition",start); Set(beam,"age",78);
+                Set(beam,"origin",start.ToVector3Shifted()); Set(beam,"ticksToImpact",-2);
+                Set(beam,"initialized",true); Set(beam,"pwrVal",2);
+                beam=RoundTripSummon(r,"lance-active-beam",beam,c.Creator);
+                var flags=BindingFlags.NonPublic|BindingFlags.Instance;
+                Check.Equal(true,(bool)typeof(Projectile_LightLance).GetField("initialized",flags)!.GetValue(beam)!, "already impacted beam stays initialized");
+                Check.Equal(start,(IntVec3)typeof(Projectile_LightLance).GetField("launchPosition",flags)!.GetValue(beam)!, "beam anchored to original cell");
+                typeof(Projectile_LightLance).GetMethod("Impact",flags)!.Invoke(beam,[null,false]);
+                Check.Equal(244,beam.burnTime,"reload does not extend beam lifetime");
+                Check.Equal(166,(int)typeof(Projectile_LightLance).GetProperty("TicksLeft",flags)!.GetValue(beam)!, "exact remaining lifetime");
+                var file=Path.Combine(r.WorkingDirectory,"lance-active-beam.xml");
+                var xml=XDocument.Load(file);
+                var record=xml.Descendants("summon").Single();
+                record.Element("TM_lanceImpacted")!.Remove();
+                record.Element("TM_lanceOrigin")!.Remove();
+                xml.Save(file);
+                var culture=System.Globalization.CultureInfo.CurrentCulture;
+                Projectile_LightLance? old=null;
+                try
+                {
+                    System.Globalization.CultureInfo.CurrentCulture=System.Globalization.CultureInfo.InvariantCulture;
+                    Scribe.loader.InitLoading(file);
+                    Scribe_Deep.Look(ref old,"summon");
+                    var directory=(LoadedObjectDirectory)typeof(CrossRefHandler).GetField("loadedObjectDirectory",flags)!.GetValue(Scribe.loader.crossRefs)!;
+                    directory.RegisterLoaded(c.Creator);
+                    Scribe.loader.FinalizeLoading();
+                }
+                finally { Scribe.ForceStop(); System.Globalization.CultureInfo.CurrentCulture=culture; }
+                Check.Equal(start,(IntVec3)typeof(Projectile_LightLance).GetField("launchPosition",flags)!.GetValue(old)!, "old impacted beam uses projectile origin");
+                typeof(Projectile_LightLance).GetMethod("Impact",flags)!.Invoke(old,[null,false]);
+                Check.Equal(244,old!.burnTime,"legacy impacted beam does not add its rank twice");
+            }));
         foreach (bool impacted in new[] { false, true })
             yield return new("SpiritProjectedCast.SabotageScribeAfterImpact" + impacted, r =>
                 SpiritRebirthRitualTransactionTests.Run(r, c =>

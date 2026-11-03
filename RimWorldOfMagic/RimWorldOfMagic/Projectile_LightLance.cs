@@ -13,6 +13,8 @@ namespace TorannMagic
     public class Projectile_LightLance : Projectile_AbilityBase
     {
         private bool initialized = false;
+        private bool geometryReady;
+        private bool soundRequested;
         private int verVal = 0;
         private int pwrVal = 0;
         public int burnTime = 200;
@@ -20,7 +22,6 @@ namespace TorannMagic
         private float arcaneDmg = 1;
         private float lightPotency = .5f;
         IntVec3 launchPosition;
-        Pawn caster;
 
         ColorInt colorInt = new ColorInt(255, 255, 140);
         private Sustainer sustainer;
@@ -43,13 +44,14 @@ namespace TorannMagic
         public override void ExposeData()
         {
             base.ExposeData();
-            //Scribe_Values.Look<bool>(ref this.initialized, "initialized", false, false);
             Scribe_Values.Look<int>(ref this.age, "age", -1, false);
             Scribe_Values.Look<int>(ref this.verVal, "verVal", 0, false);
             Scribe_Values.Look<int>(ref this.pwrVal, "pwrVal", 0, false);
             Scribe_Values.Look<int>(ref this.burnTime, "burntime", 200, false);
             Scribe_Values.Look<float>(ref this.arcaneDmg, "arcaneDmg", 1, false);
             Scribe_Values.Look<float>(ref this.lightPotency, "lightPotency", .5f, false);
+            Scribe_Values.Look(ref initialized, "TM_lanceImpacted", age >= 0 && ticksToImpact <= 0, true);
+            Scribe_Values.Look(ref launchPosition, "TM_lanceOrigin", origin.ToIntVec3(), true);
         }
 
         private int TicksLeft
@@ -62,23 +64,29 @@ namespace TorannMagic
 
         private void Initialize()
         {
-            caster = this.launcher as Pawn;
-            this.launchPosition = caster.Position;
-            CompAbilityUserMagic comp = caster.GetCompAbilityUserMagic();
-            //pwrVal = TM_Calc.GetMagicSkillLevel(caster, comp.MagicData.MagicPowerSkill_LightLance, "TM_LightLance", "_pwr", true);
-            //verVal = TM_Calc.GetMagicSkillLevel(caster, comp.MagicData.MagicPowerSkill_LightLance, "TM_LightLance", "_ver", true);
-            pwrVal = TM_Calc.GetSkillPowerLevel(caster, TorannMagicDefOf.TM_LightLance);
-            verVal = TM_Calc.GetSkillVersatilityLevel(caster, TorannMagicDefOf.TM_LightLance);
-            this.arcaneDmg = comp.arcaneDmg;
-            if (caster.health.hediffSet.HasHediff(TorannMagicDefOf.TM_LightCapacitanceHD))
+            var caster = launcher as Pawn;
+            launchPosition = caster?.Spawned == true && caster.Map == Map ? caster.Position : origin.ToIntVec3();
+            var comp = caster?.GetCompAbilityUserMagic();
+            if (comp != null)
+            {
+                pwrVal = TM_Calc.GetSkillPowerLevel(caster, TorannMagicDefOf.TM_LightLance);
+                verVal = TM_Calc.GetSkillVersatilityLevel(caster, TorannMagicDefOf.TM_LightLance);
+                arcaneDmg = comp.arcaneDmg;
+            }
+            if (caster?.health?.hediffSet?.HasHediff(TorannMagicDefOf.TM_LightCapacitanceHD) == true)
             {
                 HediffComp_LightCapacitance hd = caster.health.hediffSet.GetFirstHediffOfDef(TorannMagicDefOf.TM_LightCapacitanceHD).TryGetComp<HediffComp_LightCapacitance>();
                 this.lightPotency = hd.LightPotency;
             }
-            this.radius = Mathf.Clamp(1.8f + (.25f * verVal) * lightPotency, 1f, 3f);
-            this.angle = (Quaternion.AngleAxis(90, Vector3.up) * TM_Calc.GetVector(caster.Position, base.Position)).ToAngleFlat();
-            this.CheckSpawnSustainer();
             this.burnTime += (pwrVal * 22);
+        }
+
+        private void RestoreGeometry()
+        {
+            if (geometryReady) return;
+            geometryReady = true;
+            this.radius = Mathf.Clamp(1.8f + (.25f * verVal) * lightPotency, 1f, 3f);
+            this.angle = launchPosition == Position ? 0f : (Quaternion.AngleAxis(90, Vector3.up) * TM_Calc.GetVector(launchPosition, Position)).ToAngleFlat();
             lanceAngle = Vector3Utility.FromAngleFlat(this.angle - 90);                 //angle of beam
             lanceAngleInv = Vector3Utility.FromAngleFlat(this.angle + 90);              //opposite angle of beam
             drawPosStart = this.launchPosition.ToVector3Shifted() + lanceAngle;         //this.parent.DrawPos;
@@ -91,11 +99,13 @@ namespace TorannMagic
 
         private void CheckSpawnSustainer()
         {
-            if (this.TicksLeft >= 0)
+            if (!soundRequested && Spawned && TicksLeft > 0)
             {
+                soundRequested = true;
                 LongEventHandler.ExecuteWhenFinished(delegate
                 {
-                    this.sustainer = SoundDef.Named("OrbitalBeam").TrySpawnSustainer(SoundInfo.InMap(this.selectedTarget, MaintenanceType.PerTick));
+                    if (Spawned && TicksLeft > 0 && sustainer == null)
+                        this.sustainer = SoundDef.Named("OrbitalBeam").TrySpawnSustainer(SoundInfo.InMap(new TargetInfo(Position, Map), MaintenanceType.PerTick));
                 });
             }
         }
@@ -103,12 +113,15 @@ namespace TorannMagic
         protected override void Impact(Thing hitThing, bool blockedByShield = false)
         {
             this.Destroy(DestroyMode.Vanish);
+            if (Destroyed) return;
 
             if (!this.initialized)
             {
                 Initialize();
                 this.initialized = true;
             }
+            RestoreGeometry();
+            CheckSpawnSustainer();
 
             if (this.sustainer != null)
             {
@@ -124,7 +137,11 @@ namespace TorannMagic
 
         protected override void DrawAt(Vector3 drawLoc, bool flip = false)
         {
-            DrawLance(launchPosition);
+            if (initialized)
+            {
+                RestoreGeometry();
+                DrawLance(launchPosition);
+            }
         }
 
         public void DrawLance(IntVec3 launcherPos)
@@ -156,7 +173,7 @@ namespace TorannMagic
         {
             base.Tick();
             this.age++;
-            if (this.age < (this.burnTime * .9f))
+            if (Spawned && initialized && this.age < (this.burnTime * .9f))
             {
                 if (Find.TickManager.TicksGame % 5 == 0)
                 {
@@ -170,6 +187,8 @@ namespace TorannMagic
             bool flag = this.age <= this.burnTime;
             if (!flag)
             {
+                sustainer?.End();
+                sustainer = null;
                 base.Destroy(mode);
             }
         }        
