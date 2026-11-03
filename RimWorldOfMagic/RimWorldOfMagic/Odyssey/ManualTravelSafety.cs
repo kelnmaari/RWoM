@@ -46,7 +46,7 @@ namespace TorannMagic.Odyssey
         }
         public static bool TakePayment(PawnAbility ability)
         {
-            if (!Payments.TryGetValue(ability, out var payment)) return !IsTravel(ability) && !ClassProgression.DemonBondTravel.Applies(ability) && ability?.Def != TorannMagicDefOf.TM_FoldReality && ability?.Def != TorannMagicDefOf.TM_LightSkipGlobal;
+            if (!Payments.TryGetValue(ability, out var payment)) return !IsTravel(ability) && !ClassProgression.DemonBondTravel.Applies(ability) && ability?.Def != TorannMagicDefOf.TM_Scorn && ability?.Def != TorannMagicDefOf.TM_FoldReality && ability?.Def != TorannMagicDefOf.TM_LightSkipGlobal;
             bool due = payment.Due; payment.Due = false; return due;
         }
 

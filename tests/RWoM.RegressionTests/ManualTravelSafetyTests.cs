@@ -61,6 +61,29 @@ internal static partial class TeleportSpiritTests
 
     static IEnumerable<TestCase> ManualTravelCases()
     {
+        yield return new("ManualTravel.ScornWarnsForClampedLandingAndRejectsStaleOrders", f => World(f,w =>
+        {
+            using var env = new TravelEnvironmentFixture(w.Caster,w.Map);
+            using var patches = ManualBoundaries();
+            env.Vacuum = 1;
+            var click = new IntVec3(1,0,12);
+            var landing = new IntVec3(5,0,12);
+            var submit = typeof(Verb_Scorn).GetMethod("Submit",System.Reflection.BindingFlags.Static|System.Reflection.BindingFlags.NonPublic)!;
+            var job = new Job(new JobDef {defName="ScornBounds"});
+            bool valid = true; int orders = 0;
+            bool Submit(bool player) => (bool)submit.Invoke(null,[w.Caster,job,(LocalTargetInfo)click,player,(Func<bool>)(()=>valid),(Func<bool>)(()=>{orders++;return true;})])!;
+            Check.Equal(false,Submit(false),"dangerous automatic landing rejected");
+            Check.Equal(0,manualDialogs,"automatic order is silent");
+            Check.Equal(false,Submit(true),"manual order waits for warning");
+            Check.Equal(1,manualDialogs,"one manual warning");
+            Check.Equal(landing,job.globalTarget.Cell,"warning binds actual landing near map edge");
+            valid=false; manualContinuation!();
+            Check.Equal(0,orders,"stale order cannot move");
+            valid=true; Submit(true); manualContinuation!();
+            Check.Equal(1,orders,"valid explicit confirmation submits once");
+            Check.Equal(true,ManualTravelSafety.HasConsent(w.Caster,job,w.Map,landing),"exact landing consent");
+            Check.Equal(false,ManualTravelSafety.HasConsent(w.Caster,job,w.Map,click),"consent never follows the unclamped cell");
+        }));
         foreach (string suffix in new[] { "", "_I", "_II", "_III" })
         {
             string rank = suffix;

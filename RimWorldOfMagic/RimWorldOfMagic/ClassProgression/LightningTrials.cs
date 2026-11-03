@@ -226,7 +226,7 @@ namespace TorannMagic.ClassProgression
     public static class LightningLaunchPatch
     {
         public static void Postfix(Projectile_AbilityBase __instance, Thing launcher, AbilityUser.AbilityDef abilityDef)
-        { LightningTrials.Launched(__instance, launcher, abilityDef); ArcanistTrials.Launched(__instance, launcher, abilityDef); SummonerTrials.Launched(__instance, launcher, abilityDef); DemonTrials.Launched(__instance, launcher, abilityDef); GeomancerTrials.Launched(__instance, launcher, abilityDef); BloodMageTrials.Launched(__instance, launcher, abilityDef); }
+        { if (__instance is Projectile_Scorn scorn && launcher is Pawn body) scorn.BindLaunch(body); LightningTrials.Launched(__instance, launcher, abilityDef); ArcanistTrials.Launched(__instance, launcher, abilityDef); SummonerTrials.Launched(__instance, launcher, abilityDef); DemonTrials.Launched(__instance, launcher, abilityDef); GeomancerTrials.Launched(__instance, launcher, abilityDef); BloodMageTrials.Launched(__instance, launcher, abilityDef); }
     }
     [HarmonyPatch(typeof(Projectile_AbilityBase), nameof(Projectile_AbilityBase.ExposeData))]
     public static class LightningProjectileSavePatch { public static void Postfix(Projectile_AbilityBase __instance) { LightningTrials.ExposeProjectile(__instance); ArcanistTrials.ExposeProjectile(__instance); SummonerTrials.ExposeProjectile(__instance); DemonTrials.ExposeProjectile(__instance); GeomancerTrials.ExposeProjectile(__instance); BloodMageTrials.ExposeProjectile(__instance); } }

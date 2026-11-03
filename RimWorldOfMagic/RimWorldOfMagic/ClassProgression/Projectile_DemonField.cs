@@ -11,7 +11,7 @@ namespace TorannMagic.ClassProgression
         protected bool initialized;
         protected int age;
         protected int duration;
-        private bool resolvingImpact;
+        protected bool ResolvingImpact { get; private set; }
 
         protected abstract TMAbilityDef RankSpell { get; }
         protected abstract void TickField();
@@ -19,9 +19,9 @@ namespace TorannMagic.ClassProgression
         protected override void Impact(Thing hitThing, bool blockedByShield = false)
         {
             if (initialized) return;
-            resolvingImpact = !blockedByShield;
+            ResolvingImpact = !blockedByShield;
             try { base.Impact(hitThing,blockedByShield); }
-            finally { resolvingImpact = false; }
+            finally { ResolvingImpact = false; }
             if (Destroyed || !Spawned || blockedByShield) return;
             // Only time spent at the impact site counts toward the life of the field.
             age = 0;
@@ -43,7 +43,7 @@ namespace TorannMagic.ClassProgression
 
         public override void Destroy(DestroyMode mode = DestroyMode.Vanish)
         {
-            if (!resolvingImpact) base.Destroy(mode);
+            if (!ResolvingImpact) base.Destroy(mode);
         }
 
         protected int pwrVal, verVal;

@@ -16,4 +16,5 @@
   <JobDef><defName>TM_SpiritAttraction_II</defName><driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass><reportString>casting attraction.</reportString></JobDef>
   <JobDef><defName>TM_SpiritAttraction_III</defName><driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass><reportString>casting attraction.</reportString></JobDef>
   <JobDef><defName>TM_SpiritPsychicShock</defName><driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass><reportString>casting psychic shock.</reportString></JobDef>
+  <JobDef><defName>TM_SpiritScorn</defName><driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBolt</driverClass><reportString>casting scorn.</reportString></JobDef>
 </Defs>

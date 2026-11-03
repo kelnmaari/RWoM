@@ -124,6 +124,7 @@ namespace TorannMagic.ClassProgression
             ("TM_SpiritAttraction_I", () => TorannMagicDefOf.TM_Attraction_I, typeof(Projectile_Attraction)),
             ("TM_SpiritAttraction_II", () => TorannMagicDefOf.TM_Attraction_II, typeof(Projectile_Attraction)),
             ("TM_SpiritAttraction_III", () => TorannMagicDefOf.TM_Attraction_III, typeof(Projectile_Attraction)),
+            ("TM_SpiritScorn", () => TorannMagicDefOf.TM_Scorn, typeof(Projectile_Scorn)),
             ("TM_SpiritPsychicShock", () => TorannMagicDefOf.TM_PsychicShock, typeof(Projectile_PsychicShock)),
             ("TM_SpiritDominate", () => TorannMagicDefOf.TM_Dominate, typeof(Verb_Dominate)),
             ("TM_SpiritSoulBond", () => TorannMagicDefOf.TM_SoulBond, typeof(Verb_SoulBond)),
@@ -273,7 +274,7 @@ namespace TorannMagic.ClassProgression
             if (def.MainVerb == null || def.MainVerb.isViolent && body.WorkTagIsDisabled(WorkTags.Violent) ||
                 !Families.Any(f => f.spell() == def && (f.effect == def.MainVerb.verbClass || (DeathBolt(def) && f.effect == typeof(Projectile_HostedDeathBolt)) ||
                     ((def.MainVerb.verbClass == typeof(Verb_UseAbility) || def.MainVerb.verbClass == typeof(Effect_ValiantCharge) || def.MainVerb.verbClass == typeof(Verb_SB) ||
-                    def.MainVerb.verbClass == typeof(Verb_Attraction) || def.MainVerb.verbClass == typeof(Effect_ShadowBolt) || def.MainVerb.verbClass == typeof(Verb_LightSkip) || def.MainVerb.verbClass == typeof(Verb_BLOS) || def.MainVerb.verbClass == typeof(Verb_FogOfTorment) || def.MainVerb.verbClass == typeof(Verb_LightningCloud) || typeof(Verb_RankedStormField).IsAssignableFrom(def.MainVerb.verbClass) ||
+                    def.MainVerb.verbClass == typeof(Verb_Scorn) || def.MainVerb.verbClass == typeof(Verb_Attraction) || def.MainVerb.verbClass == typeof(Effect_ShadowBolt) || def.MainVerb.verbClass == typeof(Verb_LightSkip) || def.MainVerb.verbClass == typeof(Verb_BLOS) || def.MainVerb.verbClass == typeof(Verb_FogOfTorment) || def.MainVerb.verbClass == typeof(Verb_LightningCloud) || typeof(Verb_RankedStormField).IsAssignableFrom(def.MainVerb.verbClass) ||
                     def.MainVerb.verbClass == typeof(Verb_UseAbility_TrueBurst)) &&
                     f.effect == def.MainVerb.defaultProjectile?.thingClass &&
                     (typeof(Projectile_SpiritNativeAbility).IsAssignableFrom(f.effect) || typeof(Projectile_SpiritBolt).IsAssignableFrom(f.effect) || typeof(Projectile_SpiritRay).IsAssignableFrom(f.effect) || typeof(Projectile_DemonField).IsAssignableFrom(f.effect) || f.effect == typeof(Projectile_ChronostaticField) || f.effect == typeof(Projectile_AccelerateTime) || f.effect == typeof(Projectile_Sentinel) || f.effect == typeof(Projectile_EarthernHammer) || f.effect == typeof(Projectile_Encase) || f.effect == typeof(Projectile_IgniteBlood) || f.effect == typeof(Projectile_BloodMoon) || SpiritHostedSummons.IsProjectile(f.effect))))) ||
@@ -413,7 +414,8 @@ namespace TorannMagic.ClassProgression
                 if (def == TorannMagicDefOf.TM_EnchanterStone) order.targetC = Verb_EnchanterStone.Source(body, soul, target);
                 if (def == TorannMagicDefOf.TM_Transmutate) order.targetC = Verb_Transmutate.Source(body, soul, target);
                 void Submit() => body.jobs.TryTakeOrderedJob(order, JobTag.Misc);
-                if (DemonBondTravel.Applies(power))
+                if (def == TorannMagicDefOf.TM_Scorn) Verb_Scorn.Submit(body,order,target,true,Valid,() => body.jobs.TryTakeOrderedJob(order, JobTag.Misc));
+                else if (DemonBondTravel.Applies(power))
                     DemonBondTravel.Submit(body, power, order, true, Valid, Submit);
                 else if (def == TorannMagicDefOf.TM_ValiantCharge || def.MainVerb.verbClass == typeof(Verb_LightSkip) || Odyssey.ManualTravelSafety.IsTravel(power))
                     Odyssey.ManualTravelSafety.Submit(body, order, map, target.Cell, true, Valid, Submit);
@@ -426,7 +428,7 @@ namespace TorannMagic.ClassProgression
             command.icon = def.uiIcon;
             command.action = () => {
                 if (def.MainVerb.AbilityTargetCategory == AbilityTargetCategory.TargetSelf) { Order(body); return; }
-                var field = def.MainVerb.verbClass == typeof(Effect_ValiantCharge) || def.MainVerb.verbClass == typeof(Verb_FogOfTorment) || def.MainVerb.verbClass == typeof(Verb_LightningCloud) || typeof(Verb_RankedStormField).IsAssignableFrom(def.MainVerb.verbClass)
+                var field = def.MainVerb.verbClass == typeof(Verb_Scorn) || def.MainVerb.verbClass == typeof(Verb_Attraction) || def.MainVerb.verbClass == typeof(Effect_ValiantCharge) || def.MainVerb.verbClass == typeof(Verb_FogOfTorment) || def.MainVerb.verbClass == typeof(Verb_LightningCloud) || typeof(Verb_RankedStormField).IsAssignableFrom(def.MainVerb.verbClass)
                     ? PhysicalVerb(body, power) : null;
                 Verse.Find.Targeter.BeginTargeting(def.MainVerb.targetParams, Order, highlightAction: target => {
                     if (!body.Spawned) return;
@@ -438,7 +440,7 @@ namespace TorannMagic.ClassProgression
                     else if (field != null)
                     {
                         float radius = field.HighlightFieldRadiusAroundTarget(out _);
-                        if (radius > 0f) GenDraw.DrawRadiusRing(target.Cell, radius);
+                        if (radius > 0f) GenDraw.DrawRadiusRing(field is Verb_Scorn ? Projectile_Scorn.LandingCell(target.Cell,map: body.Map) : target.Cell, radius);
                     }
                 },
                 targetValidator: target => CanTarget(body, Find(body,soul,def), target), caster: body);
@@ -527,7 +529,7 @@ namespace TorannMagic.ClassProgression
                 return emitted;
             }
             if (!Shoot(body, power, verb, target)) return false;
-            if (!paidBurst) power.PayForAttempt(body);
+            if (!paidBurst && def != TorannMagicDefOf.TM_Scorn) power.PayForAttempt(body);
             return true;
         }
 
