@@ -99,9 +99,12 @@ namespace TorannMagic.ClassProgression
 
         public static Snapshot Capture(Pawn caster, Pawn victim, int castId)
         {
+            if (caster == null) return null;
+            var location = caster.Spawned ? caster.Map : SpiritRebirthState.TryGet(caster, out var spirit) &&
+                spirit.HasValidHost(caster) ? spirit.Host.Map : null;
             if (castId <= 0 || !ClassIdentity.TryGetState(caster, out var state) || (state.Vocation & Vocation.Mage) == 0
                 || caster.Dead || victim == null || victim.Dead || victim.thingIDNumber <= 0
-                || !caster.Spawned || !victim.Spawned || caster.Map != victim.Map
+                || !victim.Spawned || location != victim.Map
                 || caster.Faction == null || victim.IsPrisoner || victim.IsSlave || !victim.HostileTo(caster)
                 || (victim.Faction == null ? !victim.InAggroMentalState
                     : victim.Faction == caster.Faction || !victim.Faction.HostileTo(caster.Faction))) return null;
