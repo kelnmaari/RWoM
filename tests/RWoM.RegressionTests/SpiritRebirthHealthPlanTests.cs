@@ -21,6 +21,7 @@ internal static class SpiritRebirthHealthPlanTests
 
     public static IEnumerable<TestCase> Cases()
     {
+        yield return new("SpiritRebirthHealthPlan.BardSongsRetainTheirOriginalOwner", BardSongs);
         yield return new("SpiritRebirthHealthPlan.NativeResourceAndEnchantmentMarkers", NativeMarkers);
         yield return new("SpiritRebirthHealthPlan.UnsupportedLinkLeavesOriginalGraph", Unsupported);
         yield return new("SpiritRebirthHealthPlan.NativePhysicalRemovalKeepsExactClassMarker", PhysicalRemoval);
@@ -84,6 +85,42 @@ internal static class SpiritRebirthHealthPlanTests
         Check.Equal(61.25f, light.LightEnergy, "stored sunlight retained");
         Check.Equal(421, (int)bit.GetType().GetField("nextBitGrenade", Hidden)!.GetValue(bit)!, "scheduled grenade retained");
     }
+    static void BardSongs(RuntimeFixture r)
+    {
+        using var f = new SpiritRebirthStateTests.Fixture(r); Dead(f.Original);
+        using var definitions = new HealthDefinitions();
+        var severity = typeof(HediffComp_SeverityPerDay);
+        var assembly = typeof(CompClassProgression).Assembly;
+        var songs = new Dictionary<string, Type[]> {
+            ["TM_EntertainingHD"] = [severity],
+            ["TM_InspirationalHD"] = [assembly.GetType("TorannMagic.HediffComp_Inspirational", true)!, severity],
+            ["TM_SingBattleHymnHD"] = [severity, assembly.GetType("TorannMagic.HediffComp_BattleHymn", true)!]
+        };
+        foreach (var (name, components) in songs)
+        {
+            var def = new HediffDef { defName = name, hediffClass = typeof(HediffWithComps),
+                comps = components.Select(t => new HediffCompProperties { compClass = t }).ToList() };
+            DefDatabase<HediffDef>.Add(def);
+            var song = new HediffWithComps { pawn = f.Original, def = def, comps = [] };
+            foreach (var type in components)
+            {
+                var component = (HediffComp)Activator.CreateInstance(type)!;
+                component.parent = song; song.comps.Add(component);
+            }
+            f.Original.health.hediffSet.hediffs.Add(song);
+            song.Part = Part();
+            Check.Equal(false, Prepare(f.Original, out _, out _), name + " attached to a body part rejected");
+            song.Part = null;
+            song.comps[0].parent = null;
+            Check.Equal(false, Prepare(f.Original, out _, out _), name + " detached component rejected");
+            song.comps[0].parent = song;
+            Check.Equal(true, Prepare(f.Original, out _, out _), name + " supported on its original owner");
+        }
+        var original = f.Original.health.hediffSet.hediffs.ToArray();
+        Check.Equal(true, Prepare(f.Original, out var plan, out _) && Apply(plan!), "convert all three native songs");
+        SameGraph(f.Original, original, "each song remains with the soul");
+    }
+
     static void SameGraph(Pawn pawn, Hediff[] before, string reason)
     {
         Check.Equal(before.Length, pawn.health.hediffSet.hediffs.Count, reason + " count");

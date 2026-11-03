@@ -63,12 +63,26 @@ namespace TorannMagic.ClassProgression
             return true;
         }
 
+        private static readonly Dictionary<string, Type[]> bardSongs = new Dictionary<string, Type[]> {
+            { "TM_EntertainingHD", new[] { typeof(HediffComp_SeverityPerDay) } },
+            { "TM_InspirationalHD", new[] { typeof(HediffComp_Inspirational), typeof(HediffComp_SeverityPerDay) } },
+            { "TM_SingBattleHymnHD", new[] { typeof(HediffComp_SeverityPerDay), typeof(HediffComp_BattleHymn) } }
+        };
+
         private static bool IsClassResourceMarker(Hediff effect)
         {
             var def = effect.def;
             if (effect.GetType() != typeof(HediffWithComps) || def.hediffClass != typeof(HediffWithComps) ||
-                def.forceRemoveOnResurrection || def.lethalSeverity > 0f || def.comps?.Count != 1 ||
+                def.forceRemoveOnResurrection || def.lethalSeverity > 0f || def.comps == null ||
                 !ReferenceEquals(DefDatabase<HediffDef>.GetNamedSilentFail(def.defName), def)) return false;
+            if (bardSongs.TryGetValue(def.defName, out var expectedSong))
+            {
+                var live = ((HediffWithComps)effect).comps;
+                return effect.Part == null && live?.Count == expectedSong.Length
+                    && def.comps.Select(c => c?.compClass).SequenceEqual(expectedSong)
+                    && live.All(c => c?.parent == effect) && live.Select(c => c.GetType()).SequenceEqual(expectedSong);
+            }
+            if (def.comps.Count != 1) return false;
             var component = def.comps[0]?.compClass;
             if (def.defName == "TM_MagicUserHD" || def.defName == "TM_MightUserHD")
                 return component == typeof(HediffComp_SeverityPerDay);
