@@ -1,0 +1,12 @@
+<Defs>
+  <JobDef>
+    <defName>TM_SpiritPsionicBarrier</defName>
+    <driverClass>TorannMagic.ClassProgression.JobDriver_SpiritHostedMartial</driverClass>
+    <reportString>raising a psionic barrier.</reportString>
+  </JobDef>
+  <JobDef>
+    <defName>TM_SpiritProjectedBarrier</defName>
+    <driverClass>TorannMagic.ClassProgression.JobDriver_SpiritHostedMartial</driverClass>
+    <reportString>projecting a psionic barrier at TargetB.</reportString>
+  </JobDef>
+</Defs>

@@ -208,6 +208,18 @@ internal static partial class SpiritMapCollapseTests
             bullet.projectile.explosionRadius=2;
             Check.Equal(true,Incoming(physical,weapon)==null,"exclude explosive ammunition");
         });
+        foreach(var (defName,order) in new[]{("TM_PsionicBarrier","TM_SpiritPsionicBarrier"),("TM_PsionicBarrier_Projected","TM_SpiritProjectedBarrier")})
+            yield return new("PsionicProjection.BarrierOwner."+defName,f=>SpiritRebirthRitualTransactionTests.Run(f,c=>{
+                using var held=new Fixture(f,c);
+                var comp=c.Original.GetCompAbilityUserMight();
+                var def=(TMAbilityDef)typeof(TorannMagicDefOf).GetField(defName)!.GetValue(null)!;
+                var power=new MightAbility(comp){Def=def};comp.AbilityData.Powers.Add(power);comp.AbilityData.AllPowers=null;
+                var find=Production("SpiritHostedMartial").GetMethod("Find",BindingFlags.NonPublic|BindingFlags.Static)!;
+                Check.Same(power,find.Invoke(null,[c.Creator,c.Original,order])!,"original barrier used by host");
+                var native=c.Creator.GetCompAbilityUserMight();native.AbilityData.Powers.Add(new MightAbility(native){Def=def});
+                native.AbilityData.AllPowers=null;
+                Check.Equal(true,find.Invoke(null,[c.Creator,c.Original,order])==null,"native barrier takes precedence");
+            }));
         yield return new("PsionicProjection.IndividualEnergyLabels",_=>{
             var def=new HediffDef{minSeverity=0,maxSeverity=200,stages=[new HediffStage()]};
             HediffComp Energy(float amount)

@@ -335,10 +335,9 @@ namespace TorannMagic
                 Graphics.DrawMesh(MeshPool.plane10, matrix, TM_RenderQueue.burningFuryMat, 0);                
             }
 
-            if (shouldDrawPsionicShield)
+            if (shouldDrawPsionicShield && Pawn.jobs?.curDriver is JobDriver_PsionicBarrier barrier)
             {
-                float radius = 2.5f;
-                radius = 2.5f + (.75f * TM_Calc.GetSkillVersatilityLevel(Pawn, TorannMagicDefOf.TM_PsionicBarrier, false));//TM_Calc.GetMightSkillLevel(this.Pawn, this.MightData.MightPowerSkill_PsionicBarrier, "TM_PsionicBarrier", "_ver", true));
+                float radius=barrier.Radius;
                 float drawRadius = radius * .23f;
                 float num = Mathf.Lerp(drawRadius, 9.5f, drawRadius);
                 Vector3 vector = this.Pawn.CurJob.targetA.CenterVector3;
