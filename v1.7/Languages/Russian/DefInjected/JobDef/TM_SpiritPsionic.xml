@@ -1,4 +1,5 @@
 <LanguageData>
   <TM_SpiritPsionicBarrier.reportString>возводит псионический барьер.</TM_SpiritPsionicBarrier.reportString>
   <TM_SpiritProjectedBarrier.reportString>создаёт псионический барьер в TargetB.</TM_SpiritProjectedBarrier.reportString>
+  <TM_SpiritPsionicBlast.reportString>выпускает псионический залп по TargetB.</TM_SpiritPsionicBlast.reportString>
 </LanguageData>

@@ -59,6 +59,7 @@ namespace TorannMagic.ClassProgression
                 def=job==FacelessImitation.StudyOrder ? TorannMagicDefOf.TM_Mimic : DefDatabase<TMAbilityDef>.GetNamedSilentFail(FacelessMartialPath.Echo);
             else if (job == Projectile_Possess.Order) def=TorannMagicDefOf.TM_Possess;
             else if (Verb_PsionicBarrier.Handles(job)) def=job==Verb_PsionicBarrier.SelfOrder ? TorannMagicDefOf.TM_PsionicBarrier : TorannMagicDefOf.TM_PsionicBarrier_Projected;
+            else if (job == Verb_PsionicBlast.Order) def=TorannMagicDefOf.TM_PsionicBlast;
             else if (job == Verb_Transpose.Order) def=TorannMagicDefOf.TM_Transpose;
             else if (job == Verb_Reversal.Order) def=TorannMagicDefOf.TM_Reversal;
             else if (job == RangerHuntAbility.JobName) def = DefDatabase<TMAbilityDef>.GetNamedSilentFail("TM_RangerBreakthrough");
@@ -76,7 +77,8 @@ namespace TorannMagic.ClassProgression
                 (power.Def==TorannMagicDefOf.TM_DisablingShot_I || power.Def==TorannMagicDefOf.TM_DisablingShot_II || power.Def==TorannMagicDefOf.TM_DisablingShot_III) || job == Grapple && GrappleRank(power.Def as TMAbilityDef) ||
                 job==BladeMartialCast.Phase && BladeMartialCast.PhaseRank(power.Def as TMAbilityDef) ||
                 job==Verb_Transpose.Order && Verb_Transpose.Family(power.Def as TMAbilityDef) ||
-                job==Verb_RangerShot.Order && Verb_RangerShot.Family(power.Def as TMAbilityDef));
+                job==Verb_RangerShot.Order && Verb_RangerShot.Family(power.Def as TMAbilityDef) ||
+                job==Verb_PsionicBlast.Order && Verb_PsionicBlast.Family(power.Def as TMAbilityDef));
             bool Local(CompAbilityUser comp) => comp?.AbilityData.AllPowers.Any(p=>Match(p) || Verb_PsionicBarrier.Handles(job) &&
                 p?.Def is TMAbilityDef local && local.MainVerb?.verbClass==typeof(Verb_PsionicBarrier)) == true;
             if (def == null || !native && (Local(body.GetCompAbilityUserMagic()) || Local(body.GetCompAbilityUserMight()))) return null;
@@ -113,6 +115,7 @@ namespace TorannMagic.ClassProgression
             if (BladeMartialCast.Handles(job)) return !body.WorkTagIsDisabled(WorkTags.Violent) && BladeMartialCast.HasWeapon(body);
             if (job==Verb_RangerSafeTrail.Order) return RangerMastery.HasTrail(ability.Pawn);
             if (job==Verb_RangerShot.Order) return !body.WorkTagIsDisabled(WorkTags.Violent) && Verb_RangerShot.HasBow(body);
+            if (job==Verb_PsionicBlast.Order) return !body.WorkTagIsDisabled(WorkTags.Violent);
             if (job==Verb_PoisonTrap.Order) return !body.WorkTagIsDisabled(WorkTags.Violent);
             if (job==Verb_AnimalFriend.Order) return !might.animalBondingDisabled;
             if (job == Pommel) return !body.WorkTagIsDisabled(WorkTags.Violent) && body.health.capacities.CapableOf(PawnCapacityDefOf.Manipulation);
@@ -284,7 +287,7 @@ namespace TorannMagic.ClassProgression
                         GladiatorMastery.AutomaticSource(body,body.GetCompAbilityUserMight()) == cleave)
                         cleave.useCleaveToggle = !cleave.useCleaveToggle;
                 });
-            foreach (var name in new[] { Maneuver, SelfAid, Pommel, Sweep, Grapple, GladiatorWhirlwind.JobName, BladeMartialCast.Spin, BladeMartialCast.Slash, BladeMartialCast.Passage, BladeMartialCast.Phase, BladeFormAbility.JobName, Verb_AnimalFriend.Order, Verb_PoisonTrap.Order, Verb_RangerSafeTrail.Order, Verb_RangerShot.Order, RangerHuntAbility.JobName, FacelessImitation.StudyOrder, FacelessImitation.EchoOrder, Verb_Reversal.Order, Verb_Transpose.Order, Projectile_Possess.Order, Verb_PsionicBarrier.SelfOrder, Verb_PsionicBarrier.FieldOrder, Headshot, DisablingShot, AntiArmor, Aimed, Fracture, ShadowSlayer, SniperOpeningAbility.JobName, SpiritHostedStance.Job, SpiritHostedStance.StrongBack, SpiritHostedStance.HeavyBlow,
+            foreach (var name in new[] { Maneuver, SelfAid, Pommel, Sweep, Grapple, GladiatorWhirlwind.JobName, BladeMartialCast.Spin, BladeMartialCast.Slash, BladeMartialCast.Passage, BladeMartialCast.Phase, BladeFormAbility.JobName, Verb_AnimalFriend.Order, Verb_PoisonTrap.Order, Verb_RangerSafeTrail.Order, Verb_RangerShot.Order, RangerHuntAbility.JobName, FacelessImitation.StudyOrder, FacelessImitation.EchoOrder, Verb_Reversal.Order, Verb_Transpose.Order, Projectile_Possess.Order, Verb_PsionicBarrier.SelfOrder, Verb_PsionicBarrier.FieldOrder, Verb_PsionicBlast.Order, Headshot, DisablingShot, AntiArmor, Aimed, Fracture, ShadowSlayer, SniperOpeningAbility.JobName, SpiritHostedStance.Job, SpiritHostedStance.StrongBack, SpiritHostedStance.HeavyBlow,
                 SpiritHostedStance.ThickSkin, SpiritHostedStance.FightersFocus, SpiritHostedStance.GearRepair, SpiritHostedStance.InnerHealing })
             {
                 var owner = Find(body, soul, name);
@@ -305,6 +308,7 @@ namespace TorannMagic.ClassProgression
                         else if (FacelessImitation.Handles(name)) FindTarget(body,soul,job,t =>
                             Ready(body,Find(body,soul,name),name) && FacelessImitation.ValidTarget(body,owner,name,t));
                         else if (name==Verb_RangerShot.Order) FindTarget(body,soul,job,t => Ready(body,Find(body,soul,name),name) && Verb_RangerShot.For(body,owner).CanVolley(t));
+                        else if (name==Verb_PsionicBlast.Order) Verb_PsionicBlast.Choose(body,soul,owner);
                         else if (name==Verb_PoisonTrap.Order) Verb_PoisonTrap.Choose(body,owner);
                         else if (name==Verb_AnimalFriend.Order) FindTarget(body,soul,job,target => Ready(body,Find(body,soul,name),name) && Verb_AnimalFriend.ValidTarget(body,target,body.Position,owner.mightDef.MainVerb.range));
                         else if (name == RangerHuntAbility.JobName && owner is RangerHuntAbility hunt)

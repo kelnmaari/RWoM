@@ -208,7 +208,7 @@ internal static partial class SpiritMapCollapseTests
             bullet.projectile.explosionRadius=2;
             Check.Equal(true,Incoming(physical,weapon)==null,"exclude explosive ammunition");
         });
-        foreach(var (defName,order) in new[]{("TM_PsionicBarrier","TM_SpiritPsionicBarrier"),("TM_PsionicBarrier_Projected","TM_SpiritProjectedBarrier")})
+        foreach(var (defName,order) in new[]{("TM_PsionicBarrier","TM_SpiritPsionicBarrier"),("TM_PsionicBarrier_Projected","TM_SpiritProjectedBarrier"),("TM_PsionicBlast","TM_SpiritPsionicBlast"),("TM_PsionicBlast_III","TM_SpiritPsionicBlast")})
             yield return new("PsionicProjection.BarrierOwner."+defName,f=>SpiritRebirthRitualTransactionTests.Run(f,c=>{
                 using var held=new Fixture(f,c);
                 var comp=c.Original.GetCompAbilityUserMight();
