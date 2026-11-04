@@ -1,6 +1,7 @@
 using RimWorld;
 using System;
 using System.Linq;
+using System.Collections.Generic;
 using UnityEngine;
 using Verse;
 using AbilityUser;
@@ -8,8 +9,23 @@ using AbilityUser;
 namespace TorannMagic
 {
     [StaticConstructorOnStartup]
-    public class FlyingObject_PsionicDash : Projectile
+    public class FlyingObject_PsionicDash : Projectile, IThingHolder, ISuspendableThingHolder
     {
+        private readonly ThingOwner<Thing> passenger;
+        private bool returnPending, takingOff;
+        private int nextReturnAttempt;
+        private Thing carriedCargo;
+        public FlyingObject_PsionicDash() { passenger=new ThingOwner<Thing>(this,true); }
+        public bool IsContentsSuspended => true;
+        public ThingOwner GetDirectlyHeldThings() => passenger;
+        public void GetChildHolders(List<IThingHolder> children) =>
+            ThingOwnerUtility.AppendThingHoldersFromThings(children,passenger);
+        internal static bool ProtectsMap(Map map)
+        {
+            var definition=DefDatabase<ThingDef>.GetNamedSilentFail("FlyingObject_PsionicDash");
+            return definition!=null && map?.listerThings?.ThingsOfDef(definition)
+                .Any(t=>t is FlyingObject_PsionicDash dash && (dash.takingOff || dash.passenger.Count>0))==true;
+        }
         private int verVal = 0;
         private int pwrVal = 0;
         private float arcaneDmg = 1f;
@@ -95,6 +111,8 @@ namespace TorannMagic
         public override void ExposeData()
         {
             base.ExposeData();
+            Scribe_Values.Look(ref returnPending,"psionicReturnPending");
+            Scribe_References.Look(ref carriedCargo,"psionicCarriedCargo");
             Scribe_Values.Look(ref direction,"psionicDirection");
             Scribe_Values.Look(ref speed,"psionicSpeed",15f);
             Scribe_Values.Look(ref drafted,"psionicDrafted");
@@ -116,6 +134,13 @@ namespace TorannMagic
             Scribe_References.Look<Thing>(ref this.assignedTarget, "assignedTarget", false);
             Scribe_References.Look<Pawn>(ref this.pawn, "pawn", false);
             Scribe_Deep.Look<Thing>(ref this.flyingThing, "flyingThing", new object[0]);
+            if(Scribe.mode==LoadSaveMode.PostLoadInit && flyingThing!=null && !passenger.Contains(flyingThing))
+            {
+                if(flyingThing.Spawned || flyingThing.holdingOwner!=null)
+                {flyingThing=null;returnPending=true;}
+                else if(!passenger.TryAdd(flyingThing,false))
+                    throw new InvalidOperationException("Psionic dash cannot restore its saved passenger.");
+            }
         }
 
         private void Initialize()
@@ -154,19 +179,35 @@ namespace TorannMagic
 
         public void Launch(Thing launcher, Vector3 origin, LocalTargetInfo targ, Thing flyingThing, DamageInfo? newDamageInfo = null)
         {
-            bool spawned = flyingThing.Spawned;
-            pawn = launcher as Pawn;
-            if (pawn.Drafted)
+            if(passenger.Count!=0 || !Spawned || flyingThing?.Spawned!=true || flyingThing.Map!=Map ||
+                launcher is not Pawn body || !targ.IsValid || !targ.Cell.InBounds(Map))
+            {Destroy();return;}
+            var start=flyingThing.Position;
+            pawn=body;drafted=body.Drafted;trueOrigin=origin;
+            takingOff=true;
+            try
             {
-                this.drafted = true;
-            }
-            if (spawned)
-            {
+                var cargo=body.carryTracker?.CarriedThing;
+                if(cargo!=null)
+                {
+                    if(body.inventory==null || !body.carryTracker.innerContainer.TryTransferToContainer(cargo,body.inventory.innerContainer,false))
+                    {Destroy();return;}
+                    carriedCargo=cargo;
+                }
                 flyingThing.DeSpawn();
+                if(!passenger.TryAdd(flyingThing,false))
+                {
+                    if(!flyingThing.Spawned && flyingThing.holdingOwner==null)GenSpawn.Spawn(flyingThing,start,Map);
+                    Destroy();return;
+                }
+                this.flyingThing=flyingThing;
             }
-            //
-            ModOptions.Constants.SetPawnInFlight(true);
-            //
+            catch
+            {
+                if(!flyingThing.Destroyed && !flyingThing.Spawned && flyingThing.holdingOwner==null)GenSpawn.Spawn(flyingThing,start,Map);
+                throw;
+            }
+            finally {takingOff=false;}
             this.origin = origin;
             this.trueOrigin = origin;
             this.impactDamage = newDamageInfo;
@@ -190,6 +231,11 @@ namespace TorannMagic
         }
         protected override void TickInterval(int delta)
         {
+            if(returnPending)
+            {
+                if(Find.TickManager.TicksGame>=nextReturnAttempt)Destroy();
+                return;
+            }
             //base.Tick();
             this.drawTicks--;
             if(this.drawTicks <= 0)
@@ -426,16 +472,45 @@ namespace TorannMagic
                     GenExplosion.DoExplosion(base.Position, base.Map, 0.9f, DamageDefOf.Stun, this, -1, 0, null, null, null, null, null, 0f, 1, null, null, 0, false, null, 0f, 1, 0f, false);
                 }
             }
-            GenSpawn.Spawn(this.flyingThing, base.Position, base.Map);
-            ModOptions.Constants.SetPawnInFlight(false);
-            Pawn p = this.flyingThing as Pawn;
-            if (p.IsColonist && this.drafted)
-            {
-                p.drafter.Drafted = true;
-            }
             this.Destroy(DestroyMode.Vanish);
         }
 
+        private bool ReleaseNear(IntVec3 center)
+        {
+            if(passenger.Count==0)return true;
+            var body=passenger[0];
+            foreach(var cell in GenRadial.RadialCellsAround(center,3.9f,true))
+            {
+                if(!cell.InBounds(Map) || !cell.Standable(Map) || cell.GetFirstPawn(Map)!=null)continue;
+                try
+                {
+                    if(passenger.TryDrop(body,cell,Map,ThingPlaceMode.Direct,out _,playDropSound:false))return true;
+                }
+                catch
+                {
+                    if(!body.Destroyed && !body.Spawned && body.holdingOwner==null)passenger.TryAdd(body,false);
+                    throw;
+                }
+            }
+            return false;
+        }
+
+        public override void Destroy(DestroyMode mode=DestroyMode.Vanish)
+        {
+            returnPending=true;
+            if(passenger.Count>0)
+            {
+                var body=passenger[0] as Pawn;
+                if(!Spawned || Map.Disposed || (!ReleaseNear(Position) && !ReleaseNear(trueOrigin.ToIntVec3())))
+                {nextReturnAttempt=Find.TickManager.TicksGame+60;return;}
+                if(carriedCargo!=null && body?.carryTracker!=null && body.carryTracker.CarriedThing==null &&
+                    body.inventory?.innerContainer.Contains(carriedCargo)==true)
+                    body.inventory.innerContainer.TryTransferToContainer(carriedCargo,body.carryTracker.innerContainer,false);
+                if(body?.IsColonist==true && body.drafter!=null)body.drafter.Drafted=drafted;
+            }
+            flyingThing=null;
+            base.Destroy(mode);
+        }
         public void ApplyDashDamage()
         {
             DamageInfo dinfo = new DamageInfo(TMDamageDefOf.DamageDefOf.TM_PsionicInjury, Rand.Range(6,10) * (1 + .1f * pwrVal) * this.arcaneDmg, 0, (float)-1, pawn, null, null, DamageInfo.SourceCategory.ThingOrUnknown);

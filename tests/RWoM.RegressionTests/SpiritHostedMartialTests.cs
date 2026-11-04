@@ -220,6 +220,12 @@ internal static partial class SpiritMapCollapseTests
                 native.AbilityData.AllPowers=null;
                 Check.Equal(true,find.Invoke(null,[c.Creator,c.Original,order])==null,"native barrier takes precedence");
             }));
+        yield return new("PsionicProjection.DashPassengerOwner",_=>{
+            Check.Equal(true,typeof(IThingHolder).IsAssignableFrom(typeof(FlyingObject_PsionicDash)),
+                "the airborne pawn needs physical ownership");
+            Check.Equal(true,typeof(ISuspendableThingHolder).IsAssignableFrom(typeof(FlyingObject_PsionicDash)),
+                "airborne passenger must not independently tick");
+        });
         foreach(var (kind,fields) in new (string,Dictionary<string,object>)[]{
             ("Dash",new() {["direction"]=new UnityEngine.Vector3(.6f,0,.8f),["speed"]=20f,["drafted"]=true,["pwrVal"]=3,["verVal"]=2,["arcaneDmg"]=1.7f,["drawTicks"]=41,["shouldDrawPawn"]=false}),
             ("Storm",new() {["stage"]=2,["nextAttackTick"]=9021,["targetCenter"]=new UnityEngine.Vector3(17,0,25),["curveAngle"]=73f,["speed"]=10f,["timesToDamage"]=1}),
@@ -234,8 +240,24 @@ internal static partial class SpiritMapCollapseTests
                 DefDatabase<ThingDef>.Add(def);
                 var shot=(Projectile)Activator.CreateInstance(type)!;
                 shot.def=def;shot.thingIDNumber=19890;shot.usedTarget=shot.intendedTarget=IntVec3.Zero;
+                fields["origin"]=new UnityEngine.Vector3(11,0,13);
+                fields["destination"]=new UnityEngine.Vector3(31,0,43);
+                fields["ticksToImpact"]=17;
                 foreach(var pair in fields)Set(shot,pair.Key,pair.Value);
+                if(kind=="Dash"){
+                    var cargoDef=(ThingDef)RuntimeHelpers.GetUninitializedObject(typeof(ThingDef));
+                    cargoDef.defName="RegressionPsiPassenger";cargoDef.thingClass=typeof(Thing);cargoDef.category=ThingCategory.Item;cargoDef.stackLimit=75;cargoDef.comps=[];
+                    DefDatabase<ThingDef>.Add(cargoDef);
+                    var cargo=new Thing{def=cargoDef,thingIDNumber=19891,stackCount=7};
+                    Set(shot,"flyingThing",cargo);
+                }
                 var loaded=RoundTripSummon(r,"psionic-flight-"+kind,shot);
+                if(kind=="Dash"){
+                    var held=((IThingHolder)loaded).GetDirectlyHeldThings();
+                    Check.Equal(1,held.Count,"old deep passenger adopted on load");
+                    Check.Equal(7,held[0].stackCount,"passenger data preserved");
+                    Check.Same(loaded,held[0].holdingOwner.Owner,"physical parent restored");
+                }
                 foreach(var pair in fields)
                     Check.Equal(pair.Value,type.GetField(pair.Key,BindingFlags.NonPublic|BindingFlags.Public|BindingFlags.Instance)!.GetValue(loaded)!,"in-flight "+kind+" retains "+pair.Key);
             }));
