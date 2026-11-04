@@ -271,7 +271,7 @@ internal static partial class SpiritMapCollapseTests
         foreach(var (kind,fields) in new (string,Dictionary<string,object>)[]{
             ("Dash",new() {["direction"]=new UnityEngine.Vector3(.6f,0,.8f),["speed"]=20f,["drafted"]=true,["pwrVal"]=3,["verVal"]=2,["arcaneDmg"]=1.7f,["drawTicks"]=41,["shouldDrawPawn"]=false}),
             ("Storm",new() {["stage"]=2,["nextAttackTick"]=9021,["targetCenter"]=new UnityEngine.Vector3(17,0,25),["curveAngle"]=73f,["speed"]=10f,["timesToDamage"]=1}),
-            ("Leap",new() {["trueOrigin"]=new UnityEngine.Vector3(3,0,5),["trueDestination"]=new UnityEngine.Vector3(17,0,25),["trueAngle"]=73f})
+            ("Leap",new() {["returnPending"]=true,["resumeAttack"]=true,["drafted"]=false,["effVal"]=3,["trueOrigin"]=new UnityEngine.Vector3(3,0,5),["trueDestination"]=new UnityEngine.Vector3(17,0,25),["trueAngle"]=73f})
         })
             yield return new("PsionicProjection.FlightSave."+kind,r=>SpiritRebirthRitualTransactionTests.Run(r,c=>{
                 using var fixture=new Fixture(r,c);
@@ -286,7 +286,7 @@ internal static partial class SpiritMapCollapseTests
                 fields["destination"]=new UnityEngine.Vector3(31,0,43);
                 fields["ticksToImpact"]=17;
                 foreach(var pair in fields)Set(shot,pair.Key,pair.Value);
-                if(kind=="Dash"){
+                if(kind=="Dash" || kind=="Leap"){
                     var cargoDef=(ThingDef)RuntimeHelpers.GetUninitializedObject(typeof(ThingDef));
                     cargoDef.defName="RegressionPsiPassenger";cargoDef.thingClass=typeof(Thing);cargoDef.category=ThingCategory.Item;cargoDef.stackLimit=75;cargoDef.comps=[];
                     DefDatabase<ThingDef>.Add(cargoDef);
@@ -294,7 +294,7 @@ internal static partial class SpiritMapCollapseTests
                     Set(shot,"flyingThing",cargo);
                 }
                 var loaded=RoundTripSummon(r,"psionic-flight-"+kind,shot);
-                if(kind=="Dash"){
+                if(kind=="Dash" || kind=="Leap"){
                     var held=((IThingHolder)loaded).GetDirectlyHeldThings();
                     Check.Equal(1,held.Count,"old deep passenger adopted on load");
                     Check.Equal(7,held[0].stackCount,"passenger data preserved");

@@ -219,7 +219,8 @@ namespace TorannMagic
                                     //Log.Message("target range " + (body.CurJob.targetA.Thing.Position - body.Position).LengthHorizontal);
                                     Pawn targetPawn = body.CurJob.targetA.Thing as Pawn;
                                     float targetDistance = (body.Position - targetPawn.Position).LengthHorizontal;
-                                    if (targetDistance > 3 && targetDistance < (12 + EffVal) && targetPawn.Map==body.Map && !targetPawn.Downed && targetPawn.HostileTo(body))
+                                    if (targetDistance > 3 && targetDistance < (12 + EffVal) && targetPawn.Map==body.Map && !targetPawn.Downed && targetPawn.HostileTo(body) &&
+                                        Odyssey.TravelEnvironmentSafety.IsSafe(body,body.Map,targetPawn.Position,Mathf.CeilToInt(targetDistance/.75f)+1))
                                     {
                                         for (int i = 0; i < 12; i++)
                                         {
@@ -229,9 +230,13 @@ namespace TorannMagic
                                         FlyingObject_PsionicLeap flyingObject = (FlyingObject_PsionicLeap)GenSpawn.Spawn(ThingDef.Named("FlyingObject_PsionicLeap"), body.Position, body.Map);
                                         flyingObject.SetSkillOwner(Pawn);
                                         flyingObject.Launch(body, body.CurJob.targetA.Thing, body);
-                                        parent.Severity-=3f;
-                                        comp.Stamina.CurLevel -= .03f;
-                                        comp.MightUserXP += Rand.Range(20, 30);
+                                        if(flyingObject.GetDirectlyHeldThings().Contains(body))
+                                        {
+                                            parent.Severity-=3f;
+                                            comp.Stamina.CurLevel -= .03f;
+                                            comp.MightUserXP += Rand.Range(20, 30);
+                                            return; // Takeoff clears the body's map/job; do not run another augmentation this tick.
+                                        }
                                     }
                                 }
                             }
