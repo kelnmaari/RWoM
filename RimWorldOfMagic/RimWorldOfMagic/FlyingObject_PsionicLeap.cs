@@ -115,6 +115,9 @@ namespace TorannMagic
             //flyingThing.ThingID += Rand.Range(0, 2147).ToString();
         }
 
+        private Pawn skillOwner;
+        internal void SetSkillOwner(Pawn owner) => skillOwner=owner;
+
         public void Launch(Thing launcher, LocalTargetInfo targ, Thing flyingThing, DamageInfo? impactDamage)
         {
             this.Launch(launcher, base.Position.ToVector3Shifted(), targ, flyingThing, impactDamage);
@@ -137,7 +140,7 @@ namespace TorannMagic
             this.oldjobTarget = pawn.CurJob.targetA.Thing;
             //Log.Message("pre leap target is " + this.oldjobTarget.LabelShort);
             CompAbilityUserMight comp = pawn.GetCompAbilityUserMight();
-            this.effVal = TM_Calc.GetSkillEfficiencyLevel(pawn, TorannMagicDefOf.TM_PsionicAugmentation, false); //comp.MightData.MightPowerSkill_PsionicAugmentation.FirstOrDefault((MightPowerSkill x) => x.label == "TM_PsionicAugmentation_eff").level;
+            this.effVal = TM_Calc.GetSkillEfficiencyLevel(skillOwner ?? pawn, TorannMagicDefOf.TM_PsionicAugmentation, false); //comp.MightData.MightPowerSkill_PsionicAugmentation.FirstOrDefault((MightPowerSkill x) => x.label == "TM_PsionicAugmentation_eff").level;
             if (spawned)
             {
                 flyingThing.DeSpawn();

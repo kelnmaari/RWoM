@@ -123,6 +123,20 @@ namespace TorannMagic
             usePsionicMindAttackToggle = !usePsionicMindAttackToggle;
         }
 
+        internal Command_Toggle MakePsionicToggle(bool mind,Action activate)
+        {
+            bool Enabled() => mind ? usePsionicMindAttackToggle : usePsionicAugmentationToggle;
+            bool on=Enabled();
+            string image=mind?"psionicmindattack":"psionicaugmentation";
+            string label=mind?"TM_MindAttack":"TM_Augmentations";
+            return new Command_Toggle {
+                defaultLabel=(label+(on?"Enabled":"Disabled")).Translate(),
+                defaultDesc=(mind?"TM_MindAttackToggleDesc":"TM_AugmentationsToggleDesc").Translate(),
+                Order=mind?-89:-90,icon=ContentFinder<Texture2D>.Get("UI/"+image+(on?"":"_off"),true),
+                isActive=Enabled,toggleAction=activate
+            };
+        }
+
         internal Command_Toggle MakeCleaveCommand(Action action)
         {
             return new Command_Toggle
@@ -5387,6 +5401,8 @@ namespace TorannMagic
         private Dictionary<string, Command> gizmoCommands = new Dictionary<string, Command>();
         public Command GetGizmoCommands(string key)
         {
+            if (key=="psiAugmentation") return MakePsionicToggle(false,TogglePsionicAugmentation);
+            if (key=="psiMindAttack") return MakePsionicToggle(true,TogglePsionicMindAttack);
             if (!gizmoCommands.ContainsKey(key))
             {
                 Pawn p = this.Pawn;
@@ -5432,49 +5448,7 @@ namespace TorannMagic
                     };
                     gizmoCommands.Add(key, itemCQC);
                 }
-                if(key == "psiAugmentation")
-                {
-                    String toggle = "psionicaugmentation";
-                    String label = "TM_AugmentationsEnabled".Translate();
-                    String desc = "TM_AugmentationsToggleDesc".Translate();
-                    if (!this.usePsionicAugmentationToggle)
-                    {
-                        toggle = "psionicaugmentation_off";
-                        label = "TM_AugmentationsDisabled".Translate();
-                    }
-                    Command_Toggle item = new Command_Toggle
-                    {
-                        defaultLabel = label,
-                        defaultDesc = desc,
-                        Order = -90,
-                        icon = ContentFinder<Texture2D>.Get("UI/" + toggle, true),
-                        isActive = (() => this.usePsionicAugmentationToggle),
-                        toggleAction = TogglePsionicAugmentation
-                    };
-                    gizmoCommands.Add(key, item);
-                }
-                if(key == "psiMindAttack")
-                {
 
-                    String toggle2 = "psionicmindattack";
-                    String label2 = "TM_MindAttackEnabled".Translate();
-                    String desc2 = "TM_MindAttackToggleDesc".Translate();
-                    if (!this.usePsionicMindAttackToggle)
-                    {
-                        toggle2 = "psionicmindattack_off";
-                        label2 = "TM_MindAttackDisabled".Translate();
-                    }
-                    Command_Toggle item2 = new Command_Toggle
-                    {
-                        defaultLabel = label2,
-                        defaultDesc = desc2,
-                        Order = -89,
-                        icon = ContentFinder<Texture2D>.Get("UI/" + toggle2, true),
-                        isActive = (() => this.usePsionicMindAttackToggle),
-                        toggleAction = TogglePsionicMindAttack
-                    };
-                    gizmoCommands.Add(key, item2);
-                }
             }
             if (gizmoCommands.ContainsKey(key))
             {

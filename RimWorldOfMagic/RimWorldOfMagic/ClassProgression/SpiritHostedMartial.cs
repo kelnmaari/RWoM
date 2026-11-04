@@ -230,6 +230,19 @@ namespace TorannMagic.ClassProgression
         {
             foreach (var command in existing) yield return command;
             if (!SpiritRebirthState.TryGetPossessingSpirit(body, out var soul)) yield break;
+            if (HediffComp_Psionic.CanProject(body,soul))
+            {
+                var source=soul.GetCompAbilityUserMight();
+                if (source!=null)
+                {
+                    yield return source.MakePsionicToggle(false,()=>{
+                        if (HediffComp_Psionic.CanProject(body,soul)) source.usePsionicAugmentationToggle=!source.usePsionicAugmentationToggle;
+                    });
+                    yield return source.MakePsionicToggle(true,()=>{
+                        if (HediffComp_Psionic.CanProject(body,soul)) source.usePsionicMindAttackToggle=!source.usePsionicMindAttackToggle;
+                    });
+                }
+            }
             if (RangerCareer.Path(soul)?.Stage==InitiationStage.Foundation && RangerCareer.CareBody(soul)==body &&
                 RangerCareer.Companion(soul) is Pawn pet && RangerCareer.Eligible(soul,pet))
                 yield return new Command_Action {defaultLabel="TM_RangerCareOrder".Translate(pet.LabelShort),

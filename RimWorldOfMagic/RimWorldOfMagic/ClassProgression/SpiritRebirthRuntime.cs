@@ -220,6 +220,7 @@ namespace TorannMagic.ClassProgression
         {
             if (!SpiritRebirthEnergy.Marked(comp.Pawn)) return false;
             if (!SpiritRebirthBody.RetainsNeeds(comp.Pawn) || !clock.Observe(Find.TickManager.TicksGame)) return true;
+            HediffComp_Psionic.TickHosted(comp.Pawn);
             TickAbilities(comp, false);
             for (int i = comp.chainedAbilitiesList.Count - 1; i >= 0; i--)
             {
