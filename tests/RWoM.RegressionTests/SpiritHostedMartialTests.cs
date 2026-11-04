@@ -286,7 +286,7 @@ internal static partial class SpiritMapCollapseTests
                 fields["destination"]=new UnityEngine.Vector3(31,0,43);
                 fields["ticksToImpact"]=17;
                 foreach(var pair in fields)Set(shot,pair.Key,pair.Value);
-                if(kind=="Dash" || kind=="Leap"){
+                if(kind=="Dash" || kind=="Leap" || kind=="Storm"){
                     var cargoDef=(ThingDef)RuntimeHelpers.GetUninitializedObject(typeof(ThingDef));
                     cargoDef.defName="RegressionPsiPassenger";cargoDef.thingClass=typeof(Thing);cargoDef.category=ThingCategory.Item;cargoDef.stackLimit=75;cargoDef.comps=[];
                     DefDatabase<ThingDef>.Add(cargoDef);
@@ -294,7 +294,10 @@ internal static partial class SpiritMapCollapseTests
                     Set(shot,"flyingThing",cargo);
                 }
                 var loaded=RoundTripSummon(r,"psionic-flight-"+kind,shot);
-                if(kind=="Dash" || kind=="Leap"){
+                if(kind=="Storm")
+                    Check.Equal(true,(bool)type.GetField("returnPending",BindingFlags.NonPublic|BindingFlags.Instance)!.GetValue(loaded)!,
+                        "an incomplete orbit requests safe return instead of indexing missing curve points");
+                if(kind=="Dash" || kind=="Leap" || kind=="Storm"){
                     var held=((IThingHolder)loaded).GetDirectlyHeldThings();
                     Check.Equal(1,held.Count,"old deep passenger adopted on load");
                     Check.Equal(7,held[0].stackCount,"passenger data preserved");

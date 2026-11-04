@@ -187,7 +187,7 @@ namespace TorannMagic
         public void Launch(Thing launcher, Vector3 origin, LocalTargetInfo targ, Thing flyingThing, DamageInfo? newDamageInfo = null)
         {
             if(passenger.Count!=0 || !Spawned || flyingThing?.Spawned!=true || flyingThing.Map!=Map ||
-                launcher is not Pawn body || !targ.IsValid || !targ.Cell.InBounds(Map))
+                launcher is not Pawn body || !targ.IsValid || !targ.Cell.InBounds(Map) || targ.Cell==body.Position)
             {Destroy();return;}
             var start=flyingThing.Position;
             pawn=body;drafted=body.Drafted;trueOrigin=origin;
@@ -233,10 +233,9 @@ namespace TorannMagic
             this.Initialize();
         }
 
+        protected override void TickInterval(int delta) { }
+
         protected override void Tick()
-        {
-        }
-        protected override void TickInterval(int delta)
         {
             if(returnPending)
             {

@@ -209,10 +209,9 @@ namespace TorannMagic
             this.Initialize();
         }
 
+        protected override void TickInterval(int delta) { }
+
         protected override void Tick()
-        {
-        }
-        protected override void TickInterval(int delta)
         {
             if(returnPending)
             {

@@ -10,6 +10,7 @@ namespace TorannMagic
 
         public override bool CanHitTargetFrom(IntVec3 root, LocalTargetInfo targ)
         {
+            if(CasterPawn?.Spawned!=true || !targ.IsValid || targ.Cell==root)return false;
             if (targ.Thing != null && targ.Thing == this.caster)
             {
                 return this.verbProps.targetParams.canTargetSelf;

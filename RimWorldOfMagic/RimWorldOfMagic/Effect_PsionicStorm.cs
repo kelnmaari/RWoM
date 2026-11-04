@@ -1,4 +1,4 @@
-﻿using Verse;
+using Verse;
 using AbilityUser;
 using RimWorld;
 
@@ -6,6 +6,8 @@ namespace TorannMagic
 {    
     public class Effect_PsionicStorm : Verb_UseAbility
     {
+        public override bool CanHitTargetFrom(IntVec3 root, LocalTargetInfo target) =>
+            CasterPawn?.Spawned==true && target.IsValid && target.Cell!=root && base.CanHitTargetFrom(root,target);
         //bool validTarg;
 
         //public override bool CanHitTargetFrom(IntVec3 root, LocalTargetInfo targ)
@@ -49,6 +51,7 @@ namespace TorannMagic
                 LongEventHandler.QueueLongEvent(delegate
                 {
                     FlyingObject_PsionicStorm flyingObject = (FlyingObject_PsionicStorm)GenSpawn.Spawn(ThingDef.Named("FlyingObject_PsionicStorm"), this.CasterPawn.Position, this.CasterPawn.Map);
+                    flyingObject.SetSkillOwner(this.Ability.Pawn);
                     flyingObject.Launch(this.CasterPawn, t.Cell, this.CasterPawn, this);
                 }, "LaunchingFlyer", false, null);
             }
