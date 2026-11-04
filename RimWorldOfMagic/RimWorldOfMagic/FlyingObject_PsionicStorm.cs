@@ -105,6 +105,13 @@ namespace TorannMagic
         public override void ExposeData()
         {
             base.ExposeData();
+            Scribe_Values.Look(ref stage,"psionicStage");
+            Scribe_Values.Look(ref nextAttackTick,"psionicNextAttack");
+            Scribe_Values.Look(ref targetCenter,"psionicTargetCenter");
+            Scribe_Values.Look(ref curveAngle,"psionicCurveAngle");
+            Scribe_Values.Look(ref curveVariance,"psionicCurveVariance");
+            Scribe_Values.Look(ref speed,"psionicSpeed",40f);
+            Scribe_Values.Look(ref timesToDamage,"psionicImpactCount",3);
             Scribe_Values.Look<Vector3>(ref this.origin, "origin", default(Vector3), false);
             Scribe_Values.Look<Vector3>(ref this.destination, "destination", default(Vector3), false);
             Scribe_Values.Look<Vector3>(ref this.trueOrigin, "trueOrigin", default(Vector3), false);

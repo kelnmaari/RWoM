@@ -220,6 +220,25 @@ internal static partial class SpiritMapCollapseTests
                 native.AbilityData.AllPowers=null;
                 Check.Equal(true,find.Invoke(null,[c.Creator,c.Original,order])==null,"native barrier takes precedence");
             }));
+        foreach(var (kind,fields) in new (string,Dictionary<string,object>)[]{
+            ("Dash",new() {["direction"]=new UnityEngine.Vector3(.6f,0,.8f),["speed"]=20f,["drafted"]=true,["pwrVal"]=3,["verVal"]=2,["arcaneDmg"]=1.7f,["drawTicks"]=41,["shouldDrawPawn"]=false}),
+            ("Storm",new() {["stage"]=2,["nextAttackTick"]=9021,["targetCenter"]=new UnityEngine.Vector3(17,0,25),["curveAngle"]=73f,["speed"]=10f,["timesToDamage"]=1}),
+            ("Leap",new() {["trueOrigin"]=new UnityEngine.Vector3(3,0,5),["trueDestination"]=new UnityEngine.Vector3(17,0,25),["trueAngle"]=73f})
+        })
+            yield return new("PsionicProjection.FlightSave."+kind,r=>SpiritRebirthRitualTransactionTests.Run(r,c=>{
+                using var fixture=new Fixture(r,c);
+                using var material=new Patch(typeof(MaterialPool).GetMethod("MatFrom",[typeof(string),typeof(UnityEngine.Shader)])!,nameof(CancelNative));
+                var type=typeof(MightAbility).Assembly.GetType("TorannMagic.FlyingObject_Psionic"+kind,true)!;
+                var def=(ThingDef)RuntimeHelpers.GetUninitializedObject(typeof(ThingDef));
+                def.defName="RegressionPsiFlight"+kind;def.thingClass=type;def.category=ThingCategory.Projectile;def.comps=[];
+                DefDatabase<ThingDef>.Add(def);
+                var shot=(Projectile)Activator.CreateInstance(type)!;
+                shot.def=def;shot.thingIDNumber=19890;shot.usedTarget=shot.intendedTarget=IntVec3.Zero;
+                foreach(var pair in fields)Set(shot,pair.Key,pair.Value);
+                var loaded=RoundTripSummon(r,"psionic-flight-"+kind,shot);
+                foreach(var pair in fields)
+                    Check.Equal(pair.Value,type.GetField(pair.Key,BindingFlags.NonPublic|BindingFlags.Public|BindingFlags.Instance)!.GetValue(loaded)!,"in-flight "+kind+" retains "+pair.Key);
+            }));
         yield return new("PsionicProjection.InFlightBlastSave",r=>SpiritRebirthRitualTransactionTests.Run(r,c=>{
             using var held=new Fixture(r,c);
             using var material = new Patch(typeof(MaterialPool).GetMethod("MatFrom", [typeof(string),typeof(UnityEngine.Shader)])!, nameof(CancelNative));

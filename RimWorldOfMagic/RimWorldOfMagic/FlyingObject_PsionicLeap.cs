@@ -1,4 +1,4 @@
-﻿using RimWorld;
+using RimWorld;
 using System;
 using System.Linq;
 using System.Collections.Generic;
@@ -90,6 +90,10 @@ namespace TorannMagic
         public override void ExposeData()
         {
             base.ExposeData();
+            Scribe_Values.Look(ref trueOrigin,"psionicTrueOrigin");
+            Scribe_Values.Look(ref trueDestination,"psionicTrueDestination");
+            Scribe_Values.Look(ref trueAngle,"psionicTrueAngle");
+            Scribe_References.Look(ref oldjobTarget,"psionicOldTarget");
             Scribe_Values.Look<Vector3>(ref this.origin, "origin", default(Vector3), false);
             Scribe_Values.Look<Vector3>(ref this.destination, "destination", default(Vector3), false);
             Scribe_Values.Look<int>(ref this.ticksToImpact, "ticksToImpact", 0, false);

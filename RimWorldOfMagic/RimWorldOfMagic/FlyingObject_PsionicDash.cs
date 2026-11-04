@@ -1,4 +1,4 @@
-﻿using RimWorld;
+using RimWorld;
 using System;
 using System.Linq;
 using UnityEngine;
@@ -95,6 +95,14 @@ namespace TorannMagic
         public override void ExposeData()
         {
             base.ExposeData();
+            Scribe_Values.Look(ref direction,"psionicDirection");
+            Scribe_Values.Look(ref speed,"psionicSpeed",15f);
+            Scribe_Values.Look(ref drafted,"psionicDrafted");
+            Scribe_Values.Look(ref pwrVal,"psionicPower");
+            Scribe_Values.Look(ref verVal,"psionicVersatility");
+            Scribe_Values.Look(ref arcaneDmg,"psionicMight",1f);
+            Scribe_Values.Look(ref drawTicks,"psionicDrawTicks",300);
+            Scribe_Values.Look(ref shouldDrawPawn,"psionicDrawPawn",true);
             Scribe_Values.Look<Vector3>(ref this.origin, "origin", default(Vector3), false);
             Scribe_Values.Look<Vector3>(ref this.destination, "destination", default(Vector3), false);
             Scribe_Values.Look<Vector3>(ref this.trueOrigin, "trueOrigin", default(Vector3), false);
