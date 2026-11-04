@@ -61,7 +61,7 @@ namespace TorannMagic.Odyssey
             var name = ability?.Def?.defName;
             // Add-on combat jumps use the same Flight verb and despawn/payment lifecycle.
             // Resolve from the definition, without constructing a verb or touching graphics.
-            return IsFlight(ability) || name == "TM_Whirlwind" || name == "TM_BladePassage" || name == "TM_Blink" || name?.StartsWith("TM_Blink_") == true
+            return IsFlight(ability) || name == "TM_PsionicDash" || name == "TM_PsionicStorm" || name == "TM_Whirlwind" || name == "TM_BladePassage" || name == "TM_Blink" || name?.StartsWith("TM_Blink_") == true
                 || name == "TM_PhaseStrike" || name?.StartsWith("TM_PhaseStrike_") == true;
         }
 
@@ -130,6 +130,8 @@ namespace TorannMagic.Odyssey
             var job = ability.GetJob(context, target);
             int horizon = IsFlight(ability) ? (int)Math.Ceiling((pawn.Position - target.Cell).LengthHorizontal * 5f) : 0;
             if (ability.Def == TorannMagicDefOf.TM_Whirlwind) horizon=ClassProgression.GladiatorWhirlwind.Horizon(pawn,target.Cell);
+            if(ability.Def==TorannMagicDefOf.TM_PsionicDash || ability.Def==TorannMagicDefOf.TM_PsionicStorm)
+                horizon=ClassProgression.PsionicDashCast.Horizon(pawn,target.Cell,ability.Def==TorannMagicDefOf.TM_PsionicStorm);
             IntVec3 destination = target.Cell;
             var passage = ability.Verb as ClassProgression.Verb_BladePassage;
             if (passage != null && !passage.TryDestination(target, out destination)) return null;

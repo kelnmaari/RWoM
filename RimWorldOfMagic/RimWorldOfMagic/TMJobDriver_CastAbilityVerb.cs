@@ -488,13 +488,13 @@ namespace TorannMagic
             }
             else if (verbCast.AbilityProjectileDef.defName == "Projectile_PsionicDash")
             {
-                float sevReduct = 8f - this.pawn.GetCompAbilityUserMight().MightData.MightPowerSkill_PsionicDash.FirstOrDefault((MightPowerSkill x) => x.label == "TM_PsionicDash_eff").level;
+                float sevReduct = ClassProgression.PsionicDashCast.PsiCost(this.pawn, TorannMagicDefOf.TM_PsionicDash);
                 HealthUtility.AdjustSeverity(this.pawn, HediffDef.Named("TM_PsionicHD"), -sevReduct);
             }
             else if(verbCast.AbilityProjectileDef.defName == "Projectile_PsionicStorm")
             {
-                //float sevReduct = 65 - (5 * this.pawn.GetCompAbilityUserMight().MightData.MightPowerSkill_PsionicStorm.FirstOrDefault((MightPowerSkill x) => x.label == "TM_PsionicStorm_eff").level);
-                HealthUtility.AdjustSeverity(this.pawn, HediffDef.Named("TM_PsionicHD"), -100);
+                float sevReduct = ClassProgression.PsionicDashCast.PsiCost(this.pawn, TorannMagicDefOf.TM_PsionicStorm);
+                HealthUtility.AdjustSeverity(this.pawn, HediffDef.Named("TM_PsionicHD"), -sevReduct);
             }
         }
 

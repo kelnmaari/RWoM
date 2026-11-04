@@ -37,6 +37,7 @@ namespace TorannMagic
 
         public virtual void Effect()
         {
+            if (this.TargetsAoE == null || this.TargetsAoE.Count == 0 || CasterPawn?.Spawned != true) return;
             LocalTargetInfo t = this.TargetsAoE[0];
             bool flag = t.Cell != default(IntVec3);
             if (flag)
@@ -48,11 +49,17 @@ namespace TorannMagic
                     ModCheck.GiddyUp.ForceDismount(base.CasterPawn);
                 }
 
+                Map launchMap = casterPawn.Map;
                 LongEventHandler.QueueLongEvent(delegate
                 {
+                    if (!casterPawn.Spawned || casterPawn.Map != launchMap || !CanHitTargetFrom(casterPawn.Position, t) ||
+                        !Odyssey.ManualTravelSafety.CanComplete(casterPawn, launchMap, t.Cell, 900)) return;
                     FlyingObject_PsionicStorm flyingObject = (FlyingObject_PsionicStorm)GenSpawn.Spawn(ThingDef.Named("FlyingObject_PsionicStorm"), this.CasterPawn.Position, this.CasterPawn.Map);
                     flyingObject.SetSkillOwner(this.Ability.Pawn);
                     flyingObject.Launch(this.CasterPawn, t.Cell, this.CasterPawn, this);
+                    // Legacy queued jobs already paid psi before their windup. Settle only stamina/cooldown here.
+                    if (flyingObject.GetDirectlyHeldThings().Contains(casterPawn))
+                        Odyssey.ManualTravelSafety.Settle(this.Ability);
                 }, "LaunchingFlyer", false, null);
             }
         }

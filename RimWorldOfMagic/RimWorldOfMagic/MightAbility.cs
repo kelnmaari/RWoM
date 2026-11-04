@@ -29,7 +29,8 @@ namespace TorannMagic
                 return trap;
             }
             string order;
-            if (mightDef?.MainVerb?.verbClass == typeof(ClassProgression.Verb_GladiatorSweep)) order=ClassProgression.SpiritHostedMartial.Sweep;
+            if(mightDef!=null && (mightDef==TorannMagicDefOf.TM_PsionicDash || mightDef==TorannMagicDefOf.TM_PsionicStorm)) order=ClassProgression.PsionicDashCast.OrderFor(this);
+            else if (mightDef?.MainVerb?.verbClass == typeof(ClassProgression.Verb_GladiatorSweep)) order=ClassProgression.SpiritHostedMartial.Sweep;
             else if (ClassProgression.SpiritHostedMartial.GrappleRank(mightDef)) order=ClassProgression.SpiritHostedMartial.Grapple;
             else if (mightDef == TorannMagicDefOf.TM_Whirlwind && mightDef != null) order=ClassProgression.GladiatorWhirlwind.JobName;
             else if (mightDef != null && mightDef==TorannMagicDefOf.TM_BladeSpin) order=ClassProgression.BladeMartialCast.Spin;
@@ -434,7 +435,7 @@ namespace TorannMagic
                     }
                     if (mightAbilityDef == TorannMagicDefOf.TM_PsionicDash)
                     {
-                        num2 = 8 - (mightUser.MightData.MightPowerSkill_PsionicDash.FirstOrDefault((MightPowerSkill x) => x.label == "TM_PsionicDash_eff").level);
+                        num2 = ClassProgression.PsionicDashCast.PsiCost(mightUser.Pawn, TorannMagicDefOf.TM_PsionicDash);
                         text2 = "TM_PsionicInitialCost".Translate(
                             num2
                         );
@@ -450,7 +451,7 @@ namespace TorannMagic
                     }
                     if (mightAbilityDef == TorannMagicDefOf.TM_PsionicStorm)
                     {
-                        num2 = 65 - (5 * (mightUser.MightData.MightPowerSkill_PsionicStorm.FirstOrDefault((MightPowerSkill x) => x.label == "TM_PsionicStorm_eff").level));
+                        num2 = ClassProgression.PsionicDashCast.PsiCost(mightUser.Pawn, TorannMagicDefOf.TM_PsionicStorm);
                         text2 = "TM_PsionicInitialCost".Translate(
                             num2
                         );
@@ -748,7 +749,7 @@ namespace TorannMagic
                         );
                         return false;
                     }
-                    if ((this.mightDef == TorannMagicDefOf.TM_PsionicDash && psiEnergy < 8f))
+                    if ((this.mightDef == TorannMagicDefOf.TM_PsionicDash && psiEnergy < ClassProgression.PsionicDashCast.PsiCost(Pawn, mightDef)))
                     {
                         reason = "TM_NotEnoughPsionicEnergy".Translate(
                         base.Pawn.Label,
@@ -756,7 +757,7 @@ namespace TorannMagic
                         );
                         return false;
                     }
-                    int stormCost = 65 - (5 * (this.MightUser.MightData.MightPowerSkill_PsionicStorm.FirstOrDefault((MightPowerSkill x) => x.label == "TM_PsionicStorm_eff").level));
+                    float stormCost = ClassProgression.PsionicDashCast.PsiCost(Pawn, TorannMagicDefOf.TM_PsionicStorm);
                     if ((this.mightDef == TorannMagicDefOf.TM_PsionicStorm && psiEnergy < stormCost))
                     {
                         reason = "TM_NotEnoughPsionicEnergy".Translate(

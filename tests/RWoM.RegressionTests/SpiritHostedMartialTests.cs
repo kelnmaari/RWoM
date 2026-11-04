@@ -208,7 +208,7 @@ internal static partial class SpiritMapCollapseTests
             bullet.projectile.explosionRadius=2;
             Check.Equal(true,Incoming(physical,weapon)==null,"exclude explosive ammunition");
         });
-        foreach(var (defName,order) in new[]{("TM_PsionicDash","TM_SpiritPsionicDash"),("TM_PsionicBarrier","TM_SpiritPsionicBarrier"),("TM_PsionicBarrier_Projected","TM_SpiritProjectedBarrier"),("TM_PsionicBlast","TM_SpiritPsionicBlast"),("TM_PsionicBlast_III","TM_SpiritPsionicBlast")})
+        foreach(var (defName,order) in new[]{("TM_PsionicStorm","TM_SpiritPsionicStorm"),("TM_PsionicDash","TM_SpiritPsionicDash"),("TM_PsionicBarrier","TM_SpiritPsionicBarrier"),("TM_PsionicBarrier_Projected","TM_SpiritProjectedBarrier"),("TM_PsionicBlast","TM_SpiritPsionicBlast"),("TM_PsionicBlast_III","TM_SpiritPsionicBlast")})
             yield return new("PsionicProjection.BarrierOwner."+defName,f=>SpiritRebirthRitualTransactionTests.Run(f,c=>{
                 using var held=new Fixture(f,c);
                 var comp=c.Original.GetCompAbilityUserMight();
@@ -236,6 +236,19 @@ internal static partial class SpiritMapCollapseTests
             Check.Equal(true,(bool)pay.Invoke(null,[c.Original])!,"funded volley accepted");
             Check.Equal(53f,energy.Severity,"initial twenty comes from original soul");
             } finally {TorannMagicDefOf.TM_PsionicHD=previous;}
+        }));
+        yield return new("PsionicProjection.FlightEnergyCosts",r=>SpiritRebirthRitualTransactionTests.Run(r,c=>{
+            using var fixture=new Fixture(r,c);
+            var cost=Production("PsionicDashCast").GetMethod("PsiCost",BindingFlags.NonPublic|BindingFlags.Static)!;
+            foreach(var (def,baseCost,perRank) in new[]{(TorannMagicDefOf.TM_PsionicDash,8f,1f),(TorannMagicDefOf.TM_PsionicStorm,65f,5f)})
+            {
+                var skill=c.Original.GetCompAbilityUserMight().MightData.GetSkill_Efficiency(def);
+                Check.Equal(true,skill!=null,"efficiency record available");
+                foreach(int rank in new[]{0,1,2,3}) {
+                    skill.level=rank;
+                    Check.Equal(baseCost-perRank*rank,(float)cost.Invoke(null,[c.Original,def])!,"cost follows source efficiency");
+                }
+            }
         }));
         yield return new("PsionicProjection.DashTrainingOwner",r=>SpiritRebirthRitualTransactionTests.Run(r,c=>{
             using var fixture=new Fixture(r,c);
