@@ -49,6 +49,7 @@ namespace TorannMagic
                 LongEventHandler.QueueLongEvent(delegate
                 {
                     FlyingObject_PsionicDash flyingObject = (FlyingObject_PsionicDash)GenSpawn.Spawn(ThingDef.Named("FlyingObject_PsionicDash"), this.CasterPawn.Position, this.CasterPawn.Map);
+                    flyingObject.SetSkillOwner(this.Ability.Pawn);
                     flyingObject.Launch(this.CasterPawn, t.Cell, this.CasterPawn);
                 }, "LaunchingFlyer", false, null);
             }

@@ -55,6 +55,16 @@ namespace TorannMagic
         public int weaponDmg = 0;
         private bool drafted = false;
         Pawn pawn;
+        private Pawn skillOwner;
+        internal void SetSkillOwner(Pawn owner) => skillOwner = owner;
+
+        private void CaptureTraining()
+        {
+            var owner = skillOwner ?? pawn;
+            verVal = TM_Calc.GetSkillVersatilityLevel(owner, TorannMagicDefOf.TM_PsionicDash, false);
+            pwrVal = TM_Calc.GetSkillPowerLevel(owner, TorannMagicDefOf.TM_PsionicDash, false);
+            arcaneDmg = owner?.GetCompAbilityUserMight()?.mightPwr ?? 1f;
+        }
 
         //step variables
         private float sideForwardMagnitude = 2f;
@@ -150,14 +160,11 @@ namespace TorannMagic
                 FleckMaker.Static(this.origin, this.Map, FleckDefOf.ExplosionFlash, 12f);
                 SoundDefOf.Ambient_AltitudeWind.sustainFadeoutTime.Equals(30.0f);
                 FleckMaker.ThrowDustPuff(this.origin, this.Map, Rand.Range(1.2f, 1.8f));
-                CompAbilityUserMight comp = pawn.GetCompAbilityUserMight();
-                verVal = TM_Calc.GetSkillVersatilityLevel(pawn, TorannMagicDefOf.TM_PsionicDash, false);
-                pwrVal = TM_Calc.GetSkillPowerLevel(pawn, TorannMagicDefOf.TM_PsionicDash, false);
+                CaptureTraining();
                 //verVal = TM_Calc.GetMightSkillLevel(pawn, comp.MightData.MightPowerSkill_PsionicDash, "TM_PsionicDash", "_ver", true);
                 //pwrVal = TM_Calc.GetMightSkillLevel(pawn, comp.MightData.MightPowerSkill_PsionicDash, "TM_PsionicDash", "_pwr", true);
                 //this.pwrVal = comp.MightData.MightPowerSkill_PsionicDash.FirstOrDefault((MightPowerSkill x) => x.label == "TM_PsionicDash_pwr").level;
                 //this.verVal = comp.MightData.MightPowerSkill_PsionicDash.FirstOrDefault((MightPowerSkill x) => x.label == "TM_PsionicDash_ver").level;
-                this.arcaneDmg = comp.mightPwr;
                 //if (pawn.story.traits.HasTrait(TorannMagicDefOf.Faceless))
                 //{
                 //    this.pwrVal = comp.MightData.MightPowerSkill_Mimic.FirstOrDefault((MightPowerSkill x) => x.label == "TM_Mimic_pwr").level;

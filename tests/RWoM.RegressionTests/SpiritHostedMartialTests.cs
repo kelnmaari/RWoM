@@ -220,6 +220,31 @@ internal static partial class SpiritMapCollapseTests
                 native.AbilityData.AllPowers=null;
                 Check.Equal(true,find.Invoke(null,[c.Creator,c.Original,order])==null,"native barrier takes precedence");
             }));
+        yield return new("PsionicProjection.DashTrainingOwner",r=>SpiritRebirthRitualTransactionTests.Run(r,c=>{
+            using var fixture=new Fixture(r,c);
+            using var material=new Patch(typeof(MaterialPool).GetMethod("MatFrom",[typeof(string),typeof(UnityEngine.Shader)])!,nameof(CancelNative));
+            var previousSettings=TorannMagic.ModOptions.Settings.Instance;
+            try {
+            TorannMagic.ModOptions.Settings.Instance=new TorannMagic.ModOptions.Settings();
+            var flight=new FlyingObject_PsionicDash();
+            foreach(var owner in new[]{c.Creator,c.Original})
+                foreach(var suffix in new[]{"_pwr","_ver"}){
+                    var skills=owner.GetCompAbilityUserMagic().MagicData.MagicPowerSkill_Cantrips;
+                    if(!skills.Any(s=>s.label=="TM_Cantrips"+suffix))
+                        skills.Add(new MagicPowerSkill{label="TM_Cantrips"+suffix});
+                }
+            Set(flight,"pawn",c.Creator);
+            c.Creator.GetCompAbilityUserMight().mightPwr=1.1f;
+            c.Original.GetCompAbilityUserMight().mightPwr=1.8f;
+            var type=typeof(FlyingObject_PsionicDash);
+            var capture=type.GetMethod("CaptureTraining",BindingFlags.NonPublic|BindingFlags.Instance)!;
+            capture.Invoke(flight,null);
+            Check.Equal(1.1f,(float)type.GetField("arcaneDmg",BindingFlags.NonPublic|BindingFlags.Instance)!.GetValue(flight)!,"native dash uses body training");
+            type.GetMethod("SetSkillOwner",BindingFlags.NonPublic|BindingFlags.Instance)!.Invoke(flight,[c.Original]);
+            capture.Invoke(flight,null);
+            Check.Equal(1.8f,(float)type.GetField("arcaneDmg",BindingFlags.NonPublic|BindingFlags.Instance)!.GetValue(flight)!,"hosted dash uses original training");
+            } finally {TorannMagic.ModOptions.Settings.Instance=previousSettings;}
+        }));
         yield return new("PsionicProjection.DashPassengerOwner",_=>{
             Check.Equal(true,typeof(IThingHolder).IsAssignableFrom(typeof(FlyingObject_PsionicDash)),
                 "the airborne pawn needs physical ownership");
