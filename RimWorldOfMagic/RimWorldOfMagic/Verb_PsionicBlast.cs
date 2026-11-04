@@ -1,4 +1,4 @@
-﻿using Verse;
+using Verse;
 using AbilityUser;
 using UnityEngine;
 using System.Linq;
@@ -51,6 +51,7 @@ namespace TorannMagic
             IntVec3 targetVariation = this.currentTarget.Cell;
             targetVariation.x += Mathf.RoundToInt(Rand.Range(-.1f, .1f) * Vector3.Distance(pawn.DrawPos, this.currentTarget.CenterVector3) + Rand.Range(-1f, 1f)) ;
             targetVariation.z += Mathf.RoundToInt(Rand.Range(-.1f, .1f) * Vector3.Distance(pawn.DrawPos, this.currentTarget.CenterVector3) + Rand.Range(-1f, 1f));
+            targetVariation = ConstrainSpread(targetVariation,map.Size);
             float angle = (Quaternion.AngleAxis(90, Vector3.up) * GetVector(pawn.Position, targetVariation)).ToAngleFlat();
             Vector3 drawPos = pawn.DrawPos + (GetVector(pawn.Position, targetVariation) * .5f);
             TM_MoteMaker.ThrowGenericMote(TorannMagicDefOf.Mote_PsiBlastStart, drawPos, pawn.Map, Rand.Range(.4f, .6f), Rand.Range(.0f, .05f), .1f, .2f, 0, 0, 0, angle); //throw psi blast start
@@ -66,12 +67,10 @@ namespace TorannMagic
             return result;
         }
 
-        public Vector3 GetVector(IntVec3 center, IntVec3 objectPos)
-        {
-            Vector3 heading = (objectPos - center).ToVector3();
-            float distance = heading.magnitude;
-            Vector3 direction = heading / distance;
-            return direction;
-        }
+        internal static IntVec3 ConstrainSpread(IntVec3 cell, IntVec3 mapSize) =>
+            new IntVec3(Mathf.Clamp(cell.x,0,mapSize.x-1),cell.y,Mathf.Clamp(cell.z,0,mapSize.z-1));
+
+        public Vector3 GetVector(IntVec3 center, IntVec3 objectPos) =>
+            (objectPos-center).ToVector3().normalized;
     }
 }

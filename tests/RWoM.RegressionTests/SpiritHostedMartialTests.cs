@@ -220,6 +220,19 @@ internal static partial class SpiritMapCollapseTests
                 native.AbilityData.AllPowers=null;
                 Check.Equal(true,find.Invoke(null,[c.Creator,c.Original,order])==null,"native barrier takes precedence");
             }));
+        yield return new("PsionicProjection.BlastSpreadAtMapEdge",_=>{
+            var verbType=typeof(MightAbility).Assembly.GetType("TorannMagic.Verb_PsionicBlast",true)!;
+            var constrain=verbType.GetMethod("ConstrainSpread",BindingFlags.NonPublic|BindingFlags.Static);
+            Check.Equal(true,constrain!=null,"spread must remain inside the physical map");
+            var size=new IntVec3(80,1,120);
+            IntVec3 Cell(int x,int z)=>(IntVec3)constrain!.Invoke(null,[new IntVec3(x,0,z),size])!;
+            Check.Equal(new IntVec3(0,0,119),Cell(-2,122),"northwest corner");
+            Check.Equal(new IntVec3(79,0,0),Cell(81,-1),"southeast corner");
+            Check.Equal(new IntVec3(7,0,8),Cell(7,8),"ordinary spread unchanged");
+            var verb=Activator.CreateInstance(verbType,true);
+            var direction=(UnityEngine.Vector3)verbType.GetMethod("GetVector")!.Invoke(verb,[IntVec3.Zero,IntVec3.Zero])!;
+            Check.Equal(0f,direction.sqrMagnitude,"zero displacement is a finite direction");
+        });
         yield return new("PsionicProjection.IndividualEnergyLabels",_=>{
             var def=new HediffDef{minSeverity=0,maxSeverity=200,stages=[new HediffStage()]};
             HediffComp Energy(float amount)
