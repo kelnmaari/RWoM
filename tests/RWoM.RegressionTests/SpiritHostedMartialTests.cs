@@ -220,6 +220,23 @@ internal static partial class SpiritMapCollapseTests
                 native.AbilityData.AllPowers=null;
                 Check.Equal(true,find.Invoke(null,[c.Creator,c.Original,order])==null,"native barrier takes precedence");
             }));
+        yield return new("PsionicProjection.VolleyInitialEnergy",r=>SpiritRebirthRitualTransactionTests.Run(r,c=>{
+            using var fixture=new Fixture(r,c);
+            var type=typeof(MightAbility).Assembly.GetType("TorannMagic.Verb_PsionicBlast",true)!;
+            var pay=type.GetMethod("PayInitialEnergy",BindingFlags.NonPublic|BindingFlags.Static)!;
+            var previous=TorannMagicDefOf.TM_PsionicHD;
+            try {
+            TorannMagicDefOf.TM_PsionicHD=new HediffDef{defName="RegressionPsionicEnergy",hediffClass=typeof(Hediff),maxSeverity=100};
+            var energy=HediffMaker.MakeHediff(TorannMagicDefOf.TM_PsionicHD,c.Original);
+            c.Original.health.AddHediff(energy);
+            energy.Severity=19;
+            Check.Equal(false,(bool)pay.Invoke(null,[c.Original])!,"underfunded volley rejected");
+            Check.Equal(19f,energy.Severity,"rejection retains energy");
+            energy.Severity=73;
+            Check.Equal(true,(bool)pay.Invoke(null,[c.Original])!,"funded volley accepted");
+            Check.Equal(53f,energy.Severity,"initial twenty comes from original soul");
+            } finally {TorannMagicDefOf.TM_PsionicHD=previous;}
+        }));
         yield return new("PsionicProjection.DashTrainingOwner",r=>SpiritRebirthRitualTransactionTests.Run(r,c=>{
             using var fixture=new Fixture(r,c);
             using var material=new Patch(typeof(MaterialPool).GetMethod("MatFrom",[typeof(string),typeof(UnityEngine.Shader)])!,nameof(CancelNative));

@@ -115,7 +115,7 @@ namespace TorannMagic.ClassProgression
             if (BladeMartialCast.Handles(job)) return !body.WorkTagIsDisabled(WorkTags.Violent) && BladeMartialCast.HasWeapon(body);
             if (job==Verb_RangerSafeTrail.Order) return RangerMastery.HasTrail(ability.Pawn);
             if (job==Verb_RangerShot.Order) return !body.WorkTagIsDisabled(WorkTags.Violent) && Verb_RangerShot.HasBow(body);
-            if (job==Verb_PsionicBlast.Order) return !body.WorkTagIsDisabled(WorkTags.Violent);
+            if (job==Verb_PsionicBlast.Order) return !body.WorkTagIsDisabled(WorkTags.Violent) && Verb_PsionicBlast.HasInitialEnergy(ability.Pawn);
             if (job==Verb_PoisonTrap.Order) return !body.WorkTagIsDisabled(WorkTags.Violent);
             if (job==Verb_AnimalFriend.Order) return !might.animalBondingDisabled;
             if (job == Pommel) return !body.WorkTagIsDisabled(WorkTags.Violent) && body.health.capacities.CapableOf(PawnCapacityDefOf.Manipulation);

@@ -10,6 +10,17 @@ namespace TorannMagic
     {
 
         internal const string Order="TM_SpiritPsionicBlast";
+        internal static bool HasInitialEnergy(Pawn owner) =>
+            owner?.health?.hediffSet.GetFirstHediffOfDef(TorannMagicDefOf.TM_PsionicHD) is not Hediff energy || energy.Severity >= 20f;
+
+        internal static bool PayInitialEnergy(Pawn owner)
+        {
+            var energy=owner?.health?.hediffSet.GetFirstHediffOfDef(TorannMagicDefOf.TM_PsionicHD);
+            if(energy==null)return true; // Copied abilities retain the ordinary non-Psionic path.
+            if(energy.Severity<20f)return false;
+            energy.Severity-=20f;
+            return true;
+        }
         internal static bool Family(TMAbilityDef def) => def!=null &&
             (def==TorannMagicDefOf.TM_PsionicBlast || def==TorannMagicDefOf.TM_PsionicBlast_I ||
              def==TorannMagicDefOf.TM_PsionicBlast_II || def==TorannMagicDefOf.TM_PsionicBlast_III);
@@ -129,6 +140,8 @@ namespace TorannMagic
             if(Find.TickManager.TicksGame<nextShotAt)return;
             var power=Power;
             if(!CanFire(power) || fired==0 && !SpiritHostedMartial.Ready(pawn,power,Verb_PsionicBlast.Order))
+            {EndJobWith(Verse.AI.JobCondition.Incompletable);return;}
+            if(fired==0 && !Verb_PsionicBlast.PayInitialEnergy(power.Pawn))
             {EndJobWith(Verse.AI.JobCondition.Incompletable);return;}
             stopped=!Verb_PsionicBlast.For(pawn,power).Fire(job.targetB);
             fired++;
