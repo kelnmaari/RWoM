@@ -127,7 +127,7 @@ namespace TorannMagic
             Scribe_Values.Look(ref drafted,"psionicDrafted",true);
             Scribe_References.Look(ref carriedCargo,"psionicCarriedCargo");
             Scribe_References.Look(ref skillOwner,"psionicSkillOwner");
-            Scribe_Values.Look(ref stage,"psionicStage");
+            Scribe_Values.Look(ref stage,"psionicStage",-1);
             Scribe_Values.Look(ref nextAttackTick,"psionicNextAttack");
             Scribe_Values.Look(ref targetCenter,"psionicTargetCenter");
             Scribe_Values.Look(ref curveAngle,"psionicCurveAngle");
@@ -151,6 +151,7 @@ namespace TorannMagic
             Scribe_Deep.Look<Thing>(ref this.flyingThing, "flyingThing", new object[0]);
             Scribe_Collections.Look<IntVec3>(ref this.targetCells, "targetCells", LookMode.Value);
             Scribe_Collections.Look<Vector3>(ref this.curvePoints, "curvePoints", LookMode.Value);
+            if(Scribe.mode==LoadSaveMode.PostLoadInit && stage<0)RestoreLegacyPhase();
             if(Scribe.mode==LoadSaveMode.PostLoadInit && flyingThing!=null && !passenger.Contains(flyingThing))
             {
                 if(flyingThing.Spawned || flyingThing.holdingOwner!=null)
@@ -161,6 +162,27 @@ namespace TorannMagic
             if(Scribe.mode==LoadSaveMode.PostLoadInit && stage>0 && stage<3 &&
                 (curvePoints==null || curvePoints.Count<2 || destinationCurvePoint<0 || destinationCurvePoint>=curvePoints.Count))
                 returnPending=true;
+        }
+
+        private void RestoreLegacyPhase()
+        {
+            // Older saves retained the current segment but not the orbit phase or speed.
+            // Recover that segment rather than replaying the attack from takeoff.
+            targetCenter=(nearApex+farApex)*.5f;
+            if(curvePoints==null || curvePoints.Count==0)
+            {stage=0;speed=40f;return;}
+            if((destination-trueOrigin).sqrMagnitude<.0001f)stage=4;
+            else if((destination-nearApex).sqrMagnitude<.0001f)stage=3;
+            else stage=(curvePoints[0]-nearApex).sqrMagnitude<.0001f?1:2;
+            speed=stage==4?25f:circleFlightSpeed;
+            if(stage==1 && curvePoints.Count>1)
+            {
+                float turn=Vector3.Cross(farApex-nearApex,curvePoints[1]-curvePoints[0]).y;
+                curveAngle=turn<0?-90f:90f;
+            }
+            // The old save contains no next-shot timestamp; wait one normal interval.
+            nextAttackTick=Find.TickManager.TicksGame+Mathf.Max(1,
+                Mathf.RoundToInt(attackFrequencyHigh*(1-.1f*verVal)));
         }
 
         private void Initialize()

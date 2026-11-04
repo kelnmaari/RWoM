@@ -319,6 +319,26 @@ internal static partial class SpiritMapCollapseTests
                 foreach(var pair in fields)
                     Check.Equal(pair.Value,type.GetField(pair.Key,BindingFlags.NonPublic|BindingFlags.Public|BindingFlags.Instance)!.GetValue(loaded)!,"in-flight "+kind+" retains "+pair.Key);
             }));
+        yield return new("PsionicProjection.LegacyStormSegments",r=>SpiritRebirthRitualTransactionTests.Run(r,c=>{
+            using var fixture=new Fixture(r,c);
+            using var material=new Patch(typeof(MaterialPool).GetMethod("MatFrom",[typeof(string),typeof(UnityEngine.Shader)])!,nameof(CancelNative));
+            var type=typeof(FlyingObject_PsionicStorm);
+            var near=new UnityEngine.Vector3(35.5f,0,19.5f);
+            var far=new UnityEngine.Vector3(35.5f,0,39.5f);
+            var home=new UnityEngine.Vector3(35.5f,0,9.5f);
+            foreach(int phase in new[]{0,1,2,3,4})foreach(int sign in new[]{-1,1}){
+                var shot=new FlyingObject_PsionicStorm();
+                var start=phase<=1?near:new UnityEngine.Vector3(38.184658f,0,36.450264f);
+                var end=start+new UnityEngine.Vector3(sign,0,0);
+                Set(shot,"nearApex",near);Set(shot,"farApex",far);Set(shot,"trueOrigin",home);
+                Set(shot,"destination",phase==4?home:phase==3||phase==0?near:end);
+                Set(shot,"curvePoints",phase==0?new List<UnityEngine.Vector3>():new List<UnityEngine.Vector3>{start,end});
+                type.GetMethod("RestoreLegacyPhase",BindingFlags.Instance|BindingFlags.NonPublic)!.Invoke(shot,null);
+                Check.Equal(phase,(int)type.GetField("stage",BindingFlags.Instance|BindingFlags.NonPublic)!.GetValue(shot)!,"old segment resumes its original phase");
+                Check.Equal(phase==0?40f:phase==4?25f:10f,(float)type.GetField("speed",BindingFlags.Instance|BindingFlags.NonPublic)!.GetValue(shot)!,"phase speed restored");
+                if(phase==1)Check.Equal(sign*90f,(float)type.GetField("curveAngle",BindingFlags.Instance|BindingFlags.NonPublic)!.GetValue(shot)!,"second arc preserves orbit direction");
+            }
+        }));
         yield return new("PsionicProjection.InFlightBlastSave",r=>SpiritRebirthRitualTransactionTests.Run(r,c=>{
             using var held=new Fixture(r,c);
             using var material = new Patch(typeof(MaterialPool).GetMethod("MatFrom", [typeof(string),typeof(UnityEngine.Shader)])!, nameof(CancelNative));
