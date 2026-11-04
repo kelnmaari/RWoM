@@ -1,4 +1,4 @@
-﻿using RimWorld;
+using RimWorld;
 using System;
 using System.Linq;
 using System.Collections.Generic;
@@ -386,6 +386,7 @@ namespace TorannMagic
                 {
                     SoundStarter.PlayOneShot(expr_C8, new TargetInfo(this.ExactPosition.ToIntVec3(), this.Map, false));
                 }
+                if (projectile_AbilityBase is Projectile_PsionicBlast blast) blast.Prepare(this.pawn, this.pawn, true);
                 projectile_AbilityBase.Launch(this.pawn, TorannMagicDefOf.TM_PsionicBlast, drawPos, launchTarget, ProjectileHitFlags.All, false, null, null, null, null);
         }
 

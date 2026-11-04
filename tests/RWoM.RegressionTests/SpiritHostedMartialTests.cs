@@ -220,6 +220,23 @@ internal static partial class SpiritMapCollapseTests
                 native.AbilityData.AllPowers=null;
                 Check.Equal(true,find.Invoke(null,[c.Creator,c.Original,order])==null,"native barrier takes precedence");
             }));
+        yield return new("PsionicProjection.InFlightBlastSave",r=>SpiritRebirthRitualTransactionTests.Run(r,c=>{
+            using var held=new Fixture(r,c);
+            using var material = new Patch(typeof(MaterialPool).GetMethod("MatFrom", [typeof(string),typeof(UnityEngine.Shader)])!, nameof(CancelNative));
+            var type=typeof(MightAbility).Assembly.GetType("TorannMagic.Projectile_PsionicBlast",true)!;
+            var def=(ThingDef)RuntimeHelpers.GetUninitializedObject(typeof(ThingDef));
+            def.defName="RegressionPsiRound";def.thingClass=type;def.category=ThingCategory.Projectile;def.comps=[];
+            DefDatabase<ThingDef>.Add(def);
+            var shot=(Projectile_AbilityBase)Activator.CreateInstance(type)!;
+            shot.def=def;shot.thingIDNumber=19889;shot.usedTarget=shot.intendedTarget=IntVec3.Zero;
+            Set(shot,"launcher",c.Creator);
+            foreach(float factor in new[]{1.73f,0f}){
+                Set(shot,"damageFactor",factor);
+                shot=RoundTripSummon(r,"psionic-in-flight-"+(factor==0f?"zero":"trained"),shot,c.Creator);
+                Check.Same(c.Creator,shot.Launcher,"physical launcher retained");
+                Check.Equal(factor,(float)type.GetField("damageFactor",BindingFlags.NonPublic|BindingFlags.Instance)!.GetValue(shot)!,"snapshotted factor, including zero, survives load");
+            }
+        }));
         yield return new("PsionicProjection.BlastSpreadAtMapEdge",_=>{
             var verbType=typeof(MightAbility).Assembly.GetType("TorannMagic.Verb_PsionicBlast",true)!;
             var constrain=verbType.GetMethod("ConstrainSpread",BindingFlags.NonPublic|BindingFlags.Static);
