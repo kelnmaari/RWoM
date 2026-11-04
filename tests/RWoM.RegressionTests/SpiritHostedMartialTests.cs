@@ -237,6 +237,25 @@ internal static partial class SpiritMapCollapseTests
             Check.Equal(53f,energy.Severity,"initial twenty comes from original soul");
             } finally {TorannMagicDefOf.TM_PsionicHD=previous;}
         }));
+        yield return new("PsionicProjection.CrucibleSoulPayment",r=>SpiritRebirthRitualTransactionTests.Run(r,c=>{
+            using var fixture=new Fixture(r,c);
+            var prior=TorannMagicDefOf.TM_PsionicHD;
+            try {
+                TorannMagicDefOf.TM_PsionicHD=new HediffDef{defName="CrucibleSourceTest",hediffClass=typeof(Hediff),maxSeverity=200};
+                foreach(var pawn in new[]{c.Creator,c.Original}){
+                    pawn.health.hediffSet.hediffs.Add(new Hediff{def=TorannMagicDefOf.TM_PsionicHD,pawn=pawn,Severity=100});
+                }
+                var bound=typeof(JobDriver_PsionicCrucible).GetMethod("Bound",BindingFlags.NonPublic|BindingFlags.Static)!;
+                Check.Equal(true,(bool)bound.Invoke(null,[c.Creator,c.Original])!,"actual carrier accepted");
+                Check.Equal(false,(bool)bound.Invoke(null,[c.Original,c.Creator])!,"unrelated reverse binding rejected");
+                Check.Equal(true,(bool)bound.Invoke(null,[c.Creator,c.Creator])!,"native caster accepted");
+                var job=new Job{targetC=c.Original};
+                var driver=new JobDriver_PsionicCrucible{pawn=c.Creator,job=job};
+                typeof(JobDriver_PsionicCrucible).GetMethod("Charge",BindingFlags.NonPublic|BindingFlags.Instance)!.Invoke(driver,[.6f,0f]);
+                Check.Equal(true,Math.Abs(40f-c.Original.health.hediffSet.GetFirstHediffOfDef(TorannMagicDefOf.TM_PsionicHD).Severity)<.0001f,"original soul pays psi");
+                Check.Equal(100f,c.Creator.health.hediffSet.GetFirstHediffOfDef(TorannMagicDefOf.TM_PsionicHD).Severity,"physical host pool untouched");
+            } finally {TorannMagicDefOf.TM_PsionicHD=prior;}
+        }));
         yield return new("PsionicProjection.FlightEnergyCosts",r=>SpiritRebirthRitualTransactionTests.Run(r,c=>{
             using var fixture=new Fixture(r,c);
             var cost=Production("PsionicDashCast").GetMethod("PsiCost",BindingFlags.NonPublic|BindingFlags.Static)!;

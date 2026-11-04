@@ -63,6 +63,7 @@ namespace TorannMagic.ClassProgression
             else if (PsionicDashCast.Handles(job)) def=job==PsionicDashCast.StormOrder ? TorannMagicDefOf.TM_PsionicStorm : TorannMagicDefOf.TM_PsionicDash;
             else if (job == Verb_Transpose.Order) def=TorannMagicDefOf.TM_Transpose;
             else if (job == Verb_Reversal.Order) def=TorannMagicDefOf.TM_Reversal;
+            else if (job == PsionicCrucibleAbility.JobName) def=DefDatabase<TMAbilityDef>.GetNamedSilentFail("TM_PsionicKineticCrucible");
             else if (job == RangerHuntAbility.JobName) def = DefDatabase<TMAbilityDef>.GetNamedSilentFail("TM_RangerBreakthrough");
             else if (job == SniperOpeningAbility.JobName) def = DefDatabase<TMAbilityDef>.GetNamedSilentFail("TM_SniperSingleOpening");
             else if (job == Aimed || job == Fracture) def = DefDatabase<TMAbilityDef>.GetNamedSilentFail(job == Aimed ? "TM_SniperAimedShot" : "TM_SniperArmorFracture");
@@ -96,6 +97,7 @@ namespace TorannMagic.ClassProgression
             var def = ability.mightDef;
             var might = ability.MightUser;
             if (job == BladeFormAbility.JobName) return ability is BladeFormAbility && JobDriver_BladeSevenSteps.Ready(body,ability.Pawn);
+            if (job == PsionicCrucibleAbility.JobName) return ability is PsionicCrucibleAbility && JobDriver_PsionicCrucible.ReadyFrom(body,ability.Pawn);
             if (job == RangerHuntAbility.JobName) return ability is RangerHuntAbility && JobDriver_RangerBreakthrough.Ready(body,ability.Pawn);
             if (job == SniperOpeningAbility.JobName) return ability is SniperOpeningAbility opening &&
                 JobDriver_SniperSingleOpening.Ready(body, opening.Pawn) && opening.VerbFor(body).HasCompatibleWeapon;
@@ -281,6 +283,14 @@ namespace TorannMagic.ClassProgression
                             body.jobs.TryTakeOrderedJob(JobMaker.MakeJob(job,body,soul),JobTag.Misc);
                     }};
                 if(body.CurJobDef==job || !JobDriver_LastCircle.ReadyFrom(body,soul))cmd.Disable("TM_SpiritRebirthCastUnavailable".Translate());
+                yield return cmd;
+            }
+            if (Find(body,soul,PsionicCrucibleAbility.JobName) is PsionicCrucibleAbility crucible)
+            {
+                var job=DefDatabase<JobDef>.GetNamed(PsionicCrucibleAbility.JobName);
+                var cmd=new Command_Action{defaultLabel=crucible.Def.LabelCap,defaultDesc=crucible.Def.description,icon=crucible.Def.uiIcon,
+                    action=()=>{if(body.CurJobDef!=job && Ready(body,crucible,PsionicCrucibleAbility.JobName))crucible.ChooseFrom(body);}};
+                if(body.CurJobDef==job || !Ready(body,crucible,PsionicCrucibleAbility.JobName))cmd.Disable("TM_SpiritRebirthCastUnavailable".Translate());
                 yield return cmd;
             }
             var cleave = GladiatorMastery.AutomaticSource(body,body.GetCompAbilityUserMight());

@@ -47,7 +47,9 @@ namespace TorannMagic.ClassProgression
         internal static float ProjectileCost(Pawn pawn,float original) => Path(pawn) is DisciplineProgress { MartialAlternate:false } ? original*.9f : original;
         internal static float BlastFactor(Pawn pawn) => Path(pawn) is DisciplineProgress p ? (p.MartialAlternate ? 1.08f : .90f) : 1f;
         internal static bool Quiet(Pawn pawn) => Read(Path(pawn)) is PsionicProgress progress &&
-            (pawn.jobs?.curDriver is JobDriver_PsionicCrucible || progress.DisruptedUntil>Find.TickManager.TicksGame);
+            (pawn.jobs?.curDriver is JobDriver_PsionicCrucible ||
+                SpiritRebirthState.TryGet(pawn,out var soul) && soul.HasValidHost(pawn) && soul.Host?.jobs?.curDriver is JobDriver_PsionicCrucible hosted && hosted.SkillOwner==pawn ||
+                progress.DisruptedUntil>Find.TickManager.TicksGame);
         internal override bool SupportsBook(ThingDef book) => book?.defName==Book &&
             !TM_ClassUtility.CustomClasses.Any(c=>c!=null && (c.fullScript?.defName==Book || c.tornScript?.defName==Book));
         internal static bool CanAwaken(Pawn pawn)
