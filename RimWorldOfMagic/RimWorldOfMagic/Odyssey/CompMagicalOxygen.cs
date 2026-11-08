@@ -82,7 +82,9 @@ namespace TorannMagic.Odyssey
                 outputMode = Enum.IsDefined(typeof(OxygenOutputMode), value) ? value : OxygenOutputMode.Atmosphere;
             }
         }
-        public bool PipeNetworkAvailable => VgeOxygenBridge.Available(parent);
+        // Only one output owns a pulse; duplicate comps must not duplicate supply.
+        private IMagicalOxygenOutput PipeOutput => parent?.AllComps?.OfType<IMagicalOxygenOutput>().FirstOrDefault();
+        public bool PipeNetworkAvailable => PipeOutput?.Available == true;
         public double PendingPipeOxygen => pendingPipeOxygen;
         public override void CompTick() => TickPipeOutput();
         public override void CompTickInterval(int delta) => TickPipeOutput();
@@ -92,7 +94,7 @@ namespace TorannMagic.Odyssey
             int now = Find.TickManager.TicksGame;
             if (now < 0 || (lastPipeTick < 0 ? now < Props.pulseInterval : (long)now - lastPipeTick < Props.pulseInterval)) return;
             lastPipeTick = now;
-            VgeOxygenBridge.Supply(this, ref pendingPipeOxygen);
+            PipeOutput?.Supply(this, ref pendingPipeOxygen);
         }
         public CompProperties_MagicalOxygen Props => (CompProperties_MagicalOxygen)props;
         public OxygenSupplyMode SupplyMode { get => supplyMode; set => supplyMode = Enum.IsDefined(typeof(OxygenSupplyMode), value) ? value : OxygenSupplyMode.Mana; }

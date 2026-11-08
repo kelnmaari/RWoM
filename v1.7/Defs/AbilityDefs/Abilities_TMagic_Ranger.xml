@@ -67,7 +67,7 @@ Tame and train animal +12%, butchering speed +20%, smelting and construction spe
   <modExtensions>
 <li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_rangertraining</spellId>
-<domain>Magic</domain>
+<domain>Might</domain>
 <tier>0</tier>
 </li>
 </modExtensions>
@@ -115,7 +115,7 @@ Level 3: Hearing and Sight +80%, Breathing +25%, Blood filtration +10%, +80% bow
   <modExtensions>
 <li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_bowtraining</spellId>
-<domain>Magic</domain>
+<domain>Might</domain>
 <tier>0</tier>
 </li>
 </modExtensions>
@@ -158,7 +158,7 @@ Enemies caught in the poison will take 1-8 poison damage every 0.66 seconds. Poi
     <modExtensions>
 <li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_poisontrap</spellId>
-<domain>Magic</domain>
+<domain>Might</domain>
 <tier>0</tier>
 </li>
 </modExtensions>
@@ -205,7 +205,7 @@ A bond can be removed by using this ability on a bonded creature.</description>
     <modExtensions>
 <li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_animalfriend</spellId>
-<domain>Magic</domain>
+<domain>Might</domain>
 <tier>0</tier>
 </li>
 </modExtensions>
@@ -264,7 +264,7 @@ Range: 32</description>
     <modExtensions>
 <li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_arrowstorm</spellId>
-<domain>Magic</domain>
+<domain>Might</domain>
 <tier>0</tier>
 </li>
 </modExtensions>
@@ -305,7 +305,7 @@ Range: 34</description>
     <modExtensions>
 <li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_arrowstorm_i</spellId>
-<domain>Magic</domain>
+<domain>Might</domain>
 <tier>1</tier>
 </li>
 </modExtensions>
@@ -346,7 +346,7 @@ Range: 36</description>
     <modExtensions>
 <li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_arrowstorm_ii</spellId>
-<domain>Magic</domain>
+<domain>Might</domain>
 <tier>2</tier>
 </li>
 </modExtensions>
@@ -387,7 +387,7 @@ Range: 38</description>
     <modExtensions>
 <li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_arrowstorm_iii</spellId>
-<domain>Magic</domain>
+<domain>Might</domain>
 <tier>3</tier>
 </li>
 </modExtensions>

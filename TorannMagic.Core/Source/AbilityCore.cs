@@ -1,62 +1,69 @@
+using System;
 using System.Collections.Generic;
-using RimWorld;
+using System.Collections.ObjectModel;
 using Verse;
 
 namespace TorannMagic.Core
 {
-    // Central resolver: stable spellId → current Def. Rebuilt whenever the def
-    // database changes; lookups never throw (missing = null = "dormant").
     public static class AbilityCore
     {
-        private static Dictionary<string, Def> _byId;
+        private static Dictionary<string, Def> byId;
+        private static IReadOnlyDictionary<string, Def> view;
+        // Keep names rather than Def instances across database reloads.
+        private static readonly Dictionary<string, (Type type, string name)> aliases = new();
 
-        public static void Invalidate() => _byId = null;
+        public static void Invalidate()
+        {
+            byId = null;
+            view = null;
+        }
 
-        // Host-mod registration for convention ids (and any other late id).
-        // Extension ids take precedence: the registry is always rebuilt (and
-        // extension ids indexed) before the first registration lands, and an
-        // existing key is never overwritten.
         public static void Register(string spellId, Def def)
         {
-            if (spellId == null || def == null) return;
-            if (_byId == null) Rebuild();
-            if (!_byId.ContainsKey(spellId)) _byId[spellId] = def;
+            if (string.IsNullOrWhiteSpace(spellId) || string.IsNullOrEmpty(def?.defName)) return;
+            EnsureRegistry();
+            if (Add(spellId, def))
+                aliases[spellId] = (def.GetType(), def.defName);
         }
 
-        public static Def Resolve(string spellId)
-        {
-            var reg = Registry;
-            return reg != null && spellId != null && reg.TryGetValue(spellId, out var def) ? def : null;
-        }
+        public static Def Resolve(string spellId) => TryResolve(spellId, out var def) ? def : null;
 
         public static bool TryResolve(string spellId, out Def def)
         {
-            var reg = Registry;
-            if (reg != null && spellId != null && reg.TryGetValue(spellId, out def)) return true;
-            def = null; return false;
+            def = null;
+            if (string.IsNullOrWhiteSpace(spellId)) return false;
+            EnsureRegistry();
+            return byId.TryGetValue(spellId, out def);
         }
 
         public static IReadOnlyDictionary<string, Def> Registry
         {
-            get
-            {
-                if (_byId == null) Rebuild();
-                return _byId;
-            }
+            get { EnsureRegistry(); return view; }
         }
 
-        private static void Rebuild()
+        private static bool Add(string id, Def def)
         {
-            _byId = new Dictionary<string, Def>();
-            foreach (var defType in GenDefDatabase.AllDefTypesWithDatabases())
-            {
-                foreach (var def in GenDefDatabase.GetAllDefsInDatabaseForDef(defType))
+            if (byId.TryAdd(id, def) || ReferenceEquals(byId[id], def)) return true;
+            Log.WarningOnce("[RWoM Core] Duplicate spell ID '" + id + "' on " + def.defName
+                + "; keeping " + byId[id].defName + ".", GenText.StableStringHash("rwom.core.duplicate." + id));
+            return false;
+        }
+
+        private static void EnsureRegistry()
+        {
+            if (byId != null) return;
+            byId = new Dictionary<string, Def>(StringComparer.Ordinal);
+            var current = new Dictionary<(Type, string), Def>();
+            foreach (var type in GenDefDatabase.AllDefTypesWithDatabases())
+                foreach (var def in GenDefDatabase.GetAllDefsInDatabaseForDef(type))
                 {
-                    var ext = def.GetModExtension<SpellIdentityExtension>();
-                    if (ext?.spellId != null && !_byId.ContainsKey(ext.spellId))
-                        _byId[ext.spellId] = def;
+                    if (aliases.Count != 0) current[(def.GetType(), def.defName)] = def;
+                    string id = def.GetModExtension<SpellIdentityExtension>()?.spellId;
+                    if (!string.IsNullOrWhiteSpace(id)) Add(id, def);
                 }
-            }
+            foreach (var alias in aliases)
+                if (current.TryGetValue(alias.Value, out var def)) Add(alias.Key, def);
+            view = new ReadOnlyDictionary<string, Def>(byId);
         }
     }
 }

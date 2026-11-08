@@ -71,7 +71,7 @@ A well trained psionic is able to achieve incredible physical feats using a blen
   <modExtensions>
 <li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_psionicaugmentation</spellId>
-<domain>Magic</domain>
+<domain>Might</domain>
 <tier>0</tier>
 </li>
 </modExtensions>
@@ -133,7 +133,7 @@ This ability requires 2 points to level.</description>
   <modExtensions>
 <li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_psionicbarrier</spellId>
-<domain>Magic</domain>
+<domain>Might</domain>
 <tier>0</tier>
 </li>
 </modExtensions>
@@ -174,7 +174,7 @@ This barrier can be projected to a designation location.</description>
   <modExtensions>
 <li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_psionicbarrier_projected</spellId>
-<domain>Magic</domain>
+<domain>Might</domain>
 <tier>0</tier>
 </li>
 </modExtensions>
@@ -240,7 +240,7 @@ Range:		28</description>
     <modExtensions>
 <li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_psionicblast</spellId>
-<domain>Magic</domain>
+<domain>Might</domain>
 <tier>0</tier>
 </li>
 </modExtensions>
@@ -283,7 +283,7 @@ Range:		34</description>
     <modExtensions>
 <li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_psionicblast_i</spellId>
-<domain>Magic</domain>
+<domain>Might</domain>
 <tier>1</tier>
 </li>
 </modExtensions>
@@ -326,7 +326,7 @@ Range:		40</description>
     <modExtensions>
 <li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_psionicblast_ii</spellId>
-<domain>Magic</domain>
+<domain>Might</domain>
 <tier>2</tier>
 </li>
 </modExtensions>
@@ -369,7 +369,7 @@ Range:		46</description>
     <modExtensions>
 <li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_psionicblast_iii</spellId>
-<domain>Magic</domain>
+<domain>Might</domain>
 <tier>3</tier>
 </li>
 </modExtensions>
@@ -446,7 +446,7 @@ Range:		46</description>
   <modExtensions>
 <li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_psionicdash</spellId>
-<domain>Magic</domain>
+<domain>Might</domain>
 <tier>0</tier>
 </li>
 </modExtensions>
@@ -521,7 +521,7 @@ Range:		46</description>
     <modExtensions>
 <li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_psionicstorm</spellId>
-<domain>Magic</domain>
+<domain>Might</domain>
 <tier>0</tier>
 </li>
 </modExtensions>

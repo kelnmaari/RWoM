@@ -986,7 +986,7 @@ Movement speed: -2.0 c/s</description>
 	
     	
     <ThingDef ParentName="BaseBullet" Class="AbilityUser.ProjectileDef_Ability">
-		<thingClass>AbilityUser.Projectile_Ability</thingClass>
+		<thingClass>TorannMagic.ClassProgression.Projectile_HostedDeathBolt</thingClass>
 	    <defName>Projectile_DeathBolt</defName>
         <label>deathbolt</label>
         <graphicData>
@@ -1004,7 +1004,7 @@ Movement speed: -2.0 c/s</description>
 </ThingDef>
 	
 	<ThingDef ParentName="BaseBullet" Class="AbilityUser.ProjectileDef_Ability">
-		<thingClass>AbilityUser.Projectile_Ability</thingClass>
+		<thingClass>TorannMagic.ClassProgression.Projectile_HostedDeathBolt</thingClass>
 	    <defName>Projectile_DeathBolt_I</defName>
         <label>deathbolt</label>
         <graphicData>
@@ -1022,7 +1022,7 @@ Movement speed: -2.0 c/s</description>
 </ThingDef>
 	
 	<ThingDef ParentName="BaseBullet" Class="AbilityUser.ProjectileDef_Ability">
-		<thingClass>AbilityUser.Projectile_Ability</thingClass>
+		<thingClass>TorannMagic.ClassProgression.Projectile_HostedDeathBolt</thingClass>
 	    <defName>Projectile_DeathBolt_II</defName>
         <label>deathbolt</label>
         <graphicData>
@@ -1040,7 +1040,7 @@ Movement speed: -2.0 c/s</description>
 </ThingDef>
 	
 	<ThingDef ParentName="BaseBullet" Class="AbilityUser.ProjectileDef_Ability">
-		<thingClass>AbilityUser.Projectile_Ability</thingClass>
+		<thingClass>TorannMagic.ClassProgression.Projectile_HostedDeathBolt</thingClass>
 	    <defName>Projectile_DeathBolt_III</defName>
         <label>deathbolt</label>
         <graphicData>

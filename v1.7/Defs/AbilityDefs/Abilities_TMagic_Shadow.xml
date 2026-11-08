@@ -99,7 +99,7 @@
     <modExtensions>
 <li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_shadowstrike</spellId>
-<domain>Magic</domain>
+<domain>Might</domain>
 <tier>0</tier>
 </li>
 </modExtensions>
@@ -147,7 +147,7 @@ This ability requires 30 stamina to maintain and reduces stamina regeneration by
     <modExtensions>
 <li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_nightshade</spellId>
-<domain>Magic</domain>
+<domain>Might</domain>
 <tier>0</tier>
 </li>
 </modExtensions>
@@ -190,7 +190,7 @@ This ability requires 30 stamina to maintain and reduces stamina regeneration by
     <modExtensions>
 <li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_veilofshadows</spellId>
-<domain>Magic</domain>
+<domain>Might</domain>
 <tier>0</tier>
 </li>
 </modExtensions>

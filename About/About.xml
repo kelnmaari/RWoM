@@ -66,34 +66,69 @@
 	<loadBefore>
 		<li>rwmt.MultiplayerCompatibility</li>
 	</loadBefore>
-	<description>[h1]Unofficial RimWorld 1.7 update of "A RimWorld of Magic"[/h1]
+	<description><![CDATA[[img]https://images.steamusercontent.com/ugc/10172696784972477713/0CF87253012F99C7FB2AF528749B60D513BFECEC/[/img]
 
-[b][ENGLISH][/b]
-Unofficial continuation of TorannD's "A RimWorld of Magic" for RimWorld 1.7. All credit for the original goes to [url=https://steamcommunity.com/sharedfiles/filedetails/?id=1201382956]TorannD[/url] — port of [url=https://github.com/TorannD/RWoM]the original code[/url], continued as [url=https://github.com/kelnmaari/RWoM]a fork[/url].
-[i]If the original author wants this item removed from the Workshop, contact me via DM or comments — it will be taken down.[/i]
+[b]Magic for your colony[/b]
+Mages, warriors, summons, scrolls, staves and enchanted equipment. Odyssey adds magical ships, mana networks, life support and shields.
 
-[olist]
-[*]HugsLib dependency removed — its duties (147 Harmony patches, update notes) are handled by the mod itself.
-[*]The JecsTools-family libraries (AbilityUser, AbilityUserAI, CompDeflector, etc.) are no longer bundled — the mod now depends on Zaljerem's [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3312959701]JecsLite - A RimWorld of Magic[/url] (rebuilt for 1.7).
-[*]Fixed 1.7 regressions: LineOfSight default flip (autocast, Blink/Summon through walls, missing cooldowns), greyed-out ability icons, broken reflected shots, attribute patches (117 classes / 153 methods).
-[*][b]Multiplayer support[/b] built in — needs the 1.7 MP fork: [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3820003322](1.7)Multiplayer-temp[/url]. Ability casts, cooldowns and gizmos are synced.
-[*][b]Isekai family compatibility[/b] (optional; see the Leveling limitation below):
-[olist]
-[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=3657580708]ISEKAI RPG LEVELING[/url] — native integration by Jelly Creative. [b]Known limitation:[/b] the tested XML gate requires the exact name "A RimWorld of Magic" and does not recognize this fork's display name, so its RoM bonuses do not activate. Once recognition is fixed and verified, native bonuses cover mana/stamina capacity and regeneration, cooldowns and resource costs. No duplicate bonus layer is added here.
-[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=3813394602]ISEKAI DUNGEONS ADD-ON[/url] — 4 magic gates: Flame Rift, Tide Rift, Bone Crypt, Demon Gate (C–S) with RWoM creatures; auto-join gate spawns, guild contracts and scrolls.
-[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=3757560461]CREATURES[/url] and [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3718568958]GUILD FACTION[/url] add-ons — coexist; RWoM creatures appear in dungeons and guild contracts.
-[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=3800773705]RIM ISEKAI — Complete Integrated[/url] — clean coexistence verified.
-[/olist]
-[*]New character window (Grimoire): class levels, XP/mana/stamina bars with real regen rates, full spell list with descriptions and per-skill upgrade explanations, resources panel.
-[*]Debug menu: "T: Give Class..." grants any class to a selected pawn.
-[*]Bundled translations: [url=https://steamcommunity.com/sharedfiles/filedetails/?id=2882739907]Russian, Ukrainian, Portuguese (based on Nevelian's translation)[/url].
-[/olist]
+[img]https://images.steamusercontent.com/ugc/15284087167230911780/B4EDF06D1C3DCFE3CBFF2ED7C82AEF12BC7A76C8/[/img]
 
-[i]Load order: Harmony → this mod; the MP fork goes before it. Requires [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3312959701]JecsLite - A RimWorld of Magic[/url]; do NOT enable the original JecsTools alongside.[/i]
+[b]Classes & skills[/b]
+36 base progression paths and 200+ spell/skill families, grouping ranks. Addon classes are extra. Spirit rebirth is a separate ritual path.
 
-[b]Regarding the use of AI in modding:
-I am a full-time developer and IT engineer. My primary programming languages ​​are Golang, Node.js, and Python. I incorporate AI into both my daily work and my personal life. Beyond AI, I rely on my own intellect to structure workflows for coding and to address broader architectural challenges. I do not use AI in a "YOLO" (reckless/unthinking) fashion. But if you are not comfortable using mods created or developed with the help of AI, then please pass by..[/b] I fixed this mod for myself and decided to share it. If you have a problem, create a Discussion here — the code is on [url=https://github.com/kelnmaari/RWoM]GitHub[/url].
+[img]https://images.steamusercontent.com/ugc/13924547871489888852/C358ED5524C6DA83EF3F6C3E6EEB0315F262554E/[/img]
 
-[b]This mod contains AI-generated assets. If you are able to help create proper ones, please reach out to me via private message.[/b]
-</description>
+[b]New progression · optional beta[/b]
+Books unlock class stages; practical trials lead to mastery and ascension. The Grimoire shows resources and requirements. Existing progression is retained; class addons stay classic.
+
+[img]https://images.steamusercontent.com/ugc/16867629445839424729/09D218B0FFC71EC75B5B04C06C230C25AA19A7B7/[/img]
+
+[b]Spirit gameplay[/b]
+An ascended Necromancer can return a deceased colonist as a Spirit. Keep identity and progression; use former class skills through a host. Soul Stones allow recovery: one week in a new host.
+
+[img]https://images.steamusercontent.com/ugc/15915068878910789735/FAA567AAB25035E0E225B07F1F583E15EB2B680C/[/img]
+
+[b]Optional integrations[/b]
+VGE 1/2, VPE/VEF, Kure, HAR, Pawnmorpher, Giddy-Up, Simple Sidearms, Multiplayer, MedPod, Hellsing, Isekai Dungeons and Logging Framework.
+
+[h2]Important · RimWorld 1.7[/h2]
+Requires: [url=https://steamcommunity.com/sharedfiles/filedetails/?id=2009463077]Harmony[/url] · [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3312959701]JecsLite[/url] · [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3833946439]RWoM Core[/url]
+Optional adapters: [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3833946677]RWoM Integrations[/url]. Install matching package releases; load Integrations after Content and its target mods. Do not combine JecsLite with original JecsTools.
+
+Beta progression is off by default; changing it requires a restart. Keep save backups. DLC is only needed for its features; space content requires Odyssey. Keep Integrations enabled on VGE saves that use its components.
+
+[b]Compatibility:[/b] Multiplayer coverage varies by ability/mod setup. Full CE compatibility is unverified, including Techno Weapon and Super Soldier specializations. ISEKAI RPG LEVELING's tested name gate does not recognize this fork.
+
+Report bugs in Discussions with versions, class, progression mode, steps and Player.log. Saves help with load-related issues. [url=https://github.com/kelnmaari/RWoM]GitHub[/url]
+
+Prefer RWoM 1.7 closer to the original, without my reworks? [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3828893021]Use this alternative fork[/url].
+
+[h2]Credits[/h2]
+[url=https://steamcommunity.com/sharedfiles/filedetails/?id=1201382956]TorannD[/url] — original creator
+HUGINN — continuation
+Zaljerem — JecsLite
+Nevelian and contributors — translations.
+
+Developed with Torann's permission and support. AI assists development and some artwork.
+
+[b]Original contributors[/b]
+[list]
+[*]KuanKuan — Chinese translation.
+[*]Caferino — Spanish translation.
+[*]Felinoel — Wiki.
+[*]DrMrEd — Elemental art.
+[*]SihvMan — Writable scrolls and books.
+[*]Draegon — Wand art.
+[*]Diannetea — Poppi art.
+[*]Angry Wizard — UI icons.
+[*]Trisscar — Gemcutting workbench and Succubus wings.
+[*]Crustypeanut — Raw magicyte, class icons and world icon art.
+[*][url=https://www.patreon.com/Rebelrot]Rebelrot(AvP)[/url] — Staff of the Defender, Staff of Blazing Power and magic wand art.
+[*]ZE — Testing.
+[*]Bendigeidfran — Various sound effects.
+[*]Kasmex Forever — Royal Armor, world icons, books and scrolls, Thrumbo weapons and various spell effects.
+[*]Control Assuming Director — Minion art.
+[*]Kolton — Optimization.
+[/list]
+]]></description>
 </ModMetaData>

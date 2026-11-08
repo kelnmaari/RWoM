@@ -23,6 +23,8 @@ namespace TorannMagic.ClassProgression
         private RaidPhase phase;
         private int arrivalTick = -1, deadlineTick = -1;
         private bool arrivalCommitted, combatResolved, rewardTransferred;
+        internal bool ElementalRift;
+        private Thing riftMarker;
         private ThingOwner<Thing> reward;
 
         public QuestPart_ClassTomeRaid() { reward = new ThingOwner<Thing>(this); }
@@ -55,6 +57,7 @@ namespace TorannMagic.ClassProgression
             phase = RaidPhase.Preparing;
             arrivalTick = Find.TickManager.TicksGame + PreparationTicks;
             base.Enable(args);
+            if (ElementalRift && !OpenRift()) Fail();
         }
 
         public override void QuestPartTick()
@@ -75,6 +78,30 @@ namespace TorannMagic.ClassProgression
             return pawn.Dead || pawn.Downed || pawn.IsPrisonerOfColony || pawn.MapHeld != map || !pawn.HostileTo(Faction.OfPlayer);
         }
 
+        private bool OpenRift()
+        {
+            Map map=mapParent?.Map;
+            var def=DefDatabase<ThingDef>.GetNamedSilentFail(TomeElementalRift.Marker);
+            if(map==null || def==null || !map.IsPlayerHome || attackers.Count==0) return false;
+            var parms=new IncidentParms {target=map,faction=attackers[0].Faction};
+            if (!PawnsArrivalModeDefOf.EdgeWalkIn.Worker.TryResolveRaidSpawnCenter(parms)) return false;
+            var cells=TomeElementalRift.Cells(map,parms.spawnCenter,1);
+            if (cells.Count==0) return false;
+            try
+            {
+                riftMarker=ThingMaker.MakeThing(def);
+                GenSpawn.Spawn(riftMarker,cells[0],map);
+                return riftMarker.Spawned;
+            }
+            catch (Exception e) { Compatibility.TM_Log.Warning("Mastery rift placement interrupted: "+e); return false; }
+        }
+
+        private void CloseRift()
+        {
+            if (riftMarker != null && !riftMarker.Destroyed) riftMarker.Destroy(DestroyMode.Vanish);
+            riftMarker=null;
+        }
+
         private void Arrive(int now)
         {
             if (arrivalCommitted) { Fail(); return; }
@@ -83,15 +110,31 @@ namespace TorannMagic.ClassProgression
                 attackers.Any(p => p == null || p.Dead || p.Spawned || p.Faction == null || !p.HostileTo(Faction.OfPlayer)))
             { Fail(); return; }
             var parms = new IncidentParms { target = map, faction = attackers[0].Faction, spawnCenter = IntVec3.Invalid,
-                raidArrivalMode = PawnsArrivalModeDefOf.EdgeWalkIn };
-            var worker = PawnsArrivalModeDefOf.EdgeWalkIn.Worker;
-            if (!worker.CanUseOnMap(map) || !worker.TryResolveRaidSpawnCenter(parms)) { Fail(); return; }
+                raidArrivalMode = ElementalRift ? null : PawnsArrivalModeDefOf.EdgeWalkIn };
+            var worker = ElementalRift ? null : PawnsArrivalModeDefOf.EdgeWalkIn.Worker;
+            List<IntVec3> cells = null;
+            if (ElementalRift)
+            {
+                if (riftMarker?.Spawned != true || riftMarker.Map != map) { Fail(); return; }
+                cells = TomeElementalRift.Cells(map,riftMarker.Position,attackers.Count);
+                if(cells.Count != attackers.Count) { Fail(); return; }
+            }
+            else if (!worker.CanUseOnMap(map) || !worker.TryResolveRaidSpawnCenter(parms)) { Fail(); return; }
             // Commit before calling native arrival: callback exceptions must never spawn another group.
             arrivalCommitted = true;
             bool arrived = false;
             try
             {
-                worker.Arrive(attackers, parms);
+                if (ElementalRift)
+                {
+                    for(int i=0;i<attackers.Count;i++)
+                    {
+                        if (!TomeElementalRift.Empty(map,cells[i])) break;
+                        GenSpawn.Spawn(attackers[i],cells[i],map);
+                    }
+                    CloseRift();
+                }
+                else worker.Arrive(attackers, parms);
                 arrived = attackers.All(p => p.Spawned && p.Map == map);
             }
             catch (Exception e) { Log.Error("[RWoM] Tome raid arrival failed: " + e); }
@@ -198,6 +241,7 @@ namespace TorannMagic.ClassProgression
         {
             if (!BlocksMap) return;
             phase = RaidPhase.Failed;
+            CloseRift();
             DelayNextRequest();
             quest?.End(QuestEndOutcome.Fail);
         }
@@ -209,13 +253,14 @@ namespace TorannMagic.ClassProgression
             if (BlocksMap) { phase = RaidPhase.Cancelled; DelayNextRequest(); }
             // WorldPawns owns generated unspawned bodies. Releasing the reservation lets
             // native world-pawn cleanup discard them without deleting a retreated survivor.
+            CloseRift();
             if (!RewardPending) attackers.Clear();
             base.Cleanup();
         }
 
         public override IEnumerable<GlobalTargetInfo> QuestLookTargets
         {
-            get { if (mapParent != null) yield return mapParent; }
+            get { if (riftMarker?.Spawned == true) yield return riftMarker; else if (mapParent != null) yield return mapParent; }
         }
 
         public override void ExposeData()
@@ -226,6 +271,8 @@ namespace TorannMagic.ClassProgression
             Scribe_Defs.Look(ref rewardDef, "rewardDef");
             Scribe_References.Look(ref mapParent, "mapParent");
             Scribe_Collections.Look(ref attackers, "attackers", LookMode.Reference);
+            Scribe_Values.Look(ref ElementalRift, "elementalRift");
+            Scribe_References.Look(ref riftMarker, "masteryRiftMarker");
             Scribe_Values.Look(ref phase, "raidPhase", RaidPhase.Offered);
             Scribe_Values.Look(ref arrivalTick, "arrivalTick", -1);
             Scribe_Values.Look(ref deadlineTick, "deadlineTick", -1);

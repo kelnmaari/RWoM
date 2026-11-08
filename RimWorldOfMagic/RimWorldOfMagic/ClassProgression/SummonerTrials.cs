@@ -40,25 +40,41 @@ namespace TorannMagic.ClassProgression
         public enum Spell { Minion, Pylon, Explosive }
         public sealed class Tag : IExposable
         {
-            public int casterId;
+            public int casterId, bodyId;
             public Spell spell;
             public Pawn caster, victim;
             public void ExposeData()
             {
-                Scribe_Values.Look(ref casterId, "casterId", 0); Scribe_Values.Look(ref spell, "spell");
+                Scribe_Values.Look(ref casterId, "casterId", 0); Scribe_Values.Look(ref bodyId, "bodyId", 0); Scribe_Values.Look(ref spell, "spell");
                 Scribe_References.Look(ref caster, "caster"); Scribe_References.Look(ref victim, "victim");
             }
         }
         static TMAbilityDef Ability(Spell spell) => spell == Spell.Minion ? TorannMagicDefOf.TM_SummonMinion : spell == Spell.Pylon ? TorannMagicDefOf.TM_SummonPylon : TorannMagicDefOf.TM_SummonExplosive;
         static string ProjectileName(Spell spell) => spell == Spell.Minion ? "Projectile_SummonMinion" : spell == Spell.Pylon ? "Projectile_SummonPylon" : "Projectile_SummonExplosive";
+        static bool TrySpell(ThingDef projectile, out Spell spell)
+        {
+            switch (projectile?.defName)
+            {
+                case "Projectile_SummonMinion": spell = Spell.Minion; return true;
+                case "Projectile_SummonPylon": spell = Spell.Pylon; return true;
+                case "Projectile_SummonExplosive": spell = Spell.Explosive; return true;
+                default: spell = default; return false;
+            }
+        }
         static bool Matches(AbilityUser.AbilityDef ability, Spell spell)
         {
             string root = Ability(spell)?.defName;
             return root != null && ability != null && (ability.defName == root || ability.defName == root + "_I" || ability.defName == root + "_II" || ability.defName == root + "_III");
         }
+        static Pawn PhysicalBody(Pawn caster)
+        {
+            if (SpiritRebirthState.TryGet(caster, out var state))
+                return state.HasValidHost(caster) && state.Host.Spawned ? state.Host : null;
+            return caster?.Spawned == true ? caster : null;
+        }
         static DisciplineProgress Owned(Pawn caster, Spell spell)
         {
-            if (caster == null || caster.Dead || !caster.Spawned || caster.Faction == null || caster.story?.traits?.HasTrait(TorannMagicDefOf.Faceless) == true
+            if (caster == null || caster.Dead || PhysicalBody(caster) == null || caster.Faction == null || caster.story?.traits?.HasTrait(TorannMagicDefOf.Faceless) == true
                 || !ClassIdentity.TryGetState(caster, out var state) || (state.Vocation & Vocation.Mage) == 0) return null;
             var path = state.Find("rwom.summoner");
             var stage = spell == Spell.Explosive ? InitiationStage.Adept : InitiationStage.Foundation;
@@ -72,14 +88,7 @@ namespace TorannMagic.ClassProgression
         public static Tag BeginLaunch(Verb_UseAbility verb, ThingDef def)
         {
             var previous = launching; launching = null;
-            Spell spell;
-            switch (def?.defName)
-            {
-                case "Projectile_SummonMinion": spell = Spell.Minion; break;
-                case "Projectile_SummonPylon": spell = Spell.Pylon; break;
-                case "Projectile_SummonExplosive": spell = Spell.Explosive; break;
-                default: return previous;
-            }
+            if (!TrySpell(def, out var spell)) return previous;
             if (!Matches(verb.Ability?.Def, spell) || Owned(verb.CasterPawn, spell) == null) return previous;
             var magic = verb.CasterPawn.AllComps.OfType<CompAbilityUserMagic>().FirstOrDefault();
             if (verb.Ability.AbilityUser == magic && magic.AbilityData.Powers.Any(a => ReferenceEquals(a, verb.Ability)))
@@ -90,6 +99,14 @@ namespace TorannMagic.ClassProgression
         public static void Launched(Projectile_AbilityBase projectile, Thing caster, AbilityUser.AbilityDef ability)
         {
             var tag = launching; launching = null; projectiles.Remove(projectile);
+            var owner = projectile.TryGetComp<CompHostedSummon>()?.Owner;
+            if (owner != null)
+            {
+                if (caster == null || PhysicalBody(owner) != caster) return;
+                if (TrySpell(projectile.def, out var spell) && Matches(ability, spell) && Owned(owner, spell) != null)
+                    projectiles.Add(projectile, new Tag { caster = owner, casterId = owner.thingIDNumber, bodyId = caster.thingIDNumber, spell = spell });
+                return;
+            }
             if (tag != null && tag.casterId == caster?.thingIDNumber && projectile.def?.defName == ProjectileName(tag.spell) && Matches(ability, tag.spell)) projectiles.Add(projectile, tag);
         }
         public static void ExposeProjectile(Projectile_AbilityBase projectile)
@@ -103,16 +120,19 @@ namespace TorannMagic.ClassProgression
         {
             if (projectile == null || thing == null || !thing.Spawned) return;
             projectiles.TryGetValue(projectile, out var tag);
-            var caster = projectile.Caster;
+            var physical = projectile.Caster;
+            var caster = tag?.bodyId > 0 ? tag.caster : physical;
             if (tag == null || tag.spell != spell || tag.casterId != caster?.thingIDNumber || projectile.def?.defName != ProjectileName(spell)
-                || !Matches(projectile.localAbilityDef, spell) || thing.Map != caster.Map || thing.Faction != caster.Faction) return;
+                || !Matches(projectile.localAbilityDef, spell) || physical == null || PhysicalBody(caster) != physical || (tag.bodyId != 0 && tag.bodyId != physical.thingIDNumber)
+                || thing.Map != physical.Map || thing.Faction != caster.Faction) return;
             var path = Owned(caster, spell); if (path == null) return;
+            if (tag.bodyId != 0 && spell != Spell.Minion && thing.TryGetComp<CompSummoned>()?.Spawner != caster) return;
             if (spell == Spell.Minion && thing is TMPawnSummoned minion && minion.Spawner == caster && minion.validSummoning && minion.Temporary && !minion.Dead)
             { if (path.SummonerTrials.Minion != minion) path.SummonerTrials.ControlledTicks = 0; path.SummonerTrials.Minion = minion; path.SummonerTrials.LastActive = false; }
             else if (spell == Spell.Pylon && IsVariant(thing.def?.defName, "DefensePylon") && thing.TryGetComp<CompSummoned>()?.Temporary == true)
             { if (path.SummonerTrials.Pylon != thing) path.SummonerTrials.ControlledTicks = 0; path.SummonerTrials.Pylon = thing; path.SummonerTrials.LastActive = false; }
             else if (spell == Spell.Explosive && thing is Building_ExplosiveProximityTrap mine && IsVariant(thing.def?.defName, "TM_ManaMine") && thing.TryGetComp<CompSummoned>()?.Temporary == true)
-            { mines.Remove(mine); mines.Add(mine, new Tag { caster = caster, casterId = caster.thingIDNumber, spell = spell }); }
+            { mines.Remove(mine); mines.Add(mine, new Tag { caster = caster, casterId = caster.thingIDNumber, bodyId = tag.bodyId, spell = spell }); }
         }
         static bool IsVariant(string name, string root) => name == root || name == root + "_I" || name == root + "_II" || name == root + "_III";
         public static void Observe(Pawn caster, int now)
@@ -127,24 +147,32 @@ namespace TorannMagic.ClassProgression
                 }
                 return;
             }
+            var body = PhysicalBody(caster);
             var progress = path.SummonerTrials;
             var minion = progress.Minion; var pylon = progress.Pylon;
-            bool active = Owned(caster, Spell.Pylon) != null && minion != null && !minion.Dead && !minion.Downed && minion.Spawned && minion.Map == caster.Map
+            bool active = Owned(caster, Spell.Pylon) != null && minion != null && !minion.Dead && !minion.Downed && minion.Spawned && minion.Map == body.Map
                 && minion.Spawner == caster && minion.Faction == caster.Faction && minion.validSummoning && minion.Temporary
-                && pylon != null && pylon.Spawned && pylon.Map == caster.Map && pylon.Faction == caster.Faction && pylon.TryGetComp<CompSummoned>()?.Temporary == true;
+                && pylon != null && pylon.Spawned && pylon.Map == body.Map && pylon.Faction == caster.Faction && pylon.TryGetComp<CompSummoned>()?.Temporary == true
+                && (body == caster || pylon.TryGetComp<CompSummoned>().Spawner == caster);
             progress.Observe(active, now);
             if (progress.ControlledTicks >= 600) path.RecordCompletedTrial(FoundationTrialId);
         }
-        static bool Hostile(Pawn caster, Pawn victim) => caster != null && victim != null && !victim.Dead && victim.Spawned && victim.Map == caster.Map && !victim.IsPrisoner && !victim.IsSlave
-            && victim.HostileTo(caster) && (victim.Faction == null ? victim.InAggroMentalState : victim.Faction != caster.Faction && victim.Faction.HostileTo(caster.Faction));
+        static bool Hostile(Tag tag, Building_ExplosiveProximityTrap mine, Pawn victim)
+        {
+            var caster = tag.caster;
+            var body = PhysicalBody(caster);
+            return body != null && (tag.bodyId == 0 ? body == caster : body.thingIDNumber == tag.bodyId && mine.TryGetComp<CompSummoned>()?.Spawner == caster)
+                && victim != null && !victim.Dead && victim.Spawned && victim.Map == body.Map && mine.Map == body.Map && !victim.IsPrisoner && !victim.IsSlave
+                && victim.HostileTo(body) && (victim.Faction == null ? victim.InAggroMentalState : victim.Faction != caster.Faction && victim.Faction.HostileTo(caster.Faction));
+        }
         public static void Triggered(Building_ExplosiveProximityTrap mine, Pawn victim)
         {
-            if (mines.TryGetValue(mine, out var tag) && mine.Spawned && mine.Faction == tag.caster?.Faction && Hostile(tag.caster, victim) && Owned(tag.caster, Spell.Explosive) != null)
+            if (mines.TryGetValue(mine, out var tag) && mine.Spawned && mine.Faction == tag.caster?.Faction && Hostile(tag, mine, victim) && Owned(tag.caster, Spell.Explosive) != null)
                 tag.victim = victim;
         }
         public static void WickStarted(Building_ExplosiveProximityTrap mine, Pawn victim)
         {
-            if (!mines.TryGetValue(mine, out var tag) || tag.victim != victim || victim == null || mine.TryGetComp<CompExplosive>()?.wickStarted != true || mine.Armed || !mine.Spawned || mine.Faction != tag.caster?.Faction || !Hostile(tag.caster, victim)) return;
+            if (!mines.TryGetValue(mine, out var tag) || tag.victim != victim || victim == null || mine.TryGetComp<CompExplosive>()?.wickStarted != true || mine.Armed || !mine.Spawned || mine.Faction != tag.caster?.Faction || !Hostile(tag, mine, victim)) return;
             Owned(tag.caster, Spell.Explosive)?.RecordCompletedTrial(MasteryTrialId);
             tag.victim = null;
         }

@@ -34,7 +34,7 @@
 	<efficiencyReductionPercent>.15</efficiencyReductionPercent>
 	<canCopy>false</canCopy>
     <MainVerb Class="AbilityUser.VerbProperties_Ability">
-        <verbClass>TorannMagic.Verb_SB</verbClass>
+        <verbClass>TorannMagic.Verb_TargetSpiritHost</verbClass>
 			<tooltipShowProjectileDamage>false</tooltipShowProjectileDamage>
 			<tooltipShowExtraDamages>false</tooltipShowExtraDamages>
 			<tooltipShowHediffsToApply>false</tooltipShowHediffsToApply>

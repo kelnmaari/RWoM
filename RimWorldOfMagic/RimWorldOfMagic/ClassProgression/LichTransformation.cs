@@ -33,12 +33,35 @@ namespace TorannMagic.ClassProgression
             if (SpiritRebirthBodyEffects.SuppressFormerBodyEffects(magic?.Pawn)) return;
             if (magic == null || !ClassIdentity.TryGetState(magic.Pawn, out _) || !ClassIdentity.IsLich(magic.Pawn)) return;
             RestoreHealth(magic.Pawn);
+            SetFormPowers(magic);
+        }
+
+        private static MagicPower SetFormPowers(CompAbilityUserMagic magic)
+        {
             var deathBolt = magic.MagicData.MagicPowersN.FirstOrDefault(p => p.TMabilityDefs.Contains(TorannMagicDefOf.TM_DeathBolt));
             if (deathBolt != null) deathBolt.learned = true;
             magic.spell_Flight = true;
             magic.spell_LichForm = false;
             if (magic.AbilityData.Powers.Any(a => a.Def == TorannMagicDefOf.TM_LichForm))
                 magic.RemovePawnAbility(TorannMagicDefOf.TM_LichForm);
+            return deathBolt;
+        }
+
+        // Only an explicit dev grant creates a completed classic form. Loading a
+        // partial old transformation must not teach spells that were never earned.
+        internal static bool GiveClassicDebugForm(CompAbilityUserMagic magic)
+        {
+            var pawn=magic?.Pawn;
+            if (magic?.ExistingMagicData==null || pawn?.story?.traits?.HasTrait(TorannMagicDefOf.Lich)!=true ||
+                ClassIdentity.TryGetState(pawn,out _) || TorannMagicDefOf.TM_LichHD==null) return false;
+            var bolt=SetFormPowers(magic);
+            if (bolt?.abilityDef==null) return false;
+            if (!pawn.health.hediffSet.HasHediff(TorannMagicDefOf.TM_LichHD))
+                HealthUtility.AdjustSeverity(pawn,TorannMagicDefOf.TM_LichHD,.5f);
+            TM_ClassState.AddRuntimeAbility(magic,bolt.abilityDef);
+            TM_ClassState.AddRuntimeAbility(magic,TorannMagicDefOf.TM_Flight);
+            pawn.needs?.AddOrRemoveNeedsAsAppropriate();
+            return true;
         }
 
         public static void RestoreHealth(Pawn pawn)

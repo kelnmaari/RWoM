@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -171,7 +171,9 @@ namespace TorannMagic.ClassProgression
             }
             int now = Find.TickManager.TicksGame;
             if (!SpiritRebirthBody.RetainsNeeds(pawn) || !clock.Observe(now)) return true;
-            SpiritRebirthHealthForm.TryRefreshPending(pawn);
+            if (!pawn.Spawned && now % 30 == 0 && ClassIdentity.TryGetState(pawn, out var progression) &&
+                progression.Find("rwom.summoner")?.Stage == InitiationStage.Foundation)
+                SummonerTrials.Observe(pawn, now);
             if (comp.overdriveBuilding != null && now % Math.Max(1, comp.overdriveFrequency) == 0)
                 comp.ResolveTechnomancerOverdrive();
             if (comp.earthSpriteType != 0 && SpiritRebirthState.TryGet(pawn, out var spriteState) && !spriteState.DepletionPending)
@@ -198,6 +200,8 @@ namespace TorannMagic.ClassProgression
             }
             if (now % 100 == 0) BardTrials.TickHostedInspiration(pawn);
             if (now % 30 == 0) BardTrials.TickHostedHymn(pawn);
+            SpiritHostedAura.TickAuras(pawn);
+            SpiritRebirthHealthForm.TryRefreshPending(pawn);
             TickAbilities(comp, true);
             if (!SpiritRebirthBody.RetainsNeeds(pawn)) return true;
             for (int i = comp.chainedAbilitiesList.Count - 1; i >= 0; i--)
@@ -221,7 +225,10 @@ namespace TorannMagic.ClassProgression
             if (!SpiritRebirthEnergy.Marked(comp.Pawn)) return false;
             if (!SpiritRebirthBody.RetainsNeeds(comp.Pawn) || !clock.Observe(Find.TickManager.TicksGame)) return true;
             HediffComp_Psionic.TickHosted(comp.Pawn);
+            HediffComp_Hate.TickHosted(comp.Pawn);
+            HediffComp_Chi.TickHosted(comp.Pawn);
             TickAbilities(comp, false);
+            if (comp.Pawn.IsHashIntervalTick(150)) comp.Stamina?.NeedInterval();
             for (int i = comp.chainedAbilitiesList.Count - 1; i >= 0; i--)
             {
                 var chain = comp.chainedAbilitiesList[i];

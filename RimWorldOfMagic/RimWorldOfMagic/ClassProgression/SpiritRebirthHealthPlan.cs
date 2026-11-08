@@ -72,6 +72,15 @@ namespace TorannMagic.ClassProgression
         private static bool IsClassResourceMarker(Hediff effect)
         {
             var def = effect.def;
+            // Preserve the existing class stock and its trained capacity on the
+            // original pawn. Do not manufacture a fresh/refilled stock on a host.
+            if (def.defName == "TM_ApothecaryHerbsHD")
+                return effect.GetType() == typeof(Hediff_ApothecaryHerbs)
+                    && def.hediffClass == typeof(Hediff_ApothecaryHerbs)
+                    && ReferenceEquals(DefDatabase<HediffDef>.GetNamedSilentFail(def.defName), def)
+                    && effect.Part == null && !def.forceRemoveOnResurrection && def.lethalSeverity <= 0f
+                    && (def.comps == null || def.comps.Count == 0)
+                    && (((HediffWithComps)effect).comps == null || ((HediffWithComps)effect).comps.Count == 0);
             if (effect.GetType() != typeof(HediffWithComps) || def.hediffClass != typeof(HediffWithComps) ||
                 def.forceRemoveOnResurrection || def.lethalSeverity > 0f || def.comps == null ||
                 !ReferenceEquals(DefDatabase<HediffDef>.GetNamedSilentFail(def.defName), def)) return false;

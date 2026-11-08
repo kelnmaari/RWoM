@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using RimWorld;
 using UnityEngine;
 using Verse;
 
@@ -42,7 +43,8 @@ namespace TorannMagic
                 {
                     float y = 0f;
                     if (magic != null && magic.IsMagicUser) y = DrawMagicSection(center, y);
-                    if (might != null && might.IsMightUser) DrawMightSection(center, y);
+                    if (might != null && might.IsMightUser) y = DrawMightSection(center, y);
+                    DrawSleepingSection(center, y);
                 }
                 finally { Widgets.EndScrollView(); }
                 DrawDetailsColumn(columns[2]);
@@ -141,28 +143,44 @@ namespace TorannMagic
             return result.Distinct().OrderBy(def => def.label).ToList();
         }
 
-        private void DrawDetailsColumn(Rect rect)
+        private string LearningDetails()
         {
-            float width = rect.width - 20f;
-            // The requirements/learning-items column is part of the beta progression
-            // grimoire; with the feature disabled the classic grimoire renders only
-            // the resource bars (user request: do not draw this text at all).
-            var requirements = ClassProgression.ClassProgressionFeature.Enabled ? RequiredLearningItems() : new List<TMAbilityDef>();
-            string text = ClassProgression.ClassProgressionFeature.Enabled
-                ? InitiationRequirements() + "\n\n" + "TM_GrimoireLearningItems".Translate()
-                : "";
-            if (ClassProgression.ClassProgressionFeature.Enabled && requirements.Count == 0) text += "\n" + "TM_GrimoireNoLearningItems".Translate();
+            if (!ClassProgression.ClassProgressionFeature.Enabled) return "";
+            var requirements = RequiredLearningItems();
+            string text = InitiationRequirements();
+            if (ClassProgression.ClassIdentity.TryGetState(pawn, out var state) &&
+                state.Find("rwom.necromancer")?.Stage == ClassProgression.InitiationStage.Ascended)
+                text += "\n\n" + "TM_GrimoireRebirthCircle".Translate(ClassProgression.SpiritRebirthRitualEligibility.MagicyteCost,
+                    ClassProgression.SpiritRebirthRitualEligibility.SilverCost, ClassProgression.SpiritRebirthRitualEligibility.RitualTicks.ToStringTicksToPeriod());
+            bool occupied = ClassProgression.SpiritRebirthState.TryGetPossessingSpirit(pawn, out var soul);
+            if (ClassProgression.SpiritRebirthState.TryGet(occupied ? soul : pawn, out var spirit))
+            {
+                text += "\n\n" + "TM_GrimoireSpiritStone".Translate(ClassProgression.SpiritRebirthState.RecoveryDurationTicks.ToStringTicksToPeriod());
+                if (spirit.RecoveryRequired && spirit.Form == ClassProgression.SpiritRebirthForm.Possessed &&
+                    spirit.RecoveryTicks < ClassProgression.SpiritRebirthState.RecoveryDurationTicks)
+                    text += "\n" + "TM_SoulStoneRecoveryRemaining".Translate((ClassProgression.SpiritRebirthState.RecoveryDurationTicks - spirit.RecoveryTicks).ToStringTicksToPeriod());
+            }
+            text += "\n\n" + "TM_GrimoireLearningItems".Translate();
+            if (requirements.Count == 0) text += "\n" + "TM_GrimoireNoLearningItems".Translate();
             foreach (var ability in requirements)
                 text += "\n\n" + ability.LabelCap + "\n" + (ability.learnItem != null
                     ? ability.learnItem.LabelCap.ToString() : "TM_GrimoireScrollUnspecified".Translate().ToString());
+            return text;
+        }
+
+        private void DrawDetailsColumn(Rect rect)
+        {
+            float width = rect.width - 20f;
+            string text = LearningDetails();
             Text.Font = GameFont.Small;
             float textHeight = Text.CalcHeight(text, width) + 20f;
-            float resourcesHeight = GetResourceBars().Count == 0 ? 0f : 30f + GetResourceBars().Count * 54f + 26f;
+            var bars = GetResourceBars();
+            float resourcesHeight = ResourcesPanelHeight(bars.Count);
             Rect view = new Rect(0f, 0f, width, Mathf.Max(rect.height, resourcesHeight + textHeight));
             Widgets.BeginScrollView(rect, ref detailsScroll, view);
             try
             {
-                float y = DrawResourcesBlock(view, 0f);
+                float y = DrawResourcesBlock(view, 0f, bars);
                 Text.Font = GameFont.Small;
                 Label(new Rect(0f, y, width, textHeight), text, TextAnchor.UpperLeft, TextGray);
             }

@@ -28,10 +28,13 @@ internal static class VanillaBridgeTests
         yield return new("VanillaBridge.AllFamiliesEnabled", AllFamiliesEnabled);
         yield return new("VanillaBridge.LegacyGizmoHiddenForEnabled", LegacyGizmoHiddenForEnabled);
         yield return new("VanillaBridge.GizmoDisabledReflectsResources", GizmoDisabledReflectsResources);
+        yield return new("VanillaBridge.CanCastReflectsResources", CanCastReflectsResources);
+        yield return new("VanillaBridge.BridgeDefForLookup", BridgeDefForLookup);
         yield return new("VanillaBridge.OldSaveConversion", OldSaveConversion);
         yield return new("VanillaBridge.TrackerSave", TrackerSave);
         yield return new("VanillaBridge.OwnerAutocastCommandAtEveryRank", OwnerAutocastCommandAtEveryRank);
         yield return new("VanillaBridge.SinglePlayerJob", SinglePlayerJob);
+        yield return new("VanillaBridge.AiJobFlowsThroughCompanion", AiJobFlowsThroughCompanion);
         yield return new("VanillaBridge.BloodSacrificeIdleAndQueue", BloodSacrificeIdleAndQueue);
     }
 
@@ -161,6 +164,60 @@ internal static class VanillaBridgeTests
         Check.Equal(true, disabled, "unspawned pawn cannot cast");
         RuntimeLog.Clear(); // This fixture has no language pack for the disabled reason.
         Check.Equal(false, ability.AICanTargetNow(pawn), "bridges are excluded from vanilla AI targeting");
+    }
+
+    // External AI drivers and the vanilla cast job read CanCast; the vanilla
+    // tracker never holds the real cooldown or resource state, so the bridge
+    // routes readiness through the companion's admission check. It must be
+    // quiet and tolerate the same ambient state GizmoDisabled tolerates.
+    private static void CanCastReflectsResources(RuntimeFixture f)
+    {
+        EnsureCoreLoaded(f);
+        CoreBridge.RegisterSpell(Original("TM_Heal"));
+        var def = BridgeDef("TM_Bridge_Heal", "rwom.tm_heal");
+        var pawn = BridgePawn();
+        var magic = new CompAbilityUserMagic { parent = pawn };
+        pawn.AllComps.Add(magic);
+        var knowledge = new AbilityKnowledgeComp { parent = pawn };
+        pawn.AllComps.Add(knowledge);
+        GiveOwner(pawn, def);
+        var ability = (TMBridgeAbility)AbilityUtility.MakeAbility(def, pawn);
+        Check.NotNull(ability.Companion, "companion built for the CanCast check");
+        bool canCast;
+        try
+        {
+            canCast = ability.CanCast;
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException("CanCast must tolerate ambient state: " + ex.Message, ex);
+        }
+        Check.Equal(false, canCast, "an unspawned pawn cannot cast through the bridge");
+        RuntimeLog.Clear();
+    }
+
+    // The read-only lookup optional integrations use: enabled family + a
+    // registered bridge def; it grants nothing and touches no state.
+    private static void BridgeDefForLookup(RuntimeFixture f)
+    {
+        EnsureCoreLoaded(f);
+        CoreBridge.RegisterSpell(Original("TM_Heal"));
+        var bridge = BridgeDef("TM_Bridge_Heal", "rwom.tm_heal");
+        DefDatabase<RimWorld.AbilityDef>.Clear();
+        DefDatabase<RimWorld.AbilityDef>.Add(bridge);
+        try
+        {
+            // Earlier fixtures may have cached this spellId in the sync's own
+            // def cache, so assert the resolved shape rather than identity.
+            var resolved = VanillaBridgeSync.BridgeDefFor(Original("TM_Heal"));
+            Check.Equal(true, resolved is TMBridgeAbilityDef { defName: "TM_Bridge_Heal" }, "the enabled bridge def resolves by spell identity");
+            Check.Same(null, VanillaBridgeSync.BridgeDefFor(null), "null def stays null");
+            Check.Same(null, VanillaBridgeSync.BridgeDefFor(Original("TM_WithoutBridge")), "spell without a bridge def stays null");
+        }
+        finally
+        {
+            DefDatabase<RimWorld.AbilityDef>.Clear();
+        }
     }
 
     // Full rollout: foreign namespaces (non "rwom.tm_*") stay excluded even
@@ -311,11 +368,22 @@ internal static class VanillaBridgeTests
         var def = BridgeDef(row.Element("defName")!.Value, "rwom.tm_bloodgift");
         def.verbProperties.verbClass = typeof(TMBridgeAbility).Assembly.GetType(props.Element("verbClass")!.Value, true)!;
         def.verbProperties.isPrimary = (bool?)props.Element("isPrimary") ?? def.verbProperties.isPrimary;
+        EnsureCoreLoaded(f);
+        CoreBridge.RegisterSpell(Original("TM_BloodGift"));
         var pawn = BridgePawn();
         pawn.jobs = new Verse.AI.Pawn_JobTracker(pawn);
+        // A permissive companion isolates the queue-reservation logic from the
+        // admission check: an unspawned fixture pawn legitimately fails
+        // CanCastPowerCheck, which CanCast now reflects.
+        var user = pawn.TryGetComp<CompAbilityUserMagic>();
+        user.AbilityData.Powers.Add(new GizmoOwner { Def = def.Original, AbilityUser = user });
+        user.AbilityData.AllPowers = null;
+        VanillaBridgeSync.InjectKnowledgeComp(pawn);
+        pawn.TryGetComp<AbilityKnowledgeComp>().GetOrCreate("rwom.tm_bloodgift", 0).learned = true;
         var job = new Verse.AI.Job(new JobDef { defName = "OrdinaryWork" });
         pawn.jobs.jobQueue.EnqueueLast(job);
         var ability = (TMBridgeAbility)AbilityUtility.MakeAbility(def, pawn);
+        Check.Equal(true, (bool)ability.CanCast, "the permissive companion keeps CanCast open");
         Check.Equal(false, ability.Casting, "idle Blood Sacrifice must be drawable");
         Check.Equal(true, ability.CanQueueCast, "ordinary work without a verb must not reserve Blood Sacrifice");
         job.verbToUse = ability.verb;
@@ -383,6 +451,40 @@ internal static class VanillaBridgeTests
         Check.Equal(1, owner.Calls, "no extra order on rejection");
     }
 
+    // The live crash: Ability AI hands out ruled bridge spells through the
+    // vanilla cast machinery, and the bridge's own tracker verb has no
+    // PawnAbility owner, so vanilla warmup firing it crashed inside
+    // Verb_UseAbility. GetJob must return the companion's classic job —
+    // the owner verb, the TM drivers, payment and cooldown all stay on
+    // their normal path — tagged with the bridge ability so external
+    // drivers recognize the running cast.
+    private static void AiJobFlowsThroughCompanion(RuntimeFixture f)
+    {
+        EnsureCoreLoaded(f);
+        var original = Original("TM_OnePlayerJob");
+        CoreBridge.RegisterSpell(original);
+        var bridge = BridgeDef("TM_Bridge_Oneplayerjob", SpellIds.Of(original));
+        var pawn = BridgePawn();
+        GiveOwner(pawn, bridge);
+        var user = pawn.TryGetComp<CompAbilityUserMagic>();
+        var owner = new GizmoOwner { Def = original, AbilityUser = user };
+        user.AbilityData.Powers[0] = owner;
+        user.AbilityData.AllPowers = null;
+        var ability = (TMBridgeAbility)AbilityUtility.MakeAbility(bridge, pawn);
+        // A cell target: a synthetic pawn target would NRE in PawnAbility.GetJob's
+        // Downed check (the fixture pawn has no health state) — in game targets
+        // are spawned things or cells.
+        var job = ability.GetJob(new LocalTargetInfo(new IntVec3(3, 0, 3)), LocalTargetInfo.Invalid);
+        Check.NotNull(job, "companion job returned for the external AI path");
+        Check.Same(owner.Verb, job.verbToUse, "the classic owner verb casts, not the tracker verb");
+        Check.Equal(1, job.count, "null-faction fixture keeps the historical player context");
+        Check.Same(ability, job.ability, "job is tagged with the bridge ability for running-cast detection");
+        Check.Same(AbilityUser.AbilityDefOf.CastAbilityVerb, job.def, "the classic verb job runs the cast");
+
+        var sleeping = (TMBridgeAbility)AbilityUtility.MakeAbility(bridge, BridgePawn());
+        Check.Same(null, sleeping.GetJob(new LocalTargetInfo(new IntVec3(3, 0, 3)), LocalTargetInfo.Invalid), "sleeping spell refuses without a job");
+    }
+
     private static void TrackerSave(RuntimeFixture f)
     {
         var tracker = new Pawn_AbilityTracker(BridgePawn());
@@ -414,8 +516,10 @@ internal static class VanillaBridgeTests
 
     private static void EnsureCoreLoaded(RuntimeFixture f)
     {
-        string coreDll = Path.Combine(f.Repository, "TorannMagic.Core", "Assemblies", "TorannMagic.Core.dll");
-        if (File.Exists(coreDll)) Assembly.LoadFrom(coreDll);
+        var coreDll = CoreSdkTests.AssemblyPath(f.Repository);
+        // Each fixture constructs its own synthetic Def instances, including TM_Heal.
+        if (File.Exists(coreDll))
+            Assembly.LoadFrom(coreDll).GetType("TorannMagic.Core.AbilityCore", true)!.GetMethod("Invalidate")!.Invoke(null, null);
     }
 
     private static TMAbilityDef Original(string name)

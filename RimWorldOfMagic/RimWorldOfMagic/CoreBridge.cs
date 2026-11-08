@@ -14,6 +14,13 @@ namespace TorannMagic
         private static bool _scanned;
         private static MethodInfo _register;
         private static MethodInfo _tryResolve;
+        private static Func<Pawn, bool> _externalCasting;
+
+        public static bool IsExternallyCasting(Pawn pawn)
+        {
+            Scan();
+            return pawn != null && _externalCasting?.Invoke(pawn) == true;
+        }
 
         public static bool Available
         {
@@ -24,12 +31,16 @@ namespace TorannMagic
         {
             if (_scanned) return;
             _scanned = true;
+            _externalCasting = null;
             foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
             {
                 // ReflectionTypeLoadException-safe: GetType(false) never throws for
                 // plain type lookups, and the core is a plain net10 library.
                 Type core = assembly.GetType(CoreTypeName, false);
                 if (core == null) continue;
+                CoreKnowledgeProvider.Bind(assembly);
+                var ownership = assembly.GetType("TorannMagic.Core.CastOwnership", false)?.GetMethod("IsCasting", new[] { typeof(Pawn) });
+                if (ownership != null) _externalCasting = (Func<Pawn, bool>)Delegate.CreateDelegate(typeof(Func<Pawn, bool>), ownership);
                 _register = core.GetMethod("Register", new[] { typeof(string), typeof(Def) });
                 _tryResolve = core.GetMethod("TryResolve", new[] { typeof(string), typeof(Def).MakeByRefType() });
                 return;

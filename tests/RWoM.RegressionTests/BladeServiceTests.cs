@@ -20,15 +20,16 @@ internal static class BladeServiceTests
 
     public static bool NoFireStat(Thing __instance) => __instance != subject;
 
-    internal static void Verify(RuntimeFixture fixture, Pawn actor, Pawn? source=null)
+    internal static void Verify(RuntimeFixture fixture, Pawn actor, Pawn? source=null, bool soldier=false)
     {
         var def = (ThingDef)RuntimeHelpers.GetUninitializedObject(typeof(ThingDef));
         def.category = ThingCategory.Item; def.useHitPoints = true; def.stackLimit = 1;
         def.size = new IntVec2(1,1); def.thingClass = typeof(Thing); def.tools = [new Tool()];
         var blade = new Thing {def = def, thingIDNumber = 87346, HitPoints = 100};
         Set(blade, "positionInt", actor.Position); Set(blade, "mapIndexOrState",(sbyte)0);
-        var state = ClassIdentity.Component(source ?? actor).State.Find("rwom.bladedancer")!;
-        var backing = state.GetType().GetField("BladeWeapons",BindingFlags.Instance|BindingFlags.NonPublic)!;
+        object state = ClassIdentity.Component(source ?? actor).State.Find(soldier?"rwom.supersoldier":"rwom.bladedancer")!;
+        if(soldier) state=typeof(ClassIdentity).Assembly.GetType("TorannMagic.ClassProgression.SuperSoldierMartialPath")!.GetMethod("Training",BindingFlags.Static|BindingFlags.NonPublic)!.Invoke(null,[state])!;
+        var backing = state.GetType().GetField(soldier?"Weapons":"BladeWeapons",BindingFlags.Instance|BindingFlags.NonPublic)!;
         var oldIds = backing.GetValue(state);
         var oldWorld = Current.Game.World;
         var oldLords = actor.Map.lordManager;

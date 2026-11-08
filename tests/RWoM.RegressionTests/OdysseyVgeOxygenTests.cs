@@ -37,19 +37,29 @@ internal static class OdysseyVgeOxygenTests
     static bool SkipTexture() => false;
     static void Definitions(RuntimeFixture f)
     {
-        var folders=System.Xml.Linq.XDocument.Load(Path.Combine(f.Repository,"LoadFolders.xml"));
+        Check.Equal(true, typeof(MagicData).Assembly.GetType("TorannMagic.Odyssey.VgeOxygenBridge") == null, "vendor oxygen bridge has left Content");
+        var folders=System.Xml.Linq.XDocument.Load(Path.Combine(IntegrationPackageTests.Root(f),"LoadFolders.xml"));
         var folder=folders.Root!.Element("v1.7")!.Elements("li").Single(e=>e.Value=="v1.7/VGECompat");
         Check.Equal("vanillaexpanded.gravship",(string?)folder.Attribute("IfModActive"),"adapter only loaded with active VGE1");
-        var about=System.Xml.Linq.XDocument.Load(Path.Combine(f.Repository,"About/About.xml"));
+        Check.Equal(false, XDocument.Load(Path.Combine(f.Repository,"LoadFolders.xml")).Descendants("li").Any(e=>e.Value.Contains("VGECompat")),"main no longer owns the adapter root");
+        var about=System.Xml.Linq.XDocument.Load(Path.Combine(IntegrationPackageTests.Root(f),"About/About.xml"));
         foreach(var id in new[]{"vanillaexpanded.gravship","vanillaexpanded.gravship2"})
             Check.Equal(true,about.Root!.Element("loadAfter")!.Elements("li").Any(e=>e.Value==id),"optional load order "+id);
         Check.Equal(false,about.Descendants("modDependenciesByVersion").Descendants("packageId").Any(e=>e.Value.StartsWith("vanillaexpanded.gravship")),"no mandatory dependency");
         var defs=new System.Xml.XmlDocument(); defs.Load(Path.Combine(f.Repository,"v1.7/Odyssey/Defs/Buildings_Oxygen.xml"));
-        var patches=new System.Xml.XmlDocument(); patches.Load(Path.Combine(f.Repository,"v1.7/VGECompat/Patches/Oxygen.xml"));
+        var patches=new System.Xml.XmlDocument(); patches.Load(Path.Combine(IntegrationPackageTests.Root(f),"v1.7/VGECompat/Patches/Oxygen.xml"));
         foreach(System.Xml.XmlNode node in patches.SelectNodes("Patch/Operation")!)
             Check.Equal(true,DirectXmlToObject.ObjectFromXml<PatchOperation>(node,false).Apply(defs),"native patch succeeds");
         Check.Equal(1,defs.SelectNodes("Defs/ThingDef/comps/li[@Class='PipeSystem.CompProperties_Resource'][pipeNet='VGE_OxygenNet']")!.Count,"one real oxygen connector");
+        Check.Equal(1,defs.SelectNodes("Defs/ThingDef/comps/li[compClass='TorannMagic.VGE.CompVgeOxygenOutput']")!.Count,"one external output adapter");
         Check.Equal(1,defs.SelectNodes("Defs/ThingDef/modExtensions/li[@Class='VEF.Buildings.GravshipLaunchExtension'][isOxygenPusher='true']")!.Count,"native launch recognition");
+    }
+    static void AttachOutput(OdysseyOxygenTests.Pump pump)
+    {
+        var adapter = Assembly.LoadFrom(Environment.GetEnvironmentVariable("RWOM_VGE_ADAPTER") ?? throw new Exception("Missing VGE adapter build"));
+        var output = (ThingComp)Activator.CreateInstance(adapter.GetType("TorannMagic.VGE.CompVgeOxygenOutput", true)!)!;
+        output.parent = pump.Oxygen.parent; output.props = new CompProperties(output.GetType());
+        pump.Oxygen.parent.AllComps.Add(output);
     }
     static void Native(RuntimeFixture f, bool chapter2)
     {
@@ -76,7 +86,7 @@ internal static class OdysseyVgeOxygenTests
                 h.GetType().GetMethod("Patch")!.Invoke(h,[typeof(ContentFinder<Texture2D>).GetMethod("Get",[typeof(string),typeof(bool)])!,prefix,null,null,null]);
                 RuntimeHelpers.RunClassConstructor(P("CompResourceStorage").TypeHandle);
             } finally { h.GetType().GetMethod("UnpatchAll")!.Invoke(h,[id]); }
-            var p = new OdysseyOxygenTests.Pump(); p.Mana(10); Output(p,"PipeNetwork");
+            var p = new OdysseyOxygenTests.Pump(); AttachOutput(p); p.Mana(10); Output(p,"PipeNetwork");
             var map = p.Oxygen.parent.Map;
             map.Biome.inVacuum = false; // Native VGE output remains paid and functional on planets.
             map.designationManager = new DesignationManager(map);
@@ -121,6 +131,10 @@ internal static class OdysseyVgeOxygenTests
             p=loaded.Value; Near(1,(double)p.Oxygen.GetType().GetProperty("PendingPipeOxygen")!.GetValue(p.Oxygen)!,"real Scribe preserves pending output");
             Check.Equal("PipeNetwork",p.Oxygen.GetType().GetProperty("OutputMode")!.GetValue(p.Oxygen)!.ToString()!,"output mode saved independently of fuel mode");
             connector.parent=p.Oxygen.parent; p.Oxygen.parent.AllComps.Add(connector); P("CompResource").GetProperty("PipeNet")!.SetValue(connector,net);
+            Check.Equal(false, (bool)p.Oxygen.GetType().GetProperty("PipeNetworkAvailable")!.GetValue(p.Oxygen)!, "native connector alone cannot activate a missing integration");
+            Tick(p,480); Near(1,Stored(),"missing output adapter cannot deliver"); Near(9.9,p.Credit,"missing output adapter cannot charge");
+            Near(1,(double)p.Oxygen.GetType().GetProperty("PendingPipeOxygen")!.GetValue(p.Oxygen)!,"missing output adapter retains saved credit");
+            AttachOutput(p);
             Tick(p,480); Near(1,Stored(),"load does not replay paid output in same pulse");
             Tick(p,540); Near(2,Stored(),"pending output resumes after load"); Near(9.9,p.Credit,"pending output does not pay again");
             P("CompResourceStorage").GetMethod("DrawResource")!.Invoke(storage,[.1f]);

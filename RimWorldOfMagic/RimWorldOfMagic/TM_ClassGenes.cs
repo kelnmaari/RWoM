@@ -2,6 +2,7 @@ using RimWorld;
 using System.Collections.Generic;
 using System.Linq;
 using Verse;
+using HarmonyLib;
 
 namespace TorannMagic
 {
@@ -20,6 +21,7 @@ namespace TorannMagic
         private static GeneDef hiddenMageGene;
         private static GeneDef sleepingWarriorGene;
         private static bool geneLookupDone;
+        private static HashSet<Pawn> synchronizing = new HashSet<Pawn>();
 
         // Enchantment bloodline genes: markers paired 1:1 with their background
         // trait (Arcane Conduit, Mana Well, ...). The trait carries all effects;
@@ -72,16 +74,37 @@ namespace TorannMagic
             {
                 return;
             }
-            bool wanderer = pawn.story.traits.HasTrait(TorannMagicDefOf.TM_Wanderer) || pawn.story.traits.HasTrait(TorannMagicDefOf.TM_Wayfarer);
-            bool magicClass = wanderer || TM_Calc.IsMagicUser(pawn);
-            bool mightClass = wanderer || TM_Calc.IsMightUser(pawn);
-            bool magicGift = pawn.story.traits.HasTrait(TorannMagicDefOf.TM_Gifted);
-            bool mightGift = pawn.story.traits.HasTrait(TorannMagicDefOf.PhysicalProdigy);
-            ApplyGene(pawn, manaGene, magicClass);
-            ApplyGene(pawn, staminaGene, mightClass);
-            ApplyGene(pawn, hiddenMageGene, magicGift && !magicClass);
-            ApplyGene(pawn, sleepingWarriorGene, mightGift && !mightClass);
-            SyncEnchantGenes(pawn);
+            if (!synchronizing.Add(pawn)) return;
+            try
+            {
+                bool assigned = HasAssignedClass(pawn);
+                if (!assigned)
+                {
+                    // Selectable active genes also grant potential before a class
+                    // is chosen. Do not create a competing latent copy beside them.
+                    TryPairEnchant(pawn, TorannMagicDefOf.TM_Gifted,
+                        pawn.genes.GetGene(manaGene) != null ? manaGene : hiddenMageGene);
+                    TryPairEnchant(pawn, TorannMagicDefOf.PhysicalProdigy,
+                        pawn.genes.GetGene(staminaGene) != null ? staminaGene : sleepingWarriorGene);
+                }
+                bool wanderer = pawn.story.traits.HasTrait(TorannMagicDefOf.TM_Wanderer) || pawn.story.traits.HasTrait(TorannMagicDefOf.TM_Wayfarer);
+                bool magicClass = assigned && (wanderer || TM_Calc.IsMagicUser(pawn));
+                bool mightClass = assigned && (wanderer || TM_Calc.IsMightUser(pawn));
+                if (assigned)
+                {
+                    ApplyGene(pawn, manaGene, magicClass);
+                    ApplyGene(pawn, staminaGene, mightClass);
+                }
+                // Dormant/suppressed genes are not disposable markers. Only a chosen
+                // class consumes them; both potential families are consumed together.
+                if (assigned)
+                {
+                    ApplyGene(pawn, hiddenMageGene, false);
+                    ApplyGene(pawn, sleepingWarriorGene, false);
+                }
+                SyncEnchantGenes(pawn);
+                }
+            finally { synchronizing.Remove(pawn); }
         }
 
         /// <summary>
@@ -112,10 +135,63 @@ namespace TorannMagic
             {
                 pawn.genes.AddGene(geneDef, xenogene: false);
             }
-            else if (!hasTrait && gene != null)
+            else if (!hasTrait && gene != null && gene.Active && CanGrantTrait(pawn, traitDef))
             {
-                pawn.story.traits.GainTrait(new Trait(traitDef, 0, false));
+                var trait = new Trait(traitDef, 0, false);
+                if (geneDef.forcedTraits?.Any(t => t.def == traitDef && t.degree == 0) == true)
+                    trait.sourceGene = gene;
+                pawn.story.traits.GainTrait(trait);
             }
+        }
+
+        private static bool HasAssignedClass(Pawn pawn)
+            => ClassProgression.ClassEnrollment.HasChosenClass(pawn);
+
+        internal static void RestoreGiftsAfterGeneRemoval(Pawn pawn)
+        {
+            if (pawn?.genes == null || !GenesLoaded()) return;
+            // A removed third-party xenogene can uncover one of our endogenes.
+            // Run only at the mutation boundary, never scan pawns each tick.
+            if (pawn.genes.GenesListForReading.Any(g => g.def == manaGene || g.def == staminaGene || g.def == hiddenMageGene
+                || g.def == sleepingWarriorGene || allEnchantGenes.Contains(g.def)))
+            {
+                // Foundation completion removes both potentials from a snapshot.
+                // Do not recursively consume the second gift during the first removal.
+                if (pawn.story?.traits == null) return;
+                if (HasAssignedClass(pawn))
+                {
+                    if (!synchronizing.Add(pawn)) return;
+                    try { SyncEnchantGenes(pawn); }
+                    finally { synchronizing.Remove(pawn); }
+                    return;
+                }
+                SyncClassGenes(pawn);
+            }
+        }
+
+        internal static bool AllowGeneTrait(Pawn pawn, Trait trait)
+        {
+            string name = trait?.sourceGene?.def?.defName;
+            if (name == null || (name != "TM_ManaGene" && name != "TM_StaminaGene" && name != "TM_HiddenMageGene" && name != "TM_SleepingWarriorGene"
+                && name != "TM_ArcaneConduitGene" && name != "TM_ManaWellGene" && name != "TM_BoundlessGene"
+                && name != "TM_FaeBloodGene" && name != "TM_GiantsBloodGene" && name != "TM_EnlightenedGene")) return true;
+            if (!trait.sourceGene.Active || !CanGrantTrait(pawn, trait.def)) return false;
+            return (name != "TM_ManaGene" && name != "TM_StaminaGene" && name != "TM_HiddenMageGene" && name != "TM_SleepingWarriorGene") || !HasAssignedClass(pawn);
+        }
+
+        // GainTrait does not reject conflicts by default. Do not use suppression
+        // here: a bloodline gene must not displace a pawn's existing class or gift.
+        private static bool CanGrantTrait(Pawn pawn, TraitDef incoming)
+        {
+            foreach (Trait existing in pawn.story.traits.allTraits)
+            {
+                if (existing.Suppressed) continue;
+                if (existing.def == incoming
+                    || incoming.conflictingTraits?.Contains(existing.def) == true
+                    || existing.def.conflictingTraits?.Contains(incoming) == true)
+                    return false;
+            }
+            return true;
         }
 
         private static void ApplyGene(Pawn pawn, GeneDef geneDef, bool wanted)
@@ -199,5 +275,11 @@ namespace TorannMagic
                 baby.genes.AddGene(giantsBloodGene, xenogene: true);
             }
         }
+    }
+
+    [HarmonyPatch(typeof(Pawn_GeneTracker), nameof(Pawn_GeneTracker.RemoveGene))]
+    internal static class TM_ClassGeneRemovalPatch
+    {
+        private static void Postfix(Pawn ___pawn) => TM_ClassGenes.RestoreGiftsAfterGeneRemoval(___pawn);
     }
 }

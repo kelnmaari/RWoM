@@ -96,8 +96,9 @@ internal static class GrimoireKnowledgeTests
     // RED 2: only learned entries whose def fails to resolve are sleeping.
     private static void SleepingFiltersByResolvability(RuntimeFixture f)
     {
-        string coreDll = Path.Combine(f.Repository, "TorannMagic.Core", "Assemblies", "TorannMagic.Core.dll");
-        if (File.Exists(coreDll)) Assembly.LoadFrom(coreDll);
+        var coreDll = CoreSdkTests.AssemblyPath(f.Repository);
+        bool hasCore = File.Exists(coreDll);
+        if (hasCore) Assembly.LoadFrom(coreDll);
 
         var def = (TMAbilityDef)RuntimeHelpers.GetUninitializedObject(typeof(TMAbilityDef));
         def.defName = "TM_KnowledgeGrim";
@@ -114,8 +115,10 @@ internal static class GrimoireKnowledgeTests
         forgotten.learned = false; // unlearned entries are never listed
 
         var result = GrimoireKnowledge.SleepingSpells(knowledge);
-        Check.Equal(1, result.Count, "exactly the unresolvable learned entry is sleeping");
-        Check.Same(sleeping, result[0], "the sleeping entry is the one whose def is gone");
+        Check.Equal(hasCore ? 1 : 2, result.Count, "without the Core resolver both learned entries remain sleeping");
+        Check.Equal(true, result.Contains(sleeping), "removed spell remains sleeping");
+        Check.Equal(!hasCore, result.Contains(alive), "registered spell resolves only with Core available");
+        Check.Equal(true, alive.learned && sleeping.learned, "missing resolver does not erase learned knowledge");
     }
 
     // RED 3: missing pawn/comp/store never throws.

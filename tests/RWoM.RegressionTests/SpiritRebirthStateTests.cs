@@ -13,6 +13,49 @@ internal static class SpiritRebirthStateTests
 {
     public static IEnumerable<TestCase> Cases()
     {
+        yield return new("SpiritProjectedCast.BloodGiftUsesOriginalInstanceAndSuppressesDuplicate", r =>
+        {
+            using var f = new Fixture(r);
+            var prior = TorannMagicDefOf.TM_BloodGift;
+            try
+            {
+                var def = TorannMagicDefOf.TM_BloodGift = r.AddAbility("SdkSpiritGift");
+                var ability = new MagicAbility { Def = def, AbilityUser = f.Magic, CooldownTicksLeft = 120 };
+                f.Magic.AbilityData.Powers.Add(ability); f.Magic.AbilityData.AllPowers = null;
+                var state = f.Begin(); var possession = f.Hold(f.Host, f.Original);
+                Check.Equal(true, Invoke(state,"TryEnterHost", f.Original, f.Host), "reciprocal host");
+                var type = typeof(SpiritRebirthCasting).Assembly.GetType("TorannMagic.ClassProgression.SpiritBloodSacrifice")!;
+                var find = type.GetMethod("Find", BindingFlags.Static | BindingFlags.NonPublic)!;
+                object? FindOwner() => find.Invoke(null, [f.Host, f.Original]);
+                Check.Same(ability, FindOwner()!, "uses original cooldown owner");
+                var hostMagic = f.Host.GetCompAbilityUserMagic();
+                var local = new MagicAbility { Def = def, AbilityUser = hostMagic };
+                hostMagic.AbilityData.Powers.Add(local); hostMagic.AbilityData.AllPowers = null;
+                Check.Equal(true, FindOwner() == null, "host already has same spell");
+                hostMagic.AbilityData.Powers.Remove(local); hostMagic.AbilityData.AllPowers = null;
+                Check.Same(ability, FindOwner()!, "own ability removal reveals original");
+                possession.GetDirectlyHeldThings().Remove(f.Original);
+                Check.Equal(true, FindOwner() == null, "stale job cannot pay or cast");
+                Check.Equal(120, ability.CooldownTicksLeft, "query and rejected replay preserve cooldown");
+            }
+            finally { TorannMagicDefOf.TM_BloodGift = prior; }
+        });
+        yield return new("SpiritProjectedCast.OwnerMustStillBeHeldByExactBody", r =>
+        {
+            using var f = new Fixture(r);
+            var ability = new MagicAbility { AbilityUser = f.Magic };
+            var read = typeof(SpiritRebirthCasting).GetMethod("SkillOwner", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)!;
+            Pawn? Read(Pawn body) => (Pawn?)read.Invoke(null, [body, ability]);
+            Check.Same(f.Original, Read(f.Original)!, "ordinary spell uses actual owner");
+            Check.Equal(true, Read(f.Host) == null, "unpossessed pawn cannot borrow");
+            var state = f.Begin();
+            var possession = f.Hold(f.Host, f.Original);
+            Check.Equal(true, Invoke(state, "TryEnterHost", f.Original, f.Host), "reciprocal valid possession");
+            Check.Same(f.Original, Read(f.Host)!, "ranks come from soul");
+            Check.Equal(true, Read(f.Other) == null, "foreign body rejected");
+            possession.GetDirectlyHeldThings().Remove(f.Original);
+            Check.Equal(true, Read(f.Host) == null, "stale delayed cast cannot use old body");
+        });
         yield return new("SpiritRebirthState.ExplicitMarkerPreservesOriginalData", Identity);
         yield return new("SpiritRebirthState.ExactNativeHostCustody", Custody);
         yield return new("SpiritRebirthState.NativeScribeReferencesAndLegacyNull", Save);

@@ -83,8 +83,10 @@ namespace TorannMagic
         {
             if (pawn.GetCompAbilityUserMagic()?.customClass != null) return true;
             if (pawn.GetCompAbilityUserMight()?.customClass != null) return true;
-            return pawn.story.traits.allTraits.Select(t => t.def.index).Any(index =>
-                TM_ClassUtility.NonCustomMagicAndMightTraitIndexes.Contains(index));
+            // Def references, not database indexes: trait mods that mutate the
+            // TraitDef database during pawn generation shift every index.
+            return pawn.story.traits.allTraits.Any(t =>
+                TM_ClassUtility.NonCustomMagicAndMightTraitIndexes.Contains(t.def));
         }
 
         public static bool IsRobotPawn(Pawn pawn)
@@ -947,6 +949,7 @@ namespace TorannMagic
             }
             if (ability == null || chi == null) return false;
             if (ability.CooldownTicksLeft > 0) return false;
+            if (ClassProgression.MonkMartialPath.Path(pawn)?.MartialAlternate == true && !CultivationIdle(pawn)) return false;
             if (chi.Severity >= 70) return false;
             return true;
         }
@@ -957,9 +960,14 @@ namespace TorannMagic
         // otherwise builds chi and trickles rest/joy — so it fires when any of that
         // utility exists, and for a healthy rested pawn only when idle with chi to
         // gain. A working pawn is never interrupted for a chi trickle.
+        private static bool CultivationIdle(Pawn pawn) => !pawn.Drafted && (pawn.CurJob == null ||
+            (pawn.CurJob.def?.isIdle == true && !pawn.CurJob.playerForced && pawn.CurJob.workGiverDef == null));
+
         public static bool MonkMeditateWorthAutocast(Pawn pawn)
         {
             if (pawn?.health?.hediffSet == null) return false;
+            if (ClassProgression.MonkMartialPath.Path(pawn)?.MartialAlternate == true)
+                return CultivationIdle(pawn) && ClassProgression.MonkMartialPath.Chi(pawn)?.Severity < 70f;
             if (IsPawnInjured(pawn, 0)) return true;
             if ((GetPawnAfflictions(pawn)?.Count ?? 0) > 0) return true;
             if ((GetPawnAddictions(pawn)?.Count ?? 0) > 0) return true;
@@ -2029,6 +2037,9 @@ namespace TorannMagic
         }
 
         public static float GetSpellPenetration(Pawn pawn)
+            => GetSpellPenetrationFrom(pawn, pawn);
+
+        internal static float GetSpellPenetrationFrom(Pawn pawn, Pawn body)
         {
             float penetration = 0;
             CompAbilityUserMagic compMagic = pawn.GetCompAbilityUserMagic();
@@ -2047,9 +2058,9 @@ namespace TorannMagic
                 penetration += (compMight.mightPwr - 1);
             }
 
-            if (pawn.health != null && pawn.health.capacities != null)
+            if (body.health != null && body.health.capacities != null)
             {
-                penetration += (pawn.health.capacities.GetLevel(PawnCapacityDefOf.Consciousness) - 1);
+                penetration += (body.health.capacities.GetLevel(PawnCapacityDefOf.Consciousness) - 1);
             }
 
             return penetration;
@@ -3724,34 +3735,28 @@ namespace TorannMagic
             
             if (comp != null)
             {
-                int count = 2 + comp.MagicData.MagicPowerSkill_ChaosTradition.FirstOrDefault((MagicPowerSkill x) => x.label == "TM_ChaosTradition_ver").level;
+                var data = comp.MagicData;
+                if (data == null || !data.AllMagicPowersForChaosMage.Any(p => p?.TMabilityDefs?.Count > 0 && p.abilityDef is TMAbilityDef)) return;
+                int count = 2 + (data.MagicPowerSkill_ChaosTradition.FirstOrDefault(s => s.label == "TM_ChaosTradition_ver")?.level ?? 0);
                 TM_ChaosProgression.ReleasePowers(comp);
                 comp.chaosPowers = new List<TM_ChaosPowers>();
-                comp.chaosPowers.Clear();
-                if(forAI)
+                if (forAI)
                 {
-                    MagicPower p = comp.MagicData.AllMagicPowersForChaosMage.FirstOrDefault((MagicPower x) => x.abilityDef == TorannMagicDefOf.TM_Heal);
-                    p.learned = true;
-                    comp.chaosPowers.Add(new TM_ChaosPowers((TMAbilityDef)p.abilityDef, TM_ClassUtility.GetAssociatedMagicPowerSkill(comp, p)));
-                    comp.AddPawnAbility(p.abilityDef);
-                    p = comp.MagicData.AllMagicPowersForChaosMage.FirstOrDefault((MagicPower x) => x.abilityDef == TorannMagicDefOf.TM_LightningBolt);
-                    p.learned = true;
-                    comp.chaosPowers.Add(new TM_ChaosPowers((TMAbilityDef)p.abilityDef, TM_ClassUtility.GetAssociatedMagicPowerSkill(comp, p)));
-                    comp.AddPawnAbility(p.abilityDef);
-                    p = comp.MagicData.AllMagicPowersForChaosMage.FirstOrDefault((MagicPower x) => x.abilityDef == TorannMagicDefOf.TM_Shield);
-                    p.learned = true;
-                    comp.chaosPowers.Add(new TM_ChaosPowers((TMAbilityDef)p.abilityDef, TM_ClassUtility.GetAssociatedMagicPowerSkill(comp, p)));
-                    comp.AddPawnAbility(p.abilityDef);
-                    p = comp.MagicData.AllMagicPowersForChaosMage.FirstOrDefault((MagicPower x) => x.abilityDef == TorannMagicDefOf.TM_Fireball);
-                    p.learned = true;
-                    comp.chaosPowers.Add(new TM_ChaosPowers((TMAbilityDef)p.abilityDef, TM_ClassUtility.GetAssociatedMagicPowerSkill(comp, p)));
-                    comp.AddPawnAbility(p.abilityDef);
-                    p = TM_Calc.GetRandomMagicPower(comp);
-                    comp.chaosPowers.Add(new TM_ChaosPowers((TMAbilityDef)p.abilityDef, null));
+                    foreach (var def in new[] { TorannMagicDefOf.TM_Heal, TorannMagicDefOf.TM_LightningBolt, TorannMagicDefOf.TM_Shield, TorannMagicDefOf.TM_Fireball })
+                    {
+                        var fixedPower = data.AllMagicPowersForChaosMage.FirstOrDefault(p => def != null && p?.abilityDef == def);
+                        if (fixedPower == null) continue;
+                        fixedPower.learned = true;
+                        comp.chaosPowers.Add(new TM_ChaosPowers(def, TM_ClassUtility.GetAssociatedMagicPowerSkill(comp, fixedPower)));
+                        comp.AddPawnAbility(def);
+                    }
+                    var preview = GetRandomMagicPower(comp);
+                    if (preview != null) comp.chaosPowers.Add(new TM_ChaosPowers((TMAbilityDef)preview.abilityDef, null));
                 }
                 for (int i = 0; i < 5; i++)
                 {
                     MagicPower power = TM_Calc.GetRandomMagicPower(comp);
+                    if (power == null) break;
                     if (i < count)
                     {
                         power.learned = true;
@@ -3787,21 +3792,11 @@ namespace TorannMagic
 
         public static MagicPower GetRandomMagicPower(CompAbilityUserMagic comp, bool includeMasterPower = false)
         {
-            bool isDuplicate = true;
-            MagicPower power = null;
-            while (isDuplicate)
-            {
-                isDuplicate = false;
-                power = comp.MagicData.AllMagicPowersForChaosMage.RandomElement();
-                for (int i = 0; i < comp.chaosPowers.Count; i++)
-                {
-                    if (comp.chaosPowers[i].Ability == power.abilityDef)
-                    {
-                        isDuplicate = true;
-                    }
-                }
-            }
-            return power;
+            var pool = comp?.MagicData?.AllMagicPowersForChaosMage;
+            if (pool == null) return null;
+            var candidates = pool.Where(p => p?.TMabilityDefs?.Count > 0 && p.abilityDef is TMAbilityDef
+                && comp.chaosPowers?.Any(slot => slot?.Ability == p.abilityDef) != true).ToList();
+            return candidates.Count == 0 ? null : candidates.RandomElement();
         }
 
         public static bool IsUsingRanged(Pawn p)

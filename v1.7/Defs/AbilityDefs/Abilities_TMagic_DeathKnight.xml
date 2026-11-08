@@ -45,7 +45,7 @@ All of these functions are enhanced as hate levels grow and must have a sufficie
   <modExtensions>
 <li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_shroud</spellId>
-<domain>Magic</domain>
+<domain>Might</domain>
 <tier>0</tier>
 </li>
 </modExtensions>
@@ -106,7 +106,7 @@ Hate is not required to use this ability, but it's effective range is greatly in
   <modExtensions>
 <li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_waveoffear</spellId>
-<domain>Magic</domain>
+<domain>Might</domain>
 <tier>0</tier>
 </li>
 </modExtensions>
@@ -142,7 +142,7 @@ Range: 21</description>
         <staminaCost>0.20</staminaCost>
 		<efficiencyReductionPercent>.1</efficiencyReductionPercent>
 		<MainVerb Class="AbilityUser.VerbProperties_Ability">
-            <verbClass>TorannMagic.Verb_SB</verbClass>
+            <verbClass>TorannMagic.ClassProgression.Verb_DeathKnightSpite</verbClass>
 				<tooltipShowProjectileDamage>true</tooltipShowProjectileDamage>
 				<tooltipShowExtraDamages>false</tooltipShowExtraDamages>
 				<tooltipShowHediffsToApply>false</tooltipShowHediffsToApply>
@@ -171,7 +171,7 @@ Range: 21</description>
     <modExtensions>
 <li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_spite</spellId>
-<domain>Magic</domain>
+<domain>Might</domain>
 <tier>0</tier>
 </li>
 </modExtensions>
@@ -190,7 +190,7 @@ Range: 24</description>
 		<shouldInitialize>false</shouldInitialize>
 		<efficiencyReductionPercent>.1</efficiencyReductionPercent>
 		<MainVerb Class="AbilityUser.VerbProperties_Ability">
-            <verbClass>TorannMagic.Verb_SB</verbClass>
+            <verbClass>TorannMagic.ClassProgression.Verb_DeathKnightSpite</verbClass>
 				<tooltipShowProjectileDamage>true</tooltipShowProjectileDamage>
 				<tooltipShowExtraDamages>false</tooltipShowExtraDamages>
 				<tooltipShowHediffsToApply>false</tooltipShowHediffsToApply>
@@ -219,7 +219,7 @@ Range: 24</description>
     <modExtensions>
 <li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_spite_i</spellId>
-<domain>Magic</domain>
+<domain>Might</domain>
 <tier>1</tier>
 </li>
 </modExtensions>
@@ -238,7 +238,7 @@ Range: 27</description>
 		<shouldInitialize>false</shouldInitialize>
 		<efficiencyReductionPercent>.1</efficiencyReductionPercent>
 		<MainVerb Class="AbilityUser.VerbProperties_Ability">
-            <verbClass>TorannMagic.Verb_SB</verbClass>
+            <verbClass>TorannMagic.ClassProgression.Verb_DeathKnightSpite</verbClass>
 				<tooltipShowProjectileDamage>true</tooltipShowProjectileDamage>
 				<tooltipShowExtraDamages>false</tooltipShowExtraDamages>
 				<tooltipShowHediffsToApply>false</tooltipShowHediffsToApply>
@@ -267,7 +267,7 @@ Range: 27</description>
     <modExtensions>
 <li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_spite_ii</spellId>
-<domain>Magic</domain>
+<domain>Might</domain>
 <tier>2</tier>
 </li>
 </modExtensions>
@@ -286,7 +286,7 @@ Range: 30</description>
 		<shouldInitialize>false</shouldInitialize>
 		<efficiencyReductionPercent>.1</efficiencyReductionPercent>
 		<MainVerb Class="AbilityUser.VerbProperties_Ability">
-            <verbClass>TorannMagic.Verb_SB</verbClass>
+            <verbClass>TorannMagic.ClassProgression.Verb_DeathKnightSpite</verbClass>
 				<tooltipShowProjectileDamage>true</tooltipShowProjectileDamage>
 				<tooltipShowExtraDamages>false</tooltipShowExtraDamages>
 				<tooltipShowHediffsToApply>false</tooltipShowHediffsToApply>
@@ -315,7 +315,7 @@ Range: 30</description>
     <modExtensions>
 <li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_spite_iii</spellId>
-<domain>Magic</domain>
+<domain>Might</domain>
 <tier>3</tier>
 </li>
 </modExtensions>
@@ -358,7 +358,7 @@ Range: 30</description>
   <modExtensions>
 <li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_lifesteal</spellId>
-<domain>Magic</domain>
+<domain>Might</domain>
 <tier>0</tier>
 </li>
 </modExtensions>
@@ -479,7 +479,7 @@ Radius: 3.0</description>
     <modExtensions>
 <li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_graveblade</spellId>
-<domain>Magic</domain>
+<domain>Might</domain>
 <tier>0</tier>
 </li>
 </modExtensions>
@@ -522,7 +522,7 @@ Radius: 3.4</description>
     <modExtensions>
 <li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_graveblade_i</spellId>
-<domain>Magic</domain>
+<domain>Might</domain>
 <tier>1</tier>
 </li>
 </modExtensions>
@@ -565,7 +565,7 @@ Radius: 3.8</description>
     <modExtensions>
 <li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_graveblade_ii</spellId>
-<domain>Magic</domain>
+<domain>Might</domain>
 <tier>2</tier>
 </li>
 </modExtensions>
@@ -608,7 +608,7 @@ Radius: 4.2</description>
     <modExtensions>
 <li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_graveblade_iii</spellId>
-<domain>Magic</domain>
+<domain>Might</domain>
 <tier>3</tier>
 </li>
 </modExtensions>

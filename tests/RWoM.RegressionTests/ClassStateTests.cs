@@ -13,6 +13,8 @@ internal static class ClassStateTests
 {
     public static IEnumerable<TestCase> Cases()
     {
+        foreach (bool addonClass in new[] { false, true })
+            yield return new("ClassState.ScrollCantripWithSkillsAfterSave." + (addonClass ? "Addon" : "Builtin"), f => ScrollCantripAfterSave(f, addonClass));
         yield return new("ClassState.StockStormBornToHeartOfFrost", StockTransition);
         yield return new("ClassState.CustomToStockClearsStaleClass", CustomToStock);
         yield return new("ClassState.CustomToCustomPreservesOverlapAndStandalone", CustomToCustom);
@@ -54,6 +56,50 @@ internal static class ClassStateTests
             ability.abilityClass = typeof(PawnAbility);
             ability.shouldInitialize = true;
         }
+    }
+
+    static void ScrollCantripAfterSave(RuntimeFixture f, bool addonClass)
+    {
+        Prepare(f);
+        var ability = f.AddAbility("TM_AuditMagicTraining");
+        ability.learnItem = (ThingDef)System.Runtime.CompilerServices.RuntimeHelpers.GetUninitializedObject(typeof(ThingDef));
+        ability.learnItem.defName = "SpellOf_AuditMagicTraining";
+        ability.shouldInitialize = true; ability.abilityClass = typeof(PawnAbility);
+        DefDatabase<TM_CustomPowerDef>.Add(new TM_CustomPowerDef { defName = ability.defName,
+            customPower = new TM_CustomPower { forMage = true, abilityDefs = [ability],
+                skills = [new TM_CustomSkill { label = ability.defName + "_pwr", levelMax = 3, costToLevel = 1 }] } });
+        var foreign = f.AddAbility("TM_AuditForeignClassSpell");
+        foreign.learnItem = (ThingDef)System.Runtime.CompilerServices.RuntimeHelpers.GetUninitializedObject(typeof(ThingDef));
+        foreign.learnItem.defName = "SpellOf_AuditForeignClassSpell";
+        foreign.shouldInitialize = true; foreign.abilityClass = typeof(PawnAbility);
+        DefDatabase<TM_CustomPowerDef>.Add(new TM_CustomPowerDef { defName = foreign.defName,
+            customPower = new TM_CustomPower { forMage = true, abilityDefs = [foreign],
+                skills = [new TM_CustomSkill { label = foreign.defName + "_pwr", levelMax = 3, costToLevel = 1 }] } });
+        var wind = Custom("TM_AuditWindMage", abilities: [TorannMagicDefOf.TM_ShadowBolt]);
+        Registry(wind, Custom("TM_AuditForeignMage", abilities: [foreign]));
+        var p = PawnWithComps(true, false);
+        p.pawn.story.traits.allTraits.Add(new Trait(addonClass ? wind.classTrait : TorannMagicDefOf.TM_Golemancer));
+        var data = p.magic.MagicData;
+        data.MagicPowersCustom.Single(x => x.TMabilityDefs.Contains(ability)).learned = true;
+        data.MagicPowersCustom.Single(x => x.TMabilityDefs.Contains(foreign)).learned = true;
+        data.GetSkill_Power(ability).level = 2;
+        data.MagicPowersStandalone.Single(x => x.TMabilityDefs.Contains(TorannMagicDefOf.TM_Cooler)).learned = true;
+        data.MagicAbilityPoints = 7; data.MagicUserLevel = 14;
+        // This fixture saves the data container, not the enclosing world/pawn graph.
+        Set(data, "magicPawn", null!);
+        var loaded = f.Load(f.Save(data)); Set(p.magic, "magicData", loaded);
+        Set(loaded, "magicPawn", p.pawn);
+        TM_ClassState.RestoreCurrentMagicRuntime(p.magic);
+        Check.Equal(true, Has(p.magic, ability), "learned shared addon spell with skill records restored");
+        Check.Equal(true, Has(p.magic, TorannMagicDefOf.TM_Cooler), "builtin shared spell retained");
+        Check.Equal(false, Has(p.magic, foreign), "foreign class spell is not recovered as a cantrip");
+        var runtime = p.magic.AbilityData.Powers.Single(a => a.Def == ability); runtime.CooldownTicksLeft = 123;
+        TM_ClassState.RestoreCurrentMagicRuntime(p.magic);
+        Check.Same(runtime, p.magic.AbilityData.Powers.Single(a => a.Def == ability), "repeated restoration retains runtime");
+        Check.Equal(123, runtime.CooldownTicksLeft, "repeated restoration preserves cooldown");
+        Check.Equal(2, loaded.GetSkill_Power(ability).level, "saved upgrade retained");
+        Check.Equal(7, loaded.MagicAbilityPoints, "no refund or extra payment");
+        Check.Equal(14, loaded.MagicUserLevel, "level retained");
     }
 
     static TM_CustomClass Custom(string name, bool mage = true, bool fighter = false, params TMAbilityDef[] abilities)

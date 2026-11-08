@@ -17,6 +17,7 @@ namespace TorannMagic
         private int schemaVersion = CurrentSchemaVersion;
         private bool legacyImported;
         private bool pendingReconcile;
+        private bool checkShadowStepOnLoad;
         private List<SpellKnowledge> spells = new List<SpellKnowledge>();
 
         internal int NextDiagnosticTick { get; set; }
@@ -24,6 +25,7 @@ namespace TorannMagic
 
         public static AbilityKnowledgeComp ActiveFor(Pawn pawn)
             => CoreBridge.Available ? pawn?.TryGetComp<AbilityKnowledgeComp>() : null;
+        internal bool ReadyForQuery => legacyImported && !pendingReconcile;
         public int SchemaVersion => schemaVersion;
 
         public SpellKnowledge Find(string spellId)
@@ -69,7 +71,7 @@ namespace TorannMagic
             legacyImported = true;
         }
 
-        private void ImportNow()
+        private void ImportNow(bool shadowStepsOnly = false)
         {
             var pawn = parent as Pawn;
             if (pawn == null) return;
@@ -82,6 +84,7 @@ namespace TorannMagic
                 {
                     if (power?.abilityDef is not TMAbilityDef ability) continue;
                     var spellId = SpellIds.Of(power.abilityDef);
+                    if (shadowStepsOnly && spellId != SpellIds.NativeShadowStepId && spellId != SpellIds.KureShadowStepId) continue;
                     if (!power.learned)
                     {
                         if (!imported.Contains(spellId)) Remove(spellId);
@@ -105,6 +108,7 @@ namespace TorannMagic
                 {
                     if (power?.abilityDef is not TMAbilityDef ability) continue;
                     var spellId = SpellIds.Of(power.abilityDef);
+                    if (shadowStepsOnly && spellId != SpellIds.NativeShadowStepId && spellId != SpellIds.KureShadowStepId) continue;
                     if (!power.learned)
                     {
                         if (!imported.Contains(spellId)) Remove(spellId);
@@ -144,6 +148,7 @@ namespace TorannMagic
                 // re-import to the first tick.
                 if (schemaVersion < CurrentSchemaVersion) pendingReconcile = true;
                 schemaVersion = CurrentSchemaVersion;
+                checkShadowStepOnLoad = Find(SpellIds.NativeShadowStepId) != null && Find(SpellIds.KureShadowStepId) == null;
             }
         }
 
@@ -152,6 +157,20 @@ namespace TorannMagic
             // One-shot legacy import: runs on the first CompTick after spawn,
             // when all other comps have loaded their data.
             ImportLegacy();
+            if (checkShadowStepOnLoad)
+            {
+                checkShadowStepOnLoad = false;
+                if (parent is Pawn owner && owner.GetCompAbilityUserMight()?.ExistingMightData is MightData might &&
+                    might.AllMightPowers.Any(p => p?.learned == true && p.TMabilityDefs?.Any(a => a?.defName == "TM_Shadowstep") == true))
+                {
+                    // Only a real, learned Kure owner can reclaim the old ambiguous key.
+                    // A soul with both abilities keeps both entries; others are untouched.
+                    if (owner.GetCompAbilityUserMagic()?.ExistingMagicData?.AllMagicPowers.Any(p =>
+                        p?.learned == true && p.TMabilityDefs?.Any(a => a?.defName == "TM_ShadowStep") == true) != true)
+                        Remove(SpellIds.NativeShadowStepId);
+                    ImportNow(shadowStepsOnly: true);
+                }
+            }
             // Schema migration: re-read drifted flags and ranks from legacy once.
             if (pendingReconcile)
             {

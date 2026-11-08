@@ -324,6 +324,7 @@ namespace TorannMagic
                 //    caster.equipment.Primary.Destroy(DestroyMode.Vanish);
                 //}
                 caster.equipment.AddEquipment(specWeapon);
+                comp.specializedWeapon.Bind(thing, specWeapon);
                 //GenPlace.TryPlaceThing(technoWeapon, caster.Position, caster.Map, ThingPlaceMode.Direct, null, null);
                 //Job job = new Job(JobDefOf.Equip, technoWeapon);
                 //caster.jobs.TryTakeOrderedJob(job, JobTag.ChangingApparel);
@@ -424,6 +425,7 @@ namespace TorannMagic
                 //    caster.equipment.Primary.Destroy(DestroyMode.Vanish);
                 //}
                 caster.equipment.AddEquipment(specWeapon);
+                comp.specializedWeapon.Bind(thing, specWeapon);
                 //GenPlace.TryPlaceThing(technoWeapon, caster.Position, caster.Map, ThingPlaceMode.Direct, null, null);
                 //Job job = new Job(JobDefOf.Equip, technoWeapon);
                 //caster.jobs.TryTakeOrderedJob(job, JobTag.ChangingApparel);
@@ -533,6 +535,7 @@ namespace TorannMagic
                 //    caster.equipment.Primary.Destroy(DestroyMode.Vanish);
                 //}
                 caster.equipment.AddEquipment(specWeapon);
+                comp.specializedWeapon.Bind(thing, specWeapon);
                 //GenPlace.TryPlaceThing(technoWeapon, caster.Position, caster.Map, ThingPlaceMode.Direct, null, null);
                 //Job job = new Job(JobDefOf.Equip, technoWeapon);
                 //caster.jobs.TryTakeOrderedJob(job, JobTag.ChangingApparel);
@@ -988,6 +991,7 @@ namespace TorannMagic
 
         public static void PossessPawn(Pawn caster, Pawn target, bool wasDead = false, FactionDef previousFactionDef = null)
         {
+            if (ClassProgression.SpiritSummonedHost.IsSummoned(target)) return;
             //LongEventHandler.QueueLongEvent(delegate
             //{
                 Hediff_Possessor possessorHD = caster.health.hediffSet.GetFirstHediffOfDef(TorannMagicDefOf.TM_SpiritPossessorHD) as Hediff_Possessor;
@@ -1059,9 +1063,10 @@ namespace TorannMagic
                 spawnMap = p.Corpse.Map;
                 loc = p.Corpse.Position;
             }
-            TM_MoteMaker.ThrowGenericMote(TorannMagicDefOf.Mote_Ghost, loc.ToVector3Shifted(), spawnMap, 1.2f, .4f, 0f, .25f, 0, Rand.Range(2f, 3f), 0, 0);
-            GenPlace.TryPlaceThing(spirit.SplitOff(1), loc, spawnMap, ThingPlaceMode.Near, null, null, p.Rotation);
             Hediff_Possessor possessorHD = spirit.health.hediffSet.GetFirstHediffOfDef(TorannMagicDefOf.TM_SpiritPossessorHD) as Hediff_Possessor;
+            if (possessorHD == null || spawnMap == null || !hdc_sp.GetDirectlyHeldThings().TryDrop(spirit, loc, spawnMap,
+                ThingPlaceMode.Near, out var _, playDropSound: false)) return;
+            TM_MoteMaker.ThrowGenericMote(TorannMagicDefOf.Mote_Ghost, loc.ToVector3Shifted(), spawnMap, 1.2f, .4f, 0f, .25f, 0, Rand.Range(2f, 3f), 0, 0);
             possessorHD.PossessionCompatibility = hd.Severity;
             //Log.Message("remove pos 4");
             //spirit.needs.TryGetNeed(TorannMagicDefOf.TM_SpiritND).CurLevel = p.needs.TryGetNeed(TorannMagicDefOf.TM_SpiritND).CurLevel;
@@ -1142,7 +1147,7 @@ namespace TorannMagic
             if (p.story != null && p.story.traits != null)
             {
                 Trait t = p.story.traits.GetTrait(TorannMagicDefOf.TM_Possessed);
-                p.story.traits.RemoveTrait(t);
+                if (t != null) p.story.traits.RemoveTrait(t);
             }
             if (possessorHD.previousFaction != null)
             {
@@ -1304,12 +1309,15 @@ namespace TorannMagic
         }
 
         public static void DamageEntities(Thing victim, BodyPartRecord hitPart, float amt, float armorPenetration, DamageDef type, Thing instigator)
+            => DamageEntitiesResult(victim, hitPart, amt, armorPenetration, type, instigator);
+
+        internal static DamageWorker.DamageResult DamageEntitiesResult(Thing victim, BodyPartRecord hitPart, float amt, float armorPenetration, DamageDef type, Thing instigator)
         {
             DamageInfo dinfo;
             amt = Rand.Range(amt * .75f, amt * 1.25f);
             dinfo = new DamageInfo(type, amt, armorPenetration, (float)-1, instigator, hitPart, null, DamageInfo.SourceCategory.ThingOrUnknown);
             dinfo.SetAllowDamagePropagation(false);
-            victim.TakeDamage(dinfo);
+            return victim.TakeDamage(dinfo);
         }
 
         public static void DamageUndead(Pawn undead, float amt, Thing instigator)

@@ -19,12 +19,38 @@ internal static class ClassProgressionKillSwitchTests
 {
     public static IEnumerable<TestCase> Cases()
     {
+        yield return new("KillSwitch.BootstrapReadsControllerSettingsBeforeItsConstructor", BootstrapSettings);
         yield return new("KillSwitch.DisabledSaveRetainsProgression", EnsureCompSkips);
         yield return new("KillSwitch.IdentityFallsBackToClassicTraits", IdentityFallback);
         yield return new("KillSwitch.AuraChainAppliesClassicSeverity", AuraSeverity);
         yield return new("KillSwitch.GravitySlowStillApplied", GravitySlow);
         yield return new("KillSwitch.WeatherTransitionStillNative", WeatherNative);
         yield return new("KillSwitch.SpellAccessClassicDefaults", SpellAccessDefaults);
+    }
+
+    private static void BootstrapSettings(RuntimeFixture f)
+    {
+        // Match the two Mod instances and the real filename discriminator RimWorld uses.
+        var path=typeof(GenFilePaths).GetField("saveDataPath",BindingFlags.Static|BindingFlags.NonPublic)!;
+        var previous=path.GetValue(null);var original=TorannMagic.ModOptions.Settings.Instance;var enabled=ClassProgressionFeature.Enabled;
+        try
+        {
+            var profile=Path.Combine(f.WorkingDirectory,"profile");
+            Directory.CreateDirectory(Path.Combine(profile,"Config"));path.SetValue(null,profile);
+            var pack=(ModContentPack)RuntimeHelpers.GetUninitializedObject(typeof(ModContentPack));
+            Set(pack,"rootDirInt",new DirectoryInfo(Path.Combine(f.WorkingDirectory,"SampleRWoM")));
+            var bootstrap=(TorannMagicMod)RuntimeHelpers.GetUninitializedObject(typeof(TorannMagicMod));
+            Set(bootstrap,"intContent",pack);
+            File.WriteAllText(Path.Combine(profile,"Config","Mod_SampleRWoM_Controller.xml"),
+                "<SettingsBlock><ModSettings Class=\"TorannMagic.ModOptions.Settings\"><newProgressionBeta>True</newProgressionBeta></ModSettings></SettingsBlock>");
+            TorannMagic.ModOptions.Settings.Instance=null;
+            ClassProgressionFeature.SnapshotFromSettings(bootstrap);
+            Check.Equal(true,ClassProgressionFeature.Enabled,"early bootstrap reads the owner of the saved setting");
+            TorannMagic.ModOptions.Settings.Instance.newProgressionBeta=false;
+            ClassProgressionFeature.SnapshotFromSettings(bootstrap);
+            Check.Equal(false,ClassProgressionFeature.Enabled,"constructed settings owner takes precedence");
+        }
+        finally {path.SetValue(null,previous);TorannMagic.ModOptions.Settings.Instance=original;ClassProgressionFeature.Enabled=enabled;}
     }
 
     private sealed class Flag : IDisposable
@@ -57,6 +83,7 @@ internal static class ClassProgressionKillSwitchTests
     {
         var def = (ThingDef)RuntimeHelpers.GetUninitializedObject(typeof(ThingDef));
         def.defName = "KillSwitchHuman";
+        def.category = ThingCategory.Pawn; def.thingClass = typeof(Pawn);
         def.race = new RaceProperties { intelligence = Intelligence.Humanlike };
         return def;
     }

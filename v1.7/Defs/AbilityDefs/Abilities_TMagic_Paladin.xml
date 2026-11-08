@@ -542,7 +542,7 @@ Reduces recharge to 25s.</description>
 </ThingDef>
 			
 	<ThingDef ParentName="BaseBullet" Class="AbilityUser.ProjectileDef_Ability">
-        <thingClass>AbilityUser.Projectile_Ability</thingClass>
+        <thingClass>TorannMagic.ClassProgression.Projectile_SpiritNativeAbility</thingClass>
 		<defName>Projectile_ValiantCharge</defName>
         <label>Whirlwind</label>
         <graphicData>

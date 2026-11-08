@@ -3,7 +3,7 @@
 
 	    	
     <ThingDef ParentName="BaseBullet" Class="AbilityUser.ProjectileDef_Ability">
-		<thingClass>AbilityUser.Projectile_AbilityBase</thingClass>
+		<thingClass>TorannMagic.ClassProgression.Projectile_SpiritAmp</thingClass>
 	    <defName>Buff_AMP</defName>
         <label>AMP</label>
         <graphicData>

@@ -13,6 +13,8 @@ namespace TorannMagic.ClassProgression
             var comp = pawn.GetCompAbilityUserMagic();
             if (ClassIdentity.TryGetDemonBranch(pawn, out _) && ReferenceEquals(comp?.MagicData, data))
                 TM_ClassState.RestoreSharedMagicProgression(comp);
+            if (state.Find("rwom.chaos") != null)
+                foreach (var power in data.MagicPowersCM) if (!result.Contains(power)) result.Add(power);
             foreach (var direction in state.Disciplines)
             {
                 var profile = ClassIdentity.Profile(direction?.ClassId);
@@ -133,7 +135,7 @@ namespace TorannMagic.ClassProgression
 
         // Explicit mappings from InitializeSpell; flags are saved ownership, not
         // permission to learn another class's locked spells.
-        private static IEnumerable<TMAbilityDef> FlagAbilities(CompAbilityUserMagic comp)
+        internal static IEnumerable<TMAbilityDef> FlagAbilities(CompAbilityUserMagic comp)
         {
             if (comp.recallSpell && comp.recallSet && comp.recallPosition != default(IntVec3)
                 && Find.TickManager != null && comp.recallExpiration > Find.TickManager.TicksGame)
@@ -200,7 +202,7 @@ namespace TorannMagic.ClassProgression
         // native main owner, never merely an invested skill or a copied ability.
         public static void RestoreEnchanterChildren(CompAbilityUserMagic comp)
         {
-            if (comp == null || !ClassIdentity.TryGetState(comp.Pawn, out _)) return;
+            if (comp == null || !ClassIdentity.TryGetRole(comp.Pawn, Vocation.Mage, out bool mage) || !mage) return;
             var data = comp.MagicData;
             var shape = data.MagicPowersE.FirstOrDefault(p => p.TMabilityDefs.Contains(TorannMagicDefOf.TM_Shapeshift));
             if (comp.spell_Shapeshift && shape != null) shape.learned = true;
@@ -220,7 +222,7 @@ namespace TorannMagic.ClassProgression
         // to a real marker. Restoration must not create or refresh that marker.
         public static void RestoreChronomancerChildren(CompAbilityUserMagic comp)
         {
-            if (comp == null || !ClassIdentity.TryGetState(comp.Pawn, out _)) return;
+            if (comp == null || !ClassIdentity.TryGetRole(comp.Pawn, Vocation.Mage, out bool mage) || !mage) return;
             var data = comp.MagicData;
             var recall = data.MagicPowersC.FirstOrDefault(p => p.TMabilityDefs.Contains(TorannMagicDefOf.TM_Recall));
             if (comp.spell_Recall && recall != null) recall.learned = true;
@@ -238,7 +240,7 @@ namespace TorannMagic.ClassProgression
         // Existing standalone ownership survives; new grants require the learned parent.
         public static void RestoreBrightmageChildren(CompAbilityUserMagic comp)
         {
-            if (comp == null || !ClassIdentity.TryGetState(comp.Pawn, out _)) return;
+            if (comp == null || !ClassIdentity.TryGetRole(comp.Pawn, Vocation.Mage, out bool mage) || !mage) return;
             var data = comp.MagicData;
             bool native = ClassIdentity.IsBrightmage(comp.Pawn)
                 && ClassIdentity.Profile("rwom.brightmage")?.domain == DisciplineDomain.Magic;
@@ -254,7 +256,12 @@ namespace TorannMagic.ClassProgression
 
         public static bool RestoreLearned(CompAbilityUserMagic comp)
         {
-            if (comp == null || !ClassIdentity.TryGetState(comp.Pawn, out _)) return false;
+            if (comp == null || !ClassIdentity.TryGetRole(comp.Pawn, Vocation.Mage, out bool mage)) return false;
+            // InitializeSpell runs during PostLoadInit on every humanlike pawn. A
+            // warrior has a magic component but legitimately has no MagicData.
+            if (!mage) return true;
+            var chaos = ChaosDiscipline.Path(comp.Pawn);
+            if (chaos != null && comp.ExistingMagicData != null) ChaosDiscipline.RestoreView(comp,chaos);
             TM_ClassState.RestoreSharedMagicProgression(comp);
             var sharedCooldowns = new Dictionary<AbilityUser.AbilityDef, int>();
             if (ClassIdentity.TryGetDemonBranch(comp.Pawn, out _))

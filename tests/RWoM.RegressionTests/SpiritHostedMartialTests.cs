@@ -1,4 +1,4 @@
-using System.Reflection;
+﻿using System.Reflection;
 using System.Runtime.CompilerServices;
 using AbilityUser;
 using RimWorld;
@@ -17,6 +17,27 @@ internal static partial class SpiritMapCollapseTests
         public void ExposeData() => Effect.CompExposeData();
     }
 
+    private sealed class HateSave : IExposable
+    {
+        public HediffComp_Hate Effect=new();
+        public void ExposeData()=>Effect.CompExposeData();
+    }
+
+    private sealed class KnightJobSave : IExposable
+    {
+        public Pawn Body=null!;
+        public Job Order=null!;
+        public JobDriver_SpiritHostedMartial Driver=null!;
+        public void ExposeData()
+        {
+            Scribe_References.Look(ref Body,"body");
+            Scribe_Deep.Look(ref Order,"order");
+            if(Driver!=null){Driver.pawn=Body;Driver.job=Order;}
+            Scribe_Deep.Look(ref Driver,"driver");
+            if(Driver!=null){Driver.pawn=Body;Driver.job=Order;}
+        }
+    }
+
     private sealed class PsionicAttackSave : IExposable
     {
         public HediffComp Effect=(HediffComp)Activator.CreateInstance(typeof(MightAbility).Assembly.GetType("TorannMagic.HediffComp_Psionic",true)!,true)!;
@@ -33,6 +54,29 @@ internal static partial class SpiritMapCollapseTests
         }
     }
 
+    private static bool ShroudBodyDraw(Pawn_DrawTracker __instance, ref UnityEngine.Vector3 __result)
+    {
+        var pawn=(Pawn)typeof(Pawn_DrawTracker).GetField("pawn",BindingFlags.Instance|BindingFlags.NonPublic|BindingFlags.Public)!.GetValue(__instance)!;
+        __result=pawn.Position.ToVector3Shifted();return false; // Rendering interpolation only.
+    }
+    public sealed class PersistentShroudTestBullet : Bullet
+    {
+        public int Attempts;
+        public override void Destroy(DestroyMode mode = DestroyMode.Vanish)
+        {
+            if (++Attempts > 2) throw new InvalidOperationException("Shroud revisited a projectile that refused destruction");
+        }
+    }
+    private static bool ShroudChance(ref bool __result) { __result=true; return false; }
+    private static int knightLaunches;
+    private static bool CountKnightLaunch(ref bool __result) { knightLaunches++; __result=true; return false; }
+    private static bool RejectKnightLaunch(ref bool __result) { __result=false; return false; }
+    private static bool? spiteBaseBlocked;
+    private static bool ObserveSpiteBaseImpact(bool blockedByShield) { spiteBaseBlocked=blockedByShield;return false; }
+    private static Pawn? fearSource;
+    private static int fearChecks;
+    private static bool ObserveFearChance(Pawn caster, ref float __result)
+    { fearSource=caster;fearChecks++;__result=1f;return false; }
     private static DamageInfo? pommelHit;
     private static bool CapturePommel(Thing __instance, DamageInfo dinfo, ref DamageWorker.DamageResult __result)
     {
@@ -42,6 +86,10 @@ internal static partial class SpiritMapCollapseTests
     }
     private static IEnumerable<TestCase> HostedMartialCases()
     {
+        foreach (var test in HostedMonkCases()) yield return test;
+        foreach (var test in HostedCommanderCases()) yield return test;
+        foreach (var test in HostedSuperSoldierCases()) yield return test;
+        foreach (var test in HostedApothecaryCases()) yield return test;
         yield return new("SpiritProjectedCast.Martial.Sniper.AllStockRoundsCarryOriginalOwner", f =>
         {
             var xml=System.Xml.Linq.XDocument.Load(Path.Combine(f.Repository,"v1.7/Defs/AbilityDefs/Abilities_TMagic_Sniper.xml"));
@@ -236,6 +284,708 @@ internal static partial class SpiritMapCollapseTests
             Check.Equal(true,(bool)pay.Invoke(null,[c.Original])!,"funded volley accepted");
             Check.Equal(53f,energy.Severity,"initial twenty comes from original soul");
             } finally {TorannMagicDefOf.TM_PsionicHD=previous;}
+        }));
+        foreach(bool rescue in new[]{false,true})
+        yield return new(rescue?"DeathKnightProjection.RescueCredit":"DeathKnightProjection.BattleCredit",r=>SpiritRebirthRitualTransactionTests.Run(r,c=>{
+            using var fixture=new Fixture(r,c);
+            DisciplineProgress Enroll(Pawn pawn){
+                var state=new ClassProgressionState(Vocation.Warrior);Set(ClassIdentity.Component(pawn),"state",state);
+                state.TryAddFoundation("rwom.deathknight",DisciplineDomain.Might);return state.Find("rwom.deathknight")!;
+            }
+            var path=Enroll(c.Original);
+            var method=Production("DeathKnightMartialPath").GetMethod(rescue?"Rescue":"Battle",BindingFlags.NonPublic|BindingFlags.Static)!;
+            var patient=PawnWithComps(false,false).pawn;
+            void Record(int id){
+                patient.thingIDNumber=88000+id;
+                Set(Find.TickManager,"ticksGameInt",id*60000);
+                method.Invoke(null,rescue?[c.Creator,patient]:[c.Creator]);
+            }
+            int goal=rescue?3:5;
+            bool Done(DisciplineProgress p)=>p.CompletedTrials.Contains("rwom.deathknight.Foundation");
+            for(int n=1;n<goal;n++){Record(n);Record(n);}
+            Check.Equal(false,Done(path),"duplicate rescue or same-day battle is not new credit");
+            Record(goal);
+            Check.Equal(true,Done(path),"host service advances original knight");
+            var local=Enroll(c.Creator);
+            for(int n=1;n<=goal;n++)Record(n);
+            Check.Equal(true,Done(local),"native path takes priority");
+        }));
+        foreach(string name in new[]{"Spite","Spite_I","Spite_II","Spite_III","WaveOfFear","GraveBlade","GraveBlade_I","GraveBlade_II","GraveBlade_III"})
+        yield return new("DeathKnightProjection.OrderOwner."+name,r=>SpiritRebirthRitualTransactionTests.Run(r,c=>{
+            using var fixture=new Fixture(r,c);
+            var source=c.Original.GetCompAbilityUserMight();
+            var def=(TMAbilityDef)typeof(TorannMagicDefOf).GetField("TM_"+name)!.GetValue(null)!;
+            var power=new MightAbility(source){Def=def};source.AbilityData.Powers.Add(power);source.AbilityData.AllPowers=null;
+            var find=Production("SpiritHostedMartial").GetMethod("Find",BindingFlags.Static|BindingFlags.NonPublic)!;
+            object? Resolve()=>find.Invoke(null,[c.Creator,c.Original,"TM_SpiritCast"+name.Split('_')[0]]);
+            Check.Same(power,Resolve()!,"hosted order finds exact original ability");
+            var local=c.Creator.GetCompAbilityUserMight();local.AbilityData.Powers.Add(new MightAbility(local){Def=def});local.AbilityData.AllPowers=null;
+            Check.Equal(true,Resolve()==null,"native power takes precedence");
+        }));
+        foreach(var projectileType in new[]{typeof(Projectile_Spite),typeof(Projectile_WaveOfFear),typeof(Projectile_GraveBlade)})
+        yield return new("DeathKnightProjection.NativeLaunch."+projectileType.Name,r=>SpiritRebirthRitualTransactionTests.Run(r,c=>{
+            using var fixture=new Fixture(r,c);
+            var settings=TorannMagic.ModOptions.Settings.Instance;
+            var lib=Assembly.Load("0Harmony");var ht=lib.GetType("HarmonyLib.Harmony")!;
+            string id="rwom.knight.launch."+Guid.NewGuid();var harmony=Activator.CreateInstance(ht,id)!;
+            try {
+                TorannMagic.ModOptions.Settings.Instance=new TorannMagic.ModOptions.Settings{AIHardMode=false};
+                var patch=typeof(MightAbility).Assembly.GetType("TorannMagic.SniperRoundSpawn",true)!;
+                using var ownerPatch=new Patch(typeof(Verb).GetProperty("DirectOwner")!.GetMethod!,nameof(NativeAbilityOwner));
+                c.Map.weatherManager=(WeatherManager)RuntimeHelpers.GetUninitializedObject(typeof(WeatherManager));
+                c.Map.weatherManager.curWeather=new WeatherDef{maxRangeCap=-1};
+                var processor=ht.GetMethod("CreateClassProcessor")!.Invoke(harmony,[patch])!;processor.GetType().GetMethod("Patch")!.Invoke(processor,null);
+                using var draw=new Patch(typeof(Pawn_DrawTracker).GetProperty(nameof(Pawn_DrawTracker.DrawPos))!.GetMethod!,nameof(ShroudBodyDraw));
+                var presentation=typeof(MaterialPool).GetMethods().Where(m=>m.Name==nameof(MaterialPool.MatFrom)).Select(m=>new Patch(m,nameof(CancelNative))).ToArray();
+                var mods=LoadedModManager.RunningModsListForReading.ToArray();
+                try{LoadedModManager.RunningModsListForReading.Clear();RuntimeHelpers.RunClassConstructor(typeof(Projectile).TypeHandle);}
+                finally{LoadedModManager.RunningModsListForReading.AddRange(mods);foreach(var p in presentation)p.Dispose();}
+                var def=(ThingDef)RuntimeHelpers.GetUninitializedObject(typeof(ThingDef));
+                def.defName="KnightNative"+projectileType.Name;def.thingClass=projectileType;def.category=ThingCategory.Projectile;def.stackLimit=1;
+                def.size=new IntVec2(1,1);def.comps=[];def.drawerType=DrawerType.RealtimeOnly;def.destroyable=true;
+                def.projectile=new ProjectileProperties{damageDef=new DamageDef{defaultDamage=8},speed=60};
+                var source=c.Original.GetCompAbilityUserMight();source.mightPwr=1.73f;
+                if(source.Stamina==null)c.Original.needs.AllNeeds.Add(new Need_Stamina(c.Original){def=TorannMagicDefOf.TM_Stamina});
+                var abilityDef=projectileType==typeof(Projectile_Spite)?TorannMagicDefOf.TM_Spite:projectileType==typeof(Projectile_WaveOfFear)?TorannMagicDefOf.TM_WaveOfFear:TorannMagicDefOf.TM_GraveBlade;
+                var power=new MightAbility(source){Def=abilityDef};
+                var verb=new Verb_SB{caster=c.Creator,Ability=power,verbProps=new VerbProperties_Ability{range=30,defaultProjectile=def}};
+                Check.Equal(true,verb.TryLaunchProjectileCheck(def,c.Creator),"native JecsLite launch succeeds");
+                var shot=c.Map.thingGrid.ThingsListAt(c.Creator.Position).Single(t=>t.GetType()==projectileType);
+                Check.Same(c.Creator,((Projectile)shot).Launcher,"native launch retains physical actor");
+                Check.Equal(1.73f,(float)projectileType.GetField("arcaneDmg",BindingFlags.Instance|BindingFlags.NonPublic)!.GetValue(shot)!,"production spawn hook binds original multiplier");
+                Check.Equal(true,shot.Spawned && !shot.Destroyed,"real projectile exists in map grid");
+            } finally {ht.GetMethod("UnpatchAll")!.Invoke(harmony,[id]);TorannMagic.ModOptions.Settings.Instance=settings;}
+        }));
+        yield return new("DeathKnightProjection.WaveJobPayment",r=>SpiritRebirthRitualTransactionTests.Run(r,c=>{
+            using var fixture=new Fixture(r,c);
+            var settings=TorannMagic.ModOptions.Settings.Instance;
+            var originalDef=TorannMagicDefOf.TM_WaveOfFear;
+            var oldEvent=TorannMagicDefOf.TM_UsedManeuver;
+            var events=DefDatabase<HistoryEventDef>.AllDefsListForReading.ToArray();
+            var jobs=DefDatabase<JobDef>.AllDefsListForReading.ToArray();
+            try {
+                TorannMagic.ModOptions.Settings.Instance=new TorannMagic.ModOptions.Settings();
+                var def=(TMAbilityDef)typeof(object).GetMethod("MemberwiseClone",BindingFlags.Instance|BindingFlags.NonPublic)!.Invoke(originalDef,null)!;
+                def.consumeEnergy=true;def.staminaCost=.3f;
+                def.MainVerb=new VerbProperties_Ability{verbClass=typeof(Verb_SB),warmupTime=1,SecondsToRecharge=25,targetParams=new TargetingParameters{canTargetSelf=true}};
+                TorannMagicDefOf.TM_WaveOfFear=def;
+                TorannMagicDefOf.TM_UsedManeuver=new HistoryEventDef{defName="KnightWaveUsed"};
+                DefDatabase<HistoryEventDef>.Add(TorannMagicDefOf.TM_UsedManeuver);
+                var history=(History)RuntimeHelpers.GetUninitializedObject(typeof(History));history.historyEventsManager=new HistoryEventsManager();Set(Current.Game,"history",history);
+                using var notify=new Patch(typeof(IdeoUtility).GetMethod(nameof(IdeoUtility.Notify_HistoryEvent))!,nameof(CancelNative));
+                using var launch=new Patch(typeof(Verb_UseAbility).GetMethod("TryCastShot",BindingFlags.Instance|BindingFlags.NonPublic)!,nameof(CountKnightLaunch));
+                var source=c.Original.GetCompAbilityUserMight();source.maxSP=1;
+                c.Original.ageTracker.AgeBiologicalTicks=25L*GenDate.TicksPerYear;
+                _=source.MightData;
+                if(source.Stamina==null)c.Original.needs.AllNeeds.Add(new Need_Stamina(c.Original){def=TorannMagicDefOf.TM_Stamina});
+                source.Stamina.CurLevel=.9f;
+                var power=new MightAbility(source){Def=def};source.AbilityData.Powers.Add(power);source.AbilityData.AllPowers=null;
+                var job=JobMaker.MakeJob(new JobDef{defName="TM_SpiritCastWaveOfFear"},c.Original,c.Creator);
+                DefDatabase<JobDef>.Add(job.def);
+                var driver=new JobDriver_SpiritHostedMartial{pawn=c.Creator,job=job};
+                Set(c.Creator.jobs,"curJob",job);Set(c.Creator.jobs,"curDriver",driver);
+                var toils=((IEnumerable<Toil>)typeof(JobDriver_SpiritHostedMartial).GetMethod("MakeNewToils",BindingFlags.Instance|BindingFlags.NonPublic)!.Invoke(driver,null)!).ToArray();
+                knightLaunches=0;
+                float before=source.Stamina.CurLevel,price=source.ActualStaminaCost(def);
+                var execute=Production("DeathKnightCast").GetMethod("Execute",BindingFlags.Static|BindingFlags.NonPublic)!;
+                // Reject at the projectile boundary after owner/resource/target validation.
+                launch.Dispose();
+                using(var rejection=new Patch(typeof(Verb_UseAbility).GetMethod("TryCastShot",BindingFlags.Instance|BindingFlags.NonPublic)!,nameof(RejectKnightLaunch)))
+                {
+                    int cooldownBefore=power.CooldownTicksLeft;
+                    Check.Equal(false,(bool)execute.Invoke(null,[c.Creator,c.Original,job.def.defName,new LocalTargetInfo(c.Creator)])!,"failed projectile launch reports failure");
+                    Check.Equal(before,source.Stamina.CurLevel,"failed projectile launch does not pay stamina");
+                    Check.Equal(cooldownBefore,power.CooldownTicksLeft,"failed projectile launch does not start cooldown");
+                }
+                using var successfulLaunch=new Patch(typeof(Verb_UseAbility).GetMethod("TryCastShot",BindingFlags.Instance|BindingFlags.NonPublic)!,nameof(CountKnightLaunch));
+                toils[0].initAction();
+                Check.Equal(0,knightLaunches,"warmup does not launch");
+                Check.Equal(before,source.Stamina.CurLevel,"warmup is free");
+                driver.ticksLeftThisToil=23;
+                var loaded=RoundTripSummon(r,"knight-warmup-job",new KnightJobSave{Body=c.Creator,Order=job,Driver=driver},c.Creator,c.Original);
+                driver=loaded.Driver;job=loaded.Order;
+                Check.Equal(23,driver.ticksLeftThisToil,"remaining preparation survives save/load");
+                Check.Same(c.Original,job.targetA.Thing,"loaded order retains soul owner");
+                Check.Same(c.Creator,job.targetB.Thing,"loaded wave targets physical carrier");
+                Set(c.Creator.jobs,"curJob",job);Set(c.Creator.jobs,"curDriver",driver);
+                toils=((IEnumerable<Toil>)typeof(JobDriver_SpiritHostedMartial).GetMethod("MakeNewToils",BindingFlags.Instance|BindingFlags.NonPublic)!.Invoke(driver,null)!).ToArray();
+                toils[1].initAction();
+                Check.Equal(1,knightLaunches,"job launches once through physical verb");
+                Check.Equal(true,Math.Abs(before-price-source.Stamina.CurLevel)<.0001f,"source stamina paid exactly once");
+                Check.Equal(true,power.CooldownTicksLeft>0,"source cooldown starts");
+                Check.Equal(true,(bool)typeof(JobDriver_SpiritHostedMartial).GetField("attempted",BindingFlags.Instance|BindingFlags.NonPublic)!.GetValue(driver)!,"driver records completed attempt");
+                var receipt=RoundTripSummon(r,"knight-paid-job",new KnightJobSave{Body=c.Creator,Order=job,Driver=driver},c.Creator,c.Original);
+                Check.Equal(true,(bool)typeof(JobDriver_SpiritHostedMartial).GetField("attempted",BindingFlags.Instance|BindingFlags.NonPublic)!.GetValue(receipt.Driver)!,"completed attempt survives reload");
+                bool Repeat()=>(bool)execute.Invoke(null,[c.Creator,c.Original,job.def.defName,new LocalTargetInfo(c.Creator)])!;
+                float paid=source.Stamina.CurLevel;
+                Check.Equal(false,Repeat(),"cooldown prevents another launch");
+                power.CooldownTicksLeft=0;
+                source.Stamina.CurLevel=0;
+                Check.Equal(false,Repeat(),"resource spent during warmup prevents launch");
+                source.Stamina.CurLevel=paid;
+                Set(ClassIdentity.Component(c.Original).SpiritRebirth,"depletionPending",true);
+                Check.Equal(false,Repeat(),"depletion during warmup prevents launch");
+                Check.Equal(1,knightLaunches,"all rejected attempts remain free of launch");
+                Check.Equal(paid,source.Stamina.CurLevel,"rejected attempt preserves stamina");
+            } finally {TorannMagic.ModOptions.Settings.Instance=settings;TorannMagicDefOf.TM_WaveOfFear=originalDef;TorannMagicDefOf.TM_UsedManeuver=oldEvent;DefDatabase<HistoryEventDef>.Clear();foreach(var item in events)DefDatabase<HistoryEventDef>.Add(item);DefDatabase<JobDef>.Clear();foreach(var item in jobs)DefDatabase<JobDef>.Add(item);}
+        }));
+        yield return new("DeathKnightProjection.SpiteSoulPayment",r=>SpiritRebirthRitualTransactionTests.Run(r,c=>{
+            using var fixture=new Fixture(r,c);
+            using var definitions=DeathKnightCareerTests.Setup(r);
+            var state=new ClassProgressionState(Vocation.Warrior);Set(ClassIdentity.Component(c.Original),"state",state);
+            state.TryAddFoundation("rwom.deathknight",DisciplineDomain.Might);
+            var hate=new Hediff{def=TorannMagicDefOf.TM_HateHD,pawn=c.Original,Severity=35};
+            c.Original.health.hediffSet.hediffs.Add(hate);
+            var source=c.Original.GetCompAbilityUserMight();
+            var ability=new MightAbility(source){Def=TorannMagicDefOf.TM_Spite};
+            var verb=new Verb_DeathKnightSpite{caster=c.Creator,Ability=ability,verbProps=ability.mightDef.MainVerb};
+            var shot=typeof(Verb_DeathKnightSpite).GetMethod("TryCastShot",BindingFlags.Instance|BindingFlags.NonPublic)!;
+            using var launch=new Patch(typeof(Verb_UseAbility).GetMethod("TryCastShot",BindingFlags.Instance|BindingFlags.NonPublic)!,nameof(ShroudChance));
+            Check.Equal(true,(bool)shot.Invoke(verb,null)!,"funded hosted projectile launch allowed");
+            Check.Equal(15f,hate.Severity,"successful launch spends original twenty hate");
+            Check.Equal(false,(bool)shot.Invoke(verb,null)!,"resource rechecked after warmup");
+            Check.Equal(15f,hate.Severity,"unfunded retry is free");
+            hate.Severity=35;
+            var spirit=ClassIdentity.Component(c.Original).SpiritRebirth;
+            Set(spirit,"depletionPending",true);
+            Check.Equal(false,(bool)shot.Invoke(verb,null)!,"depleted soul cannot launch through carrier");
+            Check.Equal(35f,hate.Severity,"rejected owner retains hate");
+            Set(spirit,"depletionPending",false);
+            verb.caster=c.Circle;
+            Check.Equal(false,(bool)shot.Invoke(verb,null)!,"non-carrier cannot use soul's power");
+            Check.Equal(35f,hate.Severity,"invalid carrier retains hate");
+            verb.caster=c.Creator;
+            launch.Dispose();
+            using var refused=new Patch(typeof(Verb_UseAbility).GetMethod("TryCastShot",BindingFlags.Instance|BindingFlags.NonPublic)!,nameof(CancelNative));
+            Check.Equal(false,(bool)shot.Invoke(verb,null)!,"failed launch is propagated");
+            Check.Equal(35f,hate.Severity,"failed launch consumes no hate");
+        }));
+        yield return new("DeathKnightProjection.SpiteSnapshotSave",r=>SpiritRebirthRitualTransactionTests.Run(r,c=>{
+            using var fixture=new Fixture(r,c);
+            using var material=new Patch(typeof(MaterialPool).GetMethod("MatFrom",[typeof(string),typeof(UnityEngine.Shader)])!,nameof(CancelNative));
+            var type=typeof(Projectile_Spite);
+            var bind=type.GetMethod("BindShot",BindingFlags.Instance|BindingFlags.NonPublic);
+            Check.NotNull(bind,"Spite binds original skill parameters at launch");
+            var source=c.Original.GetCompAbilityUserMight();
+            var skills=source.MightData.MightPowerSkill_Spite;
+            source.mightPwr=1.73f;
+            skills.First(x=>x.label=="TM_Spite_pwr").level=2;
+            skills.First(x=>x.label=="TM_Spite_ver").level=3;
+            var def=(ThingDef)RuntimeHelpers.GetUninitializedObject(typeof(ThingDef));
+            def.defName="RegressionSpiteRound";def.thingClass=type;def.category=ThingCategory.Projectile;def.comps=[];
+            DefDatabase<ThingDef>.Add(def);
+            var shot=new Projectile_Spite{def=def,thingIDNumber=19890,usedTarget=IntVec3.Zero,intendedTarget=IntVec3.Zero};
+            Set(shot,"launcher",c.Creator);
+            var previousSettings=TorannMagic.ModOptions.Settings.Instance;
+            try {
+                TorannMagic.ModOptions.Settings.Instance=new TorannMagic.ModOptions.Settings{AIHardMode=false};
+                bind!.Invoke(shot,[c.Original,c.Creator]);
+            } finally {TorannMagic.ModOptions.Settings.Instance=previousSettings;}
+            float factor=(float)type.GetField("arcaneDmg",BindingFlags.Instance|BindingFlags.NonPublic)!.GetValue(shot)!;
+            skills.First(x=>x.label=="TM_Spite_pwr").level=0;
+            shot=RoundTripSummon(r,"knight-spite-shot",shot,c.Creator);
+            Check.Same(c.Creator,shot.Launcher,"physical damage instigator survives load");
+            Check.Equal(2,(int)type.GetField("pwrVal",BindingFlags.Instance|BindingFlags.NonPublic)!.GetValue(shot)!,"source power captured before later rank change");
+            Check.Equal(3,(int)type.GetField("verVal",BindingFlags.Instance|BindingFlags.NonPublic)!.GetValue(shot)!,"source versatility saved");
+            Check.Equal(factor,(float)type.GetField("arcaneDmg",BindingFlags.Instance|BindingFlags.NonPublic)!.GetValue(shot)!,"source damage multiplier saved");
+        }));
+        foreach(bool fear in new[]{true,false})
+        yield return new("DeathKnightProjection.ActiveFieldSave."+(fear?"Fear":"Blade"),r=>SpiritRebirthRitualTransactionTests.Run(r,c=>{
+            using var fixture=new Fixture(r,c);
+            using var material=new Patch(typeof(MaterialPool).GetMethod("MatFrom",[typeof(string),typeof(UnityEngine.Shader)])!,nameof(CancelNative));
+            var type=fear?typeof(Projectile_WaveOfFear):typeof(Projectile_GraveBlade);
+            var def=(ThingDef)RuntimeHelpers.GetUninitializedObject(typeof(ThingDef));
+            def.defName="RegressionKnightField"+(fear?"Fear":"Blade");def.thingClass=type;def.category=ThingCategory.Projectile;def.comps=[];
+            DefDatabase<ThingDef>.Add(def);
+            var shot=(Projectile_AbilityBase)Activator.CreateInstance(type)!;
+            shot.def=def;shot.thingIDNumber=19891;shot.usedTarget=shot.intendedTarget=IntVec3.Zero;
+            Set(shot,"launcher",c.Creator);Set(shot,"caster",c.Creator);Set(shot,"initialized",true);
+            Set(shot,"arcaneDmg",1.73f);Set(shot,"radius",7.2f);
+            if(fear){Set(shot,"effVal",2);Set(shot,"affectedPawns",new List<Pawn>{c.Creator});}
+            shot=RoundTripSummon(r,"knight-field-"+(fear?"fear":"blade"),shot,c.Creator);
+            object Value(string name)=>type.GetField(name,BindingFlags.Instance|BindingFlags.NonPublic)!.GetValue(shot)!;
+            Check.Equal(1.73f,(float)Value("arcaneDmg"),"active field keeps original damage multiplier");
+            Check.Equal(7.2f,(float)Value("radius"),"active field keeps its radius");
+            Check.Same(c.Creator,Value("caster"),"physical actor retained");
+            if(fear){
+                Check.Equal(2,(int)Value("effVal"),"wave efficiency retained");
+                var affected=(List<Pawn>)Value("affectedPawns");
+                Check.NotNull(affected,"loaded wave retains deduplication set");
+                Check.Equal(1,affected.Count,"no duplicate application after reload");
+                Check.Same(c.Creator,affected[0],"affected pawn reference resolved");
+            }
+        }));
+        foreach(string outcome in new[]{"Hit","Fallback","Shield","MissingTarget","OtherMap"})
+        yield return new("DeathKnightProjection.SpiteImpact."+outcome,r=>SpiritRebirthRitualTransactionTests.Run(r,c=>{
+            using var fixture=new Fixture(r,c);
+            using var material=new Patch(typeof(MaterialPool).GetMethod("MatFrom",[typeof(string),typeof(UnityEngine.Shader)])!,nameof(CancelNative));
+            using var baseImpact=new Patch(typeof(Projectile_AbilityBase).GetMethod("Impact",BindingFlags.Instance|BindingFlags.NonPublic)!,nameof(ObserveSpiteBaseImpact));
+            using var damage=new Patch(typeof(Thing).GetMethod(nameof(Thing.TakeDamage))!,nameof(CapturePommel));
+            var victim=PawnWithComps(false,false).pawn;
+            Set(victim,"mapIndexOrState",(sbyte)0);
+            var def=(ThingDef)RuntimeHelpers.GetUninitializedObject(typeof(ThingDef));
+            def.defName="KnightSpiteImpact";def.projectile=new ProjectileProperties{damageDef=new DamageDef{defaultDamage=20}};
+            var shot=new Projectile_Spite{def=def,intendedTarget=victim};
+            Set(shot,"mapIndexOrState",(sbyte)0);Set(shot,"launcher",c.Creator);
+            Set(shot,"shotBound",true);Set(shot,"pwrVal",2);Set(shot,"verVal",0);Set(shot,"arcaneDmg",1.5f);
+            if(outcome=="MissingTarget")Set(victim,"mapIndexOrState",(sbyte)-1);
+            if(outcome=="OtherMap"){
+                Current.Game.Maps.Add((Map)RuntimeHelpers.GetUninitializedObject(typeof(Map)));
+                Set(victim,"mapIndexOrState",(sbyte)(Current.Game.Maps.Count-1));
+            }
+            pommelHit=null;spiteBaseBlocked=null;
+            typeof(Projectile_Spite).GetMethod("Impact",BindingFlags.Instance|BindingFlags.NonPublic)!.Invoke(shot,[outcome=="Hit"?victim:null,outcome=="Shield"]);
+            Check.Equal((bool?)(outcome=="Shield"),spiteBaseBlocked,"base impact receives shield interception flag");
+            if(outcome=="Hit" || outcome=="Fallback"){
+                Check.Equal(true,pommelHit.HasValue,"Spite reaches real TakeDamage boundary");
+                Check.Same(c.Creator,pommelHit.Value.Instigator,"physical carrier is damage instigator");
+                Check.Equal(true,pommelHit.Value.Amount>=27f && pommelHit.Value.Amount<=45f,"source power and multiplier determine randomized damage");
+            } else Check.Equal(false,pommelHit.HasValue,"shield or unavailable target cannot receive fallback damage");
+        }));
+        yield return new("DeathKnightProjection.HateBodyStats",r=>SpiritRebirthRitualTransactionTests.Run(r,c=>{
+            using var fixture=new Fixture(r,c);
+            var type=typeof(MightAbility).Assembly.GetType("TorannMagic.ClassProgression.SpiritHateStats");
+            Check.NotNull(type,"hosted hate stat patch exists");
+            var state=new ClassProgressionState(Vocation.Warrior);Set(ClassIdentity.Component(c.Original),"state",state);
+            state.TryAddFoundation("rwom.deathknight",DisciplineDomain.Might);
+            var stat=new StatDef{defName="KnightStat"};
+            var stage=new HediffStage{statOffsets=[new StatModifier{stat=stat,value=.1f}]};
+            var def=TorannMagicDefOf.TM_SpiritPossessionHD;
+            var previous=def.stages;
+            var previousHate=TorannMagicDefOf.TM_HateHD;
+            var ht=Assembly.Load("0Harmony").GetType("HarmonyLib.Harmony")!;
+            string id="rwom.knight-stat-test."+Guid.NewGuid();var harmony=Activator.CreateInstance(ht,id)!;
+            try {
+                def.stages=[stage];
+                var hateDef=new HediffDef{defName="TM_HateHD_StatTest",maxSeverity=200,stages=[
+                    new HediffStage{statOffsets=[new StatModifier{stat=stat,value=.2f}]},
+                    new HediffStage{minSeverity=25,statOffsets=[new StatModifier{stat=stat,value=.35f}]}]};
+                var hate=new Hediff{def=hateDef,pawn=c.Original,Severity=30};
+                TorannMagicDefOf.TM_HateHD=hateDef;
+                c.Original.health.hediffSet.hediffs.Add(hate);
+                var processor=ht.GetMethod("CreateClassProcessor")!.Invoke(harmony,[type]);processor!.GetType().GetMethod("Patch")!.Invoke(processor,null);
+                float Read()=>HediffStatsUtility.GetStatOffsetForSeverity(stat,stage,c.Creator,fixture.Possession.parent.Severity);
+                Check.Equal(.45f,Read(),"carrier gets current source hate stage plus its existing offset");
+                hate.Severity=10;Check.Equal(.3f,Read(),"source severity change changes projected offset");
+                hateDef.stages[0].statOffsets[0].value=-.2f;
+                Check.Equal(-.1f,Read(),"negative movement-style offset is projected too");
+                hateDef.stages[0].statOffsets[0].value=.2f;
+                var unrelated=new HediffStage{statOffsets=[new StatModifier{stat=stat,value=.7f}]};
+                Check.Equal(.7f,HediffStatsUtility.GetStatOffsetForSeverity(stat,unrelated,c.Creator,1),"other hediff stages remain unchanged");
+                Set(ClassIdentity.Component(c.Original).SpiritRebirth,"depletionPending",true);
+                Check.Equal(.1f,Read(),"depleted soul supplies no bonus");
+                Set(ClassIdentity.Component(c.Original).SpiritRebirth,"depletionPending",false);
+                c.Creator.health.hediffSet.hediffs.Remove(fixture.Possession.parent);
+                Check.Equal(.1f,Read(),"removed possession supplies no stale bonus");
+                c.Creator.health.hediffSet.hediffs.Add(fixture.Possession.parent);
+                var local=new Hediff{def=hateDef,pawn=c.Creator,Severity=30};c.Creator.health.hediffSet.hediffs.Add(local);
+                Check.Equal(.1f,Read(),"native hate prevents a second borrowed bonus");
+                c.Creator.health.hediffSet.hediffs.Remove(local);
+                var localState=new ClassProgressionState(Vocation.Warrior);Set(ClassIdentity.Component(c.Creator),"state",localState);
+                localState.TryAddFoundation("rwom.deathknight",DisciplineDomain.Might);
+                Check.Equal(.1f,Read(),"native knight class takes precedence even before its hate marker is restored");
+            } finally {ht.GetMethod("UnpatchAll")!.Invoke(harmony,[id]);def.stages=previous;TorannMagicDefOf.TM_HateHD=previousHate;}
+        }));
+        foreach(bool hosted in new[]{true,false})
+        foreach(bool factioned in new[]{true,false})
+        yield return new("DeathKnightProjection.FearVictimAcrossLoad."+(hosted?"Soul":"Native")+"."+(factioned?"Faction":"Wild"),r=>SpiritRebirthRitualTransactionTests.Run(r,c=>{
+            using var fixture=new Fixture(r,c);
+            using var material=new Patch(typeof(MaterialPool).GetMethod("MatFrom",[typeof(string),typeof(UnityEngine.Shader)])!,nameof(CancelNative));
+            using var chance=new Patch(typeof(TM_Calc).GetMethod(nameof(TM_Calc.GetSpellSuccessChance))!,nameof(ObserveFearChance));
+            using var draw=new Patch(typeof(Pawn).GetProperty(nameof(Pawn.DrawPos))!.GetMethod!,nameof(CancelNative));
+            using var healthState=new Patch(typeof(Pawn_HealthTracker).GetMethod(nameof(Pawn_HealthTracker.CheckForStateChange))!,nameof(CancelNative));
+            var victim=PawnWithComps(false,false).pawn;
+            victim.def=c.Creator.def;
+            victim.mindState=new Pawn_MindState(victim);victim.jobs=null;
+            if(factioned)Set(victim,"factionInt",new Faction{def=new FactionDef()});
+            Set(victim,"mapIndexOrState",(sbyte)0);Set(victim,"positionInt",c.Creator.Position+IntVec3.North);
+            ((IList<Pawn>)c.Map.mapPawns.AllPawnsSpawned).Add(victim);
+            var fear=DefDatabase<HediffDef>.GetNamedSilentFail("TM_WaveOfFearHD");
+            if(fear==null){fear=new HediffDef{defName="TM_WaveOfFearHD",hediffClass=typeof(Hediff),maxSeverity=10};DefDatabase<HediffDef>.Add(fear);}
+            var def=(ThingDef)RuntimeHelpers.GetUninitializedObject(typeof(ThingDef));
+            def.defName="KnightFearVictimField";def.thingClass=typeof(Projectile_WaveOfFear);def.category=ThingCategory.Projectile;def.comps=[];
+            DefDatabase<ThingDef>.Add(def);
+            var shot=new Projectile_WaveOfFear{def=def,thingIDNumber=19981};
+            Set(shot,"mapIndexOrState",(sbyte)0);Set(shot,"caster",c.Creator);Set(shot,"launcher",c.Creator);
+            Set(shot,"skillOwner",hosted?c.Original:null);Set(shot,"shotBound",hosted);Set(shot,"initialized",true);
+            Set(shot,"pwrVal",2);Set(shot,"waveRange",4);Set(shot,"affectedPawns",new List<Pawn>());
+            fearSource=null;fearChecks=0;
+            shot.SearchAndFear();
+            Check.Same(hosted?c.Original:c.Creator,fearSource!,"fear resistance uses source with legacy carrier fallback");
+            Check.Equal(2.5f,victim.health.hediffSet.GetFirstHediffOfDef(fear).Severity,"real fear hediff receives original rank");
+            shot=RoundTripSummon(r,"knight-fear-victim",shot,c.Creator,c.Original,victim);
+            Set(shot,"mapIndexOrState",(sbyte)0);
+            shot.SearchAndFear();
+            Check.Equal(1,fearChecks,"already affected victim is not rolled again after load");
+            Check.Equal(2.5f,victim.health.hediffSet.GetFirstHediffOfDef(fear).Severity,"reload does not stack fear");
+        }));
+        foreach(string state in new[]{"MissingCarrier","DespawnedCarrier","OtherMap"})
+        yield return new("DeathKnightProjection.WaveOrphan."+state,r=>SpiritRebirthRitualTransactionTests.Run(r,c=>{
+            using var fixture=new Fixture(r,c);
+            using var material=new Patch(typeof(MaterialPool).GetMethod("MatFrom",[typeof(string),typeof(UnityEngine.Shader)])!,nameof(CancelNative));
+            var shot=new Projectile_WaveOfFear();
+            Set(shot,"mapIndexOrState",(sbyte)0);
+            Set(shot,"affectedPawns",new List<Pawn>());
+            Set(shot,"caster",state=="MissingCarrier"?null:c.Creator);
+            if(state=="DespawnedCarrier")Set(c.Creator,"mapIndexOrState",(sbyte)-1);
+            if(state=="OtherMap"){
+                var other=(Map)RuntimeHelpers.GetUninitializedObject(typeof(Map));
+                Current.Game.Maps.Add(other);
+                Set(c.Creator,"mapIndexOrState",(sbyte)(Current.Game.Maps.Count-1));
+            }
+            // An abandoned field must return before reading the carrier's map pawn registry.
+            shot.SearchAndFear();
+            Set(shot,"launcher",state=="MissingCarrier"?null:c.Creator);
+            Set(shot,"initialized",true);
+            using var baseImpact=new Patch(typeof(Projectile_AbilityBase).GetMethod("Impact",BindingFlags.Instance|BindingFlags.NonPublic)!,nameof(CancelNative));
+            typeof(Projectile_WaveOfFear).GetMethod("Impact",BindingFlags.Instance|BindingFlags.NonPublic)!.Invoke(shot,[null,false]);
+        }));
+        foreach(bool fear in new[]{true,false})
+        yield return new("DeathKnightProjection.FieldSource."+(fear?"Fear":"Blade"),r=>SpiritRebirthRitualTransactionTests.Run(r,c=>{
+            using var fixture=new Fixture(r,c);
+            var type=fear?typeof(Projectile_WaveOfFear):typeof(Projectile_GraveBlade);
+            var bind=type.GetMethod("BindShot",BindingFlags.Instance|BindingFlags.NonPublic);
+            Check.NotNull(bind,"field binds original soul before physical impact");
+            var state=new ClassProgressionState(Vocation.Warrior);Set(ClassIdentity.Component(c.Original),"state",state);
+            state.TryAddFoundation("rwom.deathknight",DisciplineDomain.Might);
+            var comp=c.Original.GetCompAbilityUserMight();comp.mightPwr=1.73f;
+            if(comp.Stamina==null)c.Original.needs.AllNeeds.Add(new Need_Stamina(c.Original){def=TorannMagicDefOf.TM_Stamina});
+            var skills=fear?comp.MightData.MightPowerSkill_WaveOfFear:comp.MightData.MightPowerSkill_GraveBlade;
+            string prefix=fear?"TM_WaveOfFear_":"TM_GraveBlade_";
+            skills.First(x=>x.label==prefix+"pwr").level=2;
+            skills.First(x=>x.label==prefix+"ver").level=3;
+            using var material=new Patch(typeof(MaterialPool).GetMethod("MatFrom",[typeof(string),typeof(UnityEngine.Shader)])!,nameof(CancelNative));
+            var shot=Activator.CreateInstance(type)!;
+            var previousSettings=TorannMagic.ModOptions.Settings.Instance;
+            try {
+                TorannMagic.ModOptions.Settings.Instance=new TorannMagic.ModOptions.Settings{AIHardMode=false};
+                bind!.Invoke(shot,[c.Original]);
+            } finally {TorannMagic.ModOptions.Settings.Instance=previousSettings;}
+            object Value(string name)=>type.GetField(name,BindingFlags.Instance|BindingFlags.NonPublic)!.GetValue(shot)!;
+            Check.Equal(2,(int)Value("pwrVal"),"source power used");
+            Check.Equal(3,(int)Value("verVal"),"source versatility used");
+            Check.Equal(1.73f,(float)Value("arcaneDmg"),"source multiplier used");
+        }));
+        yield return new("DeathKnightProjection.DamageFeedsSoul",r=>SpiritRebirthRitualTransactionTests.Run(r,c=>{
+            using var fixture=new Fixture(r,c);
+            using var definitions=DeathKnightCareerTests.Setup(r);
+            var state=new ClassProgressionState(Vocation.Warrior);Set(ClassIdentity.Component(c.Original),"state",state);
+            state.TryAddFoundation("rwom.deathknight",DisciplineDomain.Might);
+            var hate=new Hediff{def=TorannMagicDefOf.TM_HateHD,pawn=c.Original,Severity=1};
+            c.Original.health.hediffSet.hediffs.Add(hate);
+            c.Original.GetCompAbilityUserMight().MightData.MightPowerSkill_Shroud.First(x=>x.label=="TM_Shroud_eff").level=2;
+            var enemy=PawnWithComps(false,false).pawn;
+            var faction=new Faction{def=new FactionDef()};
+            Set(faction,"relations",new List<FactionRelation>{new(){other=c.Creator.Faction,kind=FactionRelationKind.Hostile}});
+            Set(enemy,"factionInt",faction);
+            enemy.kindDef=new PawnKindDef{race=enemy.def};
+            enemy.guest=new Pawn_GuestTracker(enemy);enemy.mindState=new Pawn_MindState(enemy);
+            var damage=new DamageDef{defName="KnightHostDamage",harmsHealth=true};
+            var hit=new DamageInfo(damage,10,0,-1,enemy);
+            TorannMagicMod.PreApplyDamage_Patch.Prefix(c.Creator.health,c.Creator,ref hit,out _);
+            Check.Equal(13f,hate.Severity,"hit on body feeds original soul hate");
+            Check.Equal(true,TM_Calc.GetHateHediff(c.Creator)==null,"no copied hate reservoir in host");
+            hit=new DamageInfo(damage,10,0,-1,c.Creator);
+            TorannMagicMod.PreApplyDamage_Patch.Prefix(c.Creator.health,c.Creator,ref hit,out _);
+            Check.Equal(13f,hate.Severity,"self damage cannot feed staged soul");
+        }));
+        yield return new("DeathKnightProjection.LifeStealSource",r=>SpiritRebirthRitualTransactionTests.Run(r,c=>{
+            using var fixture=new Fixture(r,c);
+            using var definitions=DeathKnightCareerTests.Setup(r);
+            var state=new ClassProgressionState(Vocation.Warrior);Set(ClassIdentity.Component(c.Original),"state",state);
+            state.TryAddFoundation("rwom.deathknight",DisciplineDomain.Might);Set(state.Find("rwom.deathknight")!,"stage",InitiationStage.Master);
+            var source=c.Original.GetCompAbilityUserMight();source.maxSP=1;
+            c.Original.ageTracker.AgeBiologicalTicks=25L*GenDate.TicksPerYear;
+            if(source.Stamina==null)c.Original.needs.AllNeeds.Add(new Need_Stamina(c.Original){def=TorannMagicDefOf.TM_Stamina});
+            source.Stamina.CurLevel=.4f;
+            Check.Equal(.4f,source.Stamina.CurLevel,"adult source starts with forty percent stamina");
+            source.MightData.MightPowerSkill_LifeSteal.First(x=>x.label=="TM_LifeSteal_eff").level=2;
+            source.MightData.MightPowerSkill_LifeSteal.First(x=>x.label=="TM_LifeSteal_pwr").level=2;
+            c.Creator.kindDef=new PawnKindDef{race=c.Creator.def};
+            c.Creator.ageTracker ??= new Pawn_AgeTracker(c.Creator);
+            c.Creator.def.race.lifeStageAges=[new LifeStageAge{minAge=0,def=new LifeStageDef{developmentalStage=DevelopmentalStage.Adult}}];
+            Set(c.Creator.ageTracker,"cachedLifeStageIndex",0);
+            var wound=new Hediff_Injury{pawn=c.Creator,Part=c.Creator.RaceProps.body.corePart,
+                def=new HediffDef{defName="KnightCarrierCut",injuryProps=new InjuryProps()}};
+            Set(wound,"severityInt",8f);c.Creator.health.hediffSet.hediffs.Add(wound);
+            // The minimal fixture has no complete capacity/body simulation; keep real Heal/Severity,
+            // excluding only unrelated downing/death notifications after the wound changes.
+            using var physiology=new Patch(typeof(Pawn_HealthTracker).GetMethod("CheckForStateChange",BindingFlags.Instance|BindingFlags.NonPublic|BindingFlags.Public)!,nameof(CancelNative));
+            var hate=new Hediff{def=TorannMagicDefOf.TM_HateHD,pawn=c.Original,Severity=10};c.Original.health.hediffSet.hediffs.Add(hate);
+            var enemy=PawnWithComps(false,false).pawn;
+            var faction=new Faction{def=new FactionDef()};Set(faction,"relations",new List<FactionRelation>{new(){other=c.Creator.Faction,kind=FactionRelationKind.Hostile}});
+            Set(enemy,"factionInt",faction);Set(enemy,"mapIndexOrState",(sbyte)0);Set(enemy,"positionInt",c.Creator.Position+IntVec3.East);
+            enemy.kindDef=new PawnKindDef{race=enemy.def};enemy.guest=new Pawn_GuestTracker(enemy);enemy.mindState=new Pawn_MindState(enemy);
+            using var draw=new Patch(typeof(Pawn_DrawTracker).GetProperty(nameof(Pawn_DrawTracker.DrawPos))!.GetMethod!,nameof(ShroudBodyDraw));
+            using var mote=new Patch(typeof(TM_MoteMaker).GetMethod(nameof(TM_MoteMaker.ThrowGenericMote))!,nameof(CancelNative));
+            using var siphon=new Patch(typeof(TM_MoteMaker).GetMethod(nameof(TM_MoteMaker.ThrowSiphonMote))!,nameof(CancelNative));
+            var weapon=(ThingDef)RuntimeHelpers.GetUninitializedObject(typeof(ThingDef));weapon.equipmentType=EquipmentType.Primary;weapon.weaponTags=[];
+            weapon.category=ThingCategory.Item;weapon.tools=[new Tool{power=10}];weapon.comps=[];
+            var hit=new DamageInfo(new DamageDef{defName="KnightDrainHit",harmsHealth=true},10,0,-1,c.Creator,weapon:weapon);
+            Check.Equal(true,weapon.IsMeleeWeapon,"test uses a native melee weapon");
+            TorannMagicMod.PreApplyDamage_Patch.Prefix(enemy.health,enemy,ref hit,out _);
+            Check.Equal(13.5f,hate.Severity,"life tap feeds attacking soul rather than victim or carrier");
+            float healed=10*(TorannMagicDefOf.TM_LifeSteal.weaponDamageFactor+.04f);
+            Check.Equal(true,healed>0 && Math.Abs(wound.Severity-(8f-healed))<.0001f,"native HealPawn heals carrier using source power rank");
+            Check.Equal(true,Math.Abs(source.Stamina.CurLevel-.42f)<.0001f,"efficiency restores original stamina");
+            Check.Equal(true,TM_Calc.GetHateHediff(c.Creator)==null,"carrier has no duplicate resource");
+            Set(enemy,"factionInt",c.Creator.Faction);
+            TorannMagicMod.PreApplyDamage_Patch.Prefix(enemy.health,enemy,ref hit,out _);
+            Check.Equal(13.5f,hate.Severity,"friendly victim cannot fuel staged life steal");
+            Set(enemy,"factionInt",faction);Set(state.Find("rwom.deathknight")!,"stage",InitiationStage.Foundation);
+            TorannMagicMod.PreApplyDamage_Patch.Prefix(enemy.health,enemy,ref hit,out _);
+            Check.Equal(13.5f,hate.Severity,"foundation cannot borrow later passive");
+            Set(state.Find("rwom.deathknight")!,"stage",InitiationStage.Master);
+            Set(ClassIdentity.Component(c.Original).SpiritRebirth,"depletionPending",true);
+            TorannMagicMod.PreApplyDamage_Patch.Prefix(enemy.health,enemy,ref hit,out _);
+            Check.Equal(13.5f,hate.Severity,"depleted soul cannot drain");
+            Check.Equal(true,Math.Abs(source.Stamina.CurLevel-.42f)<.0001f,"rejected drains restore no extra stamina");
+        }));
+        yield return new("DeathKnightProjection.HateSave",r=>SpiritRebirthRitualTransactionTests.Run(r,c=>{
+            using var fixture=new Fixture(r,c);
+            var before=new HateSave();
+            Set(before.Effect,"lastHateTick",7301);Set(before.Effect,"lastHate",53f);
+            var loaded=RoundTripSummon(r,"knight-hate-clock",before,c.Creator).Effect;
+            var flags=BindingFlags.NonPublic|BindingFlags.Instance;
+            Check.Equal(7301,(int)typeof(HediffComp_Hate).GetField("lastHateTick",flags)!.GetValue(loaded)!,"last hate gain survives load");
+            Check.Equal(53f,(float)typeof(HediffComp_Hate).GetField("lastHate",flags)!.GetValue(loaded)!,"comparison amount retained");
+        }));
+        yield return new("DeathKnightProjection.ShroudTwoProjectiles",r=>SpiritRebirthRitualTransactionTests.Run(r,c=>{
+            using var fixture=new Fixture(r,c);
+            using var definitions=DeathKnightCareerTests.Setup(r);
+            var state=new ClassProgressionState(Vocation.Warrior);Set(ClassIdentity.Component(c.Original),"state",state);
+            state.TryAddFoundation("rwom.deathknight",DisciplineDomain.Might);
+            var hate=new HediffWithComps{def=TorannMagicDefOf.TM_HateHD,pawn=c.Original,Severity=35};
+            var tracker=new HediffComp_Hate{parent=hate};hate.comps=[tracker];
+            c.Original.health.hediffSet.hediffs.Add(hate);
+            using var draw=new Patch(typeof(Pawn_DrawTracker).GetProperty(nameof(Pawn_DrawTracker.DrawPos))!.GetMethod!,nameof(ShroudBodyDraw));
+            using var chance=new Patch(typeof(Rand).GetMethod(nameof(Rand.Chance))!,nameof(ShroudChance));
+            using var mote=new Patch(typeof(TM_MoteMaker).GetMethod(nameof(TM_MoteMaker.ThrowGenericMote))!,nameof(CancelNative));
+            using var fleck=new Patch(typeof(TM_MoteMaker).GetMethod(nameof(TM_MoteMaker.ThrowGenericFleck))!,nameof(CancelNative));
+            var presentation=typeof(MaterialPool).GetMethods().Where(m=>m.Name==nameof(MaterialPool.MatFrom))
+                .Select(m=>new Patch(m,nameof(CancelNative))).ToArray();
+            var mods=LoadedModManager.RunningModsListForReading.ToArray();
+            try {LoadedModManager.RunningModsListForReading.Clear();RuntimeHelpers.RunClassConstructor(typeof(Projectile).TypeHandle);}
+            finally {LoadedModManager.RunningModsListForReading.AddRange(mods);foreach(var patch in presentation)patch.Dispose();}
+            var def=(ThingDef)RuntimeHelpers.GetUninitializedObject(typeof(ThingDef));
+            def.defName="KnightIncomingBullet";def.thingClass=typeof(Bullet);def.category=ThingCategory.Projectile;def.stackLimit=1;
+            def.size=new IntVec2(1,1);def.comps=[];def.drawerType=DrawerType.RealtimeOnly;def.destroyable=true;
+            def.projectile=new ProjectileProperties{damageDef=new DamageDef{defaultDamage=8},speed=60};
+            c.Creator.pather=new Pawn_PathFollower(c.Creator);
+            Bullet Shot(){
+                var b=(Bullet)ThingMaker.MakeThing(def);
+                Set(b,"launcher",c.Circle);
+                Set(b,"origin",c.Creator.DrawPos+new UnityEngine.Vector3(20,0,0));
+                Set(b,"destination",c.Creator.DrawPos);Set(b,"ticksToImpact",10);
+                GenSpawn.Spawn(b,c.Creator.Position,c.Map);return b;
+            }
+            var first=Shot();var second=Shot();
+            Check.Equal(true,first.Spawned && second.Spawned && !first.Destroyed && !second.Destroyed,"real bullets alive before interception");
+            Set(Find.TickManager,"ticksGameInt",2004);
+            float delta=0;tracker.CompPostTick(ref delta);
+            Check.Equal(true,first.Destroyed && second.Destroyed,"both real bullets destroyed from same cell list");
+            Check.Equal(27f,hate.Severity,"two interceptions debit original hate exactly once each");
+            Check.Equal(true,TM_Calc.GetHateHediff(c.Creator)==null,"no host resource created");
+        }));
+        yield return new("DeathKnightProjection.ShroudPersistentProjectile",r=>SpiritRebirthRitualTransactionTests.Run(r,c=>{
+            using var fixture=new Fixture(r,c);
+            using var definitions=DeathKnightCareerTests.Setup(r);
+            var state=new ClassProgressionState(Vocation.Warrior);Set(ClassIdentity.Component(c.Original),"state",state);
+            state.TryAddFoundation("rwom.deathknight",DisciplineDomain.Might);
+            var hate=new HediffWithComps{def=TorannMagicDefOf.TM_HateHD,pawn=c.Original,Severity=35};
+            var tracker=new HediffComp_Hate{parent=hate};hate.comps=[tracker];
+            c.Original.health.hediffSet.hediffs.Add(hate);
+            using var draw=new Patch(typeof(Pawn_DrawTracker).GetProperty(nameof(Pawn_DrawTracker.DrawPos))!.GetMethod!,nameof(ShroudBodyDraw));
+            using var chance=new Patch(typeof(Rand).GetMethod(nameof(Rand.Chance))!,nameof(ShroudChance));
+            using var mote=new Patch(typeof(TM_MoteMaker).GetMethod(nameof(TM_MoteMaker.ThrowGenericMote))!,nameof(CancelNative));
+            using var fleck=new Patch(typeof(TM_MoteMaker).GetMethod(nameof(TM_MoteMaker.ThrowGenericFleck))!,nameof(CancelNative));
+            var presentation=typeof(MaterialPool).GetMethods().Where(m=>m.Name==nameof(MaterialPool.MatFrom))
+                .Select(m=>new Patch(m,nameof(CancelNative))).ToArray();
+            var mods=LoadedModManager.RunningModsListForReading.ToArray();
+            try {LoadedModManager.RunningModsListForReading.Clear();RuntimeHelpers.RunClassConstructor(typeof(Projectile).TypeHandle);}
+            finally {LoadedModManager.RunningModsListForReading.AddRange(mods);foreach(var patch in presentation)patch.Dispose();}
+            var def=(ThingDef)RuntimeHelpers.GetUninitializedObject(typeof(ThingDef));
+            def.defName="KnightIncomingBullet";def.thingClass=typeof(Bullet);def.category=ThingCategory.Projectile;def.stackLimit=1;
+            def.size=new IntVec2(1,1);def.comps=[];def.drawerType=DrawerType.RealtimeOnly;def.destroyable=true;
+            def.projectile=new ProjectileProperties{damageDef=new DamageDef{defaultDamage=8},speed=60};
+            c.Creator.pather=new Pawn_PathFollower(c.Creator);
+            Bullet Shot(){
+                var b=(Bullet)ThingMaker.MakeThing(def);
+                Set(b,"launcher",c.Circle);
+                Set(b,"origin",c.Creator.DrawPos+new UnityEngine.Vector3(20,0,0));
+                Set(b,"destination",c.Creator.DrawPos);Set(b,"ticksToImpact",10);
+                GenSpawn.Spawn(b,c.Creator.Position,c.Map);return b;
+            }
+            def.thingClass=typeof(PersistentShroudTestBullet);
+            var first=(PersistentShroudTestBullet)Shot();
+            def.thingClass=typeof(Bullet);var second=Shot();
+            Check.Equal(true,first.Spawned && second.Spawned && !first.Destroyed && !second.Destroyed,"real bullets alive before interception");
+            Set(Find.TickManager,"ticksGameInt",2004);
+            float delta=0;tracker.CompPostTick(ref delta);
+            Check.Equal(1,first.Attempts,"persistent projectile is attempted only once per scan");
+            Check.Equal(true,first.Spawned && !first.Destroyed && second.Destroyed,"refused destruction does not prevent the next interception");
+            Check.Equal(27f,hate.Severity,"two interceptions debit original hate exactly once each");
+            Check.Equal(true,TM_Calc.GetHateHediff(c.Creator)==null,"no host resource created");
+        }));
+        yield return new("DeathKnightProjection.WavePaysOnceAcrossLoad",r=>SpiritRebirthRitualTransactionTests.Run(r,c=>{
+            using var fixture=new Fixture(r,c);
+            using var material=new Patch(typeof(MaterialPool).GetMethod("MatFrom",[typeof(string),typeof(UnityEngine.Shader)])!,nameof(CancelNative));
+            using var baseImpact=new Patch(typeof(Projectile_AbilityBase).GetMethod("Impact",BindingFlags.Instance|BindingFlags.NonPublic)!,nameof(CancelNative));
+            var hateDef=new HediffDef{defName="TM_HateHDRegressionWave",minSeverity=.001f,maxSeverity=200};
+            var sourceHate=new Hediff{def=hateDef,pawn=c.Original,Severity=35};
+            var hostHate=new Hediff{def=hateDef,pawn=c.Creator,Severity=90};
+            c.Original.health.hediffSet.hediffs.Add(sourceHate);c.Creator.health.hediffSet.hediffs.Add(hostHate);
+            var type=typeof(Projectile_WaveOfFear);
+            var def=(ThingDef)RuntimeHelpers.GetUninitializedObject(typeof(ThingDef));
+            def.defName="RegressionPaidWave";def.thingClass=type;def.category=ThingCategory.Projectile;def.comps=[];
+            DefDatabase<ThingDef>.Add(def);
+            var shot=new Projectile_WaveOfFear{def=def,thingIDNumber=19892,usedTarget=IntVec3.Zero,intendedTarget=IntVec3.Zero};
+            Set(shot,"launcher",c.Creator);Set(shot,"shotBound",true);Set(shot,"skillOwner",c.Original);Set(shot,"effVal",2);
+            Set(Find.TickManager,"ticksGameInt",1);
+            var impact=type.GetMethod("Impact",BindingFlags.Instance|BindingFlags.NonPublic)!;
+            shot=RoundTripSummon(r,"wave-before-payment",shot,c.Creator,c.Original);
+            impact.Invoke(shot,[null,false]);
+            Check.Equal(15f,sourceHate.Severity,"actual impact charges twenty source hate at efficiency two");
+            Check.Equal(90f,hostHate.Severity,"host hate untouched");
+            shot=RoundTripSummon(r,"wave-after-payment",shot,c.Creator,c.Original);
+            impact.Invoke(shot,[null,false]);
+            Check.Equal(15f,sourceHate.Severity,"loaded initialized wave never charges again");
+        }));
+        foreach(string scenario in new[]{"Clear","Wall","OutOfRange"})
+        yield return new("DeathKnightProjection.TargetLine."+scenario,r=>SpiritRebirthRitualTransactionTests.Run(r,c=>{
+            using var fixture=new Fixture(r,c);
+            using var directOwner=new Patch(typeof(Verb).GetProperty("DirectOwner")!.GetMethod!,nameof(NativeAbilityOwner));
+            c.Map.weatherManager=(WeatherManager)RuntimeHelpers.GetUninitializedObject(typeof(WeatherManager));
+            c.Map.weatherManager.curWeather=new WeatherDef{maxRangeCap=-1};
+            Set(c.Creator,"positionInt",new IntVec3(5,0,5));
+            var def=(TMAbilityDef)typeof(object).GetMethod("MemberwiseClone",BindingFlags.Instance|BindingFlags.NonPublic)!.Invoke(TorannMagicDefOf.TM_Spite,null)!;
+            def.MainVerb=new VerbProperties_Ability{verbClass=typeof(Verb_SB),range=8,requireLineOfSight=true,targetParams=new TargetingParameters{canTargetLocations=true}};
+            var power=new MightAbility(c.Original.GetCompAbilityUserMight()){Def=def};
+            if(scenario=="Wall"){
+                var wallDef=(ThingDef)RuntimeHelpers.GetUninitializedObject(typeof(ThingDef));wallDef.defName="KnightSightWall";wallDef.size=new IntVec2(1,1);wallDef.fillPercent=1;wallDef.passability=Traversability.Impassable;
+                var wall=new Building{def=wallDef};Set(wall,"positionInt",new IntVec3(8,0,5));Set(wall,"mapIndexOrState",(sbyte)0);c.Map.edificeGrid.Register(wall);
+            }
+            var target=new LocalTargetInfo(new IntVec3(scenario=="OutOfRange"?20:11,0,5));
+            bool valid=(bool)Production("DeathKnightCast").GetMethod("Valid",BindingFlags.Static|BindingFlags.NonPublic)!.Invoke(null,[c.Creator,power,"TM_SpiritCastSpite",target])!;
+            Check.Equal(scenario=="Clear",valid,"native physical range and sight decide targeting");
+        }));
+        yield return new("DeathKnightProjection.WaveTickCadence",r=>SpiritRebirthRitualTransactionTests.Run(r,c=>{
+            using var fixture=new Fixture(r,c);
+            using var material=new Patch(typeof(MaterialPool).GetMethod("MatFrom",[typeof(string),typeof(UnityEngine.Shader)])!,nameof(CancelNative));
+            using var baseTick=new Patch(typeof(Projectile_AbilityBase).GetMethod("Tick",BindingFlags.Instance|BindingFlags.NonPublic)!,nameof(CancelNative));
+            var shot=new Projectile_WaveOfFear();Set(shot,"mapIndexOrState",(sbyte)0);
+            Set(shot,"initialized",true);Set(shot,"caster",c.Creator);Set(shot,"affectedPawns",new List<Pawn>());
+            Set(Find.TickManager,"ticksGameInt",10);
+            typeof(Projectile_WaveOfFear).GetMethod("Tick",BindingFlags.Instance|BindingFlags.NonPublic)!.Invoke(shot,null);
+            Check.Equal(2,(int)typeof(Projectile_WaveOfFear).GetField("waveRange",BindingFlags.Instance|BindingFlags.NonPublic)!.GetValue(shot)!,"landed field expands on its own tick without another Impact");
+        }));
+        foreach(bool departed in new[]{false,true})
+        yield return new("DeathKnightProjection.BladePhysicalEffects."+(departed?"Departed":"Present"),r=>SpiritRebirthRitualTransactionTests.Run(r,c=>{
+            using var fixture=new Fixture(r,c);
+            c.Map.info=new MapInfo{Size=new IntVec3(40,1,40)};
+            c.Map.cellIndices=new CellIndices(c.Map);c.Map.thingGrid=new ThingGrid(c.Map);
+            using var material=new Patch(typeof(MaterialPool).GetMethod("MatFrom",[typeof(string),typeof(UnityEngine.Shader)])!,nameof(CancelNative));
+            using var baseImpact=new Patch(typeof(Projectile_AbilityBase).GetMethod("Tick",BindingFlags.Instance|BindingFlags.NonPublic)!,nameof(CancelNative));
+            using var mote=new Patch(typeof(TM_MoteMaker).GetMethod(nameof(TM_MoteMaker.ThrowGenericMote))!,nameof(CancelNative));
+            using var damage=new Patch(typeof(Thing).GetMethod(nameof(Thing.TakeDamage))!,nameof(CapturePommel));
+            using var physiology=new Patch(typeof(Pawn_HealthTracker).GetMethod("CheckForStateChange",BindingFlags.Instance|BindingFlags.NonPublic|BindingFlags.Public)!,nameof(CancelNative));
+            using var draw=new Patch(typeof(Pawn_DrawTracker).GetProperty(nameof(Pawn_DrawTracker.DrawPos))!.GetMethod!,nameof(ShroudBodyDraw));
+            c.Creator.kindDef=new PawnKindDef{race=c.Creator.def};c.Creator.ageTracker ??= new Pawn_AgeTracker(c.Creator);
+            c.Creator.def.race.lifeStageAges=[new LifeStageAge{minAge=0,def=new LifeStageDef{developmentalStage=DevelopmentalStage.Adult}}];
+            Set(c.Creator.ageTracker,"cachedLifeStageIndex",0);
+            var wound=new Hediff_Injury{pawn=c.Creator,Part=c.Creator.RaceProps.body.corePart,def=new HediffDef{defName="KnightBladeCut",injuryProps=new InjuryProps()}};
+            Set(wound,"severityInt",40f);c.Creator.health.hediffSet.hediffs.Add(wound);
+            var victim=PawnWithComps(false,false).pawn;victim.kindDef=new PawnKindDef{race=victim.def};
+            Set(victim,"mapIndexOrState",(sbyte)0);Set(victim,"positionInt",new IntVec3(10,0,10));
+            c.Map.thingGrid.ThingsListAtFast(victim.Position).Add(victim);
+            var shot=new Projectile_GraveBlade();
+            Set(shot,"mapIndexOrState",(sbyte)0);Set(shot,"positionInt",victim.Position);
+            Set(shot,"initialized",true);Set(shot,"caster",c.Creator);Set(shot,"launcher",c.Creator);
+            Set(shot,"pwrVal",2);Set(shot,"verVal",1);Set(shot,"arcaneDmg",1.5f);
+            Set(shot,"innerCellList",new List<IntVec3>{victim.Position});Set(shot,"ringCellList",new List<IntVec3>{victim.Position});
+            if(departed)Set(c.Creator,"mapIndexOrState",(sbyte)-1);
+            Set(Find.TickManager,"ticksGameInt",15);pommelHit=null;
+            typeof(Projectile_GraveBlade).GetMethod("Tick",BindingFlags.Instance|BindingFlags.NonPublic)!.Invoke(shot,null);
+            Check.Equal(true,pommelHit.HasValue,"placed field still damages its local victim");
+            Check.Same(c.Creator,pommelHit.Value.Instigator,"field damage credited to physical caster");
+            Check.Equal(true,pommelHit.Value.Amount>=15.75f && pommelHit.Value.Amount<=37.5f,"field uses captured source rank and multiplier");
+            if(departed)Check.Equal(40f,wound.Severity,"field cannot heal carrier after leaving its map");
+            else Check.Equal(true,wound.Severity<=28f && wound.Severity>=23.5f,"real wound healing uses captured versatility and multiplier");
+        }));
+        yield return new("DeathKnightProjection.BladeMapEdge",r=>SpiritRebirthRitualTransactionTests.Run(r,c=>{
+            using var fixture=new Fixture(r,c);
+            c.Map.info=new MapInfo{Size=new IntVec3(40,1,40)};
+            c.Map.cellIndices=new CellIndices(c.Map);c.Map.thingGrid=new ThingGrid(c.Map);
+            using var material=new Patch(typeof(MaterialPool).GetMethod("MatFrom",[typeof(string),typeof(UnityEngine.Shader)])!,nameof(CancelNative));
+            using var baseImpact=new Patch(typeof(Projectile_AbilityBase).GetMethod("Tick",BindingFlags.Instance|BindingFlags.NonPublic)!,nameof(CancelNative));
+            using var mote=new Patch(typeof(TM_MoteMaker).GetMethod(nameof(TM_MoteMaker.ThrowGenericMote))!,nameof(CancelNative));
+            var shot=new Projectile_GraveBlade();
+            Set(shot,"mapIndexOrState",(sbyte)0);Set(shot,"positionInt",IntVec3.Zero);
+            Set(shot,"initialized",true);Set(shot,"caster",c.Creator);
+            Set(shot,"innerCellList",new List<IntVec3>{IntVec3.Zero});
+            Set(shot,"ringCellList",new List<IntVec3>{IntVec3.Zero});
+            Set(Find.TickManager,"ticksGameInt",15);
+            typeof(Projectile_GraveBlade).GetMethod("Tick",BindingFlags.Instance|BindingFlags.NonPublic)!.Invoke(shot,null);
+        }));
+        yield return new("DeathKnightProjection.ShroudMapEdge",r=>SpiritRebirthRitualTransactionTests.Run(r,c=>{
+            using var fixture=new Fixture(r,c);
+            using var definitions=DeathKnightCareerTests.Setup(r);
+            c.Map.info=new MapInfo{Size=new IntVec3(40,1,40)};
+            c.Map.cellIndices=new CellIndices(c.Map);c.Map.thingGrid=new ThingGrid(c.Map);
+            Set(c.Creator,"positionInt",new IntVec3(0,0,0));
+            var hate=new HediffWithComps{def=TorannMagicDefOf.TM_HateHD,pawn=c.Creator,Severity=35};
+            var tracker=new HediffComp_Hate{parent=hate};hate.comps=[tracker];
+            var absorb=typeof(HediffComp_Hate).GetMethod("AbsorbProjectiles",BindingFlags.Instance|BindingFlags.NonPublic)!;
+            absorb.Invoke(tracker,absorb.GetParameters().Length==0?null:[c.Creator]);
+            Check.Equal(35f,hate.Severity,"empty boundary scan costs no hate");
+        }));
+        yield return new("DeathKnightProjection.HateTickOwner",r=>SpiritRebirthRitualTransactionTests.Run(r,c=>{
+            using var fixture=new Fixture(r,c);
+            using var definitions=DeathKnightCareerTests.Setup(r);
+            var state=new ClassProgressionState(Vocation.Warrior);Set(ClassIdentity.Component(c.Original),"state",state);
+            state.TryAddFoundation("rwom.deathknight",DisciplineDomain.Might);
+            var hate=new HediffWithComps{def=TorannMagicDefOf.TM_HateHD,pawn=c.Original,Severity=1};
+            var tracker=new HediffComp_Hate{parent=hate};hate.comps=[tracker];
+            c.Original.health.hediffSet.hediffs.Add(hate);
+            Set(Find.TickManager,"ticksGameInt",2000);
+            float delta=0;tracker.CompPostTick(ref delta);
+            Check.Equal(true,delta>0,"held soul hate follows living host instead of freezing off-map");
+            Check.Equal(false,tracker.CompShouldRemove,"hosting does not remove original hate");
+            float repeat=0;tracker.CompPostTick(ref repeat);
+            Check.Equal(0f,repeat,"held tick and runtime tick cannot regenerate twice");
+            Set(ClassIdentity.Component(c.Original).SpiritRebirth,"depletionPending",true);
+            Set(Find.TickManager,"ticksGameInt",2010);
+            delta=0;tracker.CompPostTick(ref delta);
+            Check.Equal(0f,delta,"depleted soul passive is dormant");
+        }));
+        yield return new("DeathKnightProjection.OathSoulPayment",r=>SpiritRebirthRitualTransactionTests.Run(r,c=>{
+            using var fixture=new Fixture(r,c);
+            using var definitions=DeathKnightCareerTests.Setup(r);
+            var state=new ClassProgressionState(Vocation.Warrior);
+            Set(ClassIdentity.Component(c.Original),"state",state);
+            state.TryAddFoundation("rwom.deathknight",DisciplineDomain.Might);
+            var path=state.Find("rwom.deathknight")!;
+            Set(path,"stage",InitiationStage.Ascended);
+            var data=Activator.CreateInstance(Production("DeathKnightDisciplineData"),true)!;
+            Set(data,"Oath",true);Set(path,"MartialData",data);
+            foreach(var pawn in new[]{c.Creator,c.Original})
+                pawn.health.hediffSet.hediffs.Add(new Hediff{def=TorannMagicDefOf.TM_HateHD,pawn=pawn,Severity=35});
+            var spend=Production("DeathKnightGuard").GetMethod("SpendGuard",BindingFlags.NonPublic|BindingFlags.Static)!;
+            Check.Equal(true,(bool)spend.Invoke(null,[c.Creator])!,"host can shield using retained soul oath");
+            Check.Equal(25f,TM_Calc.GetHateHediff(c.Original).Severity,"soul pays ten hate");
+            Check.Equal(35f,TM_Calc.GetHateHediff(c.Creator).Severity,"host hate untouched");
+            Check.Equal(false,(bool)spend.Invoke(null,[c.Creator])!,"soul cooldown prevents repeated payment");
+            Check.Equal(25f,TM_Calc.GetHateHediff(c.Original).Severity,"repeat does not debit soul");
+            Set(data,"OathReadyAt",0);
+            Set(ClassIdentity.Component(c.Original).SpiritRebirth,"depletionPending",true);
+            Check.Equal(false,(bool)spend.Invoke(null,[c.Creator])!,"depleted soul cannot shield");
+            Check.Equal(25f,TM_Calc.GetHateHediff(c.Original).Severity,"depletion does not debit hate");
+            Set(ClassIdentity.Component(c.Original).SpiritRebirth,"depletionPending",false);
+            var local=new ClassProgressionState(Vocation.Warrior);
+            Set(ClassIdentity.Component(c.Creator),"state",local);
+            local.TryAddFoundation("rwom.deathknight",DisciplineDomain.Might);
+            Check.Equal(false,(bool)spend.Invoke(null,[c.Creator])!,"native knight without oath does not borrow a second path");
+            Check.Equal(25f,TM_Calc.GetHateHediff(c.Original).Severity,"local path precedence leaves soul unchanged");
         }));
         yield return new("PsionicProjection.CrucibleSoulPayment",r=>SpiritRebirthRitualTransactionTests.Run(r,c=>{
             using var fixture=new Fixture(r,c);

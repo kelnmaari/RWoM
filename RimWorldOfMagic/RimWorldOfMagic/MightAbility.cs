@@ -672,7 +672,7 @@ namespace TorannMagic
                         
                     }
                 }
-                if(MightUser.specWpnRegNum == -1 && 
+                if(!ClassProgression.SuperSoldierWeaponProfile.ReadyWeapon(MightUser.Pawn) &&
                     (this.mightDef == TorannMagicDefOf.TM_PistolWhip || this.mightDef == TorannMagicDefOf.TM_SuppressingFire || this.mightDef == TorannMagicDefOf.TM_Mk203GL ||
                     this.mightDef == TorannMagicDefOf.TM_Buckshot || this.mightDef == TorannMagicDefOf.TM_BreachingCharge))
                 {
@@ -712,7 +712,7 @@ namespace TorannMagic
                         return false;
                     }
                 }
-                if(TM_Calc.HasHateHediff(this.MightUser.Pawn) && this.MightUser.Pawn.story.traits.HasTrait(TorannMagicDefOf.DeathKnight))
+                if(TM_Calc.HasHateHediff(this.MightUser.Pawn) && ClassProgression.DeathKnightMartialPath.IsKnight(this.MightUser.Pawn))
                 {
                     Hediff hediff = null;
                     for (int h = 0; h < this.MightUser.Pawn.health.hediffSet.hediffs.Count; h++)

@@ -18,8 +18,8 @@ namespace TorannMagic.ClassProgression
         {
             if (pawn == null || pawn.Dead || pawn.Downed || !pawn.Spawned || !pawn.IsColonistPlayerControlled
                 || !ClassIdentity.TryGetState(pawn, out var state) || state.Vocation != Vocation.Mage
-                || state.Disciplines.Count != 1 || ClassInitiation.HasLegacyClass(pawn)) return null;
-            var path = state.Disciplines[0];
+                || (state.Disciplines.Count != 1 && !state.ElementalPair) || ClassInitiation.HasLegacyClass(pawn)) return null;
+            var path = state.ElementalPair ? state.Find("rwom.ice") : state.Disciplines[0];
             return path?.Domain == DisciplineDomain.Magic
                 && (path.ClassId == "rwom.ice" || path.ClassId == "rwom.lightning" || path.ClassId == "rwom.arcanist" || path.ClassId == "rwom.paladin" || path.ClassId == "rwom.summoner" || path.ClassId == "rwom.druid" || path.ClassId == "rwom.bard" || path.ClassId == "rwom.warlock" || path.ClassId == "rwom.succubus" || path.ClassId == "rwom.geomancer" || path.ClassId == "rwom.technomancer" || path.ClassId == "rwom.bloodmage" || path.ClassId == "rwom.enchanter" || path.ClassId == "rwom.chronomancer" || path.ClassId == "rwom.brightmage" || path.ClassId == "rwom.shaman" || path.ClassId == "rwom.golemancer" || path.ClassId == "rwom.empath") ? path.ClassId : null;
         }

@@ -60,4 +60,7 @@
   <TM_MasterTomeGolemancer.label>tomo de maestría: golemante</TM_MasterTomeGolemancer.label>
   <TM_MasterTomeGolemancer.description>Un tomo raro para un golemante que ha completado la prueba de maestría. Su lectura completa la iniciación y consume el tomo. Disponible en comerciantes y recompensas de misiones; no se puede fabricar.</TM_MasterTomeGolemancer.description>
   <TM_MasterTomeGolemancer.comps.1.useLabel>Leer {0_label}</TM_MasterTomeGolemancer.comps.1.useLabel>
+  <TM_MasterTomeChaos.label>tomo maestro del mago del caos</TM_MasterTomeChaos.label>
+  <TM_MasterTomeChaos.description>Un tomo poco común para el adepto del caos. Antes de leerlo, supera la prueba con hechizos de tiradas distintas. Disponible en el comercio y como recompensa de misiones.</TM_MasterTomeChaos.description>
+  <TM_MasterTomeChaos.comps.1.useLabel>Leer {0_label}</TM_MasterTomeChaos.comps.1.useLabel>
 </LanguageData>

@@ -672,7 +672,7 @@ internal static partial class SpellItemEffectTests
     }
     static readonly List<(IntVec3 center, float radius, Func<IntVec3, bool> predicate)> previewRings = [];
     static readonly List<IntVec3> seerCells = [];
-    static void SetProjectileField(Projectile projectile, string name, object value)
+    internal static void SetProjectileField(Projectile projectile, string name, object value)
     {
         // Reflection SetValue triggers Projectile's renderer-only static material
         // initializer. Set these instance fields exactly as Launch does instead.

@@ -9,8 +9,13 @@ namespace TorannMagic.ClassProgression
         public static IEnumerable<FloatMenuOption> Options(Pawn pawn, Thing circle)
         {
             if (!ClassAscension.IsCandidate(pawn)) yield break;
-            string classId = ClassAscension.CandidateClassId(pawn);
-            string keyPrefix = classId == "rwom.empath" ? "TM_ProgressionEmpathAscension" : classId == "rwom.golemancer" ? "TM_ProgressionGolemancerAscension" : classId == "rwom.shaman" ? "TM_ProgressionShamanAscension" : classId == "rwom.brightmage" ? "TM_ProgressionBrightmageAscension" : classId == "rwom.chronomancer" ? "TM_ProgressionChronomancerAscension" : classId == "rwom.enchanter" ? "TM_ProgressionEnchanterAscension" : classId == "rwom.bloodmage" ? "TM_ProgressionBloodMageAscension" : classId == "rwom.technomancer" ? "TM_ProgressionTechnomancerAscension" : classId == "rwom.geomancer" ? "TM_ProgressionGeomancerAscension" : classId == "rwom.warlock" ? "TM_ProgressionWarlockAscension" : classId == "rwom.succubus" ? "TM_ProgressionSuccubusAscension" : classId == "rwom.druid" ? "TM_ProgressionDruidAscension" : classId == "rwom.bard" ? "TM_ProgressionBardAscension" : classId == "rwom.paladin" ? "TM_ProgressionPaladinAscension" : classId == "rwom.summoner" ? "TM_ProgressionSummonerAscension" : classId == "rwom.arcanist" ? "TM_ProgressionArcanistAscension" : classId == "rwom.lightning" ? "TM_ProgressionLightningAscension" : classId == "rwom.ice" ? "TM_ProgressionIceAscension" : classId == "rwom.fire" ? "TM_ProgressionFireAscension"
+            foreach (var id in ClassAscension.Candidates(pawn))
+                foreach (var option in ForClass(pawn, circle, id)) yield return option;
+        }
+
+        private static IEnumerable<FloatMenuOption> ForClass(Pawn pawn, Thing circle, string classId)
+        {
+            string keyPrefix = classId == "rwom.chaos" ? "TM_ChaosAscension" : classId == "rwom.empath" ? "TM_ProgressionEmpathAscension" : classId == "rwom.golemancer" ? "TM_ProgressionGolemancerAscension" : classId == "rwom.shaman" ? "TM_ProgressionShamanAscension" : classId == "rwom.brightmage" ? "TM_ProgressionBrightmageAscension" : classId == "rwom.chronomancer" ? "TM_ProgressionChronomancerAscension" : classId == "rwom.enchanter" ? "TM_ProgressionEnchanterAscension" : classId == "rwom.bloodmage" ? "TM_ProgressionBloodMageAscension" : classId == "rwom.technomancer" ? "TM_ProgressionTechnomancerAscension" : classId == "rwom.geomancer" ? "TM_ProgressionGeomancerAscension" : classId == "rwom.warlock" ? "TM_ProgressionWarlockAscension" : classId == "rwom.succubus" ? "TM_ProgressionSuccubusAscension" : classId == "rwom.druid" ? "TM_ProgressionDruidAscension" : classId == "rwom.bard" ? "TM_ProgressionBardAscension" : classId == "rwom.paladin" ? "TM_ProgressionPaladinAscension" : classId == "rwom.summoner" ? "TM_ProgressionSummonerAscension" : classId == "rwom.arcanist" ? "TM_ProgressionArcanistAscension" : classId == "rwom.lightning" ? "TM_ProgressionLightningAscension" : classId == "rwom.ice" ? "TM_ProgressionIceAscension" : classId == "rwom.fire" ? "TM_ProgressionFireAscension"
                 : classId == "rwom.necromancer" ? "TM_ProgressionNecromancerAscension" : "TM_ProgressionAscension";
             string label = (keyPrefix + "Action").Translate();
             if (circle == null || !circle.Spawned || circle.Map != pawn.Map
@@ -20,7 +25,7 @@ namespace TorannMagic.ClassProgression
                 yield return new FloatMenuOption(label + " (" + "TM_ProgressionAscensionUnavailable".Translate() + ")", null);
                 yield break;
             }
-            var offering = ClassAscension.FindOffering(pawn, circle);
+            var offering = ClassAscension.FindClassOffering(pawn, circle, classId);
             if (offering == null)
             {
                 yield return new FloatMenuOption(label + " (" + (keyPrefix + "NeedsOffering").Translate() + ")", null);

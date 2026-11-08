@@ -19,21 +19,26 @@ namespace TorannMagic
             Odyssey.ManualTravelSafety.BeginAttempt(Ability);
             burstShotsLeft = 0;
             Pawn pawn = CasterPawn;
+            Pawn owner = ClassProgression.SpiritRebirthCasting.SkillOwner(pawn, Ability);
+            if (owner == null) return false;
             var trialMove = ClassProgression.ArcanistTrials.CaptureMove(Ability, pawn, ClassProgression.ArcanistTrials.Spell.Blink);
-            if (!Odyssey.ManualTravelSafety.CanPay(Ability) || !currentTarget.IsValid || !Odyssey.ManualTravelSafety.CanComplete(pawn, pawn.Map, currentTarget.Cell)
+            bool canPay = owner == pawn ? Odyssey.ManualTravelSafety.CanPay(Ability) :
+                ClassProgression.SpiritHostedBolt.Ready(pawn, ClassProgression.SpiritHostedBolt.Find(pawn, owner, Ability.Def as TMAbilityDef));
+            if (!canPay || !currentTarget.IsValid || !Odyssey.ManualTravelSafety.CanComplete(pawn, pawn.Map, currentTarget.Cell)
                 || !TM_Teleport.Move(pawn, currentTarget.Cell))
             {
                 Messages.Message("InvalidTargetLocation".Translate(), MessageTypeDefOf.RejectInput);
                 return false;
             }
-            Odyssey.ManualTravelSafety.Settle(Ability);
+            if (owner == pawn) Odyssey.ManualTravelSafety.Settle(Ability);
+            else Odyssey.ManualTravelSafety.SettleHosted((MagicAbility)Ability, pawn);
             ClassProgression.ArcanistTrials.CompleteBlink(trialMove);
 
             // Relocation never despawns the caster, so selection, draft state and
             // the executing ability job survive without being reconstructed.
             try
             {
-                if (pawn.IsColonist && pawn.GetCompAbilityUserMagic()?.MagicData.MagicPowerSkill_Cantrips
+                if (owner.IsColonist && owner.GetCompAbilityUserMagic()?.MagicData.MagicPowerSkill_Cantrips
                     .FirstOrDefault(skill => skill.label == "TM_Cantrips_ver")?.level >= 1)
                 {
                     var enemies = TM_Calc.FindPawnsNearTarget(pawn, 2, currentTarget.Cell, true);

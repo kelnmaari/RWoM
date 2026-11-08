@@ -29,7 +29,8 @@ internal static class PridestalkerCompatibilityTests
             new TraitDegreeData { degree = (int)x.Element("degree")!, label = (string)x.Element("label")! }).ToList() };
     }
 
-    static void Menu(RuntimeFixture f)
+    static void Menu(RuntimeFixture f) => Menu(f, false);
+    internal static void Menu(RuntimeFixture f, bool sdk)
     {
         var old = DefDatabase<TraitDef>.AllDefsListForReading.ToArray();
         var classes = TM_ClassUtility.CustomClasses;
@@ -50,6 +51,13 @@ internal static class PridestalkerCompatibilityTests
             p.pawn.story.traits.allTraits.Add(new Trait(trait, trait.degreeDatas.Single().degree));
             Check.Equal(1, TM_ClassState.CurrentCustomClasses(p.pawn, true).Count, "menu choice resolves mage class");
             Check.Equal(1, TM_ClassState.CurrentCustomClasses(p.pawn, false).Count, "menu choice resolves fighter class");
+            if (sdk)
+            {
+                var result = CoreSdkTests.Rows(p.pawn).Single();
+                Check.Equal("legacy.TM_Pridestalker.4", result.GetType().GetProperty("Id")!.GetValue(result), "canonical Kure trait and degree");
+                Check.Equal("Classic", result.GetType().GetProperty("Stage")!.GetValue(result)!.ToString(), "classic has no initiation stage");
+                Check.Equal(3, Convert.ToInt32(result.GetType().GetProperty("Kind")!.GetValue(result)), "both domains in one row");
+            }
         }
         finally { DefDatabase<TraitDef>.Clear(); foreach (var d in old) DefDatabase<TraitDef>.Add(d); TM_ClassUtility.CustomClasses = classes; }
     }
@@ -79,8 +87,19 @@ internal static class PridestalkerCompatibilityTests
 
     static void Saved(RuntimeFixture f)
     {
+        var traits=DefDatabase<TraitDef>.AllDefsListForReading.ToArray();
+        try { SavedCase(f); }
+        finally { DefDatabase<TraitDef>.Clear(); foreach(var trait in traits) DefDatabase<TraitDef>.Add(trait); }
+    }
+
+    static void SavedCase(RuntimeFixture f)
+    {
         LoadBaseDefinitions(f);
         var def = Definition(f);
+        // Earlier custom-class cases may have a stub under this same defName.
+        // Scribe must resolve this case's canonical definition, not that stub.
+        var others=DefDatabase<TraitDef>.AllDefsListForReading.Where(d=>d.defName!=def.defName).ToArray();
+        DefDatabase<TraitDef>.Clear(); foreach(var other in others) DefDatabase<TraitDef>.Add(other);
         DefDatabase<TraitDef>.Add(def);
         var p = PawnWithComps(true, true);
         p.magic.MagicData.MagicUserLevel = 9;
@@ -117,7 +136,7 @@ internal static class PridestalkerCompatibilityTests
         }
     }
 
-    sealed class Hooks : IDisposable
+    internal sealed class Hooks : IDisposable
     {
         readonly object harmony;
         readonly string id = "rwom.pridestalker." + Guid.NewGuid();
@@ -125,9 +144,9 @@ internal static class PridestalkerCompatibilityTests
         {
             var type = Assembly.Load("0Harmony").GetType("HarmonyLib.Harmony")!;
             harmony = Activator.CreateInstance(type, id)!;
-            foreach (string name in new[] { "PridestalkerTraitConstructorPatch", "PridestalkerTraitLoadPatch" })
+            foreach (string name in new[] { "PridestalkerTraitConstructorPatch", "PridestalkerTraitLoadPatch", "PridestalkerRosterDegreePatch" })
             {
-                var patch = typeof(MagicData).Assembly.GetType("TorannMagic.Compatibility." + name);
+                var patch = Assembly.LoadFrom(Environment.GetEnvironmentVariable("RWOM_INTEGRATIONS_ASSEMBLY")!).GetType("TorannMagic.Compatibility." + name);
                 if (patch == null) continue; // Red run exercises unpatched production.
                 var processor = type.GetMethod("CreateClassProcessor")!.Invoke(harmony, [patch])!;
                 processor.GetType().GetMethod("Patch")!.Invoke(processor, null);

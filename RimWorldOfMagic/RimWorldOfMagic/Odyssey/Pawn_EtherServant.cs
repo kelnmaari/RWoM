@@ -92,7 +92,8 @@ namespace TorannMagic.Odyssey
         public void CancelUnspawned()
         {
             endReason = EtherServantEndReason.Cancelled;
-            if (!Spawned && ParentHolder == null && carryTracker?.CarriedThing == null && (inventory?.innerContainer.Count ?? 0) == 0)
+            if (!Spawned && ParentHolder == null && carryTracker?.CarriedThing == null && (inventory?.innerContainer.Count ?? 0) == 0
+                && ClassProgression.SpiritSummonedHost.CanDismiss(this))
                 base.Destroy(DestroyMode.Vanish);
         }
 
@@ -146,6 +147,7 @@ namespace TorannMagic.Odyssey
             if (Destroyed) return true;
             if (reason == EtherServantEndReason.Active || ending) return false;
             if (endReason == EtherServantEndReason.Active) endReason = reason;
+            if (!ClassProgression.SpiritSummonedHost.CanDismiss(this)) return false;
             // A transport or world owner remains durable. Defer disposal until a map can
             // receive every stack; never destroy an off-map cargo owner.
             if (!Spawned || Map == null) return TryEndOffMap();

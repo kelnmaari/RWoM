@@ -25,6 +25,14 @@ internal static partial class CastSafetyTests
             using var definitions = new SpiritCastingDefinitions(f);
             var oldTrait = new Trait(TorannMagicDefOf.TM_Possessor);
             w.Caster.story.traits.allTraits.Add(oldTrait);
+            // Former-class MagicData registered before the first gate call:
+            // GetCompAbilityUserMagic negatively caches pawns without the comp.
+            var formerMagic = new CompAbilityUserMagic { parent = w.Caster };
+            w.Caster.AllComps.Add(formerMagic);
+            var formerData = new MagicData();
+            Set(formerMagic, "magicData", formerData);
+            var learnedFormer = new MagicPower(new List<AbilityUser.AbilityDef> { w.Def }, false) { learned = false };
+            formerData.magicPowerCustom = [learnedFormer];
             Check.Equal(true, SpiritRebirthCasting.Allows(w.Caster, w.Def), "legacy Spirit trait alone does not opt in");
             var state = MarkSpirit(w.Caster);
             Check.Equal(false, SpiritRebirthCasting.Allows(w.Caster, w.Def), "ethereal former-class ability denied");
@@ -41,6 +49,13 @@ internal static partial class CastSafetyTests
                 Check.Equal(false, SpiritRebirthCasting.Allows(w.Caster, w.Def), "child cycle does not grant unrelated abilities");
             }
             finally { parent.childAbilities = oldChildren; }
+            // A reborn spirit keeps its former class: a power it had already
+            // learned stays castable, read-only from the retained MagicData;
+            // unlearned powers still need the grimoire (classed-spirit report).
+            learnedFormer.learned = true;
+            Check.Equal(true, SpiritRebirthCasting.Allows(w.Caster, w.Def), "learned former-class ability stays castable");
+            learnedFormer.learned = false;
+            Check.Equal(false, SpiritRebirthCasting.Allows(w.Caster, w.Def), "unlearned former-class ability still needs the grimoire");
             foreach (var form in new[] { SpiritRebirthForm.Dormant, SpiritRebirthForm.Possessed, (SpiritRebirthForm)937 })
             {
                 Set(state, "form", form);

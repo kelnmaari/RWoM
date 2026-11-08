@@ -1,5 +1,6 @@
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Xml.Linq;
 using TorannMagic;
 using TorannMagic.ClassProgression;
 using Verse;
@@ -21,6 +22,23 @@ internal static class SoulStoneHolderTests
     }
     public static IEnumerable<TestCase> Cases()
     {
+        yield return new("SoulStoneHolder.PlayerImplantOrdersAndSevenLanguages", f =>
+        {
+            var jobs=XDocument.Load(Path.Combine(f.Repository,"v1.7/Defs/JobDefs/TM_SoulStoneImplant.xml")).Root!;
+            Check.Equal(true,jobs.Elements().Any(e=>e.Element("driverClass")?.Value == "TorannMagic.ClassProgression.JobDriver_SoulStoneImplant"),"native job driver");
+            foreach(var lang in new[]{"English","Russian","Ukrainian","Spanish","Portuguese","PortugueseBrazilian","ChineseSimplified"})
+            {
+                var root=Path.Combine(f.Repository,"v1.7/Languages",lang);
+                var keys=XDocument.Load(Path.Combine(root,"Keyed/TM_SoulStoneImplant.xml")).Root!;
+                foreach(var key in new[]{"TM_SoulStoneChooseHost","TM_SoulStoneCannotImplant","TM_SoulStoneHarmful","TM_SoulStoneRecoveryRemaining","TM_SoulStoneNoExitCell"})
+                    Check.Equal(true,!string.IsNullOrWhiteSpace(keys.Element(key)?.Value),lang+" "+key);
+                var warning=keys.Element("TM_SoulStoneHarmful")!.Value;
+                Check.Equal(true,warning.Contains("{0}") && warning.Contains("{1}"),lang+" names both soul and host before confirming");
+                var reports=XDocument.Load(Path.Combine(root,"DefInjected/JobDef/TM_SoulStoneImplant.xml")).Root!;
+                foreach(var job in jobs.Elements().Where(e=>e.Element("defName")!=null))
+                    Check.NotNull(reports.Element(job.Element("defName")!.Value+".reportString"),"localized player order "+lang);
+            }
+        });
         yield return new("SoulStoneHolder.ExactNativeCaptureImplantAndRecovery", CaptureImplant);
         yield return new("SoulStoneHolder.RejectForeignUnmarkedOccupiedAndRetry", Rejections);
         yield return new("SoulStoneHolder.OccupiedDestroyStackAndSplitSafety", Safety);
@@ -200,11 +218,42 @@ internal static class SoulStoneHolderTests
             world.factionManager = new FactionManager();
             Set(Current.Game, "worldInt", world);
             var path = Path.Combine(r.WorkingDirectory, "soul-stone-native-pawn.xml");
-            try { Scribe.saver.InitSaving(path, "regression"); Scribe_Deep.Look(ref stone, "stone"); Scribe.saver.FinalizeSaving(); }
+            var carrier = new Pawn();
+            var inventory = new Pawn_InventoryTracker(carrier);
+            Check.Equal(true, inventory.innerContainer.TryAdd(stone, false), "survivor inventory owns occupied stone before save");
+            TMPawnSummoned? minion = null;
+            if (runtime)
+            {
+                var race = (ThingDef)RuntimeHelpers.GetUninitializedObject(typeof(ThingDef));
+                race.defName = "SpiritSavedMinion"; race.thingClass = typeof(TMPawnSummoned); race.category = ThingCategory.Pawn;
+                race.race = pawn.def.race; race.stackLimit = 1; race.destroyable = true; race.comps = []; race.size = new IntVec2(1, 1); race.drawerType = DrawerType.RealtimeOnly;
+                DefDatabase<ThingDef>.Add(race);
+                minion = new TMPawnSummoned { def = race, thingIDNumber = 67407, Spawner = pawn, validSummoning = true,
+                    Temporary = true, TicksToDestroy = 1800, TicksLeft = 310 };
+                minion.ageTracker = new Pawn_AgeTracker(minion);
+                minion.health = new Pawn_HealthTracker(minion);
+                f.Magic.summonedMinions.Add(minion);
+            }
+            try
+            {
+                Scribe.saver.InitSaving(path, "regression");
+                Scribe_Deep.Look(ref inventory, "inventory", carrier);
+                if (runtime) Scribe_Deep.Look(ref minion, "mapSummon");
+                Scribe.saver.FinalizeSaving();
+            }
             finally { Scribe.ForceStop(); }
-            Thing_SoulStone loaded = null!;
-            try { Scribe.loader.InitLoading(path); Scribe_Deep.Look(ref loaded, "stone"); Scribe.loader.FinalizeLoading(); }
+            inventory = null!;
+            minion = null;
+            try
+            {
+                Scribe.loader.InitLoading(path);
+                Scribe_Deep.Look(ref inventory, "inventory", carrier);
+                if (runtime) Scribe_Deep.Look(ref minion, "mapSummon");
+                Scribe.loader.FinalizeLoading();
+            }
             finally { Scribe.ForceStop(); }
+            var loaded = (Thing_SoulStone)inventory.innerContainer.Single();
+            Check.Same(inventory.innerContainer, loaded.holdingOwner, "native inventory owns the restored stone");
             var soul = Check.NotNull(loaded.ContainedSpirit, "native graph restores contained Pawn");
             Check.Equal(false, ReferenceEquals(pawn, soul), "loaded graph rebuilt from deep Pawn data");
             Check.Equal(pawn.GetUniqueLoadID(), soul.GetUniqueLoadID(), "native pawn ID survives");
@@ -221,6 +270,25 @@ internal static class SoulStoneHolderTests
             if (runtime)
             {
                 var magic = soul.GetComp<CompAbilityUserMagic>(); var might = soul.GetComp<CompAbilityUserMight>();
+                Check.Same(minion!, magic.summonedMinions.Single(), "restored original pays for the exact saved summon");
+                Check.Same(soul, minion!.Spawner, "summon still belongs to the soul in its stone");
+                Check.Same(magic, minion.CompSummoner, "summon resolves the loaded original component");
+                Check.Equal(310, minion.TicksLeft, "Scribe restores the elapsed summon lifetime");
+                SpiritRebirthRitualTransactionTests.Run(r, context =>
+                {
+                    minion.def.race.intelligence = Intelligence.Humanlike;
+                    Set(minion.def.race, "fleshType", new FleshTypeDef { isOrganic = true });
+                    using var setup = new SpiritRebirthReleaseTests.ReleaseFixture(r, context);
+                    minion.needs = new Pawn_NeedsTracker(minion);
+                    minion.stances = new Pawn_StanceTracker(minion);
+                    minion.kindDef = new PawnKindDef { defName = "SpiritSavedMinionKind", race = minion.def };
+                    minion.jobs = new Verse.AI.Pawn_JobTracker(minion);
+                    minion.rotationTracker = new Pawn_RotationTracker(minion);
+                    minion.mindState = new Verse.AI.Pawn_MindState(minion);
+                    GenSpawn.Spawn(minion, new IntVec3(15, 0, 15), context.Map, Rot4.North, WipeMode.Vanish, true);
+                    Check.Same(context.Map, minion.Map, "loaded summon spawned on the map");
+                    Check.Equal(310, minion.TicksLeft, "loading the map must not renew the summon's lifetime");
+                });
                 Check.Equal(42, magic.chainedAbilitiesList.Single().expirationTicks, "native original Magic chain timer survives");
                 Check.Equal(51, might.chainedAbilitiesList.Single().expirationTicks, "native original Might chain timer survives");
                 foreach (var owner in new object[] { magic, might })

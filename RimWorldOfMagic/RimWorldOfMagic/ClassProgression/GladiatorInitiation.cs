@@ -172,12 +172,18 @@ namespace TorannMagic.ClassProgression
                 data.MightPowersR.First(p => p.TMabilityDefs.Contains(def)).learned = true;
                 if (choice == TrailLore) data.MightPowerSkill_RangerTraining.First(s => s.label == "TM_RangerTraining_pwr").levelMax = 4;
             }
-            if (choice == Classic) might.MightData.MightPowersG.First(p => p.TMabilityDefs.Contains(def)).learned = true;
+            var chosenOwner = might.MightData.MightPowersG.FirstOrDefault(p => p.TMabilityDefs.Contains(def));
+            if (chosenOwner != null) chosenOwner.learned = true;
             ClassEnrollment.ConsumePotentials(pawn);
             var traits = pawn.story.traits;
             var warrior = DefDatabase<TraitDef>.GetNamed("TM_VocationWarrior");
             foreach (var old in traits.allTraits.Where(t => t.def != warrior && t.def.defName.StartsWith("TM_Vocation")).ToList()) traits.RemoveTrait(old);
             if (!traits.HasTrait(warrior)) traits.GainTrait(new Trait(warrior));
+            // The GainTrait hook usually syncs the class genes, but a pawn that
+            // already carries the vocation trait fires no event on re-rolls:
+            // sync explicitly so the chosen martial class consumes its latent
+            // hidden-mage/warrior gene in every path.
+            TM_ClassGenes.SyncClassGenes(pawn);
             TM_PawnTracker.ResolveComps(pawn);
             TM_LegacyRecovery.Repair(pawn);
             Restore(might);
@@ -194,13 +200,30 @@ namespace TorannMagic.ClassProgression
             var grapple = might.ExistingMightData?.MightPowersG.FirstOrDefault(p => p?.learned == true &&
                 TorannMagicDefOf.TM_Grapple != null && p.TMabilityDefs?.Contains(TorannMagicDefOf.TM_Grapple) == true);
             if (grapple != null) TM_ClassState.AddRuntimeAbility(might,grapple.abilityDef);
+            // Chosen path powers own their grimoire rows: keep the saved
+            // owner learned so Restore keeps the row visible after reloads.
+            if (path.GladiatorManeuver)
+            {
+                var maneuverOwner = might.MightData.MightPowersG.FirstOrDefault(
+                    p => p?.TMabilityDefs?.Any(d => d.defName == "TM_GladiatorManeuver") == true);
+                if (maneuverOwner != null) maneuverOwner.learned = true;
+            }
+            if (path.Attack == GladiatorAttack.Sweep)
+            {
+                var sweepOwner = might.MightData.MightPowersG.FirstOrDefault(
+                    p => p?.TMabilityDefs?.Any(d => d.defName == "TM_GladiatorSweep") == true);
+                if (sweepOwner != null) sweepOwner.learned = true;
+            }
             var ability = path.GladiatorManeuver ? DefDatabase<TMAbilityDef>.GetNamedSilentFail("TM_GladiatorManeuver")
                 : might.MightData.MightPowersG.FirstOrDefault(p => p.learned && p.TMabilityDefs.Contains(TorannMagicDefOf.TM_Sprint))?.abilityDef;
             if (ability != null) TM_ClassState.AddRuntimeAbility(might, ability);
             if (path.Ultimate == GladiatorUltimate.Whirlwind)
                 TM_ClassState.AddRuntimeAbility(might,TorannMagicDefOf.TM_Whirlwind);
             if (path.Attack == GladiatorAttack.Sweep)
-                TM_ClassState.AddRuntimeAbility(might, DefDatabase<TMAbilityDef>.GetNamedSilentFail("TM_GladiatorSweep"));
+            {
+                var sweep = DefDatabase<TMAbilityDef>.GetNamedSilentFail("TM_GladiatorSweep");
+                if (sweep != null) TM_ClassState.AddRuntimeAbility(might, sweep);
+            }
             if (path.GladiatorManeuver && might.skill_Sprint)
             {
                 var sprint = might.MightData.MightPowersG.FirstOrDefault(p => p.learned && p.TMabilityDefs.Contains(TorannMagicDefOf.TM_Sprint));

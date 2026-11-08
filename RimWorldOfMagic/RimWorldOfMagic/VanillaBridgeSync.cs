@@ -108,6 +108,17 @@ namespace TorannMagic
             return pawn?.abilities?.GetAbility(bridge) is TMBridgeAbility ability && ability.Companion != null;
         }
 
+        // The enabled bridge def standing for this spell, or null. Optional
+        // integrations key their own features on the vanilla tracker through
+        // this read-only lookup; it grants nothing and touches no state.
+        public static TMBridgeAbilityDef BridgeDefFor(TMAbilityDef def)
+        {
+            if (def == null) return null;
+            string spellId = SpellIds.Of(def);
+            if (!FamilyEnabled(spellId)) return null;
+            return BridgeDef(spellId);
+        }
+
         private static TMBridgeAbilityDef BridgeDef(string spellId)
         {
             if (BridgeDefs.TryGetValue(spellId, out TMBridgeAbilityDef cached))

@@ -22,7 +22,41 @@ namespace TorannMagic.ClassProgression
             // A trait, race, or native possession alone never opts a legacy pawn in.
             if (ClassIdentity.Component(pawn)?.SpiritRebirth == null) return true;
             if (!SpiritRebirthEnergy.CanCast(pawn)) return false;
-            return IsSpiritAbility(ability);
+            // The reborn spirit keeps its former class: abilities it had
+            // already learned stay castable alongside the spirit family
+            // (classed-spirit report). Unlearned powers still need the
+            // grimoire, and possession hosts carry no marker, so their own
+            // abilities were never gated here.
+            return IsSpiritAbility(ability) || OwnsLearnedAbility(pawn, ability);
+        }
+
+        // Read-only over the retained MagicData. The aggregate power getters
+        // materialize owners and must never run inside this admission gate.
+        private static bool OwnsLearnedAbility(Pawn pawn, AbilityDef ability)
+        {
+            var data = pawn.GetCompAbilityUserMagic()?.ExistingMagicData;
+            if (data == null) return false;
+            return KnowsLearned(data.magicPowerCustom, ability)
+                || KnowsLearned(data.magicPowerCustomStandalone, ability)
+                || KnowsLearned(data.MagicPowers, ability)
+                || KnowsLearned(data.MagicPowersStandalone, ability)
+                || KnowsLearned(data.MagicPowersW, ability)
+                || KnowsLearned(data.MagicPowersIF, ability)
+                || KnowsLearned(data.MagicPowersHoF, ability)
+                || KnowsLearned(data.MagicPowersSB, ability);
+        }
+
+        private static bool KnowsLearned(List<MagicPower> powers, AbilityDef ability)
+        {
+            if (powers == null) return false;
+            for (int i = 0; i < powers.Count; i++)
+            {
+                var power = powers[i];
+                if (power?.learned != true || power.TMabilityDefs == null) continue;
+                for (int j = 0; j < power.TMabilityDefs.Count; j++)
+                    if (ReferenceEquals(power.TMabilityDefs[j], ability)) return true;
+            }
+            return false;
         }
 
         public static bool IsSpiritAbility(AbilityDef ability)

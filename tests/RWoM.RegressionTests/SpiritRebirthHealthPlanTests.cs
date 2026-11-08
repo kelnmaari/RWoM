@@ -21,12 +21,36 @@ internal static class SpiritRebirthHealthPlanTests
 
     public static IEnumerable<TestCase> Cases()
     {
+        yield return new("SpiritRebirthHealthPlan.ApothecaryStockRetainsOriginalOwner", ApothecaryStock);
         yield return new("SpiritRebirthHealthPlan.BardSongsRetainTheirOriginalOwner", BardSongs);
         yield return new("SpiritRebirthHealthPlan.NativeResourceAndEnchantmentMarkers", NativeMarkers);
         yield return new("SpiritRebirthHealthPlan.UnsupportedLinkLeavesOriginalGraph", Unsupported);
         yield return new("SpiritRebirthHealthPlan.NativePhysicalRemovalKeepsExactClassMarker", PhysicalRemoval);
         yield return new("SpiritRebirthHealthPlan.StaleSnapshotCannotApply", Stale);
         yield return new("SpiritRebirthHealthPlan.UnknownCompAndIdentityImplantRejected", UnsafePhysical);
+    }
+
+    static void ApothecaryStock(RuntimeFixture r)
+    {
+        using var f=new SpiritRebirthStateTests.Fixture(r);Dead(f.Original);
+        using var defs=new HealthDefinitions();
+        var def=new HediffDef { defName="TM_ApothecaryHerbsHD",hediffClass=typeof(TorannMagic.Hediff_ApothecaryHerbs),maxSeverity=100 };
+        DefDatabase<HediffDef>.Add(def);
+        var herbs=new TorannMagic.Hediff_ApothecaryHerbs {def=def,pawn=f.Original};
+        herbs.Severity=37.25f;Set(herbs,"herbPwr",3);Set(herbs,"herbEff",2);Set(herbs,"herbVer",4);
+        f.Original.health.hediffSet.hediffs.Add(herbs);
+        herbs.Part=Part();
+        Check.Equal(false,Prepare(f.Original,out _,out _),"body-attached foreign stock must not be silently retained");
+        herbs.Part=null;
+        def.comps=[new HediffCompProperties {compClass=typeof(HediffComp_SeverityPerDay)}];
+        Check.Equal(false,Prepare(f.Original,out _,out _),"patched resource callbacks need explicit adapter");
+        def.comps=null;
+        Check.Equal(true,Prepare(f.Original,out var plan,out _),"native herbs do not block ritual");
+        Check.Equal(true,Apply(plan!),"conversion preserves stock rather than refilling/removing it");
+        SameGraph(f.Original,[herbs],"same herb stock retained");
+        Check.Equal(37.25f,herbs.Severity,"quantity unchanged");
+        Check.Equal(130f,herbs.MaxSeverity,"trained capacity unchanged");
+        Check.Same(f.Original,herbs.pawn,"stock keeps original owner");
     }
 
     static Hediff_ClassDiscipline Marker(Pawn pawn, BodyPartRecord part)

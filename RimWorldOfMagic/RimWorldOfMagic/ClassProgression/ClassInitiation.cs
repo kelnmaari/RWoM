@@ -9,11 +9,13 @@ namespace TorannMagic.ClassProgression
         private static readonly System.Collections.Generic.HashSet<Pawn> inFlight = new System.Collections.Generic.HashSet<Pawn>();
         public static System.Collections.Generic.IEnumerable<ClassDisciplineDef> FoundationProfiles
             => DefDatabase<ClassDisciplineDef>.AllDefsListForReading.Where(p =>
-                (p.profileId == "rwom.priest" || p.profileId == "rwom.necromancer" || p.profileId == "rwom.fire" || p.profileId == "rwom.ice" || p.profileId == "rwom.lightning" || p.profileId == "rwom.arcanist" || p.profileId == "rwom.paladin" || p.profileId == "rwom.summoner" || p.profileId == "rwom.technomancer" || p.profileId == "rwom.geomancer" || p.profileId == "rwom.shaman" || p.profileId == "rwom.empath" || p.profileId == "rwom.golemancer" || p.profileId == "rwom.brightmage" || p.profileId == "rwom.chronomancer" || p.profileId == "rwom.enchanter" || p.profileId == "rwom.bloodmage" || p.profileId == "rwom.druid" || p.profileId == "rwom.bard" || p.profileId == "rwom.warlock" || p.profileId == "rwom.succubus") && p.foundationBook != null);
+                (p.profileId == "rwom.shadow" || p.profileId == "rwom.chaos" || p.profileId == "rwom.priest" || p.profileId == "rwom.necromancer" || p.profileId == "rwom.fire" || p.profileId == "rwom.ice" || p.profileId == "rwom.lightning" || p.profileId == "rwom.arcanist" || p.profileId == "rwom.paladin" || p.profileId == "rwom.summoner" || p.profileId == "rwom.technomancer" || p.profileId == "rwom.geomancer" || p.profileId == "rwom.shaman" || p.profileId == "rwom.empath" || p.profileId == "rwom.golemancer" || p.profileId == "rwom.brightmage" || p.profileId == "rwom.chronomancer" || p.profileId == "rwom.enchanter" || p.profileId == "rwom.bloodmage" || p.profileId == "rwom.druid" || p.profileId == "rwom.bard" || p.profileId == "rwom.warlock" || p.profileId == "rwom.succubus") && p.foundationBook != null);
 
-        private static System.Collections.Generic.List<MagicPower> Powers(MagicData data, ClassDisciplineDef profile)
+        internal static System.Collections.Generic.List<MagicPower> Powers(MagicData data, ClassDisciplineDef profile)
         {
             if (data == null || profile == null) return null;
+            if (profile.profileId == "rwom.shadow" && profile.magicPowerList == "magicPowerShadow") return data.MagicPowersShadow;
+            if (profile.profileId == "rwom.chaos" && profile.magicPowerList == "magicPowerCM") return data.MagicPowersCM;
             if (profile.profileId == "rwom.priest" && profile.magicPowerList == "magicPowerPR") return data.MagicPowersPR;
             if (profile.profileId == "rwom.necromancer" && profile.magicPowerList == "magicPowerN") return data.MagicPowersN;
             if (profile.profileId == "rwom.fire" && profile.magicPowerList == "magicPowerIF") return data.MagicPowersIF;
@@ -37,11 +39,52 @@ namespace TorannMagic.ClassProgression
             if (profile.profileId == "rwom.succubus" && profile.magicPowerList == "magicPowerSD") return data.MagicPowersSD;
             return null;
         }
+        // Only creation-time callers and the explicit dev command enter here.
+        // Build and validate the real persistent owners before publishing the class.
+        internal static bool TryGrantStartingFoundation(Pawn pawn, TraitDef requested)
+        {
+            if (requested != null && requested == TorannMagicDefOf.TM_Wanderer)
+                return ClassEnrollment.ChooseGeneratedWanderer(pawn, Vocation.Mage);
+            var comp = ClassIdentity.Component(pawn);
+            var vocation = DefDatabase<TraitDef>.GetNamedSilentFail("TM_VocationMage");
+            if (comp == null || comp.State != null || requested == null || vocation == null ||
+                pawn.Dead || pawn.Destroyed || pawn.story?.traits == null || pawn.health == null || pawn.needs == null ||
+                ClassEnrollment.HasChosenClass(pawn) || !ClassEnrollment.HasNoPriorOwnership(pawn)) return false;
+            var matches = FoundationProfiles.Where(p => p.legacyTrait == requested && p.domain == DisciplineDomain.Magic).Take(2).ToList();
+            if (matches.Count != 1) return false;
+            if (pawn.GetCompAbilityUserMagic() == null) Utils.TM_PawnTracker.EnsureClassComps(pawn);
+            var magic = pawn.GetCompAbilityUserMagic();
+            if (magic == null || !ClassEnrollment.HasNoPriorOwnership(pawn)) return false;
+            var profile = matches[0];
+            var data = new MagicData(magic) { MagicUserXP = 0 };
+            var powers = Powers(data, profile);
+            var spells = profile.spells?.Where(s => s != null && s.stage == InitiationStage.Foundation).ToList();
+            int expected = profile.profileId == "rwom.shadow" || profile.profileId == "rwom.chaos" ? 1 : 2;
+            if (powers == null || spells == null || spells.Count != expected ||
+                spells.Select(s => s.ability).Distinct().Count() != expected ||
+                spells.Any(s => s.ability == null || powers.Count(p => p?.TMabilityDefs?.Contains(s.ability) == true) != 1)) return false;
+            if (!comp.BeginNewProgression(Vocation.Mage)) return false;
+            comp.State.TryAddFoundation(profile.profileId, DisciplineDomain.Magic);
+            magic.AttachStartingData(data);
+            foreach (var spell in spells) powers.Single(p => p.TMabilityDefs.Contains(spell.ability)).learned = true;
+            magic.magicPowersInitialized = true;
+            ClassEnrollment.ConsumePotentials(pawn);
+            if (!pawn.story.traits.HasTrait(vocation)) pawn.story.traits.GainTrait(new Trait(vocation));
+            Utils.TM_PawnTracker.ResolveMagicComp(magic);
+            magic.RecoverMissingProgression();
+            ClassSpellAccess.RestoreLearned(magic);
+            Compatibility.TM_LegacyRecovery.RestoreNeed(pawn, TorannMagicDefOf.TM_MagicUserHD, TorannMagicDefOf.TM_Mana);
+            comp.SynchronizeHealthDisplay();
+            return true;
+        }
+
         internal static bool HasLegacyClass(Pawn pawn)
-            => TM_ClassState.CurrentCustomClasses(pawn, true).Count != 0
-                || TM_ClassState.CurrentCustomClasses(pawn, false).Count != 0
-                || pawn.story?.traits?.allTraits.Any(t => TM_ClassGroups.MagicEntriesField.Any(e => e.trait == t.def.defName)
-                    || TM_ClassGroups.MightEntriesField.Any(e => e.trait == t.def.defName)) == true;
+            => TM_ClassState.CurrentCustomClasses(pawn, true).Any(c => !LegacyClassConversion.IsRetainedSource(pawn, c.classTrait))
+                || TM_ClassState.CurrentCustomClasses(pawn, false).Any(c => !LegacyClassConversion.IsRetainedSource(pawn, c.classTrait))
+                || pawn.story?.traits?.allTraits.Any(t =>
+                    (TM_ClassGroups.MagicEntriesField.Any(e => e.trait == t.def.defName)
+                    || TM_ClassGroups.MightEntriesField.Any(e => e.trait == t.def.defName))
+                    && !LegacyClassConversion.IsRetainedSource(pawn, t.def)) == true;
         // Only audited foundation profiles are enabled. Metadata for other paths
         // is not permission to grant their spells or mix unported passive effects.
         public static System.Collections.Generic.IEnumerable<ClassDisciplineDef> FoundationCandidates(Pawn pawn, Thing book)
@@ -58,7 +101,7 @@ namespace TorannMagic.ClassProgression
         {
             profile = null;
             if (pawn == null || pawn.Dead || pawn.Downed || !pawn.Spawned || book == null || book.Destroyed || book.def?.destroyable != true || book.stackCount < 1
-                || !ClassIdentity.TryGetState(pawn, out var state) || state.Vocation != Vocation.Mage || state.Disciplines.Count != 0) return false;
+                || !ClassIdentity.TryGetState(pawn, out var state) || state.Vocation != Vocation.Mage || !state.CanChooseFoundation(selectedProfileId)) return false;
             var candidates = FoundationProfiles.Where(p => p.profileId == selectedProfileId && p.foundationBook == book.def).Take(2).ToList();
             if (candidates.Count != 1) return false;
             var candidate = candidates[0];
@@ -66,7 +109,7 @@ namespace TorannMagic.ClassProgression
             var magic = pawn.GetCompAbilityUserMagic();
             var powers = Powers(magic?.MagicData, candidate);
             var foundations = candidate.spells?.Where(s => s != null && s.stage == InitiationStage.Foundation).ToList();
-            if (powers == null || foundations == null || foundations.Count != 2 || foundations.Any(s => s.ability == null
+            if (powers == null || foundations == null || foundations.Count != (candidate.profileId == "rwom.shadow" || candidate.profileId == "rwom.chaos" ? 1 : 2) || foundations.Any(s => s.ability == null
                 || powers.Count(p => p.TMabilityDefs.Contains(s.ability)) != 1)) return false;
             if ((candidate.profileId == "rwom.warlock" || candidate.profileId == "rwom.succubus")
                 && TM_ClassState.PrepareDemonOwners(magic, candidate) == null) return false;
@@ -85,16 +128,20 @@ namespace TorannMagic.ClassProgression
             profile = null;
             if (pawn == null || pawn.Dead || pawn.Downed || !pawn.Spawned || book == null || book.Destroyed
                 || book.def?.destroyable != true || book.stackCount < 1 || !ClassIdentity.TryGetState(pawn, out var state)
-                || state.Vocation != Vocation.Mage || state.Disciplines.Count != 1) return false;
-            var path = state.Disciplines[0];
-            if (path == null || (path.ClassId != "rwom.priest"
+                || state.Vocation != Vocation.Mage || (state.Disciplines.Count != 1 && !state.ElementalPair)) return false;
+            var path = state.ElementalPair ? state.Disciplines.FirstOrDefault(d =>
+            {
+                var p = ClassIdentity.Profile(d.ClassId);
+                return (next == InitiationStage.Adept ? p?.adeptBook : p?.masterBook) == book.def;
+            }) : state.Disciplines[0];
+            if (path == null || (path.ClassId != "rwom.chaos" && path.ClassId != "rwom.priest"
                 && path.ClassId != "rwom.necromancer" && path.ClassId != "rwom.fire" && path.ClassId != "rwom.ice" && path.ClassId != "rwom.lightning" && path.ClassId != "rwom.arcanist" && path.ClassId != "rwom.paladin" && path.ClassId != "rwom.summoner" && path.ClassId != "rwom.technomancer" && path.ClassId != "rwom.shaman" && path.ClassId != "rwom.empath" && path.ClassId != "rwom.golemancer" && path.ClassId != "rwom.brightmage" && path.ClassId != "rwom.chronomancer" && path.ClassId != "rwom.enchanter" && path.ClassId != "rwom.bloodmage" && path.ClassId != "rwom.geomancer" && path.ClassId != "rwom.druid" && path.ClassId != "rwom.bard" && path.ClassId != "rwom.warlock" && path.ClassId != "rwom.succubus")) return false;
             var candidate = ClassIdentity.Profile(path.ClassId);
             bool adept = next == InitiationStage.Adept;
             string trial = adept ? candidate?.adeptTrialId : candidate?.masterTrialId;
             if (path?.Stage != (InitiationStage)((int)next - 1) || path.Domain != DisciplineDomain.Magic
                 || candidate?.domain != DisciplineDomain.Magic || (adept ? candidate.adeptBook : candidate.masterBook) != book.def
-                || trial != ((path.ClassId == "rwom.warlock" || path.ClassId == "rwom.succubus") ? path.ClassId + (adept ? ".foundation" : ".mastery") : path.ClassId == "rwom.technomancer" ? (adept ? "rwom.technomancer.foundation" : "rwom.technomancer.mastery") : path.ClassId == "rwom.shaman" ? (adept ? "rwom.shaman.foundation" : "rwom.shaman.mastery") : path.ClassId == "rwom.empath" ? (adept ? "rwom.empath.foundation" : "rwom.empath.mastery") : path.ClassId == "rwom.golemancer" ? (adept ? "rwom.golemancer.foundation" : "rwom.golemancer.mastery") : path.ClassId == "rwom.brightmage" ? (adept ? "rwom.brightmage.foundation" : "rwom.brightmage.mastery") : path.ClassId == "rwom.chronomancer" ? (adept ? "rwom.chronomancer.foundation" : "rwom.chronomancer.mastery") : path.ClassId == "rwom.enchanter" ? (adept ? "rwom.enchanter.foundation" : "rwom.enchanter.mastery") : path.ClassId == "rwom.bloodmage" ? (adept ? "rwom.bloodmage.foundation" : "rwom.bloodmage.mastery") : path.ClassId == "rwom.geomancer" ? (adept ? "rwom.geomancer.foundation" : "rwom.geomancer.mastery") : path.ClassId == "rwom.druid" ? (adept ? "rwom.druid.foundation" : "rwom.druid.mastery") : path.ClassId == "rwom.bard" ? (adept ? "rwom.bard.foundation" : "rwom.bard.mastery") : path.ClassId == "rwom.summoner" ? (adept ? "rwom.summoner.foundation" : "rwom.summoner.mastery") : path.ClassId == "rwom.paladin" ? (adept ? "rwom.paladin.foundation" : "rwom.paladin.mastery") : path.ClassId == "rwom.arcanist" ? (adept ? "rwom.arcanist.foundation" : "rwom.arcanist.mastery") : path.ClassId == "rwom.lightning" ? (adept ? "rwom.lightning.foundation" : "rwom.lightning.mastery") : path.ClassId == "rwom.ice" ? (adept ? "rwom.ice.foundation" : "rwom.ice.mastery") : path.ClassId == "rwom.fire" ? (adept ? FireboltDamageTrial.TrialId : FireclawTrial.TrialId)
+                || trial != ((path.ClassId == "rwom.chaos" || path.ClassId == "rwom.warlock" || path.ClassId == "rwom.succubus") ? path.ClassId + (adept ? ".foundation" : ".mastery") : path.ClassId == "rwom.technomancer" ? (adept ? "rwom.technomancer.foundation" : "rwom.technomancer.mastery") : path.ClassId == "rwom.shaman" ? (adept ? "rwom.shaman.foundation" : "rwom.shaman.mastery") : path.ClassId == "rwom.empath" ? (adept ? "rwom.empath.foundation" : "rwom.empath.mastery") : path.ClassId == "rwom.golemancer" ? (adept ? "rwom.golemancer.foundation" : "rwom.golemancer.mastery") : path.ClassId == "rwom.brightmage" ? (adept ? "rwom.brightmage.foundation" : "rwom.brightmage.mastery") : path.ClassId == "rwom.chronomancer" ? (adept ? "rwom.chronomancer.foundation" : "rwom.chronomancer.mastery") : path.ClassId == "rwom.enchanter" ? (adept ? "rwom.enchanter.foundation" : "rwom.enchanter.mastery") : path.ClassId == "rwom.bloodmage" ? (adept ? "rwom.bloodmage.foundation" : "rwom.bloodmage.mastery") : path.ClassId == "rwom.geomancer" ? (adept ? "rwom.geomancer.foundation" : "rwom.geomancer.mastery") : path.ClassId == "rwom.druid" ? (adept ? "rwom.druid.foundation" : "rwom.druid.mastery") : path.ClassId == "rwom.bard" ? (adept ? "rwom.bard.foundation" : "rwom.bard.mastery") : path.ClassId == "rwom.summoner" ? (adept ? "rwom.summoner.foundation" : "rwom.summoner.mastery") : path.ClassId == "rwom.paladin" ? (adept ? "rwom.paladin.foundation" : "rwom.paladin.mastery") : path.ClassId == "rwom.arcanist" ? (adept ? "rwom.arcanist.foundation" : "rwom.arcanist.mastery") : path.ClassId == "rwom.lightning" ? (adept ? "rwom.lightning.foundation" : "rwom.lightning.mastery") : path.ClassId == "rwom.ice" ? (adept ? "rwom.ice.foundation" : "rwom.ice.mastery") : path.ClassId == "rwom.fire" ? (adept ? FireboltDamageTrial.TrialId : FireclawTrial.TrialId)
                     : path.ClassId == "rwom.necromancer" ? (adept ? NecromancerControlTrial.TrialId : NecromancerDeathMarkTrial.TrialId)
                     : adept ? "rwom.priest.heal-ally" : "rwom.priest.purify-ally")
                 || !path.CompletedTrials.Contains(trial)) return false;
@@ -102,7 +149,7 @@ namespace TorannMagic.ClassProgression
             var magic = pawn.GetCompAbilityUserMagic();
             var spells = candidate.spells?.Where(s => s != null && s.stage == next).ToList();
             var powers = Powers(magic?.MagicData, candidate);
-            int expectedSpells = (path.ClassId == "rwom.technomancer" || (path.ClassId == "rwom.necromancer" && !adept) || ((path.ClassId == "rwom.ice" || path.ClassId == "rwom.arcanist" || path.ClassId == "rwom.paladin" || path.ClassId == "rwom.geomancer" || path.ClassId == "rwom.bloodmage" || path.ClassId == "rwom.enchanter" || path.ClassId == "rwom.chronomancer" || path.ClassId == "rwom.brightmage" || path.ClassId == "rwom.shaman" || path.ClassId == "rwom.golemancer") && adept)) ? 2 : 1;
+            int expectedSpells = path.ClassId == "rwom.chaos" ? 0 : (path.ClassId == "rwom.technomancer" || (path.ClassId == "rwom.necromancer" && !adept) || ((path.ClassId == "rwom.ice" || path.ClassId == "rwom.arcanist" || path.ClassId == "rwom.paladin" || path.ClassId == "rwom.geomancer" || path.ClassId == "rwom.bloodmage" || path.ClassId == "rwom.enchanter" || path.ClassId == "rwom.chronomancer" || path.ClassId == "rwom.brightmage" || path.ClassId == "rwom.shaman" || path.ClassId == "rwom.golemancer") && adept)) ? 2 : 1;
             if (powers == null || spells == null || spells.Count != expectedSpells || spells.Any(s => s.ability == null
                 || powers.Count(p => p.TMabilityDefs.Contains(s.ability)) != 1)) return false;
             if (path.ClassId == "rwom.golemancer" && adept && !GolemancerBrands.CanPrepare(magic, path)) return false;
@@ -110,7 +157,7 @@ namespace TorannMagic.ClassProgression
             return true;
         }
 
-        private static void RestoreUnpaidBook(Pawn pawn, Thing payment, ThingOwner holder)
+        internal static void RestoreUnpaidBook(Pawn pawn, Thing payment, ThingOwner holder)
         {
             if (payment.Destroyed || payment.Spawned || payment.holdingOwner != null) return;
             if (holder != null)
@@ -132,7 +179,7 @@ namespace TorannMagic.ClassProgression
         public static bool CompleteBook(Pawn pawn, Thing book, string selectedProfileId)
         {
             if (pawn == null || !inFlight.Add(pawn)) return false;
-            try { return CompleteBookOnce(pawn, book, selectedProfileId); }
+            try { if (selectedProfileId == null && WandererLessons.Path(pawn) != null) return WandererLessons.Read(pawn, book); return CompleteBookOnce(pawn, book, selectedProfileId); }
             finally { inFlight.Remove(pawn); }
         }
 
@@ -184,6 +231,7 @@ namespace TorannMagic.ClassProgression
                 throw new System.InvalidOperationException("Class initiation changed during book payment.");
             shared?.Apply();
             foreach (var owner in owners) owner.learned = true;
+            if (next == InitiationStage.Foundation) ClassEnrollment.FinishMageFoundation(pawn);
             if (brands != null) GolemancerBrands.Commit(state.Find(profile.profileId), brands);
             ClassSpellAccess.RestoreLearned(magic);
             pawn.Notify_DisabledWorkTypesChanged();

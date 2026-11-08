@@ -48,7 +48,7 @@ namespace TorannMagic.ClassProgression
         static string ProjectileName(Spell spell) => spell == Spell.Bolt ? "Laser_LightningBolt" : spell == Spell.Cloud ? "Projectile_LightningCloud" : "Buff_AMP";
         static DisciplineProgress Owned(Pawn caster, Spell spell)
         {
-            if (caster == null || caster.Dead || !caster.Spawned || caster.Faction == null
+            if (caster == null || caster.Dead || PhysicalMap(caster) == null || caster.Faction == null
                 || caster.story?.traits?.HasTrait(TorannMagicDefOf.Faceless) == true
                 || !ClassIdentity.TryGetState(caster, out var state) || (state.Vocation & Vocation.Mage) == 0) return null;
             var path = state.Find("rwom.lightning");
@@ -61,7 +61,7 @@ namespace TorannMagic.ClassProgression
         {
             var path = Owned(caster, spell);
             if (path == null || victim == null || victim.Dead || victim.thingIDNumber <= 0 || !victim.Spawned
-                || caster.Map != victim.Map || victim.IsPrisoner || victim.IsSlave) return null;
+                || PhysicalMap(caster) != victim.Map || victim.IsPrisoner || victim.IsSlave) return null;
             if (spell == Spell.Amp)
             {
                 if (victim == caster || victim.Faction != caster.Faction || victim.health?.hediffSet == null) return null;
@@ -109,6 +109,18 @@ namespace TorannMagic.ClassProgression
             return previous;
         }
         public static void EndLaunch(Tag previous) => launching = previous;
+        private static Map PhysicalMap(Pawn caster) => caster?.Spawned == true ? caster.Map :
+            SpiritRebirthState.TryGet(caster, out var spirit) && spirit.HasValidHost(caster) ? spirit.Host.Map : null;
+        private static Pawn SourcePawn(Projectile_AbilityBase projectile) =>
+            projectile is Projectile_SpiritBolt shot ? shot.SourcePawn : projectile.Caster;
+
+        internal static void StampHosted(Projectile_AbilityBase projectile, MagicAbility ability, Spell spell)
+        {
+            var owner = ability.Pawn;
+            if (projectile.def.defName != ProjectileName(spell) || !Matches(ability.Def, spell) || Owned(owner, spell) == null) return;
+            projectileTags.Remove(projectile);
+            projectileTags.Add(projectile, new Tag { casterId = owner.thingIDNumber, spell = spell });
+        }
         public static void Launched(Projectile_AbilityBase projectile, Thing caster, AbilityUser.AbilityDef ability)
         {
             var tag = launching; launching = null;
@@ -119,7 +131,7 @@ namespace TorannMagic.ClassProgression
         static Tag Source(Projectile_AbilityBase projectile, Spell spell)
         {
             projectileTags.TryGetValue(projectile, out var tag);
-            return tag != null && tag.spell == spell && tag.casterId == projectile.Caster?.thingIDNumber
+            return tag != null && tag.spell == spell && tag.casterId == SourcePawn(projectile)?.thingIDNumber
                 && projectile.def?.defName == ProjectileName(spell) && Matches(projectile.localAbilityDef, spell) ? tag : null;
         }
         public static void ExposeProjectile(Projectile_AbilityBase projectile)
@@ -132,7 +144,7 @@ namespace TorannMagic.ClassProgression
         }
         public static DamageWorker.DamageResult Damage(Projectile_AbilityBase projectile, Thing victim, DamageInfo damage, Spell spell)
         {
-            var snapshot = Source(projectile, spell) != null ? Capture(projectile.Caster, victim as Pawn, spell) : null;
+            var snapshot = Source(projectile, spell) != null ? Capture(SourcePawn(projectile), victim as Pawn, spell) : null;
             var result = victim.TakeDamage(damage);
             Complete(snapshot, result?.totalDamageDealt ?? 0);
             return result;
@@ -226,7 +238,7 @@ namespace TorannMagic.ClassProgression
     public static class LightningLaunchPatch
     {
         public static void Postfix(Projectile_AbilityBase __instance, Thing launcher, AbilityUser.AbilityDef abilityDef)
-        { if (__instance is Projectile_Scorn scorn && launcher is Pawn body) scorn.BindLaunch(body); LightningTrials.Launched(__instance, launcher, abilityDef); ArcanistTrials.Launched(__instance, launcher, abilityDef); SummonerTrials.Launched(__instance, launcher, abilityDef); DemonTrials.Launched(__instance, launcher, abilityDef); GeomancerTrials.Launched(__instance, launcher, abilityDef); BloodMageTrials.Launched(__instance, launcher, abilityDef); }
+        { LightningTrials.Launched(__instance, launcher, abilityDef); ArcanistTrials.Launched(__instance, launcher, abilityDef); SummonerTrials.Launched(__instance, launcher, abilityDef); DemonTrials.Launched(__instance, launcher, abilityDef); GeomancerTrials.Launched(__instance, launcher, abilityDef); BloodMageTrials.Launched(__instance, launcher, abilityDef); }
     }
     [HarmonyPatch(typeof(Projectile_AbilityBase), nameof(Projectile_AbilityBase.ExposeData))]
     public static class LightningProjectileSavePatch { public static void Postfix(Projectile_AbilityBase __instance) { LightningTrials.ExposeProjectile(__instance); ArcanistTrials.ExposeProjectile(__instance); SummonerTrials.ExposeProjectile(__instance); DemonTrials.ExposeProjectile(__instance); GeomancerTrials.ExposeProjectile(__instance); BloodMageTrials.ExposeProjectile(__instance); } }

@@ -60,4 +60,7 @@
   <TM_MasterTomeGolemancer.label>том мастерства големанта</TM_MasterTomeGolemancer.label>
   <TM_MasterTomeGolemancer.description>Редкий том для големанта после выполнения испытания мастерства. Чтение завершает посвящение и расходует том. Доступен у торговцев и в наградах за задания; изготовить нельзя.</TM_MasterTomeGolemancer.description>
   <TM_MasterTomeGolemancer.comps.1.useLabel>Прочитать {0_label}</TM_MasterTomeGolemancer.comps.1.useLabel>
+  <TM_MasterTomeChaos.label>мастерский том мага хаоса</TM_MasterTomeChaos.label>
+  <TM_MasterTomeChaos.description>Редкий том для адепта Хаоса. Перед чтением пройдите испытание заклинаниями из разных наборов. Можно найти у торговцев или получить в награду за задание.</TM_MasterTomeChaos.description>
+  <TM_MasterTomeChaos.comps.1.useLabel>Прочитать {0_label}</TM_MasterTomeChaos.comps.1.useLabel>
 </LanguageData>

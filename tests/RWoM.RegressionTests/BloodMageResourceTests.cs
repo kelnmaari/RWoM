@@ -13,6 +13,37 @@ internal static class BloodMageResourceTests
     public static IEnumerable<TestCase> Cases()
     {
         yield return new("BloodMageResource.NativeSustainAndLoadedStatePreserveBlood", Sustain);
+        yield return new("SpiritProjectedCast.NativeBloodPaymentBelongsToHost", f => WithBlood(f, blood =>
+        {
+            using var fixture = new SpiritRebirthStateTests.Fixture(f);
+            var soul = fixture.Original;
+            var host = fixture.Host;
+            PrepareBody(soul); PrepareBody(host);
+            var originalPool = new Hediff { def = blood, pawn = soul };
+            var hostPool = new Hediff { def = blood, pawn = host };
+            soul.health.hediffSet.hediffs.Add(originalPool);
+            host.health.hediffSet.hediffs.Add(hostPool);
+            hostPool.Severity = 100; originalPool.Severity = 50;
+            var state = fixture.Begin(); fixture.Hold(host, soul);
+            Check.Equal(true, SpiritRebirthStateTests.Invoke(state, "TryEnterHost", soul, host), "original bound to host");
+            var def = TorannMagicDefOf.TM_BloodShield;
+            float oldCost = def.bloodCost;
+            var priorSettings = TorannMagic.ModOptions.Settings.Instance;
+            try
+            {
+                TorannMagic.ModOptions.Settings.Instance = new TorannMagic.ModOptions.Settings { AIAggressiveCasting = false };
+                def.bloodCost = .2f;
+                var ability = new MagicAbility(fixture.Magic) { Def = def };
+                var pay = typeof(MagicAbility).GetMethod("PayForAttempt", BindingFlags.Instance | BindingFlags.NonPublic)!;
+                pay.Invoke(ability, [fixture.Other]);
+                Check.Equal(100f, hostPool.Severity, "stale or foreign host cannot pay");
+                float expected = 100f - 100f * ability.ActualBloodCost;
+                pay.Invoke(ability, [host]);
+                Check.Equal(expected, hostPool.Severity, "actual physical blood price paid by host");
+                Check.Equal(50f, originalPool.Severity, "soul blood remains unchanged");
+            }
+            finally { def.bloodCost = oldCost; TorannMagic.ModOptions.Settings.Instance = priorSettings; }
+        }));
         yield return new("BloodMageResource.NativeCostAndPayment", Payment);
         yield return new("BloodMageResource.NativeMimicRefusal", Mimic);
     }

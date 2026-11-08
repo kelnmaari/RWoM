@@ -29,11 +29,11 @@ internal static class GrimoireTests
         yield return new("Grimoire.ThreeColumnsFitScreen", ThreeColumnsFitScreen);
         yield return new("Grimoire.LearningItemsPreserveCustomOwners", LearningItemsPreserveCustomOwners);
         yield return new("Grimoire.Metadata", Metadata);
+        yield return new("Grimoire.TraitIndexShiftKeepsClassAdmission", f => TraitIndexShiftKeepsClassAdmission());
         yield return new("Grimoire.LocalizationContracts", Localization);
         yield return new("Grimoire.InstalledIsekaiExactNameGate", IsekaiGate);
     }
-    static void Visibility(bool magic, bool might, bool faceless, bool showMagic, bool showMight, bool sharedRaceMagic = false) {
-        var root = Blank<Root_Play>(); var ui = Blank<UIRoot_Play>(); var map = Blank<MapInterface>(); var selector = Blank<Selector>();
+    static void Visibility(bool magic, bool might, bool faceless, bool showMagic, bool showMight, bool sharedRaceMagic = false) {        var root = Blank<Root_Play>(); var ui = Blank<UIRoot_Play>(); var map = Blank<MapInterface>(); var selector = Blank<Selector>();
         root.uiRoot = ui; ui.mapUI = map; map.selector = selector; Set(typeof(Current), "rootInt", root);
         var def = Blank<ThingDef>(); def.defName="GrimoireFixtureHuman"; def.race = new RaceProperties { intelligence=Intelligence.Humanlike };
         var pawn = new Pawn { def=def }; pawn.story = new Pawn_StoryTracker(pawn) { traits = new TraitSet(pawn) };
@@ -57,6 +57,27 @@ internal static class GrimoireTests
         TorannMagic.ModOptions.Settings.Instance.grimoireOnAbilityBar=false; Set(pawn,"factionInt",new Faction { def = new FactionDef() });
         Check.Equal(false,mt.IsVisible,"Non-colonist Magic gate"); Check.Equal(false,ft.IsVisible,"Non-colonist Might gate");
         Set(selector,"selected",new List<object>()); Check.Equal(false,mt.IsVisible,"No selection Magic gate"); Check.Equal(false,ft.IsVisible,"No selection Might gate");
+    }
+    // Live report (RimTraits - Medieval Talents): the mod removes and re-adds
+    // TraitDefs inside PawnGenerator.GenerateTraits, which re-indexes the whole
+    // trait database. Class admission compared cached database indexes, so the
+    // shift silently hid the grimoire button from trait-based classes while
+    // custom classes (matched by comp) kept it. Admission now compares def
+    // references and must survive the same mutation.
+    static void TraitIndexShiftKeepsClassAdmission() {
+        var def = Blank<ThingDef>(); def.defName="GrimoireIndexShiftHuman"; def.race = new RaceProperties { intelligence=Intelligence.Humanlike };
+        var pawn = new Pawn { def=def }; pawn.story = new Pawn_StoryTracker(pawn) { traits = new TraitSet(pawn) };
+        Set(pawn,"comps",new List<ThingComp>());
+        pawn.story.traits.allTraits.Add(new Trait(TorannMagicDefOf.TM_Bard));
+        TM_Calc.InvalidateCompCache(pawn);
+        Check.Equal(true,TM_Calc.HasMightOrMagicTrait(pawn),"class trait admits before mutation");
+        // A dedicated filler: staged environments may hold a minimal trait DB.
+        var shifted = new TraitDef { defName = "TraitIndexShiftFiller", degreeDatas = [new TraitDegreeData { degree = 0 }] };
+        DefDatabase<TraitDef>.Add(shifted);
+        typeof(DefDatabase<TraitDef>).GetMethod("Remove", BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)!
+            .Invoke(null, new object?[] { shifted });
+        DefDatabase<TraitDef>.Add(shifted);
+        Check.Equal(true,TM_Calc.HasMightOrMagicTrait(pawn),"database re-indexing cannot revoke class admission");
     }
     // Warlock, Succubus and Shadow collections each define their own power objects
     // for the same abilities (Soul Bond, Shadow Bolt, Dominate); the grimoire must
@@ -95,7 +116,27 @@ internal static class GrimoireTests
         Check.Equal(4, data.GetSkill_Power(ability).level, "investment unchanged");
         Check.Equal(6, data.GetSkill_Power(ability).levelMax, "independent skill cap unchanged");
         string source = File.ReadAllText(Path.Combine(f.Repository, "RimWorldOfMagic/RimWorldOfMagic/Window_TMGrimoire.cs"));
-        Check.Equal(2, Regex.Matches(source, @"PowerTitle\(ability.LabelCap, power.level, power.maxLevel, power.learned\)").Count, "both magic and might use rank presentation");
+        var processor = Assembly.Load("0Harmony").GetType("HarmonyLib.PatchProcessor")!;
+        var instructions = processor.GetMethods().Single(m => m.Name == "GetOriginalInstructions"
+            && m.GetParameters().Length == 2 && m.GetParameters()[1].ParameterType.Name == "ILGenerator");
+        var title = typeof(Window_TMGrimoire).GetMethod("PowerTitle", Flags)!;
+        List<object?> Operands(string method) =>
+            ((System.Collections.IEnumerable)instructions.Invoke(null,
+                [typeof(Window_TMGrimoire).GetMethod(method, Flags)!, null])!).Cast<object>()
+                .Select(op => op.GetType().GetField("operand")!.GetValue(op)).ToList();
+        foreach (var pair in new[] { ("DrawMagicPowerCard", "MagicTitle"), ("DrawMightPowerCard", "MightTitle") })
+        {
+            Check.Equal(1, Operands(pair.Item1).Count(op => Equals(op,
+                typeof(Window_TMGrimoire).GetMethod(pair.Item2, Flags))), pair.Item1 + " uses stage/rank title");
+            var ops = Operands(pair.Item2);
+            var stageTitle = typeof(Window_TMGrimoire).GetMethod("StageTitle", Flags)!;
+            Check.Equal(1, ops.Count(op => Equals(op, stageTitle)), pair.Item2 + " uses common title");
+            var inputs = ops.Take(ops.FindIndex(op => Equals(op, stageTitle))).OfType<MemberInfo>()
+                .TakeLast(3).Select(m => m.Name.Replace("get_", "")).ToArray();
+            Check.Equal(true, inputs.SequenceEqual(new[] { "level", "maxLevel", "learned" }),
+                pair.Item2 + " passes variant level, cap, and learned state");
+        }
+        Check.Equal(1, Operands("StageTitle").Count(op => Equals(op, title)), "common title preserves rank presentation");
         Check.Equal(2, Regex.Matches(source, @"if \(power.maxLevel <= 0\)").Count, "both learned single-variant actions avoid max");
     }
     static void LightningPrefix(RuntimeFixture f) {

@@ -77,15 +77,21 @@ namespace TorannMagic.ClassProgression
         }
 
         internal static bool CanProject(Pawn actor,Pawn source) =>
-            actor?.IsColonistPlayerControlled==true && source!=null && source!=actor && BladeCareer.TrialOwner(actor)==source &&
-            BladeCareer.Path(source)?.Stage==InitiationStage.Foundation && !BladeCareer.Ready(source);
+            actor?.IsColonistPlayerControlled==true && source!=null && source!=actor &&
+            ((BladeCareer.TrialOwner(actor)==source && BladeCareer.Path(source)?.Stage==InitiationStage.Foundation && !BladeCareer.Ready(source)) ||
+             (SuperSoldierMartialPath.Owner(actor)==source && SuperSoldierMartialPath.Path(source)?.Stage==InitiationStage.Foundation));
+
+        private static bool CanService(Pawn actor,Pawn source,Thing weapon) => source==actor
+            ? BladeCareer.CanService(actor,weapon) || SuperSoldierMartialPath.CanService(actor,weapon)
+            : CanProject(actor,source) &&
+              ((BladeCareer.TrialOwner(actor)==source && BladeCareer.CanService(source,weapon)) ||
+               (SuperSoldierMartialPath.Owner(actor)==source && SuperSoldierMartialPath.CanService(source,weapon)));
 
         private static bool Valid(Pawn actor, Thing weapon, Pawn source) =>
             actor?.Spawned == true && !actor.Dead && !actor.Downed && actor.IsColonistPlayerControlled &&
             weapon?.Spawned == true && weapon.Map == actor.Map && weapon.stackCount == 1 &&
             weapon.def.stackLimit == 1 && weapon.def.useHitPoints && weapon.def.IsWeapon &&
-            (source==actor ? BladeCareer.CanService(actor, weapon) || SuperSoldierMartialPath.CanService(actor, weapon)
-                : CanProject(actor,source) && BladeCareer.CanService(source,weapon)) &&
+            CanService(actor,source,weapon) &&
             !weapon.IsForbidden(actor) && !weapon.IsBurning() && Amount(weapon) > 0;
 
         internal static void Target(Pawn source)
@@ -133,8 +139,8 @@ namespace TorannMagic.ClassProgression
                 weapon.HitPoints = before + Amount(weapon);
                 if (weapon.HitPoints > before)
                 {
-                    BladeCareer.Service(source,weapon);
-                    if (source==pawn) SuperSoldierMartialPath.Serviced(pawn,weapon);
+                    if (source==pawn || BladeCareer.TrialOwner(pawn)==source) BladeCareer.Service(source,weapon);
+                    if (source==pawn || SuperSoldierMartialPath.Owner(pawn)==source) SuperSoldierMartialPath.Serviced(source,weapon);
                 }
             });
         }

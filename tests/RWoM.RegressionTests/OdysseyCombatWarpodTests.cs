@@ -23,16 +23,24 @@ internal static class OdysseyCombatWarpodTests
         yield return new("Odyssey.CombatWarpod.FullHolderScribeAfterMissingTypeLookup", f => Run(() => SaveAfterMissingTypeLookup(f)));
         yield return new("Odyssey.CombatWarpod.NativeItemPlacement", f => Run(() => NativeDrop()));
     }
-    static Type T(string name) => typeof(MagicData).Assembly.GetType("TorannMagic.Odyssey." + name)!;
+    static Assembly External => Assembly.LoadFrom(Environment.GetEnvironmentVariable("RWOM_VGE_ADAPTER") ?? throw new Exception("Missing VGE adapter build"));
+    static Type T(string name) => (name.StartsWith("MagicalCombatWarpod") ? External : typeof(MagicData).Assembly).GetType("TorannMagic.Odyssey." + name)!;
     static object Core(string name, params object[] args) => typeof(OdysseyCombatTests).GetMethod(name, BindingFlags.Static | BindingFlags.NonPublic)!.Invoke(null, args)!;
     static void Set(object value, string field, object data) => Core("Set", value, field, data);
-    static void Run(Action action) => Core("Run", action);
+    static void Run(Action action)
+    {
+        var adapter = (TorannMagic.Odyssey.IMagicalShieldProjectileAdapter)Activator.CreateInstance(External.GetType("TorannMagic.VGE.WarpodShieldAdapter", true)!)!;
+        TorannMagic.Odyssey.MagicalShieldProjectileAdapters.Register(adapter);
+        try { Core("Run", action); }
+        finally { TorannMagic.Odyssey.MagicalShieldProjectileAdapters.Unregister(adapter); }
+    }
     static float HP(ThingComp main) => (float)Core("HP", main);
     static bool Skip() => false;
     static void Optional()
     {
         foreach (var name in new[] { "MagicalCombatWarpodImpactPatch", "MagicalCombatWarpodTickPatch", "MagicalCombatWarpodSavePatch" })
         {
+            Check.Equal(true, typeof(MagicData).Assembly.GetType("TorannMagic.Odyssey."+name) == null,"warpod patch has left Content");
             var type = T(name);
             Check.Equal(type.GetMethod("TargetMethod")!.Invoke(null, null) != null, (bool)type.GetMethod("Prepare")!.Invoke(null, null)!, "optional warp adapter discovery agrees with loaded types");
         }

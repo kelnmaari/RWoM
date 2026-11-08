@@ -103,7 +103,7 @@ internal static class OdysseyThrusterDefinitionTests
         }
         var core=Path.Combine(Root(f),"Patches/MagicalThrusters.xml");
         Apply(doc,core); Apply(doc,core);
-        var vge=Path.Combine(f.Repository,"v1.7/VGECompat/Patches/MagicalThrusters.xml");
+        var vge=Path.Combine(f.Repository,"TorannMagic.Integrations/v1.7/VGECompat/Patches/MagicalThrusters.xml");
         Apply(doc,vge); Apply(doc,vge);
         foreach(var engine in new[]{"GravEngine","VGE_GravjumperEngine","VGE_GravhulkEngine"})
         foreach(var size in new[]{"Small","Large"})

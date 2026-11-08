@@ -35,22 +35,34 @@ namespace TorannMagic
             // later class removal must never make a loaded start eligible again.
             crewAssigned = true;
             var crew = init.startingAndOptionalPawns.Take(init.startingPawnCount).Where(p => p?.story?.traits != null).Distinct().ToList();
-            foreach (var pawn in crew.Where(p => TM_ClassState.HasCurrentClass(p, true))) RemoveStartingPotential(pawn);
-            var candidates = crew.Where(p => !TM_ClassState.HasCurrentClass(p, true)).ToList();
+            // Even with the beta switched off the stored identity belongs to this
+            // pawn. In particular a novice may still own both unspent potentials.
+            var legacyCrew = crew.Where(p => p.AllComps?.OfType<ClassProgression.CompClassProgression>()
+                .Any(c => c.State != null) != true).ToList();
+            foreach (var pawn in legacyCrew.Where(p => TM_ClassState.HasCurrentClass(p, true))) RemoveStartingPotential(pawn);
+            var candidates = legacyCrew.Where(p => !TM_ClassState.HasCurrentClass(p, true)).ToList();
             if (candidates.Count == 0) return;
 
             // Builtin power owners are the authoritative base-mod roster. Lich is
             // a necromancer transformation, never a starting career. Custom and
             // advanced registries deliberately do not enlarge this random pool.
+            var reserved = new HashSet<TraitDef>(crew.SelectMany(p => p.story.traits.allTraits.Select(t => t.def)));
+            foreach (var pawn in crew.Except(legacyCrew))
+                foreach (var path in pawn.AllComps.OfType<ClassProgression.CompClassProgression>().First(c => c.State != null).State.Disciplines)
+                {
+                    var trait = ClassProgression.ClassIdentity.Profile(path.ClassId)?.legacyTrait;
+                    if (trait != null) reserved.Add(trait);
+                }
             var available = TM_ClassGroups.MagicEntriesField.Where(e => e.trait != "Lich")
                 .Select(e => DefDatabase<TraitDef>.GetNamedSilentFail(e.trait)).Where(t => t != null)
-                .Where(t => !crew.Any(p => p.story.traits.allTraits.Any(owned => owned.def == t))).Distinct().ToList();
+                .Where(t => !reserved.Contains(t)).Distinct().ToList();
             foreach (var pawn in candidates)
             {
                 if (available.Count == 0) break;
                 int index = Rand.Range(0, available.Count);
                 var trait = available[index];
                 available.RemoveAt(index);
+                if (ClassProgression.ClassInitiation.TryGrantStartingFoundation(pawn, trait)) continue;
                 // Vanilla's default does not suppress or remove conflicting
                 // traits. In particular an existing might career stays owned.
                 pawn.story.traits.GainTrait(new Trait(trait));

@@ -5,6 +5,7 @@ using AbilityUser;
 using RimWorld;
 using TorannMagic;
 using TorannMagic.TMDefs;
+using TorannMagic.ClassProgression;
 using Verse;
 using static RWoM.RegressionTests.GrimoireProgressionTests;
 using AbilityDef = AbilityUser.AbilityDef;
@@ -31,7 +32,7 @@ internal static class GrimoireKureTests
         yield return new("GrimoireKure.DeclarationCoverage", DeclarationCoverage);
         yield return new("GrimoireKure.StaminaPotionAddictionNeed", f =>
         {
-            var source=new XmlDocument();source.Load(Path.Combine(f.Repository,"v1.7/Patches/KureStaminaPotion.xml"));
+            var source=new XmlDocument();source.Load(IntegrationPackageTests.Patch(f,"KureStaminaPotion.xml"));
             var op=DirectXmlToObject.ObjectFromXml<PatchOperation>(source.SelectSingleNode("/Patch/Operation")!,false);
             var definitions=new XmlDocument();definitions.LoadXml("<Defs/>");
             Check.Equal(true,op.Apply(definitions),"absent Kure is a no-op");
@@ -45,6 +46,43 @@ internal static class GrimoireKureTests
             Check.Equal(true,op.Apply(definitions),"other adapter's link remains authoritative");
             Check.Equal("AnotherNeed",definitions.SelectSingleNode("Defs/HediffDef/chemicalNeed")!.InnerText,"existing reference preserved");
             Check.Equal(1,definitions.GetElementsByTagName("chemicalNeed").Count,"idempotent patch");
+        });
+        yield return new("LegacyConversion.NativeShadowKeepsBothDomains", f =>
+        {
+            var loaded = Load(f);
+            var cls = loaded.Native.Single(c=>c.classTrait.defName=="TM_TheShadow");
+            var book = (ThingDef)System.Runtime.CompilerServices.RuntimeHelpers.GetUninitializedObject(typeof(ThingDef));
+            book.defName="BookOfShadow"; cls.fullScript=book;
+            var profiles=DefDatabase<ClassDisciplineDef>.AllDefsListForReading.ToArray();
+            var classes=TM_ClassUtility.CustomClasses;
+            var trait=TorannMagicDefOf.TM_TheShadow;
+            try
+            {
+                TorannMagicDefOf.TM_TheShadow=cls.classTrait;
+                TM_ClassUtility.CustomClasses=[cls];
+                DefDatabase<ClassDisciplineDef>.Clear();
+                DefDatabase<ClassDisciplineDef>.Add(new ClassDisciplineDef {defName="ImportShadow",profileId="rwom.shadow",
+                    legacyTrait=cls.classTrait,foundationBook=book,domain=DisciplineDomain.Magic});
+                var p=PawnWithComps(true,true);
+                var comp=new CompClassProgression {parent=p.pawn};p.pawn.AllComps.Add(comp);
+                p.pawn.story.traits.allTraits.Add(new Trait(cls.classTrait,cls.traitDegree));
+                var walk=p.magic.MagicData.MagicPowersShadow.Single(x=>x.TMabilityDefs.Contains(TorannMagicDefOf.TM_ShadowWalk));
+                var strike=p.might.MightData.MightPowersShadow.Single(x=>x.TMabilityDefs.Contains(TorannMagicDefOf.TM_ShadowStrike));
+                walk.learned=strike.learned=true; walk.ticksUntilNextCast=81;strike.ticksUntilNextCast=95;
+                var import=typeof(ClassInitiation).Assembly.GetType("TorannMagic.ClassProgression.LegacyClassConversion")!
+                    .GetMethod("TryImport",BindingFlags.NonPublic|BindingFlags.Static)!;
+                Check.Equal(true,(bool)import.Invoke(null,[p.pawn])!,"native hybrid accepted");
+                Check.Equal(Vocation.WarriorMage,comp.State.Vocation,"both resource domains");
+                Check.Equal(2,comp.State.Disciplines.Count,"both paths attached to the same pawn");
+                Check.Equal(DisciplineDomain.Magic,comp.State.Find("rwom.shadow").Domain,"arcane path");
+                Check.Equal(DisciplineDomain.Might,comp.State.Find("rwom.shadowwalker").Domain,"physical path");
+                Check.Equal(81,walk.ticksUntilNextCast,"spell receipt"); Check.Equal(95,strike.ticksUntilNextCast,"technique receipt");
+            }
+            finally
+            {
+                TorannMagicDefOf.TM_TheShadow=trait;TM_ClassUtility.CustomClasses=classes;
+                DefDatabase<ClassDisciplineDef>.Clear();foreach(var def in profiles)DefDatabase<ClassDisciplineDef>.Add(def);
+            }
         });
         foreach (string id in KureClasses)
         {
@@ -231,6 +269,16 @@ internal static class GrimoireKureTests
         }).ToList();
         foreach (var saved in savedMagic) { saved.Power.level = saved.Level; saved.Power.learned = saved.Learned; }
         foreach (var saved in savedMight) { saved.Power.level = saved.Level; saved.Power.learned = saved.Learned; }
+        if (classes.Any(c => loaded.Kure.Contains(c)))
+        {
+            var progression = new TorannMagic.ClassProgression.CompClassProgression { parent = p.pawn };
+            p.pawn.AllComps.Add(progression);
+            var import = typeof(MagicData).Assembly.GetType("TorannMagic.ClassProgression.LegacyClassConversion")!
+                .GetMethod("TryImport", BindingFlags.Static | BindingFlags.NonPublic)!;
+            Check.Equal(true, TorannMagic.ClassProgression.ClassProgressionFeature.Enabled, "exercise beta-on import");
+            Check.Equal(false, (bool)import.Invoke(null, [p.pawn])!, context + " addon remains classic on load");
+            Check.Equal(true, progression.UsesClassicProgression, context + " no hidden imported discipline");
+        }
         if (leveled && magicFamilies.Concat(mightFamilies).Any(family => family.Abilities.Count > 1))
             Check.Equal(true, savedMagic.Any(x => x.Level > 0) || savedMight.Any(x => x.Level > 0), context + " actually exercises a later rank");
         else if (leveled)

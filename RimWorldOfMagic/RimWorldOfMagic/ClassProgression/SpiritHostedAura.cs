@@ -39,6 +39,7 @@ namespace TorannMagic.ClassProgression
 
         internal static void TickAuras(Pawn soul)
         {
+            SpiritHostedCommander.VisitAuras(soul,false);
             if (Find.TickManager.TicksGame % 60 == 0)
             {
                 EmpathLifecycle.UpdateProjectedEmpathy(soul,false);
@@ -52,6 +53,7 @@ namespace TorannMagic.ClassProgression
 
         internal static void EndAuras(Pawn soul)
         {
+            SpiritHostedCommander.VisitAuras(soul,true);
             EmpathLifecycle.UpdateProjectedEmpathy(soul, true);
             DemonSoulBond.UpdateProjection(soul,true);
             if (TorannMagicDefOf.TM_SuppressiveAuraHD != null && SpiritRebirthState.TryGet(soul,out var state))

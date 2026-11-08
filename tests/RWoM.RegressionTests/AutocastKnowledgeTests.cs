@@ -107,7 +107,7 @@ internal static class AutocastKnowledgeTests
     // registers under its own id.
     private static void CoreRegistryRoundTrip(RuntimeFixture f)
     {
-        string coreDll = Path.Combine(f.Repository, "TorannMagic.Core", "Assemblies", "TorannMagic.Core.dll");
+        var coreDll = CoreSdkTests.AssemblyPath(f.Repository);
         if (!File.Exists(coreDll))
         {
             Check.Equal(false, CoreBridge.Available, "core assembly absent — bridge degrades to a no-op");

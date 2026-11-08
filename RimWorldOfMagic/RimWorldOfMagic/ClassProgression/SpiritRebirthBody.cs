@@ -13,6 +13,8 @@ namespace TorannMagic.ClassProgression
             // Its existing Spirit need must survive to retry; casting is stricter.
             if (need == null || !RetainsNeeds(pawn)) return false;
             admitted = need == TorannMagicDefOf.TM_SpiritND || need == TorannMagicDefOf.TM_Mana;
+            if (need == TorannMagicDefOf.TM_Stamina)
+                admitted = pawn.needs?.TryGetNeed(need) != null || TM_ClassState.HasCurrentClass(pawn, false);
             if (admitted && ((SpiritRebirthRitualTransaction.IsPendingAccountingOwner(pawn)
                 && !SpiritRebirthRitualTransaction.IsPreparing(pawn)) || MapComponent_SpiritCollapse.IsPendingAccountingOwner(pawn)))
                 admitted = pawn.needs?.TryGetNeed(need) != null;

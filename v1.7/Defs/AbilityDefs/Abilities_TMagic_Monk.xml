@@ -41,7 +41,7 @@
   <modExtensions>
 <li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_chi</spellId>
-<domain>Magic</domain>
+<domain>Might</domain>
 <tier>0</tier>
 </li>
 </modExtensions>
@@ -94,7 +94,7 @@ Has a low chance to disrupt the mental state of any pawn. Can be resisted.</desc
   <modExtensions>
 <li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_chiburst</spellId>
-<domain>Magic</domain>
+<domain>Might</domain>
 <tier>0</tier>
 </li>
 </modExtensions>
@@ -139,7 +139,7 @@ Mind Over Body is a passive buff that improves consciousness, moving, manipulati
   <modExtensions>
 <li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_mindoverbody</spellId>
-<domain>Magic</domain>
+<domain>Might</domain>
 <tier>0</tier>
 </li>
 </modExtensions>
@@ -182,7 +182,7 @@ Any physical or mental ailments must be purged before meditation can generate Ch
   <modExtensions>
 <li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_meditate</spellId>
-<domain>Magic</domain>
+<domain>Might</domain>
 <tier>0</tier>
 </li>
 </modExtensions>
@@ -230,7 +230,7 @@ Passive ability (8 stamina): deliver multiple hits against an opponent; attacks 
   <modExtensions>
 <li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_tigerstrike</spellId>
-<domain>Magic</domain>
+<domain>Might</domain>
 <tier>0</tier>
 </li>
 </modExtensions>
@@ -310,7 +310,7 @@ Passive ability (10 stamina): performs a round-house kick that strikes multiple 
   <modExtensions>
 <li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_dragonstrike</spellId>
-<domain>Magic</domain>
+<domain>Might</domain>
 <tier>0</tier>
 </li>
 </modExtensions>
@@ -368,7 +368,7 @@ Passive ability (10 stamina): performs a round-house kick that strikes multiple 
     <modExtensions>
 <li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_thunderstrike</spellId>
-<domain>Magic</domain>
+<domain>Might</domain>
 <tier>0</tier>
 </li>
 </modExtensions>

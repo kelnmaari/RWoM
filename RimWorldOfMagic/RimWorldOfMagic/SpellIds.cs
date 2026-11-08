@@ -13,6 +13,11 @@ namespace TorannMagic
         private static string Resolve(Def def)
             => CoreBridge.DeclaredId(def) ?? Convention(def);
 
-        internal static string Convention(Def def) => "rwom." + def.defName.ToLowerInvariant();
+        // These are two distinct shipped abilities: RWoM's TM_ShadowStep is
+        // a mana bond, Kure's TM_Shadowstep is a stamina-based teleport.
+        internal const string NativeShadowStepId = "rwom.tm_shadowstep";
+        internal const string KureShadowStepId = "kure.tm_shadowstep";
+        internal static string Convention(Def def) => def.defName == "TM_Shadowstep"
+            ? KureShadowStepId : "rwom." + def.defName.ToLowerInvariant();
     }
 }

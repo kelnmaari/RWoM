@@ -424,6 +424,11 @@ namespace TorannMagic
 
         private MagicData magicData = null;
         internal MagicData ExistingMagicData => magicData;
+        internal void AttachStartingData(MagicData prepared)
+        {
+            if (magicData != null || prepared == null) throw new InvalidOperationException("Cannot replace existing magic progression.");
+            magicData = prepared;
+        }
         internal MagicData InitializeMissingSpiritData()
             => magicData ?? (magicData = new MagicData(this));
         public MagicData MagicData
@@ -3632,7 +3637,7 @@ namespace TorannMagic
             {
                 adjustedManaCost = 0;
             }
-            if (this.Pawn.story.traits.HasTrait(TorannMagicDefOf.ChaosMage) || (this.customClass != null && this.customClass.classMageAbilities.Contains(TorannMagicDefOf.TM_ChaosTradition)))
+            if (ClassProgression.ClassIdentity.IsChaosMage(this.Pawn) || (this.customClass != null && this.customClass.classMageAbilities.Contains(TorannMagicDefOf.TM_ChaosTradition)))
             {
                 adjustedManaCost = adjustedManaCost * 1.2f;
             }
@@ -5628,84 +5633,38 @@ namespace TorannMagic
 
         public void ResolveWarlockEmpathy()
         {
-            //strange bug observed where other pawns will get the old offset of the previous pawn's offset unless other pawn has no empathy existing
-            //in other words, empathy base mood effect seems to carry over from last otherpawn instead of using current otherpawn values
-            if (Rand.Chance(this.Pawn.GetStatValue(StatDefOf.PsychicSensitivity, false) - 1))
-            {
-                Pawn otherPawn = TM_Calc.FindNearbyOtherPawn(this.Pawn, 5);
-                if (otherPawn != null && otherPawn.RaceProps.Humanlike && otherPawn.IsColonist)
-                {
-                    if (Rand.Chance(otherPawn.GetStatValue(StatDefOf.PsychicSensitivity, false) - .3f))
-                    {
-                        ThoughtHandler pawnThoughtHandler = this.Pawn.needs.mood.thoughts;
-                        List<Thought> pawnThoughts = new List<Thought>();
-                        pawnThoughtHandler.GetAllMoodThoughts(pawnThoughts);
-                        List<Thought> otherThoughts = new List<Thought>();
-                        otherPawn.needs.mood.thoughts.GetAllMoodThoughts(otherThoughts);
-                        List<Thought_Memory> memoryThoughts = new List<Thought_Memory>();
-                        memoryThoughts.Clear();
-                        float oldMemoryOffset = 0;
-                        if (Rand.Chance(.3f)) //empathy absorbed by warlock
-                        {
-                            ThoughtDef empathyThought = ThoughtDef.Named("WarlockEmpathy");
-                            memoryThoughts = this.Pawn.needs.mood.thoughts.memories.Memories;
-                            for (int i = 0; i < memoryThoughts.Count; i++)
-                            {
-                                if (memoryThoughts[i].def.defName == "WarlockEmpathy")
-                                {
-                                    oldMemoryOffset = memoryThoughts[i].MoodOffset();
-                                    if (oldMemoryOffset > 30)
-                                    {
-                                        oldMemoryOffset = 30;
-                                    }
-                                    else if (oldMemoryOffset < -30)
-                                    {
-                                        oldMemoryOffset = -30;
-                                    }
-                                    this.Pawn.needs.mood.thoughts.memories.RemoveMemoriesOfDef(memoryThoughts[i].def);
-                                }
-                            }
-                            Thought transferThought = otherThoughts.RandomElement();
-                            float newOffset = Mathf.RoundToInt(transferThought.CurStage.baseMoodEffect / 2);
-                            empathyThought.stages.FirstOrDefault().baseMoodEffect = newOffset + oldMemoryOffset;
+            if (Pawn.needs?.mood?.thoughts == null || !Pawn.Spawned ||
+                !Rand.Chance(Pawn.GetStatValue(StatDefOf.PsychicSensitivity, false) - 1)) return;
 
-                            this.Pawn.needs.mood.thoughts.memories.TryGainMemory(empathyThought, null);
-                            Vector3 drawPosOffset = this.Pawn.DrawPos;
-                            drawPosOffset.z += .3f;
-                            TM_MoteMaker.ThrowGenericMote(TorannMagicDefOf.Mote_ArcaneCircle, drawPosOffset, this.Pawn.Map, newOffset / 20, .2f, .1f, .1f, Rand.Range(100, 200), 0, 0, Rand.Range(0, 360));
-                        }
-                        else //empathy bleeding to other pawn
-                        {
-                            ThoughtDef empathyThought = ThoughtDef.Named("PsychicEmpathy");
-                            memoryThoughts = otherPawn.needs.mood.thoughts.memories.Memories;
-                            for (int i = 0; i < memoryThoughts.Count; i++)
-                            {
-                                if (memoryThoughts[i].def.defName == "PsychicEmpathy")
-                                {
-                                    oldMemoryOffset = memoryThoughts[i].CurStage.baseMoodEffect;
-                                    if (oldMemoryOffset > 30)
-                                    {
-                                        oldMemoryOffset = 30;
-                                    }
-                                    else if (oldMemoryOffset < -30)
-                                    {
-                                        oldMemoryOffset = -30;
-                                    }
-                                    otherPawn.needs.mood.thoughts.memories.RemoveMemoriesOfDef(memoryThoughts[i].def);
-                                }
-                            }
-                            Thought transferThought = pawnThoughts.RandomElement();
-                            float newOffset = Mathf.RoundToInt(transferThought.CurStage.baseMoodEffect / 2);
-                            empathyThought.stages.FirstOrDefault().baseMoodEffect = newOffset + oldMemoryOffset;
+            Pawn other = TM_Calc.FindNearbyOtherPawn(Pawn, 5);
+            if (other?.needs?.mood?.thoughts == null || !other.RaceProps.Humanlike || !other.IsColonist ||
+                !Rand.Chance(other.GetStatValue(StatDefOf.PsychicSensitivity, false) - .3f)) return;
 
-                            otherPawn.needs.mood.thoughts.memories.TryGainMemory(empathyThought, null);
-                            Vector3 drawPosOffset = otherPawn.DrawPos;
-                            drawPosOffset.z += .3f;
-                            TM_MoteMaker.ThrowGenericMote(TorannMagicDefOf.Mote_ArcaneCircle, drawPosOffset, otherPawn.Map, newOffset / 20, .2f, .1f, .1f, Rand.Range(100, 200), 0, 0, Rand.Range(0, 360));
-                        }
-                    }
-                }
-            }
+            bool absorb = Rand.Chance(.3f);
+            Pawn source = absorb ? other : Pawn;
+            Pawn recipient = absorb ? Pawn : other;
+            var thoughts = new List<Thought>();
+            source.needs.mood.thoughts.GetAllMoodThoughts(thoughts);
+            thoughts.RemoveAll(thought => thought?.CurStage == null);
+            if (thoughts.Count == 0) return;
+
+            var empathy = ThoughtDef.Named(absorb ? "WarlockEmpathy" : "PsychicEmpathy");
+            var memories = recipient.needs.mood.thoughts.memories;
+            var previous = memories.Memories.FirstOrDefault(memory => memory.def == empathy);
+            Thought sample = thoughts.RandomElement();
+            float effect = sample.CurStage.baseMoodEffect;
+            if (sample is Thought_Memory sampledMemory) effect += sampledMemory.moodOffset;
+            int contribution = Mathf.RoundToInt(effect / 2);
+            var replacement = (Thought_Memory)ThoughtMaker.MakeThought(empathy);
+            float previousEffect = previous?.MoodOffset() ?? 0f;
+            replacement.moodOffset = Mathf.RoundToInt(contribution + Mathf.Clamp(previousEffect, -30f, 30f)
+                - replacement.CurStage.baseMoodEffect);
+            memories.RemoveMemoriesOfDef(empathy);
+            memories.TryGainMemory(replacement);
+            Vector3 drawPosition = recipient.DrawPos;
+            drawPosition.z += .3f;
+            TM_MoteMaker.ThrowGenericMote(TorannMagicDefOf.Mote_ArcaneCircle, drawPosition, recipient.Map,
+                contribution / 20f, .2f, .1f, .1f, Rand.Range(100, 200), 0, 0, Rand.Range(0, 360));
         }
 
         internal void RestoreTechnoWeapon(ThingWithComps weapon)
@@ -6059,19 +6018,37 @@ namespace TorannMagic
             }            
         }
 
+        internal void SyncHostedMinionDismissal()
+        {
+            if (ExistingMagicData != null && ClassProgression.SpiritRebirthState.TryGet(Pawn, out var state) && state.HasValidHost(Pawn))
+                SyncMinionDismissal(Verb_DismissMinion.OldestOwned(this) != null, true);
+        }
+
+        private void SyncMinionDismissal(bool available, bool hosted)
+        {
+            var def = TorannMagicDefOf.TM_DismissMinion;
+            if (def == null || (!available && !hosted && !dismissMinionSpell)) return;
+            var powers = AbilityData.Powers;
+            var existing = powers.Where(p => p?.Def == def && ReferenceEquals(p.AbilityUser, this)).ToList();
+            // Keep the actual source with the longest remaining cooldown in older duplicate saves.
+            var keep = available ? existing.OrderByDescending(p => p.CooldownTicksLeft).FirstOrDefault() : null;
+            if (existing.Count > (keep == null ? 0 : 1))
+            {
+                powers.RemoveAll(p => p?.Def == def && ReferenceEquals(p.AbilityUser, this));
+                if (keep != null) powers.Add(keep);
+                AbilityData.AllPowers = null;
+            }
+            if (available && keep == null)
+            {
+                AddPawnAbility(def);
+                AbilityData.AllPowers = null;
+            }
+            dismissMinionSpell = available;
+        }
+
         public void ResolveMinions()
         {
-            if (this.summonedMinions.Count > 0 && dismissMinionSpell == false)
-            {
-                this.AddPawnAbility(TorannMagicDefOf.TM_DismissMinion);
-                dismissMinionSpell = true;
-            }
-
-            if (this.summonedMinions.Count <= 0 && dismissMinionSpell == true)
-            {
-                this.RemovePawnAbility(TorannMagicDefOf.TM_DismissMinion);
-                dismissMinionSpell = false;
-            }
+            SyncMinionDismissal(this.summonedMinions.Count > 0, false);
 
             if (this.summonedMinions.Count > 0)
             {
@@ -6343,11 +6320,12 @@ namespace TorannMagic
 
         internal void ResolveOwnedMagicEconomy()
         {
+            SyncHostedMinionDismissal();
             if (Pawn?.story?.traits == null || Pawn.health?.hediffSet == null || Pawn.apparel?.WornApparel == null
                 || Pawn.equipment == null || ExistingMagicData == null) return;
             // Retain actual owners and links. This prunes only genuinely ended
             // support, without granting commands or advancing former trials.
-            summonedMinions.RemoveAll(t => !(t is Pawn p) || p.Dead || p.Destroyed);
+            summonedMinions?.RemoveAll(t => !(t is Pawn p) || p.Dead || p.Destroyed);
             supportedUndead?.RemoveAll(t => !(t is Pawn p) || p.Dead || p.Destroyed);
             ResolveEnchantments(false);
         }
@@ -6886,6 +6864,7 @@ namespace TorannMagic
 
         internal void RestoreSavedCooldowns()
         {
+            SyncHostedMinionDismissal();
             if (stoneskinPawns?.Count > 0) SyncStoneskinControl();
             if (earthSpriteType != 0) SyncEarthSpriteControl();
             if (summonedSentinels?.Count > 0) SyncSentinelControl();
@@ -8209,7 +8188,9 @@ namespace TorannMagic
                                 }
                                 else
                                 {
-                                    this.chaosPowers.Add(new TM_ChaosPowers((TMAbilityDef)TM_Calc.GetRandomMagicPower(this).abilityDef, null));
+                                    var preview = TM_Calc.GetRandomMagicPower(this);
+                                    if (preview == null) break;
+                                    this.chaosPowers.Add(new TM_ChaosPowers((TMAbilityDef)preview.abilityDef, null));
                                 }
                             }
                         }

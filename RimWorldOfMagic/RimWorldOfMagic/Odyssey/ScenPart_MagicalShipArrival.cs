@@ -89,4 +89,26 @@ namespace TorannMagic.Odyssey
             void Add(string name, int x, int z, Rot4 rot) => sketch.AddThing(DefDatabase<ThingDef>.GetNamed(name), new IntVec3(x, 0, z), rot);
         }
     }
+
+    [HarmonyPatch(typeof(SketchTerrain), nameof(SketchTerrain.Spawn))]
+    internal static class MagicalShipFoundationPlacement
+    {
+        static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+            => instructions.MethodReplacer(AccessTools.Method(typeof(TerrainGrid),nameof(TerrainGrid.SetFoundation)),
+                AccessTools.Method(typeof(MagicalShipFoundationPlacement),nameof(Place)));
+
+        private static void Place(TerrainGrid grid, IntVec3 cell, TerrainDef foundation)
+        {
+            // RimWorld 1.7 rejects foundations on a removable floor (e.g. a
+            // generated ruin). Only clear it when the scenario actually places
+            // a hull cell after the native sketch's collision checks.
+            if (ScenPart_MagicalShipArrival.active != null && foundation == TerrainDefOf.Substructure &&
+                grid.UnderTerrainAt(cell) != null)
+            {
+                if (grid.TempTerrainAt(cell) != null) grid.RemoveTopLayer(cell, false);
+                grid.RemoveTopLayer(cell, false);
+            }
+            grid.SetFoundation(cell, foundation);
+        }
+    }
 }

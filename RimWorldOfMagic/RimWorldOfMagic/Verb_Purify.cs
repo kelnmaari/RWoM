@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using RimWorld;
@@ -10,7 +10,7 @@ using TorannMagic.Utils;
 
 namespace TorannMagic
 {
-    public class Verb_Purify : Verb_UseAbility
+    public class Verb_Purify : ClassProgression.Verb_SpiritTargetable
     {
         private int verVal;
         private int pwrVal;
@@ -45,7 +45,8 @@ namespace TorannMagic
 
         protected override bool TryCastShot()
         {
-            Pawn caster = this.CasterPawn;
+            Pawn caster = ClassProgression.SpiritRebirthCasting.SkillOwner(CasterPawn, Ability);
+            if (caster == null) return false;
             Pawn pawn = this.currentTarget.Thing as Pawn;
             CompAbilityUserMagic comp = caster.GetCompAbilityUserMagic();
             arcaneDmg = comp.arcaneDmg;
@@ -100,7 +101,7 @@ namespace TorannMagic
             }
             //if (pawn.RaceProps.Humanlike)
             //{
-            using (IEnumerator<Hediff> enumerator = pawn.health.hediffSet.hediffs.GetEnumerator())
+            using (IEnumerator<Hediff> enumerator = pawn.health.hediffSet.hediffs.ToList().GetEnumerator())
             {
                 while (enumerator.MoveNext())
                 {
@@ -194,7 +195,7 @@ namespace TorannMagic
                 }
             }
             //}
-            using (IEnumerator<Hediff_Addiction> enumerator = pawn.health.hediffSet.hediffs.OfType<Hediff_Addiction>().GetEnumerator())
+            using (IEnumerator<Hediff_Addiction> enumerator = pawn.health.hediffSet.hediffs.OfType<Hediff_Addiction>().ToList().GetEnumerator())
             {
                 while (enumerator.MoveNext())
                 {
@@ -232,7 +233,7 @@ namespace TorannMagic
                                         }
                                         else
                                         {
-                                            if (rec.Chemical.defName == "Luciferium" && ((rec.Severity - (chd.severityReduction + (chd.powerSkillAdjustment * pwrVal)) * arcaneDmg <= 0)))
+                                            if (rec.Chemical?.defName == "Luciferium" && ((rec.Severity - (chd.severityReduction + (chd.powerSkillAdjustment * pwrVal)) * arcaneDmg <= 0)))
                                             {
                                                 Hediff luciHigh = pawn.health.hediffSet.GetFirstHediffOfDef(HediffDef.Named("LuciferiumHigh"), false);
                                                 pawn.health.RemoveHediff(luciHigh);
@@ -246,24 +247,24 @@ namespace TorannMagic
                         }
                         else
                         {
-                            if (rec.Chemical.defName == "Alcohol" || rec.Chemical.defName == "Smokeleaf")
+                            if (rec.Chemical?.defName == "Alcohol" || rec.Chemical?.defName == "Smokeleaf")
                             {
                                 rec.Severity -= ((.3f + .3f * pwrVal) * arcaneDmg);
                                 num--;
                             }
-                            if ((rec.Chemical.defName == "GoJuice" || rec.Chemical.defName == "WakeUp") && verVal >= 1)
+                            if ((rec.Chemical?.defName == "GoJuice" || rec.Chemical?.defName == "WakeUp") && verVal >= 1)
                             {
                                 rec.Severity -= ((.25f + .25f * pwrVal) * arcaneDmg);
                                 num--;
                             }
-                            if (rec.Chemical.defName == "Psychite" && verVal >= 2)
+                            if (rec.Chemical?.defName == "Psychite" && verVal >= 2)
                             {
                                 rec.Severity -= ((.25f + .25f * pwrVal) * arcaneDmg);
                                 num--;
                             }
                             if (verVal >= 3)
                             {
-                                if (rec.Chemical.defName == "Luciferium" && (rec.Severity - ((.15f + .15f * pwrVal) * arcaneDmg) < 0))
+                                if (rec.Chemical?.defName == "Luciferium" && (rec.Severity - ((.15f + .15f * pwrVal) * arcaneDmg) < 0))
                                 {
                                     Hediff luciHigh = pawn.health.hediffSet.GetFirstHediffOfDef(HediffDef.Named("LuciferiumHigh"), false);
                                     pawn.health.RemoveHediff(luciHigh);

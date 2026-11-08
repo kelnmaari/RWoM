@@ -45,7 +45,7 @@ namespace TorannMagic.Guidance
 
         private IEnumerable<string> Ready() => MagicGuides.Unlocked(
             name => DefDatabase<ResearchProjectDef>.GetNamedSilentFail(name)?.IsFinished == true,
-            ModsConfig.OdysseyActive, ModsConfig.IsActive("vanillaexpanded.gravship"));
+            ModsConfig.OdysseyActive, Compatibility.OptionalCompatibility.IsEnabled("ShipOxygenGuidance"));
 
         public override void StartedNewGame()
         {

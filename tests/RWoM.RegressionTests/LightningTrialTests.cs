@@ -18,6 +18,7 @@ internal static class LightningTrialTests
         yield return new("LightningTrial.NativeOwnerStageAndVictimEligibility", Eligibility);
         yield return new("LightningTrial.PersistedExplosionAndProgress", Save);
         yield return new("LightningTrial.NativeLaunchAndAmpEffect", Amp);
+        yield return new("IceTrial.BlizzardPendingSnowSurvivesLoad", BlizzardSnow);
         yield return new("LightningTrial.NestedDamageAndUnrelatedExplosionExcluded", Nested);
     }
     sealed class Fixture : IDisposable
@@ -261,6 +262,29 @@ internal static class LightningTrialTests
         Set(existing, "severityInt", 0f);
         projectile.ApplyHediffsAndMentalStates(w.First, w.Caster, null, ability.Def);
         Check.Equal(true, w.Path.CompletedTrials.Contains(LightningTrials.FoundationTrialId), "native framework applies real AMP and completes foundation");
+    }
+    static void BlizzardSnow(RuntimeFixture f)
+    {
+        using var fixture = new Fixture(f);
+        var def = (ThingDef)RuntimeHelpers.GetUninitializedObject(typeof(ThingDef));
+        def.defName = "RegressionBlizzard"; def.thingClass = typeof(Projectile_Blizzard);
+        def.comps = []; def.category = ThingCategory.Projectile; DefDatabase<ThingDef>.Add(def);
+        var shot = new Projectile_Blizzard { def = def, thingIDNumber = 19992,
+            usedTarget = IntVec3.Zero, intendedTarget = IntVec3.Zero };
+        var schedule = typeof(Projectile_Blizzard).GetMethod("ScheduleCell", BindingFlags.Instance | BindingFlags.NonPublic);
+        Check.NotNull(schedule, "blizzard records pending snowfall instead of a fixed array");
+        Set(shot, "age", 177);
+        var cell = new IntVec3(8, 0, 11);
+        schedule!.Invoke(shot, [cell, 12]);
+        var data = new ProjectileEnvelope { projectile = shot };
+        var file = Path.Combine(f.WorkingDirectory, "blizzard-pending-snow.xml");
+        try { Scribe.saver.InitSaving(file, "regression"); Scribe_Deep.Look(ref data, "data"); Scribe.saver.FinalizeSaving(); } finally { Scribe.ForceStop(); }
+        ProjectileEnvelope restored = null!;
+        try { Scribe.loader.InitLoading(file); Scribe_Deep.Look(ref restored, "data"); Scribe.loader.FinalizeLoading(); } finally { Scribe.ForceStop(); }
+        object Field(string name) => typeof(Projectile_Blizzard).GetField(name, BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(restored.projectile)!;
+        Check.Equal(cell, ((List<IntVec3>)Field("effectCells")).Single(), "only the actual strike cell survives");
+        Check.Equal(189, ((List<int>)Field("effectAtAge")).Single(), "due time remains relative to projectile age");
+        RuntimeLog.AssertClean();
     }
     static bool SkipGraphics() => false;
     static bool FixedPosition(ref UnityEngine.Vector3 __result) { __result = new UnityEngine.Vector3(3, 0, 3); return false; }

@@ -20,7 +20,7 @@ namespace TorannMagic.Thoughts
                 }
                 if (pawn.RaceProps.Humanlike && other.RaceProps.Humanlike)
                 {
-                    if ((ClassProgression.ClassIdentity.IsPaladin(other) || ClassProgression.ClassIdentity.IsDruid(other) || ClassProgression.ClassIdentity.IsPriest(other)) && (ClassProgression.ClassIdentity.IsBaseNecromancer(pawn) || ClassProgression.ClassIdentity.IsLich(pawn) || pawn.story.traits.HasTrait(TorannMagicDefOf.DeathKnight)))
+                    if ((ClassProgression.ClassIdentity.IsPaladin(other) || ClassProgression.ClassIdentity.IsDruid(other) || ClassProgression.ClassIdentity.IsPriest(other)) && (ClassProgression.ClassIdentity.IsBaseNecromancer(pawn) || ClassProgression.ClassIdentity.IsLich(pawn) || ClassProgression.DeathKnightMartialPath.IsKnight(pawn)))
                     {
                         return true;
                     }

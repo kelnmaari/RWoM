@@ -20,7 +20,8 @@ namespace TorannMagic.ClassProgression
 
         private static DisciplineProgress Eligible(Pawn caster, Pawn target, PawnAbility ability)
         {
-            if (!ClassIdentity.TryGetState(caster, out var state) || (state.Vocation & Vocation.Mage) == 0) return null;
+            var owner = SpiritRebirthCasting.SkillOwner(caster, ability);
+            if (owner == null || !ClassIdentity.TryGetState(owner, out var state) || (state.Vocation & Vocation.Mage) == 0) return null;
             if (caster == null || target == null || caster == target || caster.Dead || target.Dead
                 || !caster.Spawned || !target.Spawned || caster.Map != target.Map
                 || target.RaceProps?.Humanlike != true || target.Faction == null || caster.Faction == null
@@ -30,7 +31,7 @@ namespace TorannMagic.ClassProgression
             var path = state.Find("rwom.priest");
             if (path?.Domain != DisciplineDomain.Magic || path.Stage != InitiationStage.Adept
                 || path.CompletedTrials.Contains(TrialId)) return null;
-            var comp = caster.AllComps.OfType<CompAbilityUserMagic>().FirstOrDefault();
+            var comp = owner.AllComps.OfType<CompAbilityUserMagic>().FirstOrDefault();
             if (comp == null || ability.AbilityUser != comp || !comp.AbilityData.Powers.Any(p => ReferenceEquals(p, ability))) return null;
             return path;
         }

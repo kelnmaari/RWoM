@@ -1,4 +1,4 @@
-﻿using Verse;
+using Verse;
 using Verse.AI;
 using AbilityUser;
 using UnityEngine;
@@ -170,7 +170,12 @@ namespace TorannMagic
                                 dmg *= 3;
                             }
                             BodyPartRecord bpr = t.health.hediffSet.GetRandomNotMissingPart(DamageDefOf.Stab, BodyPartHeight.Undefined, BodyPartDepth.Outside);
-                            TM_Action.DamageEntities(target, bpr, dmg, Rand.Range(0f, .5f), DamageDefOf.Stab, this.caster);
+                            bool trial = ClassProgression.ShadowWalkerMartialPath.Path(caster) != null && ClassProgression.ShadowWalkerMartialPath.Enemy(caster,t);
+                            bool combined = trial && (t.health.hediffSet.HasHediff(TorannMagicDefOf.TM_NightshadeToxinHD) ||
+                                caster.health.hediffSet.HasHediff(TorannMagicDefOf.TM_ShadowCloakHD));
+                            dmg = ClassProgression.ShadowWalkerMartialPath.StrikeDamage(caster,dmg);
+                            var hit = TM_Action.DamageEntitiesResult(target, bpr, dmg, Rand.Range(0f, .5f), DamageDefOf.Stab, this.caster);
+                            if (trial && hit.totalDamageDealt > 0) ClassProgression.ShadowWalkerMartialPath.Hit(caster,t.thingIDNumber,false,combined);
                             Vector3 rndPos = t.DrawPos;
                             rndPos.x += Rand.Range(-.2f, .2f);
                             rndPos.z += Rand.Range(-.2f, .2f);

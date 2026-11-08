@@ -17,7 +17,10 @@ namespace TorannMagic.ClassProgression
         // snapshot is correct regardless of Mod construction order.
         public static void SnapshotFromSettings(Verse.Mod mod)
         {
-            var settings = TorannMagic.ModOptions.Settings.Instance ?? mod?.GetSettings<TorannMagic.ModOptions.Settings>();
+            var settings = TorannMagic.ModOptions.Settings.Instance;
+            if (settings == null && mod?.Content != null)
+                settings = Verse.LoadedModManager.ReadModSettings<TorannMagic.ModOptions.Settings>(
+                    mod.Content.FolderName, nameof(TorannMagic.ModOptions.Controller));
             Enabled = settings?.newProgressionBeta ?? false;
         }
     }

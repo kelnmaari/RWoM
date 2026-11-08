@@ -17,7 +17,7 @@ internal static class IceProgressionTests
         yield return new("IceProgression.PreservedOwnersRanksAndMissingProfileGate", Ownership);
         yield return new("IceProgression.NativePassiveParityAndDeduplication", Passive);
     }
-    sealed class Fixture : IDisposable
+    internal sealed class Fixture : IDisposable
     {
         readonly Game previous = Current.Game;
         readonly ClassDisciplineDef[] profiles = DefDatabase<ClassDisciplineDef>.AllDefsListForReading.ToArray();

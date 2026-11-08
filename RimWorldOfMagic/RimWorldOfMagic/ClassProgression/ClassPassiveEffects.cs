@@ -25,7 +25,7 @@ namespace TorannMagic.ClassProgression
 
         public static float StatOffset(Pawn pawn, StatDef stat)
             => SpiritRebirthBodyEffects.SuppressFormerBodyEffects(pawn) ? 0f
-                : BladeFoundation.Offset(pawn,stat) + Offset(Demon(pawn), stat) + Offset(Priest(pawn), stat) + Offset(Necromancer(pawn), stat) + Offset(Lich(pawn), stat) + Offset(Fire(pawn), stat) + Offset(Ice(pawn), stat) + Offset(Lightning(pawn), stat) + Offset(Arcanist(pawn), stat) + Offset(Paladin(pawn), stat) + Offset(Summoner(pawn), stat) + Offset(Druid(pawn), stat) + Offset(Technomancer(pawn), stat) + Offset(Geomancer(pawn), stat) + Offset(BloodMage(pawn), stat) + Offset(Enchanter(pawn), stat) + Offset(Chronomancer(pawn), stat) + Offset(Brightmage(pawn), stat) + Offset(Golemancer(pawn), stat) + Offset(Empath(pawn), stat) + Offset(Shaman(pawn), stat) + (Bard(pawn)?.DataAtDegree(BardDegree(pawn))?.statOffsets?.Where(x => x.stat == stat).Sum(x => x.value) ?? 0f);
+                : RangerFoundation.Offset(pawn,stat) + BladeFoundation.Offset(pawn,stat) + SniperFoundation.Offset(pawn,stat) + Offset(Demon(pawn), stat) + Offset(Priest(pawn), stat) + Offset(Necromancer(pawn), stat) + Offset(Lich(pawn), stat) + Offset(Fire(pawn), stat) + Offset(Ice(pawn), stat) + Offset(Lightning(pawn), stat) + Offset(Arcanist(pawn), stat) + Offset(Paladin(pawn), stat) + Offset(Summoner(pawn), stat) + Offset(Druid(pawn), stat) + Offset(Technomancer(pawn), stat) + Offset(Geomancer(pawn), stat) + Offset(BloodMage(pawn), stat) + Offset(Enchanter(pawn), stat) + Offset(Chronomancer(pawn), stat) + Offset(Brightmage(pawn), stat) + Offset(Golemancer(pawn), stat) + Offset(Empath(pawn), stat) + Offset(Shaman(pawn), stat) + (Bard(pawn)?.DataAtDegree(BardDegree(pawn))?.statOffsets?.Where(x => x.stat == stat).Sum(x => x.value) ?? 0f);
 
         private static TraitDef Fire(Pawn pawn)
         {
@@ -255,8 +255,9 @@ namespace TorannMagic.ClassProgression
 
         public static float StatFactor(Pawn pawn, StatDef stat)
             => SpiritRebirthBodyEffects.SuppressFormerBodyEffects(pawn) ? 1f
-                : stat == StatDefOf.MoveSpeed && JobDriver_BladeSevenSteps.Exhausted(pawn) ? .8f
-                : Lich(pawn)?.DataAtDegree(0)?.statFactors?.FirstOrDefault(s => s.stat == stat)?.value ?? 1f;
+                : (stat == StatDefOf.MoveSpeed ? RangerSafeTrails.Speed(pawn) : 1f) * (stat == StatDefOf.MoveSpeed && JobDriver_BladeSevenSteps.Exhausted(pawn) ? .8f
+                : stat == StatDefOf.MoveSpeed && pawn?.jobs?.curDriver is JobDriver_RangerBreakthrough hunt && hunt.Active ? .8f
+                : RangerFoundation.Factor(pawn,stat) * (Lich(pawn)?.DataAtDegree(0)?.statFactors?.FirstOrDefault(s => s.stat == stat)?.value ?? 1f));
     }
 
     [HarmonyPatch(typeof(Pawn_StoryTracker), nameof(Pawn_StoryTracker.DisabledWorkTagsBackstoryAndTraits), MethodType.Getter)]

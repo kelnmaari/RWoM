@@ -14,6 +14,22 @@ internal static class ArcanistTrialTests
         yield return new("ArcanistTrial.BlinkActualMovementAndOwnership", Blink);
         yield return new("ArcanistTrial.NativeBlinkSuccessAndBlockedEndpoint", TeleportSpiritTests.ArcanistOwnedBlink);
         yield return new("ArcanistTrial.SummonPlacedMergedStackAndFailures", Summon);
+        yield return new("ArcanistTrial.SummonTargetsOrdinaryItemsAtEveryRank", f =>
+        {
+            var xml = new System.Xml.XmlDocument();
+            xml.Load(Path.Combine(f.Repository, "v1.7/Defs/AbilityDefs/Abilities_TMagic_Arcanist.xml"));
+            var itemDef = (ThingDef)RuntimeHelpers.GetUninitializedObject(typeof(ThingDef));
+            itemDef.category = ThingCategory.Item;
+            itemDef.isAutoAttackableMapObject = false;
+            var item = new ThingWithComps { def = itemDef };
+            foreach (var suffix in new[] { "", "_I", "_II", "_III" })
+            {
+                var node = xml.SelectSingleNode($"/Defs/*[defName='TM_Summon{suffix}']/MainVerb/targetParams");
+                var parameters = DirectXmlToObject.ObjectFromXml<TargetingParameters>(node!, false);
+                Check.Equal(true, parameters.CanTarget(new TargetInfo(item)), "ordinary nonattackable cargo " + suffix);
+                Check.Equal(false, parameters.canTargetBuildings, "building is not cargo");
+            }
+        });
         yield return new("ArcanistTrial.MissileAttributionDamageAndScribe", Missile);
         yield return new("ArcanistTrial.ShadowActualAllyEffectAndScribe", Shadow);
     }

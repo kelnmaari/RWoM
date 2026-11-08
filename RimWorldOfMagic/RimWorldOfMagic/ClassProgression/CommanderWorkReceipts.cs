@@ -76,7 +76,7 @@ namespace TorannMagic.ClassProgression
                     if(relief!=null && PsionicMartialPath.ActivePath(worker,out _)==relief) PsionicMartialPath.RecordService(relief,relief:true);
                     if(!crew)return;
                     effect.Credited=true;
-                    CommanderMartialPath.WorkDone(effect.Commander,effect.Serial,true,false,false);
+                    CommanderMartialPath.WorkDone(effect.Source,effect.Serial,true,false,false);
                 }
             };
         }
@@ -102,7 +102,7 @@ namespace TorannMagic.ClassProgression
                     casualty.Faction==___pawn.Faction && casualty.CurrentBed()!=null && casualty.CurrentBed()==___pawn.CurJob.targetB.Thing;
                 if(!repair && !rescue) return;
                 order.Credited=true;
-                CommanderMartialPath.WorkDone(order.Commander,order.Serial,false,repair,repair || rescue);
+                CommanderMartialPath.WorkDone(order.Source,order.Serial,false,repair,repair || rescue);
             }
         }
     }

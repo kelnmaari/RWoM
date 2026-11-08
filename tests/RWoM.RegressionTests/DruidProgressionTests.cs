@@ -13,6 +13,7 @@ internal static class DruidProgressionTests
 {
     public static IEnumerable<TestCase> Cases()
     {
+        foreach (var test in Bug6973Tests.Cases()) yield return test;
         yield return new("DruidProgression.NativeBooksAndStageGates", Books);
         yield return new("DruidProgression.PreservedOwnersRanksAndMissingProfileGate", Ownership);
         yield return new("DruidProgression.NativePassiveParityAndDeduplication", Passive);

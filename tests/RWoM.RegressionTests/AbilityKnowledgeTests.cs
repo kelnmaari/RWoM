@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using RimWorld;
@@ -13,18 +13,66 @@ internal static class AbilityKnowledgeTests
 {
     public static IEnumerable<TestCase> Cases()
     {
+        if (Environment.GetEnvironmentVariable("RWOM_TEST_CORE_ASSEMBLY") is string corePath && File.Exists(corePath))
+        {
+            yield return new("CoreSdk.Disciplines.Hybrid", CoreSdkTests.Disciplines);
+            yield return new("CoreSdk.Disciplines.Kure", r => PridestalkerCompatibilityTests.Menu(r, true));
+            yield return new("CoreSdk.Cast.Admission", CastSafetyTests.SdkAdmission);
+            yield return new("CoreSdk.PublicContract", r => CoreSdkTests.CheckContract(r, corePath));
+            yield return new("CoreSdk.Knowledge.Legacy", r => Reconcile(r, true));
+            yield return new("CoreSdk.Knowledge.StatusAndSnapshot", CoreSdkTests.Knowledge);
+        }
         yield return new("AbilityKnowledge.StoreRetrieveSkillRanks", StoreRetrieve);
         yield return new("AbilityKnowledge.MissingSpellReturnsZero", MissingSpell);
         yield return new("AbilityKnowledge.RemoveSpell", RemoveSpell);
         yield return new("AbilityKnowledge.SaveLoadRoundTrip", SaveLoad);
         yield return new("AbilityKnowledge.SchemaV2Reconciles", SchemaV2Reconciles);
+        foreach (bool hybrid in new[] { false, true })
+            yield return new("AbilityKnowledge.KureShadowstepSplit." + hybrid, f =>
+            {
+                GrimoireProgressionTests.LoadBaseDefinitions(f);
+                var p=GrimoireProgressionTests.PawnWithComps(hybrid,true);
+                p.pawn.thingIDNumber=46;
+                var addon=f.AddAbility("TM_Shadowstep");
+                var native=TorannMagicDefOf.TM_ShadowStep;
+                Check.Equal("kure.tm_shadowstep",SpellIds.Of(addon),"Kure convention key");
+                Check.Equal("rwom.tm_shadowstep",SpellIds.Of(native),"existing magic ID is unchanged");
+                if (hybrid)
+                    p.magic.MagicData.MagicPowersStandalone.Add(new MagicPower {TMabilityDefs=[native],learned=true,autocast=false});
+                p.might.MightData.MightPowersStandalone.Add(new MightPower {TMabilityDefs=[addon],learned=true,autocast=true});
+                var knowledge=new AbilityKnowledgeComp {parent=p.pawn};
+                GrimoireProgressionTests.Set(knowledge,"legacyImported",true);
+                knowledge.GetOrCreate("rwom.tm_shadowstep",0);
+                knowledge.GetOrCreate("sleeping.unrelated",2).pwr=3;
+                var wrap=new KnowledgeWrap {Comp=knowledge};
+                string path=Path.Combine(f.WorkingDirectory,"kure-shadow.xml");
+                try { Scribe.saver.InitSaving(path,"regression");Scribe_Deep.Look(ref wrap,"wrap");Scribe.saver.FinalizeSaving(); }
+                finally { Scribe.ForceStop(); }
+                wrap=null!;
+                try { Scribe.loader.InitLoading(path);Scribe_Deep.Look(ref wrap,"wrap");Scribe.loader.FinalizeLoading(); }
+                finally { Scribe.ForceStop(); }
+                wrap.Comp.parent=p.pawn;p.pawn.AllComps.Add(wrap.Comp);
+                var previous=Current.Game;
+                try
+                {
+                    Current.Game=(Game)RuntimeHelpers.GetUninitializedObject(typeof(Game));
+                    GrimoireProgressionTests.Set(Current.Game,"tickManager",new TickManager());
+                    wrap.Comp.CompTick();
+                }
+                finally {Current.Game=previous;}
+                Check.Equal(true,wrap.Comp.Find("kure.tm_shadowstep")?.autocast==true,"stamina owner's autocast retained");
+                Check.Equal(hybrid,wrap.Comp.Find("rwom.tm_shadowstep")!=null,"only a real magic owner keeps the native entry");
+                Check.Equal(3,wrap.Comp.Find("sleeping.unrelated").pwr,"unavailable unrelated knowledge retained");
+            });
     }
 
     // Ф4 step 4 stage 2: v1 saves drifted from legacy (toggles and ranks moved
     // after the one-shot import, before dual-write existed). Bumping the schema
     // triggers a one-shot reconcile on the next tick: flags AND ranks are
     // re-read from legacy, then the version stamps current.
-    private static void SchemaV2Reconciles(RuntimeFixture f)
+    private static void SchemaV2Reconciles(RuntimeFixture f) => Reconcile(f, false);
+
+    private static void Reconcile(RuntimeFixture f, bool querySdk)
     {
         if (Current.Game == null)
         {
@@ -107,7 +155,17 @@ internal static class AbilityKnowledgeTests
         // The game's comp loader restores `parent`; a bare Scribe wrap does not.
         loaded.Comp.parent = pawn;
 
+        pawn.AllComps.Remove(knowledge);
+        pawn.AllComps.Add(loaded.Comp);
+        if (querySdk) CoreSdkTests.Query(pawn, SpellIds.Of(def), "PendingImport");
         loaded.Comp.CompTick(); // reconcile runs here
+        if (querySdk)
+        {
+            CoreBridge.RegisterSpell(def);
+            var snapshot = CoreSdkTests.Query(pawn, SpellIds.Of(def), "Available");
+            Check.Equal(2, (int)snapshot.GetType().GetProperty("Tier")!.GetValue(snapshot)!, "SDK returns reconciled tier");
+            Check.Equal(true, (bool)snapshot.GetType().GetProperty("Autocast")!.GetValue(snapshot)!, "SDK returns reconciled autocast");
+        }
         Check.Equal(2, loaded.Comp.SchemaVersion, "schema stamped current");
         var entry = loaded.Comp.Find(TorannMagic.SpellIds.Of(def));
         Check.NotNull(entry, "reconciled entry present");

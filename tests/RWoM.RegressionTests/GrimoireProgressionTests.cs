@@ -20,6 +20,54 @@ internal static class GrimoireProgressionTests
 
     public static IEnumerable<TestCase> Cases()
     {
+        yield return new("GrimoireProgression.StageTitlesPreserveLearnedAndHybridAccess", f =>
+        {
+            var previous = DefDatabase<TorannMagic.ClassProgression.ClassDisciplineDef>.AllDefsListForReading.ToArray();
+            var oldLanguage = LanguageDatabase.activeLanguage; var oldDefault = LanguageDatabase.defaultLanguage;
+            try
+            {
+                var language = (LoadedLanguage)RuntimeHelpers.GetUninitializedObject(typeof(LoadedLanguage));
+                language.folderName = "English";
+                Set(language, "dataIsLoaded", true); Set(language, "workerInt", new LanguageWorker_English());
+                language.keyedReplacements = Directory.GetFiles(Path.Combine(f.Repository,"Languages/English/Keyed"),"*.xml")
+                    .SelectMany(p=>System.Xml.Linq.XDocument.Load(p).Root!.Elements()).GroupBy(e=>e.Name.LocalName)
+                    .ToDictionary(g=>g.Key,g=>new LoadedLanguage.KeyedReplacement {key=g.Key,value=g.First().Value});
+                LanguageDatabase.activeLanguage = LanguageDatabase.defaultLanguage = language;
+                DefDatabase<TorannMagic.ClassProgression.ClassDisciplineDef>.Clear();
+                var ability = (TMAbilityDef)RuntimeHelpers.GetUninitializedObject(typeof(TMAbilityDef));
+                ability.defName = "StageTitleTest";
+                var state = new TorannMagic.ClassProgression.ClassProgressionState(TorannMagic.ClassProgression.Vocation.Mage);
+                state.TryAddFoundation("rwom.fire", TorannMagic.ClassProgression.DisciplineDomain.Magic);
+                DefDatabase<TorannMagic.ClassProgression.ClassDisciplineDef>.Add(new TorannMagic.ClassProgression.ClassDisciplineDef() { defName="StageFire", profileId="rwom.fire", label="Fire",
+                    spells=[new() {ability=ability, stage=TorannMagic.ClassProgression.InitiationStage.Master}] });
+                var method = typeof(Window_TMGrimoire).GetMethod("StageSuffix", Flags)!;
+                string Suffix(bool learned) => (string)method.Invoke(null, [state, new AbilityUser.AbilityDef[] { ability }, learned])!;
+                Check.Equal(true, Suffix(false).Contains("TM_GrimoireStageTooLow".Translate().ToString()), "future ability explains stage lock");
+                Check.Equal(false, Suffix(true).Contains("TM_GrimoireStageTooLow".Translate().ToString()), "retained learned spell never labelled locked");
+                state.TryAddFoundation("rwom.ice", TorannMagic.ClassProgression.DisciplineDomain.Magic);
+                DefDatabase<TorannMagic.ClassProgression.ClassDisciplineDef>.Add(new TorannMagic.ClassProgression.ClassDisciplineDef() {defName="StageIce",profileId="rwom.ice",label="Ice",
+                    spells=[new() {ability=ability,stage=TorannMagic.ClassProgression.InitiationStage.Foundation}]});
+                Check.Equal(false, Suffix(false).Contains("TM_GrimoireStageTooLow".Translate().ToString()), "either hybrid path can grant shared spell");
+                Check.Equal("", (string)method.Invoke(null, [null, new AbilityUser.AbilityDef[] {ability}, false])!, "classic addon has no invented stage");
+            }
+            finally { LanguageDatabase.activeLanguage=oldLanguage; LanguageDatabase.defaultLanguage=oldDefault; DefDatabase<TorannMagic.ClassProgression.ClassDisciplineDef>.Clear(); foreach(var p in previous) DefDatabase<TorannMagic.ClassProgression.ClassDisciplineDef>.Add(p); }
+        });
+        yield return new("GrimoireProgression.NoviceUpgradeLabelsSevenLanguages", f =>
+        {
+            foreach (var language in new[] { "English", "Russian", "ChineseSimplified", "Portuguese", "PortugueseBrazilian", "Spanish", "Ukrainian" })
+            {
+                var entries = Directory.GetFiles(Path.Combine(f.Repository, "Languages", language, "Keyed"), "*.xml")
+                    .SelectMany(path => System.Xml.Linq.XDocument.Load(path).Root!.Elements()).ToList();
+                foreach (var spell in new[] { "ArcaneBolt", "MageLight", "Extinguish", "Heater", "Cooler", "SmokeCloud" })
+                foreach (var upgrade in new[] { "pwr", "eff", "ver" })
+                {
+                    var key = "TM_" + spell + "_" + upgrade;
+                    var labels = entries.Where(e => e.Name.LocalName == key).ToList();
+                    Check.Equal(1, labels.Count, language + " has one label for " + key);
+                    Check.Equal(true, !string.IsNullOrWhiteSpace(labels[0].Value) && labels[0].Value != key, "translated upgrade label");
+                }
+            }
+        });
         yield return new("GrimoireProgression.MageWithInactiveMightComp", MageWithInactiveMight);
         yield return new("GrimoireProgression.FighterWithInactiveMagicComp", FighterWithInactiveMagic);
         yield return new("GrimoireProgression.LeveledSharedAbilityDeduplicates", LeveledSharedAbility);

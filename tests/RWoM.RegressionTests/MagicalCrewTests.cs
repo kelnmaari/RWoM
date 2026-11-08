@@ -3,6 +3,7 @@ using System.Runtime.CompilerServices;
 using AbilityUser;
 using RimWorld;
 using TorannMagic;
+using TorannMagic.ClassProgression;
 using TorannMagic.TMDefs;
 using Verse;
 using static RWoM.RegressionTests.GrimoireProgressionTests;
@@ -13,6 +14,61 @@ internal static class MagicalCrewTests
 {
     public static IEnumerable<TestCase> Cases()
     {
+        yield return new("MagicalCrew.ScenarioGrantsOnlyFoundationToFreshMage", f =>
+        {
+            using var definitions = Prepare(f);
+            var pawn = PawnWithComps(false, false);
+            ReadyPawn(pawn.pawn);
+            var comp = new CompClassProgression { parent = pawn.pawn };
+            pawn.pawn.AllComps.Add(comp);
+            var reserved = PawnWithComps(false, false).pawn;
+            foreach (var entry in TM_ClassGroups.MagicEntriesField.Where(e => e.trait != "Priest"))
+                reserved.story.traits.allTraits.Add(new Trait(DefDatabase<TraitDef>.GetNamed(entry.trait)));
+            using var scope = new StartScope([reserved, pawn.pawn], 2);
+            var profiles = DefDatabase<ClassDisciplineDef>.AllDefsListForReading.ToArray();
+            var traits = DefDatabase<TraitDef>.AllDefsListForReading.ToArray();
+            try
+            {
+                DefDatabase<ClassDisciplineDef>.Clear();
+                if (DefDatabase<TraitDef>.GetNamedSilentFail("TM_VocationMage") == null)
+                    DefDatabase<TraitDef>.Add(new TraitDef { defName = "TM_VocationMage", degreeDatas = [new TraitDegreeData()] });
+                DefDatabase<ClassDisciplineDef>.Add(new ClassDisciplineDef { defName = "CrewPriest", profileId = "rwom.priest",
+                    magicPowerList = "magicPowerPR", legacyTrait = TorannMagicDefOf.Priest, domain = DisciplineDomain.Magic,
+                    foundationBook = (ThingDef)RuntimeHelpers.GetUninitializedObject(typeof(ThingDef)), spells = [
+                        new DisciplineSpell { ability = TorannMagicDefOf.TM_AdvancedHeal, stage = InitiationStage.Foundation },
+                        new DisciplineSpell { ability = TorannMagicDefOf.TM_Purify, stage = InitiationStage.Foundation }] });
+                NewPart().PostGameStart();
+                Check.Equal(InitiationStage.Foundation, comp.State.Find("rwom.priest").Stage, "scenario chooses foundation");
+                Check.Equal(false, pawn.pawn.story.traits.HasTrait(TorannMagicDefOf.Priest), "identity is stored on the discipline");
+                Check.Equal(2, pawn.magic.MagicData.MagicPowersPR.Count(p => p.learned), "exactly two priest spells owned");
+                Check.Equal(true, pawn.magic.AbilityData.Powers.Any(p => p.Def == TorannMagicDefOf.TM_Purify), "real cast command restored");
+                Check.NotNull(pawn.pawn.needs.TryGetNeed(TorannMagicDefOf.TM_Mana), "mana available");
+                NewPart().PostGameStart();
+                Check.Equal(1, comp.State.Disciplines.Count, "repeated scenario entry preserves single grant");
+            }
+            finally
+            {
+                DefDatabase<ClassDisciplineDef>.Clear(); foreach (var def in profiles) DefDatabase<ClassDisciplineDef>.Add(def);
+                DefDatabase<TraitDef>.Clear(); foreach (var def in traits) DefDatabase<TraitDef>.Add(def);
+            }
+        });
+        yield return new("MagicalCrew.PreserveEnrolledNoviceAndWarrior", f =>
+        {
+            using var definitions = Prepare(f);
+            var novice = PawnWithComps(false, false).pawn;
+            var warrior = PawnWithComps(false, false).pawn;
+            using var scope = new StartScope([novice, warrior], 2);
+            foreach (var pawn in new[] { novice, warrior })
+            {
+                var comp = new CompClassProgression { parent = pawn };
+                pawn.AllComps.Add(comp);
+                Check.Equal(true, comp.BeginNewProgression(pawn == novice ? Vocation.Mage : Vocation.Warrior), "initialized explicit identity");
+            }
+            novice.story.traits.allTraits.Add(new Trait(TorannMagicDefOf.PhysicalProdigy));
+            NewPart().PostGameStart();
+            Check.Equal(true, novice.story.traits.HasTrait(TorannMagicDefOf.PhysicalProdigy), "unspent second potential kept until a discipline is chosen");
+            Check.Equal(0, warrior.story.traits.allTraits.Count, "scenario never overlays a classic magic trait on an enrolled warrior");
+        });
         foreach (string className in new[] { "InnerFire", "HeartOfFrost", "StormBorn", "Arcanist", "Paladin", "Summoner", "Druid", "Necromancer", "Priest", "TM_Bard", "Succubus", "Warlock", "Geomancer", "Technomancer", "BloodMage", "Enchanter", "Chronomancer", "TM_Wanderer", "ChaosMage", "TM_Brightmage", "TM_Shaman", "TM_Golemancer" })
             yield return new("MagicalCrew.BuiltinPool." + className, f =>
             {

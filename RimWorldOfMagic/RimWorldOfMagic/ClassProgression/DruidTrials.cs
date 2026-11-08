@@ -8,10 +8,15 @@ namespace TorannMagic.ClassProgression
     public static class DruidTrials
     {
         public const string FoundationTrialId = "rwom.druid.foundation", MasteryTrialId = "rwom.druid.mastery";
+        static Pawn CastingBody(Pawn owner)
+        {
+            if (owner == null || owner.Spawned) return owner;
+            return SpiritRebirthState.TryGet(owner, out var state) && state.HasValidHost(owner) ? state.Host : null;
+        }
         static DisciplineProgress Owned(PawnAbility ability, TMAbilityDef spell, InitiationStage stage)
         {
             var caster = ability?.Pawn;
-            if (caster == null || caster.Dead || !caster.Spawned || caster.Faction == null
+            if (caster == null || caster.Dead || CastingBody(caster)?.Spawned != true || caster.Faction == null
                 || caster.story?.traits?.HasTrait(TorannMagicDefOf.Faceless) == true
                 || !ClassIdentity.TryGetState(caster, out var state) || (state.Vocation & Vocation.Mage) == 0) return null;
             var path = state.Find("rwom.druid");
@@ -21,14 +26,14 @@ namespace TorannMagic.ClassProgression
                 || magic == null || ability.AbilityUser != magic || !magic.AbilityData.Powers.Any(p => ReferenceEquals(p, ability))) return null;
             return magic.MagicData.MagicPowersD.Any(p => p.learned && p.TMabilityDefs.Contains(spell) && p.TMabilityDefs.Contains(ability.Def)) ? path : null;
         }
-        static bool Animal(Pawn caster, Pawn target) => target != null && !target.Dead && target.Spawned && target.Map == caster.Map
+        static bool Animal(Pawn caster, Pawn target) => target != null && !target.Dead && target.Spawned && target.Map == CastingBody(caster)?.Map
             && target.RaceProps?.Animal == true && target.Faction != caster.Faction;
         static bool Manhunter(Pawn target)
         {
             var state = target?.mindState?.mentalStateHandler?.CurStateDef;
             return state != null && (state == MentalStateDefOf.Manhunter || state == MentalStateDefOf.ManhunterPermanent);
         }
-        static bool Ally(Pawn caster, Pawn target) => target != null && target != caster && !target.Dead && target.Spawned && target.Map == caster.Map
+        static bool Ally(Pawn caster, Pawn target) => target != null && target != CastingBody(caster) && !target.Dead && target.Spawned && target.Map == CastingBody(caster)?.Map
             && target.RaceProps?.Humanlike == true && target.Faction == caster.Faction && !target.IsPrisoner && !target.IsSlave
             && !TM_Calc.IsUndead(target) && target.health?.hediffSet != null;
         static bool Finite(float value) => !float.IsNaN(value) && !float.IsInfinity(value);

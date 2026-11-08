@@ -17,6 +17,39 @@ internal static partial class CastSafetyTests
         RuntimeHelpers.RunClassConstructor(typeof(MessageTypeDefOf).TypeHandle);
         RuntimeLog.AcceptHeadlessDefOfInitialization("MessageTypeDefOf");
     }
+    private sealed class AdmissionAbility : MagicAbility
+    {
+        public override bool CanCastPowerCheck(AbilityContext context, out string reason) { reason = ""; return true; }
+    }
+
+    internal static void SdkAdmission(RuntimeFixture f) => World(f, w =>
+    {
+        Check.Equal(true, CoreBridge.Available, "provider installed");
+        var assembly = Assembly.Load("TorannMagic.Core");
+        var api = assembly.GetType("TorannMagic.Core.AbilityCasting", true)!.GetMethod("Check")!;
+        object mode = Enum.Parse(assembly.GetType("TorannMagic.Core.CastMode", true)!, "Manual");
+        string Query(Verb verb) => api.Invoke(null, [verb, (LocalTargetInfo)w.Target, mode])!.ToString()!;
+        Check.Equal("Busy", Query(w.Verb), "existing cast job respected");
+        Set(w.Caster.jobs, "curJob", null);
+        w.Verb.Ability = new AdmissionAbility { Def = w.Def };
+        Check.Equal("Allowed", Query(w.Verb), "valid manual cast");
+        Set(Current.Game, "questManager", new QuestManager());
+        var pacifist = new Trait(new TraitDef { defName = "SdkPacifism", disabledWorkTags = WorkTags.Violent, degreeDatas = [new TraitDegreeData()] }, 0);
+        w.Caster.story.traits.allTraits.Add(pacifist);
+        w.Def.MainVerb.isViolent = true;
+        Check.Equal("ViolenceDisabled", Query(w.Verb), "pacifist cannot use violent ability");
+        w.Def.MainVerb.isViolent = false;
+        Check.Equal("Allowed", Query(w.Verb), "pacifist may cast peaceful spell");
+        Check.Equal("UnsupportedAbility", Query(new Verb_Shoot()), "foreign ability delegated");
+        mode = Enum.Parse(mode.GetType(), "Automatic");
+        Check.Equal("Allowed", Query(w.Verb), "valid automatic cast");
+        w.Wall(); w.Def.MainVerb.requireLineOfSight = true;
+        Check.Equal("AutomaticCastDenied", Query(w.Verb), "blocked line of sight");
+        Set(w.Caster, "mapIndexOrState", (sbyte)-1);
+        Check.Equal("OffMap", Query(w.Verb), "caravan cannot cast");
+        Check.Equal(0, w.Verb.Shots, "query never executes");
+        Check.Equal(true, w.Caster.CurJob == null, "query never schedules");
+    });
     public static IEnumerable<TestCase> Cases()
     {
         foreach (var test in EtherShellJobCases()) yield return test;

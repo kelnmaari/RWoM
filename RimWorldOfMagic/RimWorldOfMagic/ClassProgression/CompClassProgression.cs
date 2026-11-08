@@ -8,6 +8,7 @@ namespace TorannMagic.ClassProgression
     public sealed class CompClassProgression : ThingComp
     {
         private ClassProgressionState state;
+        internal bool DebugKeepClassic;
         private SpiritRebirthState spiritRebirth;
         public SpiritRebirthState SpiritRebirth => spiritRebirth;
         private SpiritRebirthRitualTransaction spiritRitual;
@@ -64,15 +65,9 @@ namespace TorannMagic.ClassProgression
             if (!ClassProgressionFeature.Enabled) yield break;
             var pawn = parent as Pawn;
             if (pawn?.IsColonistPlayerControlled != true) yield break;
-            if (ClassIdentity.TryGetState(pawn, out _))
-            {
-                yield return new Command_Action {
-                    defaultLabel = "TM_ProgressionOpenGrimoire".Translate(),
-                    defaultDesc = "TM_ProgressionOpenGrimoireDesc".Translate(),
-                    icon = Verse.TexButton.IconBook, action = () => Window_TMGrimoire.OpenFor(pawn)
-                };
-            }
-            else if (ClassEnrollment.CanEnrollMage(pawn))
+            // The existing purple-book gizmo opens both classic and new progression.
+            // Keep only the separate enrollment action here.
+            if (!ClassIdentity.TryGetState(pawn, out _) && ClassEnrollment.CanEnrollMage(pawn))
             {
                 yield return new Command_Action {
                     defaultLabel = "TM_ProgressionEnrollMage".Translate(),
@@ -89,6 +84,10 @@ namespace TorannMagic.ClassProgression
         public override void CompTick()
         {
             base.CompTick();
+            if (parent is not Pawn pawn) return;
+            if (Circle != null && !Circle.Tick(pawn, Find.TickManager.TicksGame)) EndCircle();
+            if (Ward != null && !Ward.Active(pawn,Find.TickManager.TicksGame)) Ward=null;
+            if (Cover != null && !Cover.Active(pawn, Find.TickManager.TicksGame)) Cover = null;
             if (!ClassProgressionFeature.Enabled) return;
             if (spiritRebirth?.DepletionPending == true) SpiritRebirthEnergy.Retry(parent as Pawn);
             if (state?.Find("rwom.summoner")?.Stage == InitiationStage.Foundation && Find.TickManager.TicksGame % 30 == 0)
@@ -97,6 +96,9 @@ namespace TorannMagic.ClassProgression
 
         public override void PostDeSpawn(Map map, DestroyMode mode = DestroyMode.Vanish)
         {
+            if (Circle != null) EndCircle();
+            Ward=null;
+            Cover = null;
             if (!ClassProgressionFeature.Enabled) { base.PostDeSpawn(map, mode); return; }
             var path = state?.Find("rwom.summoner");
             if (path != null) path.SummonerTrials.LastActive = false;
@@ -135,13 +137,56 @@ namespace TorannMagic.ClassProgression
                 }
         }
 
+        internal GladiatorCircle Circle;
+        internal GladiatorWard Ward;
+        private void EndCircle()
+        {
+            Circle=null;
+            if (parent is not Pawn pawn) return;
+            var def=DefDatabase<HediffDef>.GetNamedSilentFail("TM_LastCircleStance");
+            var stance=def == null ? null : pawn.health?.hediffSet.GetFirstHediffOfDef(def);
+            if (stance != null) pawn.health.RemoveHediff(stance);
+        }
+        internal GladiatorCover Cover;
+        public override void PostPreApplyDamage(ref DamageInfo hit, out bool absorbed)
+        {
+            absorbed = false;
+            if (parent is not Pawn bearer) return;
+            if (bearer.jobs?.curDriver is JobDriver_SniperSingleOpening opening && opening.Aiming && hit.Amount > 0f &&
+                hit.Def?.ExternalViolenceFor(bearer) == true)
+                hit.SetAmount(hit.Amount * 1.2f);
+            if (bearer.jobs?.curDriver is JobDriver_BladeSevenSteps form && form.Active && hit.Amount > 0f && hit.Def?.ExternalViolenceFor(bearer) == true)
+                hit.SetAmount(hit.Amount * 1.15f);
+            if (bearer.jobs?.curDriver is JobDriver_RangerBreakthrough hunt && hunt.Active)
+            {
+                hunt.Guard(ref hit, out absorbed);
+                if (absorbed) return;
+            }
+            Hediff_CrucibleWard.Shield(bearer,ref hit,out absorbed);
+            if(absorbed)return;
+            CommanderOrderEffects.Shield(bearer,ref hit,out absorbed);
+            if (absorbed) return;
+            if (Ward != null && Ward.Active((Pawn)parent,Find.TickManager.TicksGame))
+            {
+                Ward.Absorb(ref hit);
+                if (hit.Amount <= 0) { absorbed=true; return; }
+            }
+            if (Cover == null) return;
+            if (!Cover.Active((Pawn)parent, Find.TickManager.TicksGame)) { Cover = null; return; }
+            Cover.Intercept(ref hit, out absorbed);
+        }
+
         internal int NecromancyConsentJob = -1;
 
         public override void PostExposeData()
         {
             base.PostExposeData();
             Scribe_Values.Look(ref NecromancyConsentJob, "TM_necromancyConsentJob", -1);
-            if (Scribe.mode == LoadSaveMode.Saving && state == null && spiritRebirth == null && spiritRitual == null && tomeQuestAvailableAtTick == 0) return;
+            if (Scribe.mode != LoadSaveMode.Saving || Circle != null) Scribe_Deep.Look(ref Circle,"TM_gladiatorCircle");
+            if (Scribe.mode != LoadSaveMode.Saving || Ward != null) Scribe_Deep.Look(ref Ward,"TM_gladiatorWard");
+            if (Scribe.mode != LoadSaveMode.Saving || Cover != null) Scribe_Deep.Look(ref Cover, "TM_gladiatorCover");
+            if (Scribe.mode == LoadSaveMode.Saving && !DebugKeepClassic && state == null && spiritRebirth == null && spiritRitual == null && tomeQuestAvailableAtTick == 0) return;
+            Scribe_Values.Look(ref DebugKeepClassic, "TM_debugKeepClassic");
             Scribe_Deep.Look(ref state, "TM_classProgression");
             Scribe_Deep.Look(ref spiritRebirth, "TM_spiritRebirth");
             Scribe_Deep.Look(ref spiritRitual, "TM_spiritRitual");
@@ -154,23 +199,27 @@ namespace TorannMagic.ClassProgression
     {
         static ClassProgressionBootstrap()
         {
-            // AbilityKnowledgeComp: injected for ALL humanlike pawns — the knowledge
-            // store serves both classic and progression pawns.
-            foreach (var def in DefDatabase<ThingDef>.AllDefsListForReading)
-            {
-                if (def?.race == null || !def.race.Humanlike) continue;
-                if (def.comps == null) def.comps = new List<CompProperties>();
-                if (!def.comps.Any(p => p?.compClass == typeof(TorannMagic.AbilityKnowledgeComp)))
-                    def.comps.Add(new CompProperties { compClass = typeof(TorannMagic.AbilityKnowledgeComp) });
-            }
             // The save carrier stays registered while gameplay is disabled.
             foreach (var def in DefDatabase<ThingDef>.AllDefsListForReading) EnsureComp(def);
+            EnsureRegenOrigin(DefDatabase<HediffDef>.GetNamedSilentFail("TM_EnergyRegenHD"));
+        }
+
+        // Kure replaces this entire Def during XML patching. Its own timer, stages and limits still apply.
+        internal static void EnsureRegenOrigin(HediffDef def)
+        {
+            if (def?.hediffClass == null || !typeof(HediffWithComps).IsAssignableFrom(def.hediffClass)) return;
+            def.comps ??= new List<HediffCompProperties>();
+            if (!def.comps.Any(p => p?.compClass == typeof(HediffComp_HostedStance)))
+                def.comps.Add(new HediffCompProperties { compClass = typeof(HediffComp_HostedStance) });
         }
 
         public static void EnsureComp(ThingDef def)
         {
-            if (def?.race == null || !def.race.Humanlike) return;
+            // Generated corpses retain the live pawn's RaceProperties.
+            if (def?.category != ThingCategory.Pawn || def.race?.Humanlike != true) return;
             if (def.comps == null) def.comps = new List<CompProperties>();
+            if (!def.comps.Any(p => p?.compClass == typeof(AbilityKnowledgeComp)))
+                def.comps.Add(new CompProperties { compClass = typeof(AbilityKnowledgeComp) });
             if (!def.comps.Any(p => p?.compClass == typeof(CompClassProgression)))
                 def.comps.Add(new CompProperties { compClass = typeof(CompClassProgression) });
         }

@@ -12,7 +12,8 @@ internal static class SummonerTrialTests
     public static IEnumerable<TestCase> Cases()
     {
         yield return new("SummonerTrial.ObservedTimeAndSave", Timing);
-        yield return new("SummonerTrial.NativeOwnedSpawnAndMineTrigger", Spawns);
+        yield return new("SummonerTrial.NativeOwnedSpawnAndMineTrigger", f => Spawns(f, false));
+        yield return new("SummonerTrial.HostedBothStagesSaveAndBrokenCustody", f => Spawns(f, true));
     }
     sealed class Fixture : IDisposable
     {
@@ -23,6 +24,37 @@ internal static class SummonerTrialTests
         readonly Faction friendly = new() { def = new FactionDef { isPlayer = true } };
         readonly Faction enemy = new() { def = new FactionDef() };
         public readonly Pawn Caster, Target;
+        public Pawn? Host;
+        public ThingOwner<Thing>? Holder;
+        public HediffComp_SpiritPossession? Possession;
+        IDisposable? ui;
+        readonly DesignationDef[] designations = DefDatabase<DesignationDef>.AllDefsListForReading.ToArray();
+        readonly HediffDef originalPossession = TorannMagicDefOf.TM_SpiritPossessionHD;
+        public void EnterHost()
+        {
+            ui = (IDisposable)Activator.CreateInstance(typeof(SpiritRebirthRuntimeTests).GetNestedType("UiPauseScope", BindingFlags.NonPublic)!)!;
+            Find.World.components = [];
+            Find.World.UI = (WorldInterface)RuntimeHelpers.GetUninitializedObject(typeof(WorldInterface));
+            Find.World.UI.tilePicker = new TilePicker();
+            Set(Find.TickManager, "curTimeSpeed", TimeSpeed.Normal);
+            var map = Current.Game.Maps[0];
+            map.spawnedThings = new ThingOwner<Thing>(map);
+            if (DefDatabase<DesignationDef>.DefCount == 0)
+                DefDatabase<DesignationDef>.Add(new DesignationDef { defName = "HostedSummonerTest" });
+            map.designationManager = new DesignationManager(map);
+            Host = PawnWithComps(false, false).pawn;
+            Prepare(Host, friendly, 28003);
+            Set(Caster, "mapIndexOrState", (sbyte)-1);
+            Caster.def.stackLimit = 1;
+            Check.Equal(true, SpiritRebirthStateTests.Invoke(Progression, "BeginSpiritRebirth"), "reborn owner");
+            var hediff = new HediffWithComps { def = TorannMagicDefOf.TM_SpiritPossessionHD = new HediffDef { defName = "TrialHost" }, pawn = Host };
+            var possession = Possession = new HediffComp_SpiritPossession { parent = hediff };
+            hediff.comps = [possession]; Host.health.hediffSet.hediffs.Add(hediff);
+            Holder = new ThingOwner<Thing>(possession); Set(possession, "innerContainer", Holder);
+            Check.Equal(true, Holder.TryAdd(Caster, false), "host holds native pawn");
+            Check.Equal(true, SpiritRebirthStateTests.Invoke(Progression.SpiritRebirth, "TryEnterHost", Caster, Host), "reciprocal possession");
+            Check.Equal(true, Caster.Map == null && Host.Map != null, "only the host is physically on the map");
+        }
         public readonly CompAbilityUserMagic Magic;
         public readonly CompClassProgression Progression;
         public DisciplineProgress Path => Progression.State.Find("rwom.summoner");
@@ -63,8 +95,8 @@ internal static class SummonerTrialTests
         public bool Mastery => Path.CompletedTrials.Contains(SummonerTrials.MasteryTrialId);
         public void Dispose()
         {
-            SummonerTrials.EndLaunch(null!); Current.Game = previous;
-            Restore(profiles); Restore(things); Restore(hediffs);
+            ui?.Dispose(); SummonerTrials.EndLaunch(null!); TorannMagicDefOf.TM_SpiritPossessionHD = originalPossession; Current.Game = previous;
+            Restore(profiles); Restore(things); Restore(hediffs); Restore(designations);
         }
         static void Restore<T>(T[] defs) where T : Def, new() { DefDatabase<T>.Clear(); foreach (var def in defs) DefDatabase<T>.Add(def); }
     }
@@ -80,15 +112,23 @@ internal static class SummonerTrialTests
     {
         var ability = w.Ability(def, owned);
         var projectile = new TestProjectile { def = Definition(name) };
-        projectile.Seed(w.Caster); projectile.localAbilityDef = def;
-        var verb = new Verb_BLOS { Ability = ability }; Set(verb, "caster", w.Caster);
+        var body = w.Host ?? w.Caster;
+        projectile.Seed(body); projectile.localAbilityDef = def;
+        if (w.Host != null && owned)
+        {
+            var source = new CompHostedSummon { parent = projectile };
+            Set(source, "projected", true); Set(source, "owner", w.Caster);
+            Set(projectile, "comps", new List<ThingComp> { source });
+        }
+        var verb = new Verb_BLOS { Ability = ability }; Set(verb, "caster", body);
         var previous = SummonerTrials.BeginLaunch(verb, projectile.def);
-        try { SummonerTrials.Launched(projectile, w.Caster, def); } finally { SummonerTrials.EndLaunch(previous); }
+        try { SummonerTrials.Launched(projectile, body, def); } finally { SummonerTrials.EndLaunch(previous); }
         return projectile;
     }
-    static void Spawns(RuntimeFixture f)
+    static void Spawns(RuntimeFixture f, bool hosted)
     {
         using var w = new Fixture(f);
+        if (hosted) w.EnterHost();
         var minion = new TMPawnSummoned { def = w.Caster.def, thingIDNumber = 28111, Spawner = w.Caster, Temporary = true, validSummoning = true };
         minion.health = new Pawn_HealthTracker(minion);
         Set(minion, "mapIndexOrState", (sbyte)0); Set(minion, "factionInt", w.Caster.Faction);
@@ -98,6 +138,13 @@ internal static class SummonerTrialTests
         var native = Projectile(w, TorannMagicDefOf.TM_SummonMinion, "Projectile_SummonMinion");
         var projectileSave = RoundTrip(f, new Envelope(), native, null, w.Caster);
 
+        if (hosted)
+        {
+            w.Holder!.Remove(w.Caster);
+            SummonerTrials.Spawned(native, minion, SummonerTrials.Spell.Minion);
+            Check.Equal(true, w.Path.SummonerTrials.Minion == null, "in-flight shot cannot earn credit after exit");
+            Check.Equal(true, w.Holder.TryAdd(w.Caster, false), "restore the original before a valid impact");
+        }
         Set(minion, "mapIndexOrState", (sbyte)-1);
         SummonerTrials.Spawned(native, minion, SummonerTrials.Spell.Minion);
         Check.Equal(true, w.Path.SummonerTrials.Minion == null, "failed unspawned minion excluded");
@@ -105,9 +152,16 @@ internal static class SummonerTrialTests
         SummonerTrials.Spawned(native, minion, SummonerTrials.Spell.Minion);
         Check.Equal(true, w.Path.SummonerTrials.Minion == minion, "native successful owned minion registers");
         var pylon = new ThingWithComps { def = Definition("DefensePylon"), thingIDNumber = 28112 };
-        Set(pylon, "comps", new List<ThingComp> { new CompSummoned { parent = pylon, Temporary = true } });
+        Set(pylon, "comps", new List<ThingComp> { new CompSummoned { parent = pylon, Spawner = w.Caster, Temporary = true } });
         Set(pylon, "mapIndexOrState", (sbyte)0); Set(pylon, "factionInt", w.Caster.Faction);
         var pylonShot = Projectile(w, TorannMagicDefOf.TM_SummonPylon, "Projectile_SummonPylon");
+        if (hosted)
+        {
+            pylon.TryGetComp<CompSummoned>().Spawner = w.Host;
+            SummonerTrials.Spawned(pylonShot, pylon, SummonerTrials.Spell.Pylon);
+            Check.Equal(true, w.Path.SummonerTrials.Pylon == null, "host-owned pylon cannot qualify for soul's trial");
+            pylon.TryGetComp<CompSummoned>().Spawner = w.Caster;
+        }
         SummonerTrials.Spawned(pylonShot, pylon, SummonerTrials.Spell.Pylon);
         Check.Equal(true, w.Path.SummonerTrials.Pylon == pylon, "native pylon registers");
         Check.Equal(false, w.Foundation, "placement alone is not a trial");
@@ -124,12 +178,21 @@ internal static class SummonerTrialTests
         Set(pylon, "factionInt", w.Caster.Faction);
         w.Path.SummonerTrials.LastTick = -1; w.Path.SummonerTrials.LastActive = false;
         SummonerTrials.Observe(w.Caster, 0);
-        w.Caster.story.traits.allTraits.Add(new Trait(TorannMagicDefOf.Faceless));
+        if (hosted) w.Holder!.Remove(w.Caster);
+        else w.Caster.story.traits.allTraits.Add(new Trait(TorannMagicDefOf.Faceless));
         SummonerTrials.Observe(w.Caster, 30);
-        w.Caster.story.traits.allTraits.Clear();
+        if (hosted) Check.Equal(true, w.Holder!.TryAdd(w.Caster, false), "restore custody after missed interval");
+        else w.Caster.story.traits.allTraits.Clear();
         SummonerTrials.Observe(w.Caster, 60);
         Check.Equal(0, w.Path.SummonerTrials.ControlledTicks, "temporary ownership loss breaks interval");
-        for (int tick = 90; tick <= 630; tick += 30) SummonerTrials.Observe(w.Caster, tick);
+        for (int tick = 90; tick <= 630; tick += 30)
+        {
+            if (!hosted) { SummonerTrials.Observe(w.Caster, tick); continue; }
+            Set(Find.TickManager, "ticksGameInt", tick);
+            float severity = 0;
+            w.Possession!.CompPostTick(ref severity);
+            w.Possession.CompPostTick(ref severity);
+        }
         Check.Equal(570, w.Path.SummonerTrials.ControlledTicks, "bounded native coexistence observed");
         var saved = RoundTrip(f, new Envelope { progress = w.Path.SummonerTrials }, null, null, minion, pylon);
         Check.Equal(true, ReferenceEquals(minion, saved.progress.Minion), "saved minion resolves original reference without duplication");
@@ -139,7 +202,7 @@ internal static class SummonerTrialTests
         Check.Equal(true, w.Foundation, "600 active ticks completes foundation");
         w.Progression.State.TryAdvanceAfterTrial("rwom.summoner", InitiationStage.Foundation, SummonerTrials.FoundationTrialId);
         var mine = new Building_ExplosiveProximityTrap { def = Definition("TM_ManaMine"), thingIDNumber = 28113 };
-        Set(mine, "comps", new List<ThingComp> { new CompSummoned { parent = mine, Temporary = true }, new CompExplosive { parent = mine } });
+        Set(mine, "comps", new List<ThingComp> { new CompSummoned { parent = mine, Spawner = w.Caster, Temporary = true }, new CompExplosive { parent = mine } });
         Set(mine, "mapIndexOrState", (sbyte)0); Set(mine, "factionInt", w.Caster.Faction);
         var mineShot = Projectile(w, TorannMagicDefOf.TM_SummonExplosive, "Projectile_SummonExplosive");
         SummonerTrials.Spawned(mineShot, mine, SummonerTrials.Spell.Explosive);
@@ -158,6 +221,14 @@ internal static class SummonerTrialTests
         SummonerTrials.WickStarted(mine, w.Target);
         Check.Equal(false, w.Mastery, "refused wick does not complete");
         mine.TryGetComp<CompExplosive>().wickStarted = true;
+        if (hosted)
+        {
+            w.Holder!.Remove(w.Caster);
+            SummonerTrials.WickStarted(mine, w.Target);
+            Check.Equal(false, w.Mastery, "lost host after the triggering contact cannot award mastery");
+            Check.Equal(true, w.Holder.TryAdd(w.Caster, false), "restore exact original");
+            SummonerTrials.Triggered(mine, w.Target);
+        }
         SummonerTrials.WickStarted(mine, w.Target); SummonerTrials.WickStarted(mine, w.Target);
         Check.Equal(true, w.Mastery, "owned hostile trigger and wick completes once");
     }

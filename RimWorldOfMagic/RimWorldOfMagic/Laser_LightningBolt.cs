@@ -7,21 +7,61 @@ using UnityEngine;
 
 namespace TorannMagic
 {
-    class Laser_LightningBolt : Projectile_AbilityLaser 
+    // Keep the native beam attached to the physical caster until impact.
+    public class Projectile_SpiritRay : Projectile_AbilityLaser
+    {
+        protected bool projected;
+        private Pawn source;
+
+        internal virtual void PrepareProjection(MagicAbility power)
+        {
+            projected = true;
+            source = power.Pawn;
+        }
+
+        public override void ExposeData()
+        {
+            base.ExposeData();
+            Scribe_Values.Look(ref projected, "TM_projectedLightning");
+            if (!projected) return;
+            Scribe_References.Look(ref source, "TM_lightningSoul");
+        }
+
+        protected override void Impact(Thing hitThing, bool blockedByShield = false)
+        {
+            if (!projected) { base.Impact(hitThing, blockedByShield); return; }
+            // The beam animates from the body. Its real damage and native battle log
+            // resolve on the soul even after the body releases it.
+            var physical = launcher;
+            launcher = source;
+            try { base.Impact(hitThing, blockedByShield); }
+            finally { launcher = physical; }
+        }
+    }
+
+    class Laser_LightningBolt : Projectile_SpiritRay
     {
         private int verVal;
         private int pwrVal;
         private float arcaneDmg = 1;
 
-        public override void Impact_Override(Thing hitThing)
+        internal override void PrepareProjection(MagicAbility power)
         {
-            Map map = base.Map;
-            base.Impact_Override(hitThing);
+            base.PrepareProjection(power);
+            ReadRanks(power.Pawn);
+        }
 
-            Pawn pawn = this.launcher as Pawn;
-                       
-            
-            
+        public override void ExposeData()
+        {
+            base.ExposeData();
+            if (!projected) return;
+            Scribe_Values.Look(ref pwrVal, "TM_lightningPower");
+            Scribe_Values.Look(ref verVal, "TM_lightningVersatility");
+            Scribe_Values.Look(ref arcaneDmg, "TM_lightningScale", 1f);
+        }
+
+        private void ReadRanks(Pawn pawn)
+        {
             if (pawn.story.traits.HasTrait(TorannMagicDefOf.Faceless))
             {
                 MightPowerSkill mpwr = pawn.GetCompAbilityUserMight().MightData.MightPowerSkill_Mimic.FirstOrDefault((MightPowerSkill x) => x.label == "TM_Mimic_pwr");
@@ -49,6 +89,17 @@ namespace TorannMagic
             {
                 pwrVal = 3;
                 verVal = 3;
+            }
+        }
+
+        public override void Impact_Override(Thing hitThing)
+        {
+            Map map = Map;
+            base.Impact_Override(hitThing);
+            if (!projected)
+            {
+                if (!(launcher is Pawn pawn) || pawn.story?.traits == null) return;
+                ReadRanks(pawn);
             }
             bool flag = hitThing != null;
             if (flag)

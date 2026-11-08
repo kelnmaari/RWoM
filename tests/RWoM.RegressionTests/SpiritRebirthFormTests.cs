@@ -114,6 +114,32 @@ internal static class SpiritRebirthFormTests
             Check.Equal(17, loaded.MagicAbilityPoints, "saved points retained"); Check.Equal(234, loaded.MagicUserXP, "saved XP retained");
             Check.Equal(3, loaded.magicPowerSkill_Custom.Single(s => s.label == skill.label).level, "saved skill retained");
         });
+        yield return new("SpiritRebirthForm.ClassedPawnKeepsGuaranteedSpirits", f =>
+        {
+            using var w = new SpiritRebirthStateTests.Fixture(f);
+            using var defs = new Definitions(f);
+            bool Ensure() => (bool)Call("SpiritRebirthAbilities", "Ensure", w.Original);
+            // The classed-pawn state from the live report: a retained
+            // MagicData whose aggregate custom getter already materialized
+            // unlearned owners for the whole mage tree, including the
+            // guaranteed spirit powers. The fresh-owner guarantee inside
+            // EnsureSpiritOwner never ran for those owners.
+            Set(w.Magic, "magicData", new MagicData());
+            var data = (MagicData)typeof(CompAbilityUserMagic).GetField("magicData", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(w.Magic)!;
+            _ = data.MagicPowersCustom;
+            var drain = data.magicPowerCustom.Single(p => p.TMabilityDefs[0].defName == "TM_SpiritDrain");
+            var distort = data.magicPowerCustom.Single(p => p.TMabilityDefs[0].defName == "TM_DistortSpirit");
+            Check.Equal(false, drain.learned, "classed pawn state: guaranteed owners start unlearned");
+            Check.Equal(false, distort.learned, "chance powers start unlearned too");
+            w.Begin();
+            Check.Equal(true, Ensure(), "release accepted for the classed pawn");
+            Check.Equal("TM_SpiritDrain,TM_SpiritPossession",
+                string.Join(",", data.magicPowerCustom.Where(p => p.learned).Select(p => p.TMabilityDefs[0].defName).OrderBy(n => n)),
+                "the guarantee reaches existing owners");
+            Check.Equal(false, distort.learned, "chance powers stay never-rerolled");
+            Check.Equal(true, w.Magic.AbilityData.Powers.Any(p => p?.Def?.defName == "TM_SpiritDrain"), "drain runtime granted");
+            Check.Equal(true, w.Magic.AbilityData.Powers.Any(p => p?.Def?.defName == "TM_SpiritPossession"), "possession runtime granted");
+        });
     }
 
     sealed class Definitions : IDisposable

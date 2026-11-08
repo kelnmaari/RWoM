@@ -1340,6 +1340,13 @@ namespace TorannMagic
                             TorannMagicDefOf.TM_Whirlwind
                         }),
                     };
+                    // Beta gladiator path choices (Adept attack and the
+                    // Reforged foundation) own their single-def powers so the
+                    // grimoire can render and rank them.
+                    var gladiatorSweep = DefDatabase<TMAbilityDef>.GetNamedSilentFail("TM_GladiatorSweep");
+                    if (gladiatorSweep != null) this.mightPowerG.Add(new MightPower(new List<AbilityUser.AbilityDef> { gladiatorSweep }));
+                    var gladiatorManeuver = DefDatabase<TMAbilityDef>.GetNamedSilentFail("TM_GladiatorManeuver");
+                    if (gladiatorManeuver != null) this.mightPowerG.Add(new MightPower(new List<AbilityUser.AbilityDef> { gladiatorManeuver }));
                 }
                 return this.mightPowerG;
             }

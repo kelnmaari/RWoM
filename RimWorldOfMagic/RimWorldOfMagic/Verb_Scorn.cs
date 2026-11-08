@@ -58,7 +58,8 @@ namespace TorannMagic
 
         public override void DrawHighlight(LocalTargetInfo target)
         {
-            if (CasterPawn?.Spawned != true || !target.IsValid) { base.DrawHighlight(target); return; }
+            if (CasterPawn?.Spawned != true) return;
+            if (!target.IsValid) { base.DrawHighlight(target); return; }
             var cell = Projectile_Scorn.LandingCell(target.Cell,CasterPawn.Map);
             if (cell.IsValid) base.DrawHighlight(cell);
         }

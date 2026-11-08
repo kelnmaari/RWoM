@@ -40,6 +40,20 @@ namespace TorannMagic.ClassProgression
             bool sprint = job == SpiritHostedStance.Job;
             TMAbilityDef def;
             if (job == Headshot) def = TorannMagicDefOf.TM_Headshot;
+            else if (ApothecaryCast.Handles(job)) def=ApothecaryCast.Definition(job);
+            else if (job == Verb_ApothecaryAntitoxin.HostedOrder) def=ApothecaryMartialPath.Ability(ApothecaryMartialPath.Toxin);
+            else if (job == ApothecaryKitAbility.Order) def=ApothecaryMartialPath.Ability(ApothecaryMartialPath.Kit);
+            else if(Verb_CommanderAuras.Handles(job)) def=Verb_CommanderAuras.Definition(job);
+            else if(Verb_CommanderOrders.Handles(job)) def=Verb_CommanderOrders.Definition(job);
+            else if (Verb_CommanderCoordination.Handles(job)) def=CommanderMartialPath.Def(job==Verb_CommanderCoordination.CrewOrder?CommanderMartialPath.Crew:CommanderMartialPath.Rally);
+            else if (job == JobDriver_Meditate.HostedJob) def = TorannMagicDefOf.TM_Meditate;
+            else if (job == MonkDragonCast.Order) def = TorannMagicDefOf.TM_DragonStrike;
+            else if (job == Verb_ChiBurst.HostedOrder) def = TorannMagicDefOf.TM_ChiBurst;
+            else if (job == JobDriver_SpiritTigerStrike.Order) def = TorannMagicDefOf.TM_TigerStrike;
+            else if (job == Verb_MonkPalmSeal.HostedOrder) def = DefDatabase<TMAbilityDef>.GetNamedSilentFail(MonkMartialPath.SealName);
+            else if (job == JobDriver_MonkMeridian.HostedOrder) def = DefDatabase<TMAbilityDef>.GetNamedSilentFail(MonkMartialPath.MeridianName);
+            else if (DeathKnightCast.Handles(job)) def = DeathKnightCast.Definition(job);
+            else if (SuperSoldierCast.Handles(job)) def = SuperSoldierCast.Definition(job);
             else if (job == DisablingShot) def = TorannMagicDefOf.TM_DisablingShot;
             else if (job == AntiArmor) def = TorannMagicDefOf.TM_AntiArmor;
             else if (job == ShadowSlayer) def = TorannMagicDefOf.TM_ShadowSlayer;
@@ -79,14 +93,14 @@ namespace TorannMagic.ClassProgression
                 (power.Def==TorannMagicDefOf.TM_DisablingShot_I || power.Def==TorannMagicDefOf.TM_DisablingShot_II || power.Def==TorannMagicDefOf.TM_DisablingShot_III) || job == Grapple && GrappleRank(power.Def as TMAbilityDef) ||
                 job==BladeMartialCast.Phase && BladeMartialCast.PhaseRank(power.Def as TMAbilityDef) ||
                 job==Verb_Transpose.Order && Verb_Transpose.Family(power.Def as TMAbilityDef) ||
-                job==Verb_RangerShot.Order && Verb_RangerShot.Family(power.Def as TMAbilityDef) ||
-                job==Verb_PsionicBlast.Order && Verb_PsionicBlast.Family(power.Def as TMAbilityDef));
-            bool Local(CompAbilityUser comp) => comp?.AbilityData.AllPowers.Any(p=>Match(p) || Verb_PsionicBarrier.Handles(job) &&
+                job==Verb_RangerShot.Order && Verb_RangerShot.Family(power.Def as TMAbilityDef) || Verb_CommanderOrders.Matches(job,power.Def as TMAbilityDef) ||
+                job==Verb_PsionicBlast.Order && Verb_PsionicBlast.Family(power.Def as TMAbilityDef) || ApothecaryCast.Matches(job,power.Def as TMAbilityDef));
+            bool Local(CompAbilityUser comp) => comp?.AbilityData.AllPowers.Any(p=>Match(p) || DeathKnightCast.Matches(job,p?.Def as TMAbilityDef) || Verb_PsionicBarrier.Handles(job) &&
                 p?.Def is TMAbilityDef local && local.MainVerb?.verbClass==typeof(Verb_PsionicBarrier)) == true;
             if (def == null || !native && (Local(body.GetCompAbilityUserMagic()) || Local(body.GetCompAbilityUserMight()))) return null;
             var source = soul.GetCompAbilityUserMight();
             var powers = source?.AbilityData.Powers.OfType<MightAbility>()
-                .Where(a => Match(a) && ReferenceEquals(a.AbilityUser, source)).Take(2).ToList();
+                .Where(a => (Match(a) || DeathKnightCast.Matches(job,a.Def as TMAbilityDef)) && ReferenceEquals(a.AbilityUser, source)).Take(2).ToList();
             return powers?.Count == 1 ? powers[0] : null;
         }
 
@@ -96,17 +110,37 @@ namespace TorannMagic.ClassProgression
                 (ability.Pawn != body && body.Faction != Faction.OfPlayer) || ability.CooldownTicksLeft > 0) return false;
             var def = ability.mightDef;
             var might = ability.MightUser;
+            if (ApothecaryCast.Handles(job)) return ApothecaryCast.Funded(body,ability,job);
+            if (job == Verb_ApothecaryAntitoxin.HostedOrder) return Verb_ApothecaryAntitoxin.Funded(body,ability);
+            if (job == ApothecaryKitAbility.Order) return ability is ApothecaryKitAbility &&
+                ApothecaryMartialPath.Owner(body)==ability.Pawn && JobDriver_ApothecaryKit.Ready(body);
             if (job == BladeFormAbility.JobName) return ability is BladeFormAbility && JobDriver_BladeSevenSteps.Ready(body,ability.Pawn);
             if (job == PsionicCrucibleAbility.JobName) return ability is PsionicCrucibleAbility && JobDriver_PsionicCrucible.ReadyFrom(body,ability.Pawn);
             if (job == RangerHuntAbility.JobName) return ability is RangerHuntAbility && JobDriver_RangerBreakthrough.Ready(body,ability.Pawn);
             if (job == SniperOpeningAbility.JobName) return ability is SniperOpeningAbility opening &&
                 JobDriver_SniperSingleOpening.Ready(body, opening.Pawn) && opening.VerbFor(body).HasCompatibleWeapon;
+            if (job == JobDriver_Meditate.HostedJob) return MonkMartialPath.Owner(body) == ability.Pawn && MonkMartialPath.Chi(ability.Pawn) != null;
+            if (job == Verb_ChiBurst.HostedOrder) return MonkMartialPath.Owner(body) == ability.Pawn &&
+                MonkMartialPath.Chi(ability.Pawn) is Hediff burstChi && burstChi.Severity >= 100 * might.ActualChiCost(def);
+            if (job == JobDriver_MonkMeridian.HostedOrder) return ability is MonkMeridianAbility &&
+                MonkMartialPath.Owner(body)==ability.Pawn && JobDriver_MonkMeridian.Ready(body);
+            if (job == Verb_MonkPalmSeal.HostedOrder || job == JobDriver_SpiritTigerStrike.Order || job == MonkDragonCast.Order) return MonkMartialPath.Owner(body)==ability.Pawn &&
+                body.equipment?.Primary==null && !body.WorkTagIsDisabled(WorkTags.Violent) &&
+                MonkMartialPath.Chi(ability.Pawn) is Hediff chi && chi.Severity>=100* might.ActualChiCost(def);
             if (SpiritHostedStance.BaseAbility(job) != null) return SpiritHostedStance.Ready(body,ability);
-            if (!def.consumeEnergy || def.staminaCost <= 0 || def.chiCost != 0 || def.bloodCost != 0 || def.manaCost != 0 ||
+            // Commander auras reserve stamina through native upkeep, rather than spending it on activation.
+            if ((!def.consumeEnergy && !Verb_CommanderAuras.Handles(job)) || def.staminaCost <= 0 || def.chiCost != 0 || def.bloodCost != 0 || def.manaCost != 0 ||
                 def.requiredNeed != null || def.requiredHediff != null || might.ExistingMightData == null ||
                 might.Stamina == null || might.Stamina.CurLevel < might.ActualStaminaCost(def)) return false;
             if (job==Verb_Reversal.Order) return !body.WorkTagIsDisabled(WorkTags.Violent) &&
                 TorannMagicDefOf.TM_ReversalHD!=null && !body.health.hediffSet.HasHediff(TorannMagicDefOf.TM_ReversalHD);
+            if(Verb_CommanderCoordination.Handles(job)) return CommanderMartialPath.Owner(body)==ability.Pawn &&
+                CommanderMartialPath.Path(ability.Pawn) is DisciplineProgress commander &&
+                (job==Verb_CommanderCoordination.CrewOrder || commander.Stage>=InitiationStage.Master);
+            if(Verb_CommanderAuras.Handles(job)) return SpiritHostedCommander.AuraEmitter(ability.Pawn)==body;
+            if(Verb_CommanderOrders.Handles(job)) return CommanderMartialPath.Owner(body)==ability.Pawn;
+            if (DeathKnightCast.Handles(job)) return DeathKnightCast.Funded(body,ability,job);
+            if (SuperSoldierCast.Handles(job)) return SuperSoldierCast.Funded(body,ability,job);
             if (Verb_PsionicBarrier.Handles(job) || FacelessImitation.Handles(job) || job==Verb_Transpose.Order || job==Projectile_Possess.Order) return true;
             if (IsSniperShot(job)) return !body.WorkTagIsDisabled(WorkTags.Violent) &&
                 (Verb_SniperBallisticShot.FromHost(body, ability)?.HasCompatibleWeapon ?? (Verb_SniperShot.WeaponVerb(body) != null));
@@ -139,17 +173,23 @@ namespace TorannMagic.ClassProgression
         internal static bool CanMelee(Pawn body, Pawn target, MightAbility ability,string job)
         {
             if (target?.Spawned != true || target.Map != body.Map) return false;
+            if (job == Verb_MonkPalmSeal.HostedOrder) return Verb_MonkPalmSeal.Target(body,target);
+            if (job == JobDriver_SpiritTigerStrike.Order) return !target.Downed && CanStrike(body,target,ability);
             if (job == Grapple) return Verb_Grapple.ForHost(body,ability).CanHitTargetFrom(body.Position,target);
             if (job == Sweep) return Verb_GladiatorSweep.ForHost(body,ability).CanHitTargetFrom(body.Position,target);
             return CanStrike(body,target,ability);
         }
-        internal static bool UsesCombatTarget(string job) => job == Sweep || job == Grapple || job == Pommel;
+        internal static bool UsesCombatTarget(string job) => job == Sweep || job == Grapple || job == Pommel || job == Verb_MonkPalmSeal.HostedOrder || job == JobDriver_SpiritTigerStrike.Order;
 
         internal static bool Strike(Pawn body, Pawn soul, Pawn target,string job = Pommel)
         {
             var ability = Find(body, soul, job);
             if (!Ready(body, ability, job) || !CanMelee(body, target, ability,job)) return false;
-            if (job == Sweep)
+            if (job == Verb_MonkPalmSeal.HostedOrder)
+            {
+                if (!Verb_MonkPalmSeal.Strike(body,target)) return false;
+            }
+            else if (job == Sweep)
             {
                 if (!Verb_GladiatorSweep.ForHost(body,ability).Strike(target)) return false;
             }
@@ -210,6 +250,11 @@ namespace TorannMagic.ClassProgression
                         if (!(Find(body,soul,job.defName) is RangerHuntAbility hunt)) return;
                         order=hunt.MakeJobFor(body,target);
                     }
+                    else if (job.defName==ApothecaryKitAbility.Order)
+                    {
+                        if (!(Find(body,soul,job.defName) is ApothecaryKitAbility kit)) return;
+                        order=kit.MakeJobFor(body,target);
+                    }
                     else if (job.defName==Verb_RangerShot.Order) order=Verb_RangerShot.MakeOrder(body,soul,target);
                     else order = JobMaker.MakeJob(job, soul, target);
                     body.jobs.TryTakeOrderedJob(order, JobTag.Misc);
@@ -240,6 +285,7 @@ namespace TorannMagic.ClassProgression
         {
             foreach (var command in existing) yield return command;
             if (!SpiritRebirthState.TryGetPossessingSpirit(body, out var soul)) yield break;
+            foreach(var command in SpiritHostedCommander.Commands(body,soul)) yield return command;
             if (HediffComp_Psionic.CanProject(body,soul))
             {
                 var source=soul.GetCompAbilityUserMight();
@@ -301,7 +347,7 @@ namespace TorannMagic.ClassProgression
                         cleave.useCleaveToggle = !cleave.useCleaveToggle;
                 });
             foreach (var name in new[] { Maneuver, SelfAid, Pommel, Sweep, Grapple, GladiatorWhirlwind.JobName, BladeMartialCast.Spin, BladeMartialCast.Slash, BladeMartialCast.Passage, BladeMartialCast.Phase, BladeFormAbility.JobName, Verb_AnimalFriend.Order, Verb_PoisonTrap.Order, Verb_RangerSafeTrail.Order, Verb_RangerShot.Order, RangerHuntAbility.JobName, FacelessImitation.StudyOrder, FacelessImitation.EchoOrder, Verb_Reversal.Order, Verb_Transpose.Order, Projectile_Possess.Order, Verb_PsionicBarrier.SelfOrder, Verb_PsionicBarrier.FieldOrder, Verb_PsionicBlast.Order, PsionicDashCast.JobName, PsionicDashCast.StormOrder, Headshot, DisablingShot, AntiArmor, Aimed, Fracture, ShadowSlayer, SniperOpeningAbility.JobName, SpiritHostedStance.Job, SpiritHostedStance.StrongBack, SpiritHostedStance.HeavyBlow,
-                SpiritHostedStance.ThickSkin, SpiritHostedStance.FightersFocus, SpiritHostedStance.GearRepair, SpiritHostedStance.InnerHealing })
+                SpiritHostedStance.ThickSkin, SpiritHostedStance.FightersFocus, SpiritHostedStance.GearRepair, SpiritHostedStance.InnerHealing, JobDriver_Meditate.HostedJob, Verb_MonkPalmSeal.HostedOrder, JobDriver_MonkMeridian.HostedOrder, JobDriver_SpiritTigerStrike.Order, MonkDragonCast.Order, Verb_ChiBurst.HostedOrder, DeathKnightCast.Spite, DeathKnightCast.Fear, DeathKnightCast.Blade, Verb_CommanderCoordination.CrewOrder, Verb_CommanderCoordination.RallyOrder, Verb_CommanderOrders.MoveOrder, Verb_CommanderOrders.AlertOrder, Verb_CommanderOrders.HoldOrder, Verb_CommanderAuras.ProvisionerOrder, Verb_CommanderAuras.TaskMasterOrder, Verb_CommanderAuras.CommanderOrder, SuperSoldierCast.Whip, SuperSoldierCast.Grenade, SuperSoldierCast.Charge, SuperSoldierCast.Dressing, SuperSoldierCast.Buckshot, SuperSoldierCast.Suppressing, SuperSoldierCast.Mortar, Verb_ApothecaryAntitoxin.HostedOrder, ApothecaryKitAbility.Order, ApothecaryCast.Balm, ApothecaryCast.Elixir, ApothecaryCast.Clarity, ApothecaryCast.Bliss, ApothecaryCast.Poison, ApothecaryCast.Fire })
             {
                 var owner = Find(body, soul, name);
                 var job = DefDatabase<JobDef>.GetNamedSilentFail(name);
@@ -310,6 +356,17 @@ namespace TorannMagic.ClassProgression
                     icon = owner.Def.uiIcon, action = () => {
                         if (body.CurJobDef == job || !Ready(body, Find(body, soul, name), name)) return;
                         if (name == GladiatorWhirlwind.JobName) GladiatorWhirlwind.ChooseDestination(body,soul,owner);
+                        else if (ApothecaryCast.Handles(name)) ApothecaryCast.Choose(body,soul,owner,name);
+                        else if (name == Verb_ApothecaryAntitoxin.HostedOrder) FindTarget(body,soul,job,target =>
+                            Ready(body,Find(body,soul,name),name) && Verb_ApothecaryAntitoxin.For(body,owner).CanHitTargetFrom(body.Position,target));
+                        else if (name == ApothecaryKitAbility.Order) FindTarget(body,soul,job,target =>
+                            Ready(body,Find(body,soul,name),name) && JobDriver_ApothecaryKit.Candidate(body,target));
+                        else if (Verb_CommanderCoordination.Handles(name)) Verb_CommanderCoordination.Choose(body,owner,name);
+                        else if (name == JobDriver_Meditate.HostedJob || name == JobDriver_MonkMeridian.HostedOrder) body.jobs.TryTakeOrderedJob(JobMaker.MakeJob(job, body.Position, soul), JobTag.Misc);
+                        else if (DeathKnightCast.Handles(name)) DeathKnightCast.Choose(body,soul,owner,name);
+                        else if (SuperSoldierCast.Handles(name)) SuperSoldierCast.Choose(body,soul,owner,name);
+                        else if (name == MonkDragonCast.Order) MonkDragonCast.Choose(body,soul,owner);
+                        else if (name == Verb_ChiBurst.HostedOrder) Verb_ChiBurst.Choose(body,soul,owner);
                         else if (PsionicDashCast.Handles(name)) PsionicDashCast.ChooseDestination(body,soul,owner);
                         else if (name==BladeMartialCast.Slash || name==BladeMartialCast.Passage || name==BladeMartialCast.Phase) BladeMartialCast.ChooseTarget(body,soul,owner,name);
                         else if (name == BladeFormAbility.JobName && owner is BladeFormAbility form) form.ChooseRoute(body);
@@ -371,8 +428,15 @@ namespace TorannMagic.ClassProgression
             warmup.initAction = () => {
                 var owner = SpiritHostedMartial.Find(pawn, soul, name);
                 if (!SpiritHostedMartial.Ready(pawn, owner, name) ||
+                    ApothecaryCast.Handles(name) && !ApothecaryCast.Valid(pawn,owner,job.targetB) ||
+                    name == Verb_ApothecaryAntitoxin.HostedOrder && !Verb_ApothecaryAntitoxin.For(pawn,owner).CanHitTargetFrom(pawn.Position,job.targetB) ||
+                    Verb_CommanderCoordination.Handles(name) && !Verb_CommanderCoordination.For(pawn,owner).CanHitTargetFrom(pawn.Position,job.targetB) ||
+                    DeathKnightCast.Handles(name) && !DeathKnightCast.Valid(pawn,owner,name,job.targetB) ||
+                    SuperSoldierCast.Handles(name) && !SuperSoldierCast.Valid(pawn,owner,name,job.targetB) ||
                     SpiritHostedMartial.IsSniperShot(name) && !SpiritHostedMartial.CanFire(pawn,owner,job.targetB.Pawn) ||
                     name == GladiatorWhirlwind.JobName && !GladiatorWhirlwind.CanLaunch(pawn,owner,job.targetB.Cell) ||
+                    name == MonkDragonCast.Order && !MonkDragonCast.CanLaunch(pawn,owner,job.targetB) ||
+                    name == Verb_ChiBurst.HostedOrder && !Verb_ChiBurst.Valid(pawn,owner,job.targetB) ||
                     PsionicDashCast.Handles(name) && !PsionicDashCast.CanLaunch(pawn,owner,job.targetB.Cell) ||
                     BladeMartialCast.Handles(name) && !BladeMartialCast.Valid(pawn,owner,name,job.targetB) ||
                     Verb_PsionicBarrier.Handles(name) && !Verb_PsionicBarrier.Valid(pawn,owner,job.targetB) ||
@@ -390,6 +454,65 @@ namespace TorannMagic.ClassProgression
             yield return Toils_General.Do(() => {
                 if (attempted || pawn.CurJob != job || pawn.jobs.curDriver != this) { EndJobWith(JobCondition.Incompletable); return; }
                 attempted = true;
+                if(ApothecaryCast.Handles(name))
+                {
+                    EndJobWith(ApothecaryCast.Execute(pawn,soul,name,job.targetB) ? JobCondition.Succeeded : JobCondition.Incompletable);
+                    return;
+                }
+                if(name == Verb_ApothecaryAntitoxin.HostedOrder)
+                {
+                    var power=SpiritHostedMartial.Find(pawn,soul,name);
+                    // The clinical effect owns the herb payment and cooldown; never pay a second time here.
+                    if(!SpiritHostedMartial.Ready(pawn,power,name) || !Verb_ApothecaryAntitoxin.For(pawn,power).CastFromHost(job.targetB))
+                        EndJobWith(JobCondition.Incompletable);
+                    return;
+                }
+                if(Verb_CommanderAuras.Handles(name))
+                {
+                    var power=SpiritHostedMartial.Find(pawn,soul,name);
+                    if(SpiritHostedMartial.Ready(pawn,power,name) && Verb_CommanderAuras.CastFromHost(pawn,power)) power.PostAbilityAttempt();
+                    EndJobWith(JobCondition.Succeeded);
+                    return;
+                }
+                if(Verb_CommanderOrders.Handles(name))
+                {
+                    var power=SpiritHostedMartial.Find(pawn,soul,name);
+                    if(SpiritHostedMartial.Ready(pawn,power,name) && Verb_CommanderOrders.CastFromHost(pawn,power)) power.PostAbilityAttempt();
+                    else EndJobWith(JobCondition.Incompletable);
+                    return;
+                }
+                if(Verb_CommanderCoordination.Handles(name))
+                {
+                    var power=SpiritHostedMartial.Find(pawn,soul,name);
+                    if(SpiritHostedMartial.Ready(pawn,power,name) && Verb_CommanderCoordination.For(pawn,power).Issue(job.targetB))
+                        power.PostAbilityAttempt();
+                    else EndJobWith(JobCondition.Incompletable);
+                    return;
+                }
+                if (name == Verb_ChiBurst.HostedOrder)
+                {
+                    var power = SpiritHostedMartial.Find(pawn,soul,name);
+                    if (Verb_ChiBurst.Valid(pawn,power,job.targetB) && Verb_ChiBurst.For(pawn,power).CastFromHost(job.targetB))
+                        power.PostAbilityAttempt();
+                    else EndJobWith(JobCondition.Incompletable);
+                    return;
+                }
+                if (DeathKnightCast.Handles(name))
+                {
+                    if (!DeathKnightCast.Execute(pawn,soul,name,job.targetB)) EndJobWith(JobCondition.Incompletable);
+                    return;
+                }
+                if (SuperSoldierCast.Handles(name))
+                {
+                    if (!SuperSoldierCast.Execute(pawn,soul,name,job.targetB)) EndJobWith(JobCondition.Incompletable);
+                    return;
+                }
+                if (name == MonkDragonCast.Order)
+                {
+                    if (!MonkDragonCast.Launch(pawn,SpiritHostedMartial.Find(pawn,soul,name),job.targetB))
+                        EndJobWith(JobCondition.Incompletable);
+                    return;
+                }
                 if(PsionicDashCast.Handles(name))
                 {
                     if(!PsionicDashCast.Launch(pawn,SpiritHostedMartial.Find(pawn,soul,name),job.targetB.Cell))

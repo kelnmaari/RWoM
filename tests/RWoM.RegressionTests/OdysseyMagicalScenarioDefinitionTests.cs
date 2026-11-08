@@ -58,7 +58,7 @@ internal static class OdysseyMagicalScenarioDefinitionTests
             Check.Equal("TorannMagic.Odyssey.SketchResolver_MagicalStarterShip", resolver.resolver.GetType().FullName!, "native sketch resolver registration");
             Check.Equal("false", arrival.SelectSingleNode("includeReservoir")!.InnerText, "core-only ship has no optional reservoir");
             var patch = new XmlDocument();
-            patch.Load(Path.Combine(f.Repository, "v1.7/VGECompat/Patches/MagicalStarterShip.xml"));
+            patch.Load(Path.Combine(f.Repository, "TorannMagic.Integrations/v1.7/VGECompat/Patches/MagicalStarterShip.xml"));
             foreach (XmlNode operation in patch.SelectNodes("Patch/Operation")!)
                 Check.Equal(true, DirectXmlToObject.ObjectFromXml<PatchOperation>(operation, false).Apply(doc), "VGE reservoir patch applies");
             Check.Equal("true", doc.SelectSingleNode("Defs/ScenarioDef/scenario/parts/li/includeReservoir")!.InnerText, "VGE receives a starter reservoir");

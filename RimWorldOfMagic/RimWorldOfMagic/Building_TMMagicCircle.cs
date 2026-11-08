@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Verse;
@@ -19,6 +19,7 @@ namespace TorannMagic
         public override IEnumerable<FloatMenuOption> GetFloatMenuOptions(Pawn myPawn)
         {
             foreach (var option in base.GetFloatMenuOptions(myPawn)) yield return option;
+            foreach (var option in ClassProgression.SpellMasteryRitual.Options(myPawn, this)) yield return option;
             foreach (var option in ClassProgression.ClassAscensionMenu.Options(myPawn, this)) yield return option;
             foreach (var option in ClassProgression.IceAttunement.Options(myPawn, this)) yield return option;
             foreach (var option in ClassProgression.SpiritRebirthRitualJob.Options(myPawn, this)) yield return option;

@@ -9,6 +9,24 @@ internal static class LoggingCompatTests
 {
     public static IEnumerable<TestCase> Cases()
     {
+        yield return new("LoggingCompat.WithoutIntegrationUsesVerse", _ =>
+        {
+            RuntimeLog.AssertClean();
+            var problems = (List<string>)typeof(RuntimeLog).GetField("Problems", BindingFlags.NonPublic | BindingFlags.Static)!.GetValue(null)!;
+            try
+            {
+                Check.Equal(false, TM_Log.TryWriteExternal("Warning", "RWoM", "absent adapter", null!), "unpatched optional boundary declines event");
+                TM_Log.Warning("without Integration");
+                Check.Equal(1, problems.Count, "Content alone writes once to actual Verse sink");
+                Check.Equal(true, problems[0].Contains("[RWoM] without Integration"), "Content alone preserves message");
+            }
+            finally { RuntimeLog.Clear(); }
+        });
+        yield return new("LoggingCompat.BackendOwnedByIntegrations", _ =>
+        {
+            Check.Equal(false, typeof(TM_Log).GetNestedTypes(BindingFlags.NonPublic).Any(t => t.Name == "Provider"), "Content does not own external provider");
+            Check.NotNull(Backend, "Integrations owns external discovery");
+        });
         yield return new("LoggingCompat.AbsentAndIncompatibleProviderPreserveSeverityAndException", _ =>
         {
             foreach (Type? facade in new Type?[] { null, typeof(IncompatibleFacade) })
@@ -180,7 +198,7 @@ internal static class LoggingCompatTests
                 var assembly = Assembly.LoadFrom(Path.GetFullPath(installedPath));
                 Check.Equal("RimWorks.RimLogging", assembly.GetName().Name, "Requested installed logging assembly identity");
                 TM_Log.Warning("compatibility", "headless optional-provider readiness probe");
-                Check.NotNull(typeof(TM_Log).GetField("provider", BindingFlags.NonPublic | BindingFlags.Static)!.GetValue(null),
+                Check.NotNull(Backend.GetField("provider", BindingFlags.NonPublic | BindingFlags.Static)!.GetValue(null),
                     "Real installed facade and lifecycle bind without mandatory references");
                 Check.Equal(1, output.Count, "Uninitialized installed framework still preserves warning via fallback");
                 // Do not initialize the framework, register sinks, or touch installed settings.
@@ -198,16 +216,25 @@ internal static class LoggingCompatTests
             Override("fallback", (Action<string, string>)((level, text) => output.Enqueue((level, text)))));
     }
 
+    private static Type Backend => Assembly.LoadFrom(Environment.GetEnvironmentVariable("RWOM_INTEGRATIONS_ASSEMBLY")!).GetType("TorannMagic.Integrations.LoggingBackend", true)!;
+    private static int hookUsers;
     private static IDisposable Override(string name, object value)
     {
-        var field = typeof(TM_Log).GetField(name, BindingFlags.NonPublic | BindingFlags.Static)!;
+        var field = (name == "fallback" ? typeof(TM_Log) : Backend).GetField(name, BindingFlags.NonPublic | BindingFlags.Static)!;
+        var ht = Assembly.Load("0Harmony").GetType("HarmonyLib.Harmony")!;
+        var harmony = Activator.CreateInstance(ht, "rwom.tests.logging-extraction")!;
+        if (hookUsers++ == 0)
+            {
+            var processor = ht.GetMethod("CreateClassProcessor")!.Invoke(harmony, new object[] { Backend.Assembly.GetType("TorannMagic.Integrations.LoggingBackendPatch", true)! })!;
+            processor.GetType().GetMethod("Patch")!.Invoke(processor, null);
+        }
         var previous = field.GetValue(null);
         field.SetValue(null, value);
         Invalidate();
-        return new Restore(() => { field.SetValue(null, previous); Invalidate(); });
+        return new Restore(() => { field.SetValue(null, previous); Invalidate(); if (--hookUsers == 0) ht.GetMethod("UnpatchAll")!.Invoke(harmony, new object[] { "rwom.tests.logging-extraction" }); });
     }
 
-    private static void Invalidate() => typeof(TM_Log).GetMethod("Invalidate", BindingFlags.NonPublic | BindingFlags.Static)!.Invoke(null, null);
+    private static void Invalidate() => Backend.GetMethod("Invalidate", BindingFlags.NonPublic | BindingFlags.Static)!.Invoke(null, null);
 
     private sealed class Scope(params IDisposable[] values) : IDisposable
     {

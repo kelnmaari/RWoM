@@ -22,17 +22,24 @@ internal static class SpiritRebirthBodyTests
             using var patches = new FleshStatTests.ProductionPatches(); patches.Add(typeof(TorannMagicMod.Pawn_NeedsTracker_Patch));
             var old = DefDatabase<NeedDef>.AllDefsListForReading.ToArray();
             var oldMana = TorannMagicDefOf.TM_Mana; var oldSpirit = TorannMagicDefOf.TM_SpiritND;
+            var oldStamina = TorannMagicDefOf.TM_Stamina;
+            var settings = TorannMagic.ModOptions.Settings.Instance;
             try
             {
                 DefDatabase<NeedDef>.Clear();
+                TorannMagic.ModOptions.Settings.Instance = new TorannMagic.ModOptions.Settings();
                 TorannMagicDefOf.TM_Mana = Need("BodyMana", typeof(Need_Mana), true);
+                TorannMagicDefOf.TM_Stamina = Need("BodyStamina", typeof(Need_Stamina), true);
                 TorannMagicDefOf.TM_SpiritND = Need("BodySpirit", typeof(Need_Spirit), true);
                 var rest = Need("BodyRest", typeof(Need_Rest), false);
                 foreach (var p in new[] { f.Original, f.Host })
                 {
                     p.ageTracker = new Pawn_AgeTracker(p);
+                    p.kindDef = new PawnKindDef { defName = "SpiritBodyColonist", race = p.def };
                     p.def.race.lifeStageAges = [new LifeStageAge { def = new LifeStageDef { developmentalStage = DevelopmentalStage.Adult } }];
                     Set(p.ageTracker, "cachedLifeStageIndex", 0);
+                    Set(p.ageTracker, "ageBiologicalTicksInt", 25L * 3600000L);
+                    Set(p,"factionInt",new Faction {def=new FactionDef {isPlayer=true}});
                 }
                 f.Comp.BeginNewProgression(Vocation.Warrior);
                 Check.Equal(false, f.Magic.IsMagicUser, "saved warrior is not enrolled as mage");
@@ -40,6 +47,8 @@ internal static class SpiritRebirthBodyTests
                 f.Original.needs.AddOrRemoveNeedsAsAppropriate();
                 var spirit = Check.NotNull(f.Original.needs.TryGetNeed(TorannMagicDefOf.TM_SpiritND), "active original gets native Spirit need without legacy hediff");
                 var mana = Check.NotNull(f.Original.needs.TryGetNeed(TorannMagicDefOf.TM_Mana), "warrior gets missing Mana carrier without role mutation");
+                var stamina = Check.NotNull(f.Original.needs.TryGetNeed(TorannMagicDefOf.TM_Stamina), "native update retains warrior stamina");
+                Check.Equal(0f,stamina.CurLevel,"missing former reserve not refilled");
                 Check.Equal(true, f.Original.needs.TryGetNeed(rest) == null, "physical rest removed");
                 spirit.CurLevel = 0; mana.CurLevel = 0;
                 Check.Equal(true, SpiritRebirthStateTests.Invoke(f.Comp.SpiritRebirth, "BeginDepletion", f.Original), "validated depletion enters pending retry state");
@@ -54,6 +63,14 @@ internal static class SpiritRebirthBodyTests
                 f.Original.needs.AddOrRemoveNeedsAsAppropriate();
                 Check.Same(spirit, f.Original.needs.TryGetNeed(TorannMagicDefOf.TM_SpiritND), "held original retains Spirit need");
                 Check.Same(mana, f.Original.needs.TryGetNeed(TorannMagicDefOf.TM_Mana), "held original retains Mana upkeep owner");
+                Check.Same(stamina,f.Original.needs.TryGetNeed(TorannMagicDefOf.TM_Stamina),"hosted original retains its own stamina");
+                Set(Current.Game,"tickManager",new TickManager());
+                Set(Find.TickManager,"ticksGameInt",310);
+                stamina.NeedInterval();
+                float recovered=stamina.CurLevel;
+                Check.Equal(true,recovered>0,$"original regains stamina while hosted (current {recovered}, max {stamina.MaxLevel}, base gain {((Need_Stamina)stamina).baseStaminaGain}, wild {f.Original.NonHumanlikeOrWildMan()}, multiplier {TorannMagic.ModOptions.Settings.Instance.needMultiplier})");
+                stamina.NeedInterval();
+                Check.Equal(recovered,stamina.CurLevel,"duplicate native interval never grants twice");
                 var stoneDef = (ThingDef)RuntimeHelpers.GetUninitializedObject(typeof(ThingDef));
                 stoneDef.defName = "BodySoulStone"; stoneDef.thingClass = typeof(Thing_SoulStone); stoneDef.category = ThingCategory.Item; stoneDef.stackLimit = 1;
                 var stone = new Thing_SoulStone { def = stoneDef };
@@ -68,7 +85,8 @@ internal static class SpiritRebirthBodyTests
             }
             finally
             {
-                TorannMagicDefOf.TM_Mana = oldMana; TorannMagicDefOf.TM_SpiritND = oldSpirit;
+                TorannMagicDefOf.TM_Mana = oldMana; TorannMagicDefOf.TM_SpiritND = oldSpirit; TorannMagicDefOf.TM_Stamina = oldStamina;
+                TorannMagic.ModOptions.Settings.Instance=settings;
                 DefDatabase<NeedDef>.Clear(); foreach (var d in old) DefDatabase<NeedDef>.Add(d);
             }
         });

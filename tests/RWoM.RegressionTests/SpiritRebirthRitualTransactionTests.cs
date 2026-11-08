@@ -75,6 +75,22 @@ internal static class SpiritRebirthRitualTransactionTests
         yield return new("SpiritRitualTransaction.RefusedEscrowRefundAllowsNewJob", r => Run(r, RefusedEscrow));
         yield return new("SpiritRitualTransaction.NativePendingReceiptAndInventoryScribe", r => Run(r, c => Save(r, c, false)));
         yield return new("SpiritRitualTransaction.NativeCompletedReceiptScribe", r => Run(r, c => Save(r, c, true)));
+        yield return new("SpiritRitualTransaction.ApothecaryStockThroughConversionAndScribe", r => Run(r, c =>
+        {
+            var prior=DefDatabase<HediffDef>.AllDefsListForReading.ToArray();
+            try
+            {
+                var def=new HediffDef{defName="TM_ApothecaryHerbsHD",hediffClass=typeof(Hediff_ApothecaryHerbs),maxSeverity=100};
+                DefDatabase<HediffDef>.Clear();
+                foreach(var existing in prior.Where(d=>d.defName!=def.defName))DefDatabase<HediffDef>.Add(existing);
+                DefDatabase<HediffDef>.Add(def);
+                var herbs=new Hediff_ApothecaryHerbs{def=def,pawn=c.Original};
+                herbs.Severity=37.25f;Set(herbs,"herbPwr",3);Set(herbs,"herbEff",2);Set(herbs,"herbVer",4);
+                c.Original.health.hediffSet.hediffs.Add(herbs);
+                Save(r,c,true,herbs);
+            }
+            finally {DefDatabase<HediffDef>.Clear();foreach(var def in prior)DefDatabase<HediffDef>.Add(def);}
+        }));
         yield return new("SpiritRitualTransaction.AliveExceptionIsDormantAndOwned", r => Run(r, AliveException));
         yield return new("SpiritRitualTransaction.RefundDropExceptionRetainsNativeResource", r => Run(r, RefundException));
     }
@@ -344,7 +360,7 @@ internal static class SpiritRebirthRitualTransactionTests
         RuntimeLog.AssertClean();
     }
 
-    static void Save(RuntimeFixture r, Context c, bool complete)
+    static void Save(RuntimeFixture r, Context c, bool complete, Hediff_ApothecaryHerbs? herbs=null)
     {
         var comp = ClassIdentity.Component(c.Original);
         if (complete) Success(c);
@@ -355,8 +371,16 @@ internal static class SpiritRebirthRitualTransactionTests
             Check.Equal(true, comp.State == null && comp.SpiritRebirth == null, "classic pending receipt has neither progression nor Spirit marker");
         }
         var defs = DefDatabase<ThingDef>.AllDefsListForReading.ToArray();
+        var culture=System.Globalization.CultureInfo.CurrentCulture;
+        if(herbs!=null)
+        {
+            Check.Equal(true,c.Original.health.hediffSet.hediffs.Contains(herbs),"paid ritual retains original herb instance");
+            Check.Equal(37.25f,herbs.Severity,"ritual neither refills nor consumes herbs");
+        }
         try
         {
+            // Match the game's invariant serialization thread, as in other native Scribe fixtures.
+            System.Globalization.CultureInfo.CurrentCulture=System.Globalization.CultureInfo.InvariantCulture;
             // Behavior above ran the real native conversion graph. For this Scribe
             // proof retain the actual Pawn, native health/inventory and receipt;
             // unrelated optional tracker references are outside this save fixture.
@@ -365,7 +389,7 @@ internal static class SpiritRebirthRitualTransactionTests
                 if (!field.IsInitOnly && field.FieldType.Name.StartsWith("Pawn_") && field.Name != "inventory" && field.Name != "health")
                     field.SetValue(pawn, null);
             pawn.Name = null; pawn.kindDef = null; Set(pawn, "factionInt", null);
-            pawn.health.hediffSet.hediffs.Clear();
+            pawn.health.hediffSet.hediffs.RemoveAll(h=>h!=herbs);
             pawn.def.thingClass = typeof(Pawn); pawn.def.category = ThingCategory.Pawn;
             pawn.def.comps = new List<CompProperties> { new CompProperties { compClass = typeof(CompClassProgression) } };
             Set(pawn, "comps", new List<ThingComp> { comp });
@@ -388,6 +412,15 @@ internal static class SpiritRebirthRitualTransactionTests
             var restored = (Pawn)loaded.CarriedThing;
             Check.Equal(pawn.GetUniqueLoadID(), restored.GetUniqueLoadID(), "same saved Pawn identity restored by native owner");
             Check.Same(loaded.GetDirectlyHeldThings(), restored.holdingOwner, "loaded carry owns restored original");
+            if(herbs!=null)
+            {
+                var restoredHerbs=restored.health.hediffSet.hediffs.OfType<Hediff_ApothecaryHerbs>().Single();
+                Check.Same(restored,restoredHerbs.pawn,"loaded stock belongs to deep restored soul");
+                Check.Equal(37.25f,restoredHerbs.Severity,"loaded stock amount preserved");
+                Check.Equal(130f,restoredHerbs.MaxSeverity,"loaded stock capacity preserved");
+                foreach(var entry in new[]{("herbPwr",3),("herbEff",2),("herbVer",4)})
+                    Check.Equal(entry.Item2,(int)typeof(Hediff_ApothecaryHerbs).GetField(entry.Item1,BindingFlags.Instance|BindingFlags.NonPublic)!.GetValue(restoredHerbs)!,"loaded herb training "+entry.Item1);
+            }
             Check.Equal(complete ? 0 : 350, restored.inventory.innerContainer.Sum(t => t.stackCount), "native inventory serializes exact outstanding escrow");
             foreach (var item in restored.inventory.innerContainer) Check.Same(restored.inventory.innerContainer, item.holdingOwner, "restored escrow has reciprocal native owner");
             var restoredComp = ClassIdentity.Component(restored);
@@ -399,6 +432,6 @@ internal static class SpiritRebirthRitualTransactionTests
             Check.Equal(complete ? 0 : 350, restored.inventory.innerContainer.Sum(t => t.stackCount), "retry preserves native payment state");
             RuntimeLog.AssertClean();
         }
-        finally { DefDatabase<ThingDef>.Clear(); foreach (var def in defs) DefDatabase<ThingDef>.Add(def); }
+        finally { System.Globalization.CultureInfo.CurrentCulture=culture;DefDatabase<ThingDef>.Clear(); foreach (var def in defs) DefDatabase<ThingDef>.Add(def); }
     }
 }

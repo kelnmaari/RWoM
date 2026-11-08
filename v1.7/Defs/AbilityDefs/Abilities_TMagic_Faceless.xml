@@ -59,7 +59,7 @@ Disguise will not fool any pawn that already sees the faceless as a threat.</des
   <modExtensions>
 <li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_disguise</spellId>
-<domain>Magic</domain>
+<domain>Might</domain>
 <tier>0</tier>
 </li>
 </modExtensions>
@@ -104,7 +104,7 @@ Disguise will not fool any pawn that already sees the faceless as a threat.</des
   <modExtensions>
 <li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_mimic</spellId>
-<domain>Magic</domain>
+<domain>Might</domain>
 <tier>0</tier>
 </li>
 </modExtensions>
@@ -149,7 +149,7 @@ Disguise will not fool any pawn that already sees the faceless as a threat.</des
   <modExtensions>
 <li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_reversal</spellId>
-<domain>Magic</domain>
+<domain>Might</domain>
 <tier>0</tier>
 </li>
 </modExtensions>
@@ -195,7 +195,7 @@ Cooldown: 15</description>
     <modExtensions>
 <li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_transpose</spellId>
-<domain>Magic</domain>
+<domain>Might</domain>
 <tier>0</tier>
 </li>
 </modExtensions>
@@ -238,7 +238,7 @@ Cooldown: 13</description>
     <modExtensions>
 <li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_transpose_i</spellId>
-<domain>Magic</domain>
+<domain>Might</domain>
 <tier>1</tier>
 </li>
 </modExtensions>
@@ -281,7 +281,7 @@ Cooldown: 11</description>
     <modExtensions>
 <li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_transpose_ii</spellId>
-<domain>Magic</domain>
+<domain>Might</domain>
 <tier>2</tier>
 </li>
 </modExtensions>
@@ -325,7 +325,7 @@ Cooldown: 9</description>
     <modExtensions>
 <li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_transpose_iii</spellId>
-<domain>Magic</domain>
+<domain>Might</domain>
 <tier>3</tier>
 </li>
 </modExtensions>
@@ -387,7 +387,7 @@ Only creatures with a human-like mind capable of self-doubt can be possessed.</d
     <modExtensions>
 <li Class="TorannMagic.Core.SpellIdentityExtension" MayRequire="huginn.rwom.core">
 <spellId>rwom.tm_possess</spellId>
-<domain>Magic</domain>
+<domain>Might</domain>
 <tier>0</tier>
 </li>
 </modExtensions>

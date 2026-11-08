@@ -6,10 +6,11 @@ using Verse;
 
 namespace RWoM.RegressionTests;
 
-internal static class ClassTomeRaidTests
+internal static partial class ClassTomeRaidTests
 {
     public static IEnumerable<TestCase> Cases()
     {
+        foreach (var test in RiftCases()) yield return test;
         yield return new("ClassTome.RaidOfferDoesNotActivateOrCreateReward", f => {
             using var game = new GameScope();
             var part = new QuestPart_ClassTomeRaid();

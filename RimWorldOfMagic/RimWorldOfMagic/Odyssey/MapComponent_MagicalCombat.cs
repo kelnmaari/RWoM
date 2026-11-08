@@ -289,7 +289,8 @@ namespace TorannMagic.Odyssey
 
         public bool TryInterceptProjectile(Thing emitter, Projectile projectile, Vector3 origin, Vector3 from, Vector3 to)
         {
-            if (MagicalCombatWarpod.IsLanded(projectile)) return true;
+            var adapter = MagicalShieldProjectileAdapters.Find(projectile);
+            if (adapter?.AlreadyIntercepted(projectile) == true) return true;
             if (Receipt(projectile))
                 return true;
             if (groups.Count == 0 || !Valid() || projectile.Launcher == null)
@@ -298,13 +299,16 @@ namespace TorannMagic.Odyssey
                 if (g.Emitters.Contains(emitter) && Ready(g) && projectile.Launcher.HostileTo(g.Main.parent.Faction) && Entry(g, origin, from, to, out var t))
                 {
                     var hit = from + (to - from) * t;
-                    MagicalCombatWarpod.Landing landing = null;
+                    IMagicalShieldInterception landing = null;
                     float damage = projectile.DamageAmount;
-                    if (MagicalCombatWarpod.IsWarpod(projectile) &&
-                        (!MagicalCombatWarpod.TryPlan(projectile, this, hit, groups.Where(Ready).SelectMany(group => group.Centers).Distinct().ToList(), out landing, out damage) ||
-                         !MagicalCombatWarpod.CanCommit(projectile, this, landing))) return false;
+                    if (adapter != null)
+                    {
+                        landing = adapter.Plan(projectile, this, hit, groups.Where(Ready).SelectMany(group => group.Centers).Distinct().ToList());
+                        if (landing == null || !landing.CanCommit) return false;
+                        damage = landing.Damage;
+                    }
                     if (!TryAbsorb(g.Main, damage, hit)) return false;
-                    if (landing != null) MagicalCombatWarpod.Commit(projectile, landing);
+                    landing?.Commit();
                     Remember(projectile);
                     return true;
                 }

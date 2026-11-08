@@ -13,7 +13,12 @@ internal static class OdysseyCombatBeamTests
         yield return new("Odyssey.CombatBeam.InstalledVgePaths", f => Fixture(Installed));
         yield return new("Odyssey.CombatBeam.OptionalAndPulsePayment", f => { T("MagicalCombatAnticraftPulsePatch"); Fixture(Pulses); });
     }
-    static Type T(string n) => typeof(MagicData).Assembly.GetType("TorannMagic.Odyssey."+n) ?? throw new Exception("Missing beam adapter: "+n);
+    static Type T(string n)
+    {
+        var owner = n == "MagicalCombatNativeBeamPatch" ? typeof(MagicData).Assembly
+            : Assembly.LoadFrom(Environment.GetEnvironmentVariable("RWOM_VGE_ADAPTER") ?? throw new Exception("Missing VGE adapter build"));
+        return owner.GetType("TorannMagic.Odyssey." + n) ?? throw new Exception("Missing beam adapter: " + n);
+    }
     static object Core(string n, params object[] args) => typeof(OdysseyCombatTests).GetMethod(n,BindingFlags.Static|BindingFlags.NonPublic)!.Invoke(null,args)!;
     static void Fixture(Action action) => Core("Run",action);
     static void Set(object o,string n,object v) => Core("Set",o,n,v);
@@ -23,6 +28,7 @@ internal static class OdysseyCombatBeamTests
         static void Optional() {
         using var patches=new Patch();
         foreach(var n in new[]{"MagicalCombatArtilleryBeamPatch","MagicalCombatAnticraftImpactPatch","MagicalCombatAnticraftPulsePatch"}) {
+            Check.Equal(true, typeof(MagicData).Assembly.GetType("TorannMagic.Odyssey."+n) == null,"VGE beam patch has one external owner");
             var type=T(n); var target=type.GetMethod("TargetMethod")!.Invoke(null,null);
             Check.Equal(target!=null,(bool)type.GetMethod("Prepare")!.Invoke(null,null)!,"optional Prepare agrees with actual assembly availability");
             patches.Discover(type);
@@ -131,7 +137,7 @@ internal static class OdysseyCombatBeamTests
                 patches.Apply(typeof(GenSpawn).GetMethod("Spawn",new[]{typeof(ThingDef),typeof(IntVec3),typeof(Map),typeof(WipeMode)})!,typeof(OdysseyCombatBeamTests),nameof(CaptureStrikeSpawn));
                 foreach(var method in typeof(CompOrbitalBeam).GetMethods().Where(m=>m.Name=="StartAnimation")) patches.Apply(method,typeof(OdysseyCombatBeamTests),nameof(Skip));
                 foreach(var method in typeof(MoteMaker).GetMethods().Where(m=>m.Name=="MakePowerBeamMote")) patches.Apply(method,typeof(OdysseyCombatBeamTests),nameof(Skip));
-                var derivedPatch=typeof(MagicData).Assembly.GetType("TorannMagic.Odyssey.MagicalCombatAnticraftImpactPatch");
+                var derivedPatch=T("MagicalCombatAnticraftImpactPatch");
                 if(derivedPatch!=null) patches.Apply(derived.GetType().GetMethod("Impact")!,derivedPatch);
                 Set(main,"currentHitPoints",500f); before=HP(main);
                 derived.GetType().GetMethod("Impact")!.Invoke(derived,new object?[]{null,false});

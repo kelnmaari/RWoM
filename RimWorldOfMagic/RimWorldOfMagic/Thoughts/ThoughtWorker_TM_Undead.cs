@@ -22,7 +22,7 @@ namespace TorannMagic.Thoughts
                 {
                     return false;
                 }
-                if (pawn.story.traits.HasTrait(TorannMagicDefOf.TM_OKWithDeath) || pawn.story.traits.HasTrait(TorannMagicDefOf.DeathKnight) || ClassProgression.ClassIdentity.IsBaseNecromancer(pawn) || ClassProgression.ClassIdentity.IsLich(pawn) || pawn.story.traits.HasTrait(TraitDefOf.Psychopath) || pawn.story.traits.HasTrait(TraitDefOf.Bloodlust) || pawn.story.traits.HasTrait(TraitDef.Named("Masochist")))
+                if (pawn.story.traits.HasTrait(TorannMagicDefOf.TM_OKWithDeath) || ClassProgression.DeathKnightMartialPath.IsKnight(pawn) || ClassProgression.ClassIdentity.IsBaseNecromancer(pawn) || ClassProgression.ClassIdentity.IsLich(pawn) || pawn.story.traits.HasTrait(TraitDefOf.Psychopath) || pawn.story.traits.HasTrait(TraitDefOf.Bloodlust) || pawn.story.traits.HasTrait(TraitDef.Named("Masochist")))
                 {
                     return false;
                 }

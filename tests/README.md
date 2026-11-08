@@ -120,6 +120,10 @@ one process. Always pass an `-ArtifactsDir` outside the repository.
 
 ## Odyssey magical thrusters
 
-Use `-Filter 'Odyssey.MagicalThruster,Odyssey.Thruster'` for the flight-fuel and definition checks. The runner builds the optional `Compatibility/TorannMagic.VGE` adapter into the external artifacts directory when the installed VGE assembly is available. `-VgeDir` selects that read-only dependency directory; the core assembly has no mandatory VGE reference.
+Use `-Filter 'Odyssey.MagicalThruster,Odyssey.Thruster'` for the flight-fuel and definition checks. The runner builds the optional `TorannMagic.Integrations/Source/TorannMagic.VGE` adapter into the external artifacts directory when the installed VGE assembly is available. `-VgeDir` selects that read-only dependency directory; the core assembly has no mandatory VGE reference.
 
 The launch fixture executes the installed `Building_GravEngine.ConsumeFuel` with production Harmony hooks and real `CompRefuelable` payments. It supplies native floor/room caches and a cached route cost, so this verifies payment and rollback, not world-map generation or pathfinding. VGE cases use its real provider enumeration, payment and refund APIs. Definition cases resolve native XML inheritance and apply the shipping patches. Sprite checks verify directional files and alpha-capable PNGs; visual alignment, exhaust animations, the world target UI and an actual departure/landing still require an in-game check.
+
+### Integration extraction candidates
+
+The runner builds matching Core sources and `TorannMagic.Integrations` into the selected external ArtifactsDir, alongside conditional `TorannMagic.VGE`. `-CoreAssembly` selects an explicit matching Core binary; `-WithoutCore` keeps Core unloaded in the harness while retaining build references. Core-required VPE cases then report capability skips. Use `Core.CastOwnership,VpeAutocast,PridestalkerCompatibility,DebugClassRoster,IntegrationPackage` for the migration contracts and `GrimoireKure` for class data coverage. The shipped Core example accepts `-p:CoreAssemblyPath=...` for candidate validation. These commands do not update repository/install DLLs.

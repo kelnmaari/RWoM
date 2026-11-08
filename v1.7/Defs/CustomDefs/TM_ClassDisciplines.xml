@@ -430,4 +430,45 @@
       <li><ability>TM_Symbiosis</ability><stage>Ascended</stage></li>
     </spells>
   </TorannMagic.ClassProgression.ClassDisciplineDef>
+  <TorannMagic.ClassProgression.ClassDisciplineDef>
+    <defName>TM_DisciplineChaos</defName>
+    <label>chaos mage</label>
+    <profileId>rwom.chaos</profileId><domain>Magic</domain><legacyTrait>ChaosMage</legacyTrait>
+    <magicPowerList>magicPowerCM</magicPowerList>
+    <foundationBook>Torn_BookOfChaos</foundationBook><adeptBook>BookOfChaos</adeptBook><masterBook>TM_MasterTomeChaos</masterBook>
+    <adeptTrialId>rwom.chaos.foundation</adeptTrialId><masterTrialId>rwom.chaos.mastery</masterTrialId>
+    <spells><li><ability>TM_ChaosTradition</ability><stage>Foundation</stage></li></spells>
+  </TorannMagic.ClassProgression.ClassDisciplineDef>
+  <TorannMagic.ClassProgression.ClassDisciplineDef>
+    <defName>TM_DisciplineShadow</defName>
+    <label>shadow</label>
+    <profileId>rwom.shadow</profileId>
+    <domain>Magic</domain>
+    <legacyTrait>TM_TheShadow</legacyTrait>
+    <magicPowerList>magicPowerShadow</magicPowerList>
+    <foundationBook>BookOfShadow</foundationBook>
+    <adeptTrialId>rwom.shadow.crossing</adeptTrialId>
+    <spells><li><ability>TM_ShadowWalk</ability><stage>Foundation</stage></li></spells>
+  </TorannMagic.ClassProgression.ClassDisciplineDef>
+  <TorannMagic.ClassProgression.ClassDisciplineDef>
+    <defName>TM_DisciplineWanderer</defName>
+    <label>wanderer</label>
+    <profileId>rwom.wanderer</profileId>
+    <domain>Magic</domain>
+    <legacyTrait>TM_Wanderer</legacyTrait>
+    <magicPowerList>magicPowerW</magicPowerList>
+    <spells>
+      <li><ability>TM_WandererCraft</ability><stage>Foundation</stage></li>
+      <li><ability>TM_Cantrips</ability><stage>Foundation</stage></li>
+    </spells>
+  </TorannMagic.ClassProgression.ClassDisciplineDef>
+  <TorannMagic.ClassProgression.ClassDisciplineDef>
+    <defName>TM_DisciplineGladiator</defName><label>gladiator</label><profileId>rwom.gladiator</profileId><domain>Might</domain>
+  </TorannMagic.ClassProgression.ClassDisciplineDef>
+  <TorannMagic.ClassProgression.ClassDisciplineDef>
+    <defName>TM_DisciplineSniper</defName><label>sniper</label><profileId>rwom.sniper</profileId><domain>Might</domain>
+  </TorannMagic.ClassProgression.ClassDisciplineDef>
+  <TorannMagic.ClassProgression.ClassDisciplineDef>
+    <defName>TM_DisciplineBladedancer</defName><label>bladedancer</label><profileId>rwom.bladedancer</profileId><domain>Might</domain>
+  </TorannMagic.ClassProgression.ClassDisciplineDef>
 </Defs>

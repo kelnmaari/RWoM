@@ -11,15 +11,19 @@ namespace TorannMagic.ClassProgression
     public static class ClassTomeQuestOffer
     {
         private static readonly HashSet<Pawn> generating = new HashSet<Pawn>();
-        public static ClassDisciplineDef Candidate(Pawn pawn)
+        public static ClassDisciplineDef Candidate(Pawn pawn) => Candidates(pawn).FirstOrDefault();
+
+        internal static IEnumerable<ClassDisciplineDef> Candidates(Pawn pawn)
         {
             if (!ClassIdentity.TryGetState(pawn, out var state) || state.Vocation != Vocation.Mage
-                || state.Disciplines.Count != 1 || ClassInitiation.HasLegacyClass(pawn)) return null;
-            var path = state.Disciplines[0];
-            if (path.Stage != InitiationStage.Adept || path.Domain != DisciplineDomain.Magic
-                || (path.ClassId != "rwom.fire" && path.ClassId != "rwom.ice" && path.ClassId != "rwom.lightning" && path.ClassId != "rwom.paladin" && path.ClassId != "rwom.summoner" && path.ClassId != "rwom.arcanist" && path.ClassId != "rwom.priest" && path.ClassId != "rwom.necromancer" && path.ClassId != "rwom.technomancer" && path.ClassId != "rwom.shaman" && path.ClassId != "rwom.golemancer" && path.ClassId != "rwom.empath" && path.ClassId != "rwom.brightmage" && path.ClassId != "rwom.chronomancer" && path.ClassId != "rwom.enchanter" && path.ClassId != "rwom.bloodmage" && path.ClassId != "rwom.geomancer" && path.ClassId != "rwom.druid" && path.ClassId != "rwom.bard" && path.ClassId != "rwom.warlock" && path.ClassId != "rwom.succubus")) return null;
-            var profile = ClassIdentity.Profile(path.ClassId);
-            return profile?.domain == DisciplineDomain.Magic && profile.masterBook != null ? profile : null;
+                || (state.Disciplines.Count != 1 && !state.ElementalPair) || ClassInitiation.HasLegacyClass(pawn)) yield break;
+            foreach (var path in state.Disciplines)
+            {
+                if (path.Stage != InitiationStage.Adept || path.Domain != DisciplineDomain.Magic
+                    || (path.ClassId != "rwom.chaos" && path.ClassId != "rwom.fire" && path.ClassId != "rwom.ice" && path.ClassId != "rwom.lightning" && path.ClassId != "rwom.paladin" && path.ClassId != "rwom.summoner" && path.ClassId != "rwom.arcanist" && path.ClassId != "rwom.priest" && path.ClassId != "rwom.necromancer" && path.ClassId != "rwom.technomancer" && path.ClassId != "rwom.shaman" && path.ClassId != "rwom.golemancer" && path.ClassId != "rwom.empath" && path.ClassId != "rwom.brightmage" && path.ClassId != "rwom.chronomancer" && path.ClassId != "rwom.enchanter" && path.ClassId != "rwom.bloodmage" && path.ClassId != "rwom.geomancer" && path.ClassId != "rwom.druid" && path.ClassId != "rwom.bard" && path.ClassId != "rwom.warlock" && path.ClassId != "rwom.succubus")) continue;
+                var profile = ClassIdentity.Profile(path.ClassId);
+                if (profile?.domain == DisciplineDomain.Magic && profile.masterBook != null) yield return profile;
+            }
         }
 
         public static IEnumerable<QuestPart_ClassTomeRaid> Requests()
@@ -43,7 +47,10 @@ namespace TorannMagic.ClassProgression
         }
 
         // Request creates only a quest offer. Native Accept is the sole raid activation.
-        public static Quest Request(Pawn pawn)
+        public static Quest Request(Pawn pawn) => RequestFor(pawn, Candidate(pawn)?.profileId);
+
+        internal static Quest RequestFor(Pawn pawn, string id) => RequestEncounter(pawn,id,false);
+        internal static Quest RequestEncounter(Pawn pawn, string id, bool rift)
         {
             if (pawn == null || !generating.Add(pawn)) return null;
             var owned = new List<Pawn>();
@@ -56,15 +63,17 @@ namespace TorannMagic.ClassProgression
                 if (UnavailableReason(pawn) != null || QuestGen.Working) return null;
                 var root = DefDatabase<QuestScriptDef>.GetNamedSilentFail("TM_ClassMasteryTome");
                 if (root == null) return null;
-                var profile = Candidate(pawn);
+                var profile = Candidates(pawn).FirstOrDefault(p => p.profileId == id);
+                if (profile == null) return null;
                 var map = pawn.Map;
-                float budget = Budget(StorytellerUtility.DefaultThreatPointsNow(map));
-                var faction = Find.FactionManager.AllFactionsListForReading.FirstOrDefault(f =>
+                float threat = StorytellerUtility.DefaultThreatPointsNow(map);
+                float budget = rift ? TomeElementalRift.Budget(threat) : Budget(threat);
+                var faction = rift ? TomeElementalRift.Faction() : Find.FactionManager.AllFactionsListForReading.FirstOrDefault(f =>
                     !f.Hidden && !f.temporary && !f.defeated && f.def.humanlikeFaction && !f.def.raidsForbidden
                     && f.HostileTo(Faction.OfPlayer) && f.def.pawnGroupMakers != null
                     && f.def.pawnGroupMakers.Any(g => g.kindDef == PawnGroupKindDefOf.Combat)
                     && f.def.MinPointsToGeneratePawnGroup(PawnGroupKindDefOf.Combat) <= budget);
-                var kinds = new[] { "Tribal_Penitent", "Tribal_Archer", "Tribal_Warrior" }
+                var kinds = rift ? TomeElementalRift.Kinds(profile.profileId,budget) : new[] { "Tribal_Penitent", "Tribal_Archer", "Tribal_Warrior" }
                     .Select(n => DefDatabase<PawnKindDef>.GetNamedSilentFail(n))
                     .Where(k => k?.race?.race?.Humanlike == true && k.combatPower > 0 && k.combatPower <= budget).ToList();
                 if (faction == null || kinds.Count == 0) return null;
@@ -82,19 +91,25 @@ namespace TorannMagic.ClassProgression
                         mustBeCapableOfViolence: true, forceBaselinerChance: 1f, developmentalStages: DevelopmentalStage.Adult));
                     if (created == null) return null;
                     owned.Add(created); // Record ownership before callbacks or world registration.
-                    if (created.Dead || created.Downed || created.DevelopmentalStage != DevelopmentalStage.Adult || !created.RaceProps.Humanlike
+                    if (created.Dead || created.Downed || created.DevelopmentalStage != DevelopmentalStage.Adult) return null;
+                    if (rift)
+                    {
+                        if (created is not TMPawnSummoned elemental || created.Faction != faction) return null;
+                        elemental.validSummoning = true; elemental.Temporary = false;
+                    }
+                    else if (!created.RaceProps.Humanlike
                         || created.GetStatValue(StatDefOf.Flammability) <= 0) return null;
                     if (!created.IsWorldPawn()) Find.WorldPawns.PassToWorld(created);
                     spent += kind.combatPower;
                 }
                 if (owned.Count == 0) return null;
                 var context = new ClassTomeQuestContext { initiator = pawn, profileId = profile.profileId,
-                    reward = profile.masterBook, mapParent = map.Parent, attackers = owned };
+                    reward = profile.masterBook, mapParent = map.Parent, attackers = owned, rift = rift };
                 var slate = new Slate();
                 slate.Set("tomeContext", context);
                 slate.Set("points", spent);
                 slate.Set("resolvedQuestName", "TM_TomeQuestTitle".Translate(profile.masterBook.LabelCap).ToString());
-                slate.Set("resolvedQuestDescription", "TM_TomeQuestDescription".Translate(
+                slate.Set("resolvedQuestDescription", (rift ? "TM_TomeRiftDescription" : "TM_TomeQuestDescription").Translate(
                     map.Parent.LabelCap, owned.Count, spent.ToString("0"), profile.masterBook.LabelCap).ToString());
                 quest = QuestGen.Generate(root, slate);
                 if (!GenerationCompleted(quest, context)) return null;
@@ -151,6 +166,7 @@ namespace TorannMagic.ClassProgression
         public MapParent mapParent;
         public List<Pawn> attackers;
         public bool completed;
+        public bool rift;
     }
     public sealed class QuestNode_ClassMasteryTome : QuestNode
     {
@@ -161,6 +177,7 @@ namespace TorannMagic.ClassProgression
             if (c?.attackers == null || c.attackers.Count == 0) throw new InvalidOperationException("Missing tome encounter.");
             var part = new QuestPart_ClassTomeRaid();
             part.Configure(c.initiator, c.profileId, c.reward, c.mapParent, c.attackers, QuestGen.quest.InitiateSignal);
+            part.ElementalRift = c.rift;
             QuestGen.quest.AddPart(part);
             QuestGen.quest.ReservePawns(c.attackers);
             c.completed = true;

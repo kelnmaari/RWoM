@@ -27,6 +27,8 @@ namespace TorannMagic.Odyssey
                 // Provenance belongs to this possession's actually held spirit, never just
                 // a trait or a surviving Need_Spirit.wasDead flag on a former host.
                 if (spirit == null || spirit.holdingOwner != possession.GetDirectlyHeldThings()) continue;
+                if (possession.ReanimatedHost && ClassProgression.SpiritRebirthState.TryGetPossessingSpirit(pawn,out var original)
+                    && original == spirit) return true;
                 var state = spirit.health?.hediffSet?.GetFirstHediffOfDef(TorannMagicDefOf.TM_SpiritPossessorHD) as Hediff_Possessor;
                 if (state != null && state.wasDead) return true;
             }

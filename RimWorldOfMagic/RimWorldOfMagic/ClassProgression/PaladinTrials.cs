@@ -12,9 +12,9 @@ namespace TorannMagic.ClassProgression
         public const string FoundationTrialId = "rwom.paladin.foundation", MasteryTrialId = "rwom.paladin.mastery";
         static bool Matches(AbilityUser.AbilityDef ability, TMAbilityDef root)
             => ability != null && root != null && (ability == root || ability.defName == root.defName + "_I" || ability.defName == root.defName + "_II" || ability.defName == root.defName + "_III");
-        static DisciplineProgress Owned(Pawn caster, TMAbilityDef spell)
+        static DisciplineProgress Owned(Pawn caster, TMAbilityDef spell, Pawn emitter = null)
         {
-            if (caster == null || caster.Dead || !caster.Spawned || caster.Faction == null
+            if (caster == null || caster.Dead || !(emitter ?? caster).Spawned || caster.Faction == null
                 || caster.story?.traits?.HasTrait(TorannMagicDefOf.Faceless) == true
                 || !ClassIdentity.TryGetState(caster, out var state) || (state.Vocation & Vocation.Mage) == 0) return null;
             var path = state.Find("rwom.paladin");
@@ -24,11 +24,11 @@ namespace TorannMagic.ClassProgression
             var magic = caster.AllComps.OfType<CompAbilityUserMagic>().FirstOrDefault();
             return magic?.MagicData.MagicPowersP.Any(p => p.learned && p.TMabilityDefs.Contains(spell)) == true ? path : null;
         }
-        static DisciplineProgress Owned(PawnAbility ability, TMAbilityDef spell)
+        static DisciplineProgress Owned(PawnAbility ability, TMAbilityDef spell, Pawn emitter = null)
         {
             var magic = ability?.Pawn?.AllComps.OfType<CompAbilityUserMagic>().FirstOrDefault();
             return Matches(ability?.Def, spell) && magic != null && ability.AbilityUser == magic
-                && magic.AbilityData.Powers.Any(p => ReferenceEquals(p, ability)) ? Owned(ability.Pawn, spell) : null;
+                && magic.AbilityData.Powers.Any(p => ReferenceEquals(p, ability)) ? Owned(ability.Pawn, spell, emitter) : null;
         }
         static bool Ally(Pawn caster, Pawn target)
             => caster != null && target != null && target != caster && !target.Dead && target.Spawned && target.Map == caster.Map
@@ -71,7 +71,7 @@ namespace TorannMagic.ClassProgression
             var aura = ability.Pawn?.health?.hediffSet?.GetFirstHediffOfDef(TorannMagicDefOf.TM_RayOfHope_AuraHD);
             if (aura == null) return;
             auras.Remove(aura);
-            if (Owned(ability, TorannMagicDefOf.TM_P_RayofHope) != null) auras.Add(aura, new Tag { casterId = ability.Pawn.thingIDNumber });
+            if (Owned(ability, TorannMagicDefOf.TM_P_RayofHope, aura.TryGetComp<HediffComp_Aura>()?.ProjectedHost) != null) auras.Add(aura, new Tag { casterId = ability.Pawn.thingIDNumber });
         }
         public static void ExposeAura(Hediff aura)
         {
@@ -84,9 +84,10 @@ namespace TorannMagic.ClassProgression
         {
             auras.TryGetValue(source, out var tag);
             var caster = source.pawn;
+            var emitter = source.TryGetComp<HediffComp_Aura>()?.ProjectedHost ?? caster;
             var path = source.def == TorannMagicDefOf.TM_RayOfHope_AuraHD && tag != null && tag.casterId == caster?.thingIDNumber
                 && (effect == TorannMagicDefOf.RayofHope || effect == TorannMagicDefOf.RayofHope_I || effect == TorannMagicDefOf.RayofHope_II || effect == TorannMagicDefOf.RayofHope_III)
-                && Ally(caster, recipient) && caster.health.hediffSet.hediffs.Contains(source) ? Owned(caster, TorannMagicDefOf.TM_P_RayofHope) : null;
+                && Ally(emitter, recipient) && caster.health.hediffSet.hediffs.Contains(source) ? Owned(caster, TorannMagicDefOf.TM_P_RayofHope, emitter) : null;
             float before = path != null ? recipient.health.hediffSet.GetFirstHediffOfDef(effect)?.Severity ?? 0 : 0;
             // Keep the existing Arcanist/Ice observers and the single native mutation.
             ArcanistTrials.ApplyAura(source, recipient, effect);

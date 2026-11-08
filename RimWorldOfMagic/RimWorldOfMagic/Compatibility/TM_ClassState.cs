@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -316,7 +316,7 @@ namespace TorannMagic
             RestoreSharedMagicProgression(comp);
             var families = data.AllMagicPowers.Select(p => p.TMabilityDefs).ToList();
             var keep = Expand(after.SelectMany(c => c.Abilities), families);
-            keep.UnionWith(Expand(data.MagicPowersStandalone.Concat(data.MagicPowersCustomStandalone).Where(p => p.learned).SelectMany(p => p.TMabilityDefs), families));
+            keep.UnionWith(Expand(SharedMagicPowers(comp).Where(p => p.learned).SelectMany(p => p.TMabilityDefs), families));
             var removed = Expand(before.SelectMany(c => c.Abilities), families);
             removed.ExceptWith(keep);
             RemoveRuntime(comp, removed);
@@ -377,6 +377,7 @@ namespace TorannMagic
         {
             if (ClassProgression.ClassSpellAccess.RestoreLearned(comp)) return;
             var classes = MagicClasses(comp.Pawn, comp.MagicData);
+            RestoreEmptyClassicMagicStarter(comp, classes);
             if (newData)
                 foreach (var saved in comp.AbilityData.Powers.ToList())
                 {
@@ -389,14 +390,16 @@ namespace TorannMagic
                     owner.level = Math.Max(owner.level, owner.TMabilityDefs.IndexOf(saved.Def));
                 }
             ReconcileMagic(comp, newData ? new List<ClassEntry>() : classes, classes);
-            foreach (var power in comp.MagicData.MagicPowersStandalone.Concat(comp.MagicData.MagicPowersCustomStandalone)
+            foreach (var power in SharedMagicPowers(comp)
                 .Concat(TM_ChaosProgression.ActivePowers(comp)).Where(p => p.learned))
                 Grant(comp, power.abilityDef, power.TMabilityDefs);
+            comp.RestoreSavedCooldowns();
         }
 
         public static void RestoreCurrentMightRuntime(CompAbilityUserMight comp, bool newData = false)
         {
             var classes = MightClasses(comp.Pawn, comp.MightData);
+            RestoreEmptyClassicMightStarter(comp, classes);
             if (newData)
                 foreach (var saved in comp.AbilityData.Powers.ToList())
                 {
@@ -407,9 +410,55 @@ namespace TorannMagic
                     owner.learned = true;
                     owner.level = Math.Max(owner.level, owner.TMabilityDefs.IndexOf(saved.Def));
                 }
+            if (!ClassProgression.LegacyMartialConversion.RestoreImportedTools(comp))
+            {
+                ClassProgression.JobDriver_GladiatorInitiation.Restore(comp);
+                ClassProgression.SniperSurvey.Restore(comp);
+                ClassProgression.BladeCareer.Restore(comp);
+                ClassProgression.RangerCareer.Restore(comp);
+                if (ClassProgression.ClassIdentity.TryGetState(comp.Pawn, out var martialState))
+                    ClassProgression.AdditionalMartialRegistry.Current(martialState, out var discipline)?.Restore(comp, discipline);
+            }
             ReconcileMight(comp, newData ? new List<ClassEntry>() : classes, classes);
+            foreach (var power in ClassProgression.WandererLessons.MartialPicks(comp, ClassProgression.WandererLessons.Path(comp.Pawn)))
+                Grant(comp, power.abilityDef, power.TMabilityDefs);
             foreach (var power in comp.MightData.MightPowersStandalone.Concat(comp.MightData.MightPowersCustomStandalone).Where(p => p.learned))
                 Grant(comp, power.abilityDef, power.TMabilityDefs);
+            comp.RestoreSavedCooldowns();
+        }
+
+        // An existing data block is not proof that a classic class was ever
+        // initialized. Repair only completely empty classes, without a reset.
+        // Even with beta disabled, saved staged-progression pawns are excluded.
+        private static bool CanRestoreClassicStarter(CompAbilityUser comp) =>
+            comp.Pawn.GetComp<ClassProgression.CompClassProgression>()?.State == null &&
+            !comp.AbilityData.Powers.Any(p => p?.Def != null);
+
+        private static void RestoreEmptyClassicMagicStarter(CompAbilityUserMagic comp, List<ClassEntry> classes)
+        {
+            if (!CanRestoreClassicStarter(comp)) return;
+            var powers = classes.SelectMany(c => c.Abilities).Select(a => PreferredMagicOwner(comp, a))
+                .Where(p => p != null).Distinct().ToList();
+            if (powers.Any(p => p.learned) || comp.MagicData.MagicPowersStandalone.Any(p => p.learned) ||
+                comp.MagicData.MagicPowersCustomStandalone.Any(p => p.learned)) return;
+            var starter = classes.Where(c => !c.Advanced).SelectMany(c => c.Abilities)
+                .Select(a => PreferredMagicOwner(comp, a)).FirstOrDefault(p => p != null && !p.requiresScroll);
+            if (starter != null) starter.learned = true;
+        }
+
+        private static void RestoreEmptyClassicMightStarter(CompAbilityUserMight comp, List<ClassEntry> classes)
+        {
+            if (!CanRestoreClassicStarter(comp)) return;
+            var powers = classes.SelectMany(c => c.Abilities)
+                .Select(a => comp.MightData.AllMightPowers.FirstOrDefault(p => p.TMabilityDefs.Contains(a)))
+                .Where(p => p != null).Distinct().ToList();
+            if (powers.Any(p => p.learned) || comp.MightData.MightPowersStandalone.Any(p => p.learned) ||
+                comp.MightData.MightPowersCustomStandalone.Any(p => p.learned)) return;
+            var starter = classes.Where(c => !c.Advanced).SelectMany(c => c.Abilities)
+                .Where(a => (a as TMAbilityDef)?.learnItem == null)
+                .Select(a => comp.MightData.AllMightPowers.FirstOrDefault(p => p.TMabilityDefs.Contains(a)))
+                .FirstOrDefault(p => p != null);
+            if (starter != null) starter.learned = true;
         }
 
         public static void GrantCurrentMagicStarts(CompAbilityUserMagic comp)
@@ -433,9 +482,27 @@ namespace TorannMagic
         public static bool IsMagicPowerAuthorized(CompAbilityUserMagic comp, MagicPower power)
         {
             var data = comp.MagicData;
-            return data.MagicPowersStandalone.Contains(power) || data.MagicPowersCustomStandalone.Contains(power) ||
+            return data.MagicPowersStandalone.Contains(power) || data.MagicPowersCustomStandalone.Contains(power) || IsIndependentCustomCantrip(comp, power) ||
                 MagicClasses(comp.Pawn, data).Any(c => Matches(c.Abilities, power.TMabilityDefs));
         }
+
+        // Custom powers with upgrade records live outside CustomStandalone even
+        // when they are shared scroll spells (for example Kure Magic Training).
+        // Do not recover a former class's spell merely because its learned bit remains.
+        private static bool IsIndependentCustomCantrip(CompAbilityUserMagic comp, MagicPower power)
+        {
+            var data = comp.MagicData;
+            if (!data.MagicPowersCustom.Contains(power) ||
+                !power.TMabilityDefs.OfType<TMAbilityDef>().Any(a => a.learnItem != null)) return false;
+            if (TM_ClassUtility.CustomClasses.Any(c => c.classMageAbilities != null && Matches(c.classMageAbilities, power.TMabilityDefs))) return false;
+            return !TM_ClassGroups.MagicEntriesField.Any(e =>
+                (TM_ClassGroups.ResolveMagicList(data, e.field) ?? new List<MagicPower>())
+                    .Any(p => Matches(p.TMabilityDefs, power.TMabilityDefs)));
+        }
+
+        private static IEnumerable<MagicPower> SharedMagicPowers(CompAbilityUserMagic comp)
+            => comp.MagicData.MagicPowersStandalone.Concat(comp.MagicData.MagicPowersCustomStandalone)
+                .Concat(comp.MagicData.MagicPowersCustom.Where(p => IsIndependentCustomCantrip(comp, p))).Distinct();
 
         public static void ResetMagicRuntime(CompAbilityUserMagic comp)
         {

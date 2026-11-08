@@ -133,7 +133,8 @@ internal static class SoulStoneDefinitionTests
             Check.Equal(true, translated.TryGetValue(Id + ".label", out var label) && !string.IsNullOrWhiteSpace(label), "nonempty label " + language);
             Check.Equal(true, translated.TryGetValue(Id + ".description", out var description) && !string.IsNullOrWhiteSpace(description), "nonempty description " + language);
             var keys = XDocument.Load(Path.Combine(f.Repository, "v1.7/Languages", language, "Keyed/TM_SoulStone.xml")).Root!.Elements().ToDictionary(e => e.Name.LocalName, e => e.Value);
-            Check.Equal(3, keys.Count, "three presentation keys " + language);
+            Check.Equal(4, keys.Count, "presentation and abandonment keys " + language);
+            Check.Equal(true, keys["TM_SoulStoneAbandonWarning"].Contains("{0}"), "warning names souls " + language);
             Check.Equal(true, keys["TM_SoulStoneOccupiedLabel"].Contains("{0}") && keys["TM_SoulStoneOccupiedLabel"].Contains("{1}"), "label placeholders " + language);
             Check.Equal(true, keys["TM_SoulStoneContainedSpirit"].Contains("{0}"), "actual soul placeholder " + language);
             Check.Equal(false, string.IsNullOrWhiteSpace(keys["TM_SoulStoneRecoveryDebt"]), "recovery debt translated " + language);

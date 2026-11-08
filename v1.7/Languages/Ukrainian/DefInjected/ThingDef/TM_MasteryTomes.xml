@@ -60,4 +60,7 @@
   <TM_MasterTomeGolemancer.label>том майстерності големанта</TM_MasterTomeGolemancer.label>
   <TM_MasterTomeGolemancer.description>Рідкісний том для големанта після виконання випробування майстерності. Читання завершує посвяту й витрачає том. Доступний у торговців та як нагорода за завдання; виготовити неможливо.</TM_MasterTomeGolemancer.description>
   <TM_MasterTomeGolemancer.comps.1.useLabel>Прочитати {0_label}</TM_MasterTomeGolemancer.comps.1.useLabel>
+  <TM_MasterTomeChaos.label>майстерський том мага хаосу</TM_MasterTomeChaos.label>
+  <TM_MasterTomeChaos.description>Рідкісний том для адепта Хаосу. Перед читанням пройдіть випробування закляттями з різних наборів. Можна придбати в торговців або отримати за завдання.</TM_MasterTomeChaos.description>
+  <TM_MasterTomeChaos.comps.1.useLabel>Прочитати {0_label}</TM_MasterTomeChaos.comps.1.useLabel>
 </LanguageData>

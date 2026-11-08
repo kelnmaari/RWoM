@@ -4,6 +4,7 @@
 
    <ThingDef ParentName="BaseBullet" Class="AbilityUser.ProjectileDef_Ability">
 		<thingClass>TorannMagic.Projectile_SummonMinion</thingClass>
+        <comps><li><compClass>TorannMagic.ClassProgression.CompHostedSummon</compClass></li></comps>
 	    <defName>Projectile_SummonMinion</defName>
         <label>summon minion</label>
         <graphicData>
@@ -109,6 +110,7 @@
 
    <ThingDef ParentName="BaseBullet" Class="AbilityUser.ProjectileDef_Ability">
 		<thingClass>TorannMagic.Projectile_SummonPylon</thingClass>
+        <comps><li><compClass>TorannMagic.ClassProgression.CompHostedSummon</compClass></li></comps>
 	    <defName>Projectile_SummonPylon</defName>
         <label>summon defense pylon</label>
         <graphicData>
@@ -172,6 +174,7 @@
 
    <ThingDef ParentName="BaseBullet" Class="AbilityUser.ProjectileDef_Ability">
 		<thingClass>TorannMagic.Projectile_SummonExplosive</thingClass>
+        <comps><li><compClass>TorannMagic.ClassProgression.CompHostedSummon</compClass></li></comps>
 	    <defName>Projectile_SummonExplosive</defName>
         <label>summon explosive trap</label>
         <graphicData>
@@ -235,6 +238,7 @@
 
    <ThingDef ParentName="BaseBullet" Class="AbilityUser.ProjectileDef_Ability">
 		<thingClass>TorannMagic.Projectile_SummonElemental</thingClass>
+        <comps><li><compClass>TorannMagic.ClassProgression.CompHostedSummon</compClass></li></comps>
 	    <defName>Projectile_SummonElemental</defName>
         <label>summon elemental</label>
         <graphicData>
@@ -298,6 +302,7 @@
 
    <ThingDef ParentName="BaseBullet" Class="AbilityUser.ProjectileDef_Ability">
 		<thingClass>TorannMagic.Projectile_SummonPoppi</thingClass>
+        <comps><li><compClass>TorannMagic.ClassProgression.CompHostedSummon</compClass></li></comps>
 	    <defName>Projectile_SummonPoppi</defName>
         <label>summon poppi</label>
         <graphicData>

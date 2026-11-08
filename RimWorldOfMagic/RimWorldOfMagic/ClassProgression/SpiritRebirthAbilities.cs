@@ -26,6 +26,19 @@ namespace TorannMagic.ClassProgression
             foreach (var definition in definitions)
             {
                 var owner = data.EnsureSpiritOwner(definition.customPower);
+                // A classed pawn keeps its retained MagicData, which already
+                // holds unlearned owners for the guaranteed spirit powers —
+                // the fresh-owner guarantee inside EnsureSpiritOwner never ran
+                // for them (classed-spirit report: released without drain or
+                // possession). Apply the same guarantee here, and only here:
+                // chance-learned powers keep their never-rerolled contract.
+                if (!owner.learned && !definition.customPower.requiresScroll
+                    && definition.customPower.abilityDefs.Count > 0
+                    && definition.customPower.abilityDefs[0] is TMAbilityDef guaranteed
+                    && guaranteed.learnChance >= 1f)
+                {
+                    owner.learned = true;
+                }
                 if (!owner.learned || owner.TMabilityDefs == null || owner.TMabilityDefs.Count == 0) continue;
                 var current = owner.TMabilityDefs[System.Math.Max(0, System.Math.Min(owner.level, owner.TMabilityDefs.Count - 1))] as TMAbilityDef;
                 if (current != null && family.Contains(current)

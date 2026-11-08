@@ -7,13 +7,14 @@
     <displayPriorityInXenotype>480</displayPriorityInXenotype>
   </GeneCategoryDef>
 
-  <!-- Active genes: carried together with a magic or might class. Pure markers,
-       they deliberately do not enable any need (the class comps own those). -->
+  <!-- Active genes mark assigned classes; on classless pawns they grant potential.
+       They do not directly enable needs (the class comps own those). -->
 
   <GeneDef>
     <defName>TM_ManaGene</defName>
+    <forcedTraits><li><def>TM_Gifted</def><degree>0</degree></li></forcedTraits>
     <label>mana</label>
-    <description>This pawn's body sustains an inner mana pool, the mark of a true magic user. Children of carriers may be born with the hidden mage gene.</description>
+    <description>A classless carrier gains magical potential and can learn a magic class. For a pawn who already has a class, this gene marks their magic and does not grant another class or potential. Children of carriers may be born with the hidden mage gene.</description>
     <iconPath>UI/manashield</iconPath>
     <iconColor>(0.35, 0.5, 0.95)</iconColor>
     <displayCategory>TM_ClassGifts</displayCategory>
@@ -27,8 +28,9 @@
 
   <GeneDef>
     <defName>TM_StaminaGene</defName>
+    <forcedTraits><li><def>PhysicalProdigy</def><degree>0</degree></li></forcedTraits>
     <label>stamina</label>
-    <description>This pawn's body sustains an inner stamina pool, the mark of a true warrior. Children of carriers may be born with the sleeping warrior gene.</description>
+    <description>A classless carrier gains physical potential and can learn a warrior class. For a pawn who already has a class, this gene marks their might and does not grant another class or potential. Children of carriers may be born with the sleeping warrior gene.</description>
     <iconPath>UI/bestowmight</iconPath>
     <iconColor>(0.35, 0.8, 0.45)</iconColor>
     <displayCategory>TM_ClassGifts</displayCategory>
@@ -44,6 +46,7 @@
 
   <GeneDef>
     <defName>TM_HiddenMageGene</defName>
+    <forcedTraits><li><def>TM_Gifted</def><degree>0</degree></li></forcedTraits>
     <label>hidden mage</label>
     <description>A dormant spark of magic sleeps in this pawn. Taking a magic class will awaken it into the mana gene.</description>
     <iconPath>Other/ClassTextures/CustomMageMark</iconPath>
@@ -59,6 +62,7 @@
 
   <GeneDef>
     <defName>TM_SleepingWarriorGene</defName>
+    <forcedTraits><li><def>PhysicalProdigy</def><degree>0</degree></li></forcedTraits>
     <label>sleeping warrior</label>
     <description>A dormant warrior spirit sleeps in this pawn. Taking a might class will awaken it into the stamina gene.</description>
     <iconPath>Other/ClassTextures/CustomFighterMark</iconPath>
@@ -78,6 +82,7 @@
 
   <GeneDef>
     <defName>TM_ArcaneConduitGene</defName>
+    <forcedTraits><li><def>TM_ArcaneConduitTD</def><degree>0</degree></li></forcedTraits>
     <label>arcane conduit blood</label>
     <description>This pawn's bloodline is abnormally receptive to the ebb and flow of mana. Carriers of this gene are born with the Arcane Conduit gift.</description>
     <iconPath>UI/transfermana</iconPath>
@@ -93,6 +98,7 @@
 
   <GeneDef>
     <defName>TM_ManaWellGene</defName>
+    <forcedTraits><li><def>TM_ManaWellTD</def><degree>0</degree></li></forcedTraits>
     <label>mana well blood</label>
     <description>This pawn's bloodline carries a deep natural mana reservoir. Carriers of this gene are born with the Mana Well gift.</description>
     <iconPath>UI/manavortex</iconPath>
@@ -108,6 +114,7 @@
 
   <GeneDef>
     <defName>TM_BoundlessGene</defName>
+    <forcedTraits><li><def>TM_BoundlessTD</def><degree>0</degree></li></forcedTraits>
     <label>boundless blood</label>
     <description>This pawn's bloodline recovers its powers with unusual speed. Carriers of this gene are born with the Boundless gift.</description>
     <iconPath>UI/arcanebarrier</iconPath>
@@ -123,6 +130,7 @@
 
   <GeneDef>
     <defName>TM_FaeBloodGene</defName>
+    <forcedTraits><li><def>TM_FaeBloodTD</def><degree>0</degree></li></forcedTraits>
     <label>fae blood</label>
     <description>Fae folk flow somewhere in this pawn's ancestry. Carriers of this gene are born with the Fae blood gift.</description>
     <iconPath>UI/blessland</iconPath>
@@ -138,6 +146,7 @@
 
   <GeneDef>
     <defName>TM_GiantsBloodGene</defName>
+    <forcedTraits><li><def>TM_GiantsBloodTD</def><degree>0</degree></li></forcedTraits>
     <label>giant blood</label>
     <description>Giants flow somewhere in this pawn's ancestry. Carriers of this gene are born with the Giant's blood gift.</description>
     <iconPath>Other/ClassTextures/supersoldierFighterMark</iconPath>
@@ -153,6 +162,7 @@
 
   <GeneDef>
     <defName>TM_EnlightenedGene</defName>
+    <forcedTraits><li><def>TM_EnlightenedTD</def><degree>0</degree></li></forcedTraits>
     <label>enlightened blood</label>
     <description>This pawn's bloodline is blessed by magic itself. Carriers of this gene are born with the Enlightened gift.</description>
     <iconPath>UI/enchantedaura</iconPath>

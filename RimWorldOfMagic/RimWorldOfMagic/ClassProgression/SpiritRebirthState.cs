@@ -47,7 +47,7 @@ namespace TorannMagic.ClassProgression
         {
             if (receipt == null || !ReferenceEquals(receipt.Original, pawn) || !receipt.OwnsOriginal
                 || !MatchesPendingMapDeath(pawn, receipt.Keeper.map, receipt.Id)) return false;
-            if (form != SpiritRebirthForm.Dormant) { form = SpiritRebirthForm.Dormant; host = null; MarkHealthFormDirty(); }
+            if (form != SpiritRebirthForm.Dormant) { SpiritHostedAura.EndAuras(pawn); form = SpiritRebirthForm.Dormant; host = null; MarkHealthFormDirty(); }
             return true;
         }
         internal bool TryCompletePendingMapDeath(Pawn pawn, SpiritPendingHostCollapse receipt)
@@ -219,6 +219,7 @@ namespace TorannMagic.ClassProgression
 
         private void CommitStone(Thing_SoulStone destination)
         {
+            SpiritHostedAura.EndAuras(original);
             host = null;
             stone = destination;
             form = SpiritRebirthForm.Stone;
@@ -236,7 +237,7 @@ namespace TorannMagic.ClassProgression
 
         internal bool TryEnterHost(Pawn pawn, Pawn candidate)
         {
-            if (!IsCurrent(pawn) || host != null || !Holds(candidate, pawn)) return false;
+            if (!IsCurrent(pawn) || host != null || SpiritSummonedHost.IsSummoned(candidate) || !Holds(candidate, pawn)) return false;
             if (form == SpiritRebirthForm.Stone)
             {
                 if (stone == null || stone.Destroyed || stone.GetDirectlyHeldThings().Count != 0) return false;
@@ -245,6 +246,8 @@ namespace TorannMagic.ClassProgression
             else if (form != SpiritRebirthForm.Ethereal || stone != null) return false;
             stone = null;
             host = candidate;
+            if (ClassIdentity.TryGetState(pawn, out var progression) && progression.Find("rwom.summoner") is DisciplineProgress summoner)
+                summoner.SummonerTrials.LastActive = false;
             form = SpiritRebirthForm.Possessed;
             MarkHealthFormDirty();
             lastRecoveryTick = -1;
@@ -257,6 +260,7 @@ namespace TorannMagic.ClassProgression
                 || host.Dead || host.Destroyed || (recoveryRequired && recoveryTicks < RecoveryDurationTicks)
                 || pawn.Dead || !SpiritRebirthFormPolicy.HasMapCustody(pawn)
                 || Possession(expectedHost)?.GetDirectlyHeldThings()?.Contains(pawn) == true) return false;
+            SpiritHostedAura.EndAuras(pawn);
             host = null;
             form = SpiritRebirthForm.Ethereal;
             MarkHealthFormDirty();

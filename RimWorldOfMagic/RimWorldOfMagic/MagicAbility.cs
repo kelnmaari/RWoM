@@ -94,8 +94,11 @@ namespace TorannMagic
 
         }
 
-        public override void PostAbilityAttempt()  //commented out in CompAbilityUserMagic
+        public override void PostAbilityAttempt() => PayForAttempt(Pawn);
+
+        internal void PayForAttempt(Pawn body)
         {
+            if (body == null || !ReferenceEquals(ClassProgression.SpiritRebirthCasting.SkillOwner(body, this), Pawn)) return;
             if (!Odyssey.ManualTravelSafety.TakePayment(this)) return;
             //base.PostAbilityAttempt();
             
@@ -168,7 +171,7 @@ namespace TorannMagic
                 }
                 if (this.magicDef.bloodCost != 0)
                 {
-                    HealthUtility.AdjustSeverity(this.Pawn, HediffDef.Named("TM_BloodHD"), -100 * this.ActualBloodCost);
+                    HealthUtility.AdjustSeverity(body, HediffDef.Named("TM_BloodHD"), -100 * this.ActualBloodCost);
                 }
                 if (magicDef.requiredHediff != null)
                 {
@@ -235,6 +238,7 @@ namespace TorannMagic
                     }
                 }
             }                       
+            ClassProgression.ChaosDiscipline.RecordUse(this);
         }
 
         private void AddChainedAbility(TMAbilityDef magicDef)

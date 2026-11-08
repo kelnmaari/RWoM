@@ -13,6 +13,14 @@ internal static class FireProgressionTests
 {
     public static IEnumerable<TestCase> Cases()
     {
+        yield return new("ShadowDiscipline.BookAndCrossing", Shadow);
+        yield return new("ChaosDiscipline.NativeAscension", r => ClassAscensionJobTests.Work(r, chaos:true));
+        yield return new("ChaosDiscipline.BooksDrawsAnchorAndRefund", Chaos);
+        foreach (var test in SpellMasteryTests.Cases()) yield return test;
+        foreach (bool fireFirst in new[] { true, false })
+            yield return new("ElementalHybrid.NativeBooks." + (fireFirst ? "FireFirst" : "IceFirst"), r => Hybrid(r, fireFirst));
+        yield return new("ElementalHybrid.AscendFire", r => ClassAscensionJobTests.Work(r, fire:true, hybrid:true));
+        yield return new("ElementalHybrid.AscendIce", r => ClassAscensionJobTests.Work(r, ice:true, hybrid:true));
         yield return new("FireProgression.NativeBooksAndStageGates", Books);
         yield return new("FireProgression.ActualResultThresholdAndScribe", Damage);
         yield return new("FireProgression.HostileTargetsAndProjectileAttribution", Targets);
@@ -72,7 +80,7 @@ internal static class FireProgressionTests
             DefDatabase<ClassDisciplineDef>.Clear(); DefDatabase<ClassDisciplineDef>.Add(Profile);
             if (initiate) Check.Equal(true, ClassInitiation.CompleteBook(Caster, Book(Profile.foundationBook)), "native foundation transaction succeeds");
         }
-        static ThingDef BookDef(string name)
+        internal static ThingDef BookDef(string name)
         {
             var d = (ThingDef)RuntimeHelpers.GetUninitializedObject(typeof(ThingDef));
             d.defName = name; d.thingClass = typeof(Thing); d.category = ThingCategory.Item; d.destroyable = true; d.stackLimit = 75; d.drawerType = DrawerType.RealtimeOnly;
@@ -90,6 +98,144 @@ internal static class FireProgressionTests
             DefDatabase<ClassDisciplineDef>.Clear(); foreach (var d in profiles) DefDatabase<ClassDisciplineDef>.Add(d);
             DefDatabase<DesignationDef>.Clear(); foreach (var d in designations) DefDatabase<DesignationDef>.Add(d);
         }
+    }
+
+    static void Shadow(RuntimeFixture f)
+    {
+        using var w = new Fixture(f, false);
+        var node = XDocument.Load(Path.Combine(f.Repository, "v1.7/Defs/CustomDefs/TM_ClassDisciplines.xml"))
+            .Root!.Elements().Single(e => (string?)e.Element("profileId") == "rwom.shadow");
+        var spell = DefDatabase<TMAbilityDef>.GetNamed(node.Descendants("ability").Single().Value);
+        var profile = new ClassDisciplineDef { defName = "TestShadow", profileId = "rwom.shadow", domain = DisciplineDomain.Magic,
+            legacyTrait = new TraitDef { defName = "TM_TheShadow" }, magicPowerList = node.Element("magicPowerList")!.Value,
+            foundationBook = Fixture.BookDef(node.Element("foundationBook")!.Value),
+            spells = [new DisciplineSpell { ability = spell, stage = InitiationStage.Foundation }] };
+        DefDatabase<ClassDisciplineDef>.Add(profile);
+        var book = w.Book(profile.foundationBook);
+        Check.Equal(true, ClassInitiation.CompleteBook(w.Caster, book), "real foundation transaction");
+        Check.Equal(false, ClassInitiation.CompleteBook(w.Caster, book), "no second charge");
+        var path = w.Progression.State.Find(profile.profileId);
+        var owned = w.Magic.AbilityData.Powers.Single(a => a.Def == spell);
+        var entry = typeof(ClassIdentity).Assembly.GetType("TorannMagic.Verb_ShadowWalk")!
+            .GetMethod("CompleteCrossing", BindingFlags.NonPublic | BindingFlags.Static)!;
+        var dest = new IntVec3(20, 0, 20);
+        Set(w.Caster,"positionInt",dest); Set(w.Target,"positionInt",dest);
+        bool Cross(AbilityUser.PawnAbility cast, int distance) => (bool)entry.Invoke(null,
+            [cast, w.Target, w.Caster.Map, dest - new IntVec3(distance, 0, 0)])!;
+        Check.Equal(false, Cross(new MagicAbility(w.Magic) { Def = spell }, 8), "copied cast excluded");
+        Check.Equal(false, Cross(owned, 7), "short hop does not finish trial");
+        Check.Equal(true, Cross(owned, 8), "eight cell crossing unlocks cloak");
+        Check.Equal(true, Cross(owned, 1), "later short crossings grant cloak");
+        Check.Equal(false, Cross(owned, 0), "no cloak for stationary cast");
+        Check.Equal(InitiationStage.Adept, path.Stage, "finished once");
+        Check.Equal(1, path.CompletedTrials.Count, "one trial recorded");
+        var saved = w.Progression.State;
+        var file = Path.Combine(f.WorkingDirectory, "shadow-crossing.xml");
+        try { Scribe.saver.InitSaving(file, "regression"); Scribe_Deep.Look(ref saved, "progression"); Scribe.saver.FinalizeSaving(); }
+        finally { Scribe.ForceStop(); }
+        ClassProgressionState loaded = null!;
+        try { Scribe.loader.InitLoading(file); Scribe_Deep.Look(ref loaded, "progression"); Scribe.loader.FinalizeLoading(); }
+        finally { Scribe.ForceStop(); }
+        Set(w.Progression, "state", loaded);
+        Check.Equal(true, Cross(owned, 1), "reward survives save and load");
+    }
+
+    static void Chaos(RuntimeFixture f)
+    {
+        using var w = new Fixture(f, false);
+        var x = System.Xml.Linq.XDocument.Load(Path.Combine(f.Repository,"v1.7/Defs/CustomDefs/TM_ClassDisciplines.xml")).Root!.Elements()
+            .Single(e => (string?)e.Element("profileId") == "rwom.chaos");
+        ThingDef BookDef(string field) => Fixture.BookDef(x.Element(field)!.Value);
+        var profile=new ClassDisciplineDef { defName="ChaosTestProfile",profileId="rwom.chaos",domain=DisciplineDomain.Magic,
+            legacyTrait=TorannMagicDefOf.ChaosMage,magicPowerList=x.Element("magicPowerList")!.Value,
+            foundationBook=BookDef("foundationBook"),adeptBook=BookDef("adeptBook"),masterBook=BookDef("masterBook"),
+            adeptTrialId=x.Element("adeptTrialId")!.Value,masterTrialId=x.Element("masterTrialId")!.Value,
+            spells=[new DisciplineSpell {stage=InitiationStage.Foundation,ability=TorannMagicDefOf.TM_ChaosTradition}] };
+        DefDatabase<ClassDisciplineDef>.Add(profile);
+        var data=w.Magic.MagicData;
+        var pool=data.MagicPowersIF.Concat(data.MagicPowersHoF).Where(p => p.TMabilityDefs.Count>0).ToList();
+        foreach(var power in pool) power.learned=false;
+        var permanent=pool[0]; permanent.learned=true;
+        Set(data,"allMagicPowersForChaosMageList",pool);
+        Check.Equal(true,ClassInitiation.CompleteBook(w.Caster,w.Book(profile.foundationBook)),"torn chaos book grants foundation");
+        var path=w.Progression.State.Find(profile.profileId);
+        var type=typeof(ClassIdentity).Assembly.GetType("TorannMagic.ClassProgression.ChaosDiscipline")!;
+        var flags=System.Reflection.BindingFlags.Static|System.Reflection.BindingFlags.NonPublic;
+        bool Deal() => (bool)type.GetMethod("Deal",flags)!.Invoke(null,[w.Magic,path])!;
+        Check.Equal(true,Deal(),"successful first draw");
+        var ledger=path.Chaos;
+        Check.Equal(2,ledger.Borrowed.Count,"foundation slots");
+        var source=TM_ChaosProgression.ActivePowers(w.Magic);
+        Check.Equal(false,source.Contains(permanent),"permanent grant not in refund pool");
+        void Use(MagicPower power)
+        {
+            var a=new MagicAbility(w.Magic) { Def=power.abilityDef };
+            w.Magic.AbilityData.Powers.Add(a);
+            try { type.GetMethod("RecordUse",flags)!.Invoke(null,[a]); }
+            finally { w.Magic.AbilityData.Powers.Remove(a); }
+        }
+        foreach(var a in source) Use(a);
+        Check.Equal(true,ClassInitiation.CompleteBook(w.Caster,w.Book(profile.adeptBook)),"two distinct spells complete first trial");
+        for(int i=0;i<2;i++){Check.Equal(true,Deal(),"new set"); Use(TM_ChaosProgression.ActivePowers(w.Magic).First());}
+        Check.Equal(true,ClassInitiation.CompleteBook(w.Caster,w.Book(profile.masterBook)),"two distinct draws unlock master tome");
+        var choose=ledger.GetType().GetMethod("SelectAnchor",System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.NonPublic)!;
+        var kept=TM_ChaosProgression.ActivePowers(w.Magic).First();
+        string id=SpellIds.Of(kept.TMabilityDefs[0]);
+        Check.Equal(false,(bool)choose.Invoke(ledger,[id,path])!,"master cannot anchor before ascension");
+        path.RecordCompletedTrial("rwom.chaos.ascension");
+        w.Progression.State.TryAdvanceAfterTrial(profile.profileId,InitiationStage.Master,"rwom.chaos.ascension");
+        Check.Equal(true,(bool)choose.Invoke(ledger,[id,path])!,"select active spell");
+        kept.level=1; kept.costToLevel=2; int before=data.MagicAbilityPoints;
+        var saved=ledger; var file=Path.Combine(f.WorkingDirectory,"chaos-anchor.xml");
+        try { Scribe.saver.InitSaving(file,"regression");Scribe_Deep.Look(ref saved,"chaos");Scribe.saver.FinalizeSaving(); } finally { Scribe.ForceStop(); }
+        saved=null!;
+        try { Scribe.loader.InitLoading(file);Scribe_Deep.Look(ref saved,"chaos");Scribe.loader.FinalizeLoading(); } finally { Scribe.ForceStop(); }
+        Check.Equal(id,saved.Anchor,"load preserves pending choice");
+        Check.Equal(true,saved.Borrowed.SequenceEqual(ledger.Borrowed),"load preserves draw order and spells");
+        Set(path,"chaos",saved);
+        Check.Equal(true,Deal(),"ascended draw completes");
+        Check.Equal(true,saved.Borrowed.Contains(id) && saved.Anchor==null,"one-use anchor retained exact spell and cleared");
+        Check.Equal(before+2,data.MagicAbilityPoints,"retained spell also refunds full investment exactly once");
+        Check.Equal(0,kept.level,"retained spell has fresh ranks");
+        Check.Equal(true,permanent.learned,"independent permanent spell survives");
+        Check.Equal(4,saved.Borrowed.Count,"master slots retained at ascension");
+        Check.Equal(0,w.Caster.story.traits.allTraits.Count,"no old chaos trait");
+        RuntimeLog.AssertClean();
+    }
+    static void Hybrid(RuntimeFixture f, bool fireFirst)
+    {
+        ClassDisciplineDef ice;
+        using (var i = new IceProgressionTests.Fixture(f, false)) ice = i.Profile;
+        using var w = new Fixture(f, false);
+        DefDatabase<ClassDisciplineDef>.Add(ice);
+        w.Magic.MagicData.MagicPowerSkill_Soothe.First().level = 2;
+        var profiles = fireFirst ? new[] { w.Profile, ice } : new[] { ice, w.Profile };
+        foreach (var profile in profiles)
+        {
+            var book = w.Book(profile.foundationBook);
+            Check.Equal(true, ClassInitiation.CompleteBook(w.Caster, book), "actual foundation");
+            Check.Equal(1, book.stackCount, "one torn book per branch");
+            Check.Equal(false, ClassInitiation.CompleteBook(w.Caster, book), "duplicate foundation refused");
+        }
+        var state = w.Progression.State;
+        foreach (var profile in profiles)
+        {
+            var path = state.Find(profile.profileId);
+            var book = w.Book(profile.adeptBook);
+            Check.Equal(false, ClassInitiation.CompleteBook(w.Caster,book), "other path cannot waive trial");
+            path.RecordCompletedTrial(profile.adeptTrialId);
+            Check.Equal(true, ClassInitiation.CompleteBook(w.Caster,book), "exact full tome advances chosen branch");
+        }
+        foreach (var profile in profiles)
+        {
+            var path = state.Find(profile.profileId);
+            path.RecordCompletedTrial(profile.masterTrialId);
+            Check.Equal(true, ClassInitiation.CompleteBook(w.Caster,w.Book(profile.masterBook)), "separate master tomes");
+            Check.Equal(InitiationStage.Master, path.Stage, "chosen branch advanced");
+        }
+        Check.Equal(2, w.Magic.MagicData.MagicPowerSkill_Soothe.First().level, "previously invested rank retained");
+        Check.Equal(2, state.Disciplines.Count, "two paths only");
+        Check.Equal(0, w.Caster.story.traits.allTraits.Count, "no class traits granted");
     }
 
     static void Books(RuntimeFixture f)

@@ -60,4 +60,7 @@
   <TM_MasterTomeGolemancer.label>master tome: golemancer</TM_MasterTomeGolemancer.label>
   <TM_MasterTomeGolemancer.description>A rare tome for a golemancer who has met the requirements for mastery. Reading it completes the corresponding initiation and consumes the tome. Available from traders and quest rewards; it cannot be crafted.</TM_MasterTomeGolemancer.description>
   <TM_MasterTomeGolemancer.comps.1.useLabel>Read {0_label}</TM_MasterTomeGolemancer.comps.1.useLabel>
+  <TM_MasterTomeChaos.label>master tome: chaos mage</TM_MasterTomeChaos.label>
+  <TM_MasterTomeChaos.description>A rare tome for an adept chaos mage. Complete the trial of using spells from different draws before reading it. Obtained from traders or as a quest reward.</TM_MasterTomeChaos.description>
+  <TM_MasterTomeChaos.comps.1.useLabel>Read {0_label}</TM_MasterTomeChaos.comps.1.useLabel>
 </LanguageData>

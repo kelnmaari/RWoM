@@ -167,7 +167,9 @@ namespace TorannMagic
                                 PsionicEnergyCost(verb);
                             }
 
-                            if (this.pawn.story.traits.HasTrait(TorannMagicDefOf.DeathKnight) && !validCastFlag)
+                            // Staged Spite pays when the projectile is successfully fired.
+                            if (!validCastFlag && this.pawn.story.traits.HasTrait(TorannMagicDefOf.DeathKnight) &&
+                                ClassProgression.DeathKnightMartialPath.Path(this.pawn) == null)
                             {
                                 HateCost(verb);
                             }
@@ -236,7 +238,7 @@ namespace TorannMagic
                     if (!wildCheck && this.duration <= 6)
                     {
                         wildCheck = true;
-                        if (this.pawn.story != null && this.pawn.story.traits != null && this.pawn.story.traits.HasTrait(TorannMagicDefOf.ChaosMage) && Rand.Chance(.1f))
+                        if (this.pawn.story != null && this.pawn.story.traits != null && TorannMagic.ClassProgression.ClassIdentity.IsChaosMage(this.pawn) && Rand.Chance(.1f))
                         {
                             verb.Ability.PostAbilityAttempt();
                             TM_Action.DoWildSurge(this.pawn, this.pawn.GetCompAbilityUserMagic(), (MagicAbility)verb.Ability, (TMAbilityDef)verb.Ability.Def, TargetA);
@@ -410,7 +412,7 @@ namespace TorannMagic
                                 if (!wildCheck && this.duration <= 6)
                                 {
                                     wildCheck = true;
-                                    if (this.pawn.story != null && this.pawn.story.traits != null && this.pawn.story.traits.HasTrait(TorannMagicDefOf.ChaosMage) && Rand.Chance(.1f))
+                                    if (this.pawn.story != null && this.pawn.story.traits != null && TorannMagic.ClassProgression.ClassIdentity.IsChaosMage(this.pawn) && Rand.Chance(.1f))
                                     {
                                         bool completeJob = TM_Action.DoWildSurge(this.pawn, this.pawn.GetCompAbilityUserMagic(), (MagicAbility)verb.Ability, (TMAbilityDef)verb.Ability.Def, TargetA);
                                         if (!completeJob)
@@ -508,7 +510,7 @@ namespace TorannMagic
                     hediff = this.pawn.health.hediffSet.hediffs[h];
                 }
             }
-            if (hediff != null && verbCast.AbilityProjectileDef.defName == "Projectile_Spite")
+            if (hediff != null && verbCast.AbilityProjectileDef?.defName == "Projectile_Spite")
             {
                 HealthUtility.AdjustSeverity(this.pawn, hediff.def, -20f);
             }            

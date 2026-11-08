@@ -148,7 +148,7 @@ namespace TorannMagic.TMDefs
         }
 
         // Powers are classified by their base def: level variants share the tree.
-        private static string BaseName(string defName)
+        internal static string BaseName(string defName)
         {
             if (defName.EndsWith("_III")) return defName.Substring(0, defName.Length - 4);
             if (defName.EndsWith("_II")) return defName.Substring(0, defName.Length - 3);

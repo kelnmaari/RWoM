@@ -13,11 +13,6 @@ namespace TorannMagic.Core
         public static readonly string Stamina = "TM_Stamina";
         public static readonly string Chi = "TM_ChiHD"; // hediff-based, not a need
 
-        private static readonly HashSet<string> _knownNeedDefNames = new HashSet<string>
-        {
-            "TM_Mana", "TM_Stamina"
-        };
-
         public static Need FindNeed(Pawn pawn, string resourceDefName)
         {
             if (pawn?.needs == null || resourceDefName == null) return null;
@@ -35,7 +30,7 @@ namespace TorannMagic.Core
         public static bool TryConsume(Pawn pawn, string resourceDefName, float amount)
         {
             var need = FindNeed(pawn, resourceDefName);
-            if (need == null || need.CurLevel < amount) return false;
+            if (!float.IsFinite(amount) || amount < 0f || need == null || need.CurLevel < amount) return false;
             need.CurLevel -= amount;
             return true;
         }
@@ -43,7 +38,7 @@ namespace TorannMagic.Core
         public static void TryAdd(Pawn pawn, string resourceDefName, float amount)
         {
             var need = FindNeed(pawn, resourceDefName);
-            if (need != null) need.CurLevel += amount;
+            if (need != null && float.IsFinite(amount) && amount >= 0f) need.CurLevel += amount;
         }
 
         public static bool IsMagicUser(Pawn pawn)

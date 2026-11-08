@@ -15,4 +15,10 @@
     <carryThingAfterJob>true</carryThingAfterJob>
     <dropThingBeforeJob>false</dropThingBeforeJob>
   </JobDef>
+  <JobDef>
+    <defName>TM_SpiritBloodSacrifice</defName>
+    <driverClass>TorannMagic.ClassProgression.JobDriver_SpiritBloodSacrifice</driverClass>
+    <reportString>performing a blood sacrifice.</reportString>
+    <casualInterruptible>false</casualInterruptible>
+  </JobDef>
 </Defs>

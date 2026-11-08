@@ -35,14 +35,24 @@ internal static class ClassInitiationTests
         }
     }
 
-    static Envelope RoundTrip(RuntimeFixture f, Envelope data, string name, Action<XDocument>? edit = null)
+    static Envelope RoundTrip(RuntimeFixture f, Envelope data, string name, Action<XDocument>? edit = null, Pawn? owner = null)
     {
         var path = Path.Combine(f.WorkingDirectory, name + ".xml");
         try { Scribe.saver.InitSaving(path, "regression"); Scribe_Deep.Look(ref data, "pawnData"); Scribe.saver.FinalizeSaving(); }
         finally { Scribe.ForceStop(); }
         if (edit != null) { var xml = XDocument.Load(path); edit(xml); xml.Save(path); }
         Envelope loaded = null!;
-        try { Scribe.loader.InitLoading(path); Scribe_Deep.Look(ref loaded, "pawnData"); Scribe.loader.FinalizeLoading(); }
+        try
+        {
+            Scribe.loader.InitLoading(path); Scribe_Deep.Look(ref loaded, "pawnData");
+            if (owner != null)
+            {
+                var refs = Scribe.loader.crossRefs;
+                var dir = refs.GetType().GetField("loadedObjectDirectory", BindingFlags.NonPublic | BindingFlags.Instance)!.GetValue(refs)!;
+                dir.GetType().GetMethod("RegisterLoaded")!.Invoke(dir, [owner]);
+            }
+            Scribe.loader.FinalizeLoading();
+        }
         finally { Scribe.ForceStop(); }
         RuntimeLog.AssertClean();
         return loaded;
@@ -50,6 +60,270 @@ internal static class ClassInitiationTests
 
     public static IEnumerable<TestCase> Cases()
     {
+        yield return new("LegacyConversion.WarriorPostLoadInitializesOnlyMight", f =>
+        {
+            using var map = new MapScope();
+            GrimoireProgressionTests.LoadBaseDefinitions(f);
+            var p = GrimoireProgressionTests.PawnWithComps(false,true);
+            p.pawn.story.traits.allTraits.Add(new Trait(TorannMagicDefOf.Gladiator));
+            var comp = new CompClassProgression { parent=p.pawn };p.pawn.AllComps.Add(comp);
+            comp.BeginNewProgression(Vocation.Warrior);
+            comp.State.TryAddFoundation("rwom.gladiator",DisciplineDomain.Might);
+            var data=p.might.MightData;
+            data.MightUserLevel=17;data.MightAbilityPoints=7;
+            p.magic.InitializeSpell();
+            ClassSpellAccess.RestoreEnchanterChildren(p.magic);
+            ClassSpellAccess.RestoreChronomancerChildren(p.magic);
+            ClassSpellAccess.RestoreBrightmageChildren(p.magic);
+            Check.Equal(true,p.magic.MagicData==null,"no phantom magical progression after load");
+            Check.Same(data,p.might.MightData,"existing might owner preserved");
+            Check.Equal(17,data.MightUserLevel,"fighter level");Check.Equal(7,data.MightAbilityPoints,"fighter points");
+        });
+        foreach (var test in LegacyMartialImportTests.Cases()) yield return test;
+        foreach (var role in new[] { Vocation.Mage, Vocation.Warrior, Vocation.WarriorMage })
+            yield return new("LegacyConversion.Wanderer." + role, f =>
+            {
+                using var map = new MapScope();
+                GrimoireProgressionTests.LoadBaseDefinitions(f);
+                bool mage = (role & Vocation.Mage) != 0, warrior = (role & Vocation.Warrior) != 0;
+                var p = GrimoireProgressionTests.PawnWithComps(mage, warrior);
+                var comp = new CompClassProgression { parent = p.pawn }; p.pawn.AllComps.Add(comp);
+                if (mage) p.pawn.story.traits.allTraits.Add(new Trait(TorannMagicDefOf.TM_Wanderer));
+                MightPower? pick = null;
+                if (warrior)
+                {
+                    p.pawn.story.traits.allTraits.Add(new Trait(TorannMagicDefOf.TM_Wayfarer));
+                    pick = p.might.MightData.AllMightPowersWithSkills.First(x => x.TMabilityDefs.Count >= 2 && !p.might.MightData.MightPowersW.Contains(x));
+                    pick.learned = true; pick.level = 1; pick.ticksUntilNextCast = 132;
+                }
+                var import = typeof(ClassInitiation).Assembly.GetType("TorannMagic.ClassProgression.LegacyClassConversion")!
+                    .GetMethod("TryImport", BindingFlags.NonPublic | BindingFlags.Static)!;
+                Check.Equal(true, (bool)import.Invoke(null,[p.pawn])!, "classic route adopted");
+                var path = comp.State.Find("rwom.wanderer");
+                Check.Equal((DisciplineDomain)role, path.Domain, "actual owned vocation");
+                if (pick != null)
+                {
+                    var method = typeof(WandererLessons).GetMethod("MartialPicks", BindingFlags.Static | BindingFlags.NonPublic)!;
+                    Check.Equal(true, ((IEnumerable<MightPower>)method.Invoke(null,[p.might,path])!).Contains(pick), "existing choice displayed with same owner");
+                    Check.Equal(1,pick.level,"existing rank"); Check.Equal(132,pick.ticksUntilNextCast,"existing timer");
+                }
+                Check.Equal(false, (bool)import.Invoke(null,[p.pawn])!, "no repeat lessons");
+            });
+        yield return new("LegacyConversion.LichAdoptsAlreadyTransformedIdentity", f =>
+        {
+            using var map = new MapScope();
+            GrimoireProgressionTests.LoadBaseDefinitions(f);
+            var saved = DefDatabase<ClassDisciplineDef>.AllDefsListForReading.ToArray();
+            try
+            {
+                DefDatabase<ClassDisciplineDef>.Clear();
+                DefDatabase<ClassDisciplineDef>.Add(new ClassDisciplineDef { defName = "ImportNecromancer", profileId = "rwom.necromancer",
+                    legacyTrait = TorannMagicDefOf.Necromancer, domain = DisciplineDomain.Magic,
+                    foundationBook = (ThingDef)RuntimeHelpers.GetUninitializedObject(typeof(ThingDef)) });
+                var p = GrimoireProgressionTests.PawnWithComps(true, false);
+                p.pawn.story.traits.allTraits.Add(new Trait(TorannMagicDefOf.Lich));
+                var comp = new CompClassProgression { parent = p.pawn }; p.pawn.AllComps.Add(comp);
+                var owner = p.magic.MagicData.MagicPowersN.Single(x => x.TMabilityDefs.Contains(TorannMagicDefOf.TM_DeathBolt));
+                var import = typeof(ClassInitiation).Assembly.GetType("TorannMagic.ClassProgression.LegacyClassConversion")!
+                    .GetMethod("TryImport", BindingFlags.NonPublic | BindingFlags.Static)!;
+                owner.learned = false;
+                Check.Equal(false, (bool)import.Invoke(null,[p.pawn])!, "incomplete transformation cannot grant an ascension");
+                owner.learned = true; owner.ticksUntilNextCast = 274;
+                Check.Equal(true, (bool)import.Invoke(null,[p.pawn])!, "import existing lich");
+                Check.Equal(true, ClassIdentity.IsLich(p.pawn), "restores transformed path");
+                Check.Equal(274, owner.ticksUntilNextCast, "timer persists on original Death Bolt");
+                Check.Equal(true, p.pawn.story.traits.HasTrait(TorannMagicDefOf.Lich), "beta off retains original identity");
+            }
+            finally { DefDatabase<ClassDisciplineDef>.Clear(); foreach (var def in saved) DefDatabase<ClassDisciplineDef>.Add(def); }
+        });
+        yield return new("LegacyConversion.ElementalPairCommitsBothOrNeither", f =>
+        {
+            using var map = new MapScope();
+            GrimoireProgressionTests.LoadBaseDefinitions(f);
+            var saved = DefDatabase<ClassDisciplineDef>.AllDefsListForReading.ToArray();
+            try
+            {
+                DefDatabase<ClassDisciplineDef>.Clear();
+                var p = GrimoireProgressionTests.PawnWithComps(true, false);
+                var comp = new CompClassProgression { parent = p.pawn }; p.pawn.AllComps.Add(comp);
+                var import = typeof(ClassInitiation).Assembly.GetType("TorannMagic.ClassProgression.LegacyClassConversion")!
+                    .GetMethod("TryImport", BindingFlags.NonPublic | BindingFlags.Static)!;
+                var fire = p.magic.MagicData.MagicPowersIF[0]; var ice = p.magic.MagicData.MagicPowersHoF[0];
+                foreach (var (id, trait, list, power) in new[] {
+                    ("rwom.fire", TorannMagicDefOf.InnerFire, "magicPowerIF", fire),
+                    ("rwom.ice", TorannMagicDefOf.HeartOfFrost, "magicPowerHoF", ice) })
+                {
+                    p.pawn.story.traits.allTraits.Add(new Trait(trait));
+                    power.learned = true;
+                    DefDatabase<ClassDisciplineDef>.Add(new ClassDisciplineDef { defName = "Import" + trait.defName,
+                        profileId = id, domain = DisciplineDomain.Magic, legacyTrait = trait, magicPowerList = list,
+                        foundationBook = (ThingDef)RuntimeHelpers.GetUninitializedObject(typeof(ThingDef)),
+                        spells = [new DisciplineSpell { ability = (TMAbilityDef)power.TMabilityDefs[0], stage = InitiationStage.Foundation }] });
+                }
+                var iceProfile = ClassIdentity.Profile("rwom.ice"); var iceSpell = iceProfile.spells[0].ability;
+                iceProfile.spells[0].ability = null;
+                Check.Equal(false, (bool)import.Invoke(null,[p.pawn])!, "broken second path prevents partial conversion");
+                Check.Equal(true, comp.State == null, "no first path committed");
+                iceProfile.spells[0].ability = iceSpell;
+                Check.Equal(true, (bool)import.Invoke(null,[p.pawn])!, "valid fire/ice pair recognized");
+                Check.Equal(2, comp.State.Disciplines.Count, "both paths committed");
+                Check.Equal(InitiationStage.Foundation, comp.State.Find("rwom.ice").Stage, "ice");
+                Check.Equal(InitiationStage.Foundation, comp.State.Find("rwom.fire").Stage, "fire");
+                Check.Equal(true, ice.learned && fire.learned, "both learned owners preserved");
+            }
+            finally { DefDatabase<ClassDisciplineDef>.Clear(); foreach (var def in saved) DefDatabase<ClassDisciplineDef>.Add(def); }
+        });
+        foreach(int mask in new[]{1,2,3})
+        yield return new("LegacyConversion.HybridPaidUltimates."+mask,f=>
+        {
+            using var map=new MapScope();
+            GrimoireProgressionTests.LoadBaseDefinitions(f);
+            var saved=DefDatabase<ClassDisciplineDef>.AllDefsListForReading.ToArray();
+            try
+            {
+                DefDatabase<ClassDisciplineDef>.Clear();
+                var p=GrimoireProgressionTests.PawnWithComps(true,false);
+                var comp=new CompClassProgression{parent=p.pawn};p.pawn.AllComps.Add(comp);
+                var data=p.magic.MagicData;
+                foreach(var (id,trait,list,pool,ult) in new[]{
+                    ("rwom.fire",TorannMagicDefOf.InnerFire,"magicPowerIF",data.MagicPowersIF,TorannMagicDefOf.TM_Firestorm),
+                    ("rwom.ice",TorannMagicDefOf.HeartOfFrost,"magicPowerHoF",data.MagicPowersHoF,TorannMagicDefOf.TM_Blizzard)})
+                {
+                    p.pawn.story.traits.allTraits.Add(new Trait(trait));
+                    DefDatabase<ClassDisciplineDef>.Add(new ClassDisciplineDef{defName="Import"+trait.defName,profileId=id,
+                        domain=DisciplineDomain.Magic,legacyTrait=trait,magicPowerList=list,foundationBook=(ThingDef)RuntimeHelpers.GetUninitializedObject(typeof(ThingDef)),
+                        spells=[new DisciplineSpell{ability=(TMAbilityDef)pool[0].TMabilityDefs[0],stage=InitiationStage.Foundation},
+                            new DisciplineSpell{ability=ult,stage=InitiationStage.Ascended}]});
+                }
+                p.magic.spell_Firestorm=(mask&1)!=0;p.magic.spell_Blizzard=(mask&2)!=0;
+                var import=typeof(ClassInitiation).Assembly.GetType("TorannMagic.ClassProgression.LegacyClassConversion")!.GetMethod("TryImport",BindingFlags.Static|BindingFlags.NonPublic)!;
+                import.Invoke(null,[p.pawn]);
+                var state=comp.State;
+                if(mask!=3)
+                {
+                    Check.Equal(InitiationStage.Ascended,state.Find(mask==1?"rwom.fire":"rwom.ice").Stage,"only previously paid path ascends");
+                    Check.Equal(1,state.Disciplines.Count(x=>x.Stage==InitiationStage.Ascended),"one ultimate");
+                    return;
+                }
+                Check.Equal(0,state.Disciplines.Count(x=>x.Stage==InitiationStage.Ascended),"two prior scrolls require explicit choice");
+                p.pawn.thingIDNumber=22878;
+                var loaded=RoundTrip(f,new Envelope{magic=data,progression=comp},"hybrid-paid-choice",owner:p.pawn);
+                state=loaded.progression.State;
+                var choose=typeof(ClassProgressionState).GetMethod("ChooseImportedElement",BindingFlags.Instance|BindingFlags.NonPublic)!;
+                Check.Equal(false,(bool)choose.Invoke(state,["rwom.priest"])!,"no unrelated path");
+                Check.Equal(true,(bool)choose.Invoke(state,["rwom.ice"])!,"saved choice available");
+                Check.Equal(false,(bool)choose.Invoke(state,["rwom.fire"])!,"choice cannot be repeated");
+                Check.Equal(true,p.magic.spell_Firestorm && p.magic.spell_Blizzard,"neither previously learned spell lost");
+            }
+            finally{DefDatabase<ClassDisciplineDef>.Clear();foreach(var d in saved)DefDatabase<ClassDisciplineDef>.Add(d);}
+        });
+        foreach (bool paid in new[]{false,true})
+        foreach (bool previouslyImported in new[]{false,true})
+        yield return new($"LegacyConversion.PriestAscension.Paid{paid}.OldBeta{previouslyImported}", f =>
+        {
+            using var map=new MapScope();
+            GrimoireProgressionTests.LoadBaseDefinitions(f);
+            var saved=DefDatabase<ClassDisciplineDef>.AllDefsListForReading.ToArray();
+            bool beforeBeta=ClassProgressionFeature.Enabled;
+            try
+            {
+                ClassProgressionFeature.Enabled=true;
+                DefDatabase<ClassDisciplineDef>.Clear();
+                var p=GrimoireProgressionTests.PawnWithComps(true,false);
+                p.pawn.story.traits.allTraits.Add(new Trait(TorannMagicDefOf.Priest));
+                var comp=new CompClassProgression{parent=p.pawn};p.pawn.AllComps.Add(comp);
+                var data=p.magic.MagicData;
+                var owners=data.MagicPowersPR;
+                var ultimate=owners.Single(o=>o.TMabilityDefs.Contains(TorannMagicDefOf.TM_Resurrection));
+                owners[0].learned=true;
+                ultimate.learned=true; // Legacy Scribe defaults to true when the node is absent.
+                if(previouslyImported && !paid)ultimate.level=ultimate.TMabilityDefs.Count; // No such rank in this family.
+                ultimate.ticksUntilNextCast=219;
+                p.magic.spell_Resurrection=paid;
+                data.MagicUserLevel=27;data.MagicAbilityPoints=4;
+                DefDatabase<ClassDisciplineDef>.Add(new ClassDisciplineDef{defName="ImportPriest",profileId="rwom.priest",
+                    domain=DisciplineDomain.Magic,legacyTrait=TorannMagicDefOf.Priest,magicPowerList="magicPowerPR",
+                    foundationBook=(ThingDef)RuntimeHelpers.GetUninitializedObject(typeof(ThingDef)),
+                    spells=[new DisciplineSpell{ability=(TMAbilityDef)owners[0].TMabilityDefs[0],stage=InitiationStage.Foundation},
+                        new DisciplineSpell{ability=TorannMagicDefOf.TM_Resurrection,stage=InitiationStage.Ascended}]});
+                if(previouslyImported)
+                {
+                    comp.BeginNewProgression(Vocation.Mage);
+                    comp.State.TryAddFoundation("rwom.priest",DisciplineDomain.Magic);
+                    GrimoireProgressionTests.Set(comp.State.Find("rwom.priest"),"ImportedTrait",TorannMagicDefOf.Priest.defName);
+                }
+                var import=typeof(ClassInitiation).Assembly.GetType("TorannMagic.ClassProgression.LegacyClassConversion")!.GetMethod("TryImport",BindingFlags.Static|BindingFlags.NonPublic)!;
+                import.Invoke(null,[p.pawn]);
+                var expected=paid?InitiationStage.Ascended:InitiationStage.Foundation;
+                Check.Equal(expected,comp.State.Find("rwom.priest").Stage,"recognize only actual old scroll ownership");
+                p.magic.spell_Resurrection=!paid;
+                import.Invoke(null,[p.pawn]);
+                Check.Equal(expected,comp.State.Find("rwom.priest").Stage,"finished migration never reevaluates a later grant or removal");
+                Check.Same(ultimate,data.MagicPowersPR.Last(),"native owner kept");
+                Check.Equal(219,ultimate.ticksUntilNextCast,"cooldown kept");Check.Equal(4,data.MagicAbilityPoints,"points kept");
+                p.pawn.thingIDNumber=19724;
+                ClassProgressionFeature.Enabled=false;
+                var restored=RoundTrip(f,new Envelope{progression=comp,magic=data},"paid-ultimate-"+paid+"-"+previouslyImported,owner:p.pawn);
+                p.pawn.AllComps.Remove(comp);restored.progression.parent=p.pawn;p.pawn.AllComps.Add(restored.progression);
+                Check.Equal(false,(bool)import.Invoke(null,[p.pawn])!,"disabled beta leaves old import alone");
+                ClassProgressionFeature.Enabled=true;
+                import.Invoke(null,[p.pawn]);
+                Check.Equal(expected,restored.progression.State.Find("rwom.priest").Stage,"Scribe and beta off/on preserve the original decision");
+                Check.Equal(27,restored.magic.MagicUserLevel,"level survives beta-off save");
+            }
+            finally{ClassProgressionFeature.Enabled=beforeBeta;DefDatabase<ClassDisciplineDef>.Clear();foreach(var d in saved)DefDatabase<ClassDisciplineDef>.Add(d);}
+        });
+
+        yield return new("LegacyConversion.LeveledPriestRetainsOwnersAndCanGainLevel", f =>
+        {
+            using var map = new MapScope();
+            GrimoireProgressionTests.LoadBaseDefinitions(f);
+            var saved = DefDatabase<ClassDisciplineDef>.AllDefsListForReading.ToArray();
+            var enabled = ClassProgressionFeature.Enabled;
+            try
+            {
+                DefDatabase<ClassDisciplineDef>.Clear();
+                var p = GrimoireProgressionTests.PawnWithComps(true, false);
+                p.pawn.story.traits.allTraits.Add(new Trait(TorannMagicDefOf.Priest));
+                var comp = new CompClassProgression { parent = p.pawn }; p.pawn.AllComps.Add(comp);
+                var data = p.magic.MagicData;
+                var powers = data.MagicPowersPR;
+                var heal = powers[2]; heal.learned = true; heal.level = 2; heal.autocast = true; heal.ticksUntilNextCast = 193;
+                powers[0].learned = true;
+                data.MagicUserLevel = 17; data.MagicUserXP = 321; data.MagicAbilityPoints = 7;
+                DefDatabase<ClassDisciplineDef>.Add(new ClassDisciplineDef { defName = "ImportPriest", profileId = "rwom.priest",
+                    domain = DisciplineDomain.Magic, legacyTrait = TorannMagicDefOf.Priest, magicPowerList = "magicPowerPR",
+                    foundationBook = (ThingDef)RuntimeHelpers.GetUninitializedObject(typeof(ThingDef)),
+                    spells = [new DisciplineSpell { ability = (TMAbilityDef)powers[0].TMabilityDefs[0], stage = InitiationStage.Foundation },
+                        new DisciplineSpell { ability = (TMAbilityDef)powers[2].TMabilityDefs[0], stage = InitiationStage.Adept }] });
+                var import = typeof(ClassInitiation).Assembly.GetType("TorannMagic.ClassProgression.LegacyClassConversion")!.GetMethod("TryImport", BindingFlags.NonPublic | BindingFlags.Static)!;
+                bool Run() => (bool)import.Invoke(null, [p.pawn])!;
+                ClassProgressionFeature.Enabled = false; Check.Equal(false, Run(), "beta off leaves legacy pawn alone");
+                ClassProgressionFeature.Enabled = true; Check.Equal(true, Run(), "first enabled load adopts existing class");
+                Check.Equal(false, Run(), "repeat is idempotent");
+                Check.Equal(InitiationStage.Adept, comp.State.Find("rwom.priest").Stage, "recorded known tier");
+                Check.Same(heal, p.magic.MagicData.MagicPowersPR[2], "existing rank owner retained");
+                Check.Equal(2, heal.level, "rank"); Check.Equal(true, heal.autocast, "autocast"); Check.Equal(193, heal.ticksUntilNextCast, "timer");
+                Check.Equal(321,data.MagicUserXP,"XP"); Check.Equal(7,data.MagicAbilityPoints,"unspent points");
+                string? label = data.AllMagicPowerSkills.First().label;
+                data.AllMagicPowerSkills.First().level = 2;
+                p.pawn.thingIDNumber = 17423;
+                var restored = RoundTrip(f, new Envelope { magic = data, progression = comp }, "imported-priest", owner: p.pawn);
+                Check.Equal(InitiationStage.Adept, restored.progression.State.Find("rwom.priest").Stage, "converted stage survives Scribe");
+                var restoredPower = restored.magic.MagicPowersPR[2];
+                Check.Equal(2, restoredPower.level, "reloaded rank"); Check.Equal(true, restoredPower.autocast, "reloaded autocast");
+                Check.Equal(193, restoredPower.ticksUntilNextCast, "reloaded cooldown");
+                Check.Equal(2, restored.magic.AllMagicPowerSkills.First(s => s.label == label).level, "reloaded skill investment");
+                p.magic.LevelUp(true);
+                Check.Equal(18,data.MagicUserLevel,"native level gain continues after conversion");
+                Check.Equal(true,data.MagicAbilityPoints > 7,"next level awards points");
+            }
+            finally
+            {
+                ClassProgressionFeature.Enabled = enabled;
+                DefDatabase<ClassDisciplineDef>.Clear(); foreach (var def in saved) DefDatabase<ClassDisciplineDef>.Add(def);
+            }
+        });
         yield return new("ClassInitiation.EmptyComponentsRemainClassic", f =>
         {
             GrimoireProgressionTests.LoadBaseDefinitions(f);
@@ -413,9 +687,19 @@ internal static class ClassInitiationTests
         yield return new("ClassInitiation.BootstrapIsPassiveAndIdempotent", f =>
         {
             var human = (ThingDef)RuntimeHelpers.GetUninitializedObject(typeof(ThingDef));
+            human.category = ThingCategory.Pawn; human.thingClass = typeof(Pawn);
             human.race = new RaceProperties { intelligence = Intelligence.Humanlike }; human.comps = [];
             ClassProgressionBootstrap.EnsureComp(human); ClassProgressionBootstrap.EnsureComp(human);
             Check.Equal(1, human.comps.Count(p => p.compClass == typeof(CompClassProgression)), "no duplicate pawn component");
+            var corpse = (ThingDef)RuntimeHelpers.GetUninitializedObject(typeof(ThingDef));
+            corpse.category = ThingCategory.Item; corpse.thingClass = typeof(Corpse); corpse.race = human.race; corpse.comps = [];
+            ClassProgressionBootstrap.EnsureComp(corpse);
+            Check.Equal(0, corpse.comps.Count, "generated corpse sharing human race properties has no pawn components");
+            var corpseComp = new CompClassProgression { parent = new Corpse { def = corpse } };
+            var incoming = new DamageInfo(new DamageDef { defName = "TestDeterioration" }, 1);
+            corpseComp.PostPreApplyDamage(ref incoming, out bool absorbed);
+            Check.Equal(false, absorbed, "existing non-pawn holder cannot intercept deterioration");
+            Check.Equal(1f, incoming.Amount, "native corpse damage unchanged");
             var animal = (ThingDef)RuntimeHelpers.GetUninitializedObject(typeof(ThingDef)); animal.race = new RaceProperties { intelligence = Intelligence.Animal }; animal.comps = [];
             ClassProgressionBootstrap.EnsureComp(animal);
             Check.Equal(0, animal.comps.Count, "animals not enrolled");

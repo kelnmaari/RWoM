@@ -12,6 +12,7 @@ namespace TorannMagic
     {
         static SpellIdentityBootstrap()
         {
+            if (!CoreBridge.Available) return;
             foreach (TMAbilityDef def in DefDatabase<TMAbilityDef>.AllDefsListForReading)
                 CoreBridge.RegisterSpell(def);
         }

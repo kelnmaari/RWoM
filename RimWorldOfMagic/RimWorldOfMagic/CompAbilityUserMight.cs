@@ -159,9 +159,19 @@ namespace TorannMagic
         {
             useCQCToggle = !useCQCToggle;
         }
+        internal Command_Toggle MakeCqcCommand(Action action)
+        {
+            return new Command_Toggle {
+                defaultLabel=(useCQCToggle?"TM_CQCEnabled":"TM_CQCDisabled").Translate(),
+                defaultDesc="TM_CQCToggleDesc".Translate(), Order=-90,
+                icon=ContentFinder<Texture2D>.Get("UI/cqc",true),
+                isActive=()=>useCQCToggle,toggleAction=action
+            };
+        }
         public List<Thing> combatItems = new List<Thing>();
         public int allowMeditateTick = 0;
         public ThingOwner<ThingWithComps> equipmentContainer = new ThingOwner<ThingWithComps>();
+        internal ClassProgression.SuperSoldierWeaponBinding specializedWeapon = new();
         public int specWpnRegNum = -1;        
 
         public Verb_Deflected deflectVerb;
@@ -883,6 +893,12 @@ namespace TorannMagic
         {
             Pawn abilityUser = base.Pawn;
             bool flag2;
+            if (ClassProgression.ClassIdentity.TryGetState(abilityUser, out var progression)
+                && (progression.Find("rwom.wanderer") != null || progression.Disciplines.Any(path => path.Domain == ClassProgression.DisciplineDomain.Might)))
+            {
+                mightPowersInitialized = true;
+                return;
+            }
             MightData.MightUserLevel = 0;
             MightData.MightAbilityPoints = 0;
             List<TMAbilityDef> usedAbilities = new List<TMAbilityDef>();
@@ -2076,6 +2092,10 @@ namespace TorannMagic
 
         public float ActualHediffCost(TMAbilityDef mightDef)
         {
+            if (mightDef?.defName == ClassProgression.PsionicMartialPath.Crucible)
+                return .60f * ClassProgression.PsionicMartialPath.Capacity(Pawn);
+            if (mightDef?.defName == ClassProgression.ApothecaryMartialPath.Kit || mightDef?.defName == ClassProgression.ApothecaryMartialPath.Toxin)
+                return mightDef.hediffCost * (ClassProgression.ApothecaryMartialPath.Stock(Pawn)?.MaxSeverity ?? 100f) / 100f;
             float num = 1f;
             if (mightDef != null && MightData.GetSkill_Efficiency(mightDef) != null)
             {
@@ -2109,6 +2129,12 @@ namespace TorannMagic
 
         public float ActualStaminaCost(TMAbilityDef mightDef)
         {
+            if (mightDef.abilityClass == typeof(ClassProgression.SniperOpeningAbility) ||
+                mightDef.abilityClass == typeof(ClassProgression.BladeFormAbility) ||
+                mightDef.abilityClass == typeof(ClassProgression.RangerHuntAbility) ||
+                mightDef.abilityClass == typeof(ClassProgression.PsionicCrucibleAbility) ||
+                mightDef.abilityClass == typeof(ClassProgression.CommanderOperationAbility))
+                return mightDef.staminaCost * (Stamina?.MaxLevel ?? 1f);
             float adjustedStaminaCost = mightDef.staminaCost;
             if (mightDef.efficiencyReductionPercent != 0)
             {                
@@ -3004,7 +3030,7 @@ namespace TorannMagic
                                 {
                                     if (this.Pawn.equipment.Primary != null && this.Pawn.equipment.Primary.def.IsRangedWeapon)
                                     {
-                                        if (this.specWpnRegNum != -1)
+                                        if (ClassProgression.SuperSoldierWeaponProfile.ReadyWeapon(this.Pawn))
                                         {
                                             if (current.abilityDef == TorannMagicDefOf.TM_PistolWhip)
                                             {
@@ -3570,7 +3596,7 @@ namespace TorannMagic
                                 {
                                     if (this.Pawn.equipment.Primary != null && this.Pawn.equipment.Primary.def.IsRangedWeapon)
                                     {
-                                        if (this.specWpnRegNum != -1)
+                                        if (ClassProgression.SuperSoldierWeaponProfile.ReadyWeapon(this.Pawn))
                                         {
                                             if (current.abilityDef == TorannMagicDefOf.TM_PistolWhip)
                                             {
@@ -3942,7 +3968,8 @@ namespace TorannMagic
                     }
                 }
 
-                if (this.Pawn.story.traits.HasTrait(TorannMagicDefOf.Gladiator) || (this.customClass != null && this.customClass.classFighterAbilities.Contains(TorannMagicDefOf.TM_Fortitude)))
+                if (this.Pawn.story.traits.HasTrait(TorannMagicDefOf.Gladiator) || (this.customClass != null && this.customClass.classFighterAbilities.Contains(TorannMagicDefOf.TM_Fortitude))
+                    || ClassProgression.JobDriver_GladiatorDefense.Path(Pawn)?.Defense == ClassProgression.GladiatorDefense.Fortitude)
                 {
                     if (!this.Pawn.health.hediffSet.HasHediff(TorannMagicDefOf.TM_HediffFortitude))
                     {
@@ -3953,7 +3980,7 @@ namespace TorannMagic
                 if (this.Pawn.health.hediffSet.HasHediff(TorannMagicDefOf.TM_HediffSprint))
                 {
                     Hediff rec = this.Pawn.health.hediffSet.GetFirstHediffOfDef(TorannMagicDefOf.TM_HediffSprint, false);
-                    if (rec != null && rec.Severity != (.5f + this.MightData.MightPowerSkill_Sprint.FirstOrDefault((MightPowerSkill x) => x.label == "TM_Sprint_pwr").level))
+                    if (rec != null && !ClassProgression.SpiritHostedStance.Projected(rec) && rec.Severity != (.5f + this.MightData.MightPowerSkill_Sprint.FirstOrDefault((MightPowerSkill x) => x.label == "TM_Sprint_pwr").level))
                     {
                         this.Pawn.health.RemoveHediff(rec);
                         HealthUtility.AdjustSeverity(this.Pawn, TorannMagicDefOf.TM_HediffSprint, (.5f + this.MightData.MightPowerSkill_Sprint.FirstOrDefault((MightPowerSkill x) => x.label == "TM_Sprint_pwr").level));
@@ -4065,7 +4092,7 @@ namespace TorannMagic
                     }
                 }
 
-                if (this.Pawn.story.traits.HasTrait(TorannMagicDefOf.DeathKnight) || (this.customClass != null && (this.customClass.classFighterAbilities.Contains(TorannMagicDefOf.TM_Shroud) || this.customClass.classHediff == TorannMagicDefOf.TM_HateHD)))
+                if (ClassProgression.DeathKnightMartialPath.IsKnight(this.Pawn) || (this.customClass != null && (this.customClass.classFighterAbilities.Contains(TorannMagicDefOf.TM_Shroud) || this.customClass.classHediff == TorannMagicDefOf.TM_HateHD)))
                 {
                     int hatePwr = this.MightData.MightPowerSkill_Shroud.FirstOrDefault((MightPowerSkill x) => x.label == "TM_Shroud_pwr").level;
                     float sevSvr = 0;
@@ -4169,6 +4196,7 @@ namespace TorannMagic
                         while (enumerator.MoveNext())
                         {
                             Hediff rec = enumerator.Current;
+                            if (ClassProgression.SpiritHostedStance.Projected(rec)) continue;
                             if (rec.def == TorannMagicDefOf.TM_HediffHeavyBlow && rec.Severity != (.95f + (.19f * pwrVal)))
                             {
                                 rec.Severity = .95f + (.19f * pwrVal);
@@ -4279,7 +4307,13 @@ namespace TorannMagic
             return base.CompGetGizmosExtra();
         }
 
-        private void ResolveSustainedSkills()
+        internal void RefreshSpiritEconomy()
+        {
+            if (ExistingMightData != null && Pawn?.story?.traits != null && Pawn.apparel != null)
+                ResolveSustainedSkills(false);
+        }
+
+        private void ResolveSustainedSkills(bool physicalBody = true)
         {
             float _maxSP = 0;
             float _maxSPUpkeep = 0;
@@ -4415,7 +4449,7 @@ namespace TorannMagic
                         _arcaneDmg += item.arcaneDmg * enchantmentFactor;
 
                     }
-                    if (this.Pawn.story != null && this.Pawn.story.traits.HasTrait(TorannMagicDefOf.TM_Monk) && this.Pawn.Faction != null && this.Pawn.Faction.HostileTo(Faction.OfPlayer))
+                    if (physicalBody && this.Pawn.story != null && this.Pawn.story.traits.HasTrait(TorannMagicDefOf.TM_Monk) && this.Pawn.Faction != null && this.Pawn.Faction.HostileTo(Faction.OfPlayer))
                     {
                         ThingWithComps outItem;
                         this.Pawn.equipment.TryDropEquipment(this.Pawn.equipment.Primary, out outItem, this.Pawn.Position, true);
@@ -4429,7 +4463,8 @@ namespace TorannMagic
                 while (enumerator.MoveNext())
                 {
                     Hediff rec = enumerator.Current;
-                    TMAbilityDef ability = this.MightData.GetHediffAbility(rec);
+                    TMAbilityDef ability = ClassProgression.SpiritHostedStance.Projected(rec)
+                        ? null : this.MightData.GetHediffAbility(rec);
                     if (ability != null)
                     {
                         MightPowerSkill skill = this.MightData.GetSkill_Efficiency(ability);
@@ -4455,27 +4490,30 @@ namespace TorannMagic
             if (this.bondedPet != null)
             {
                 _maxSPUpkeep += (TorannMagicDefOf.TM_AnimalFriend.upkeepEnergyCost * (1f - (TorannMagicDefOf.TM_AnimalFriend.upkeepEfficiencyPercent * this.MightData.GetSkill_Efficiency(TorannMagicDefOf.TM_AnimalFriend).level)));
-                if (this.bondedPet.Dead || this.bondedPet.Destroyed)
+                if (physicalBody)
                 {
-                    if(this.bondedPet.Dead)
+                    if (this.bondedPet.Dead || this.bondedPet.Destroyed)
                     {
-                        this.bondedPet.health.RemoveHediff(this.bondedPet.health.hediffSet.GetFirstHediffOfDef(TorannMagicDefOf.TM_RangerBondHD, false));
+                        if(this.bondedPet.Dead)
+                        {
+                            this.bondedPet.health.RemoveHediff(this.bondedPet.health.hediffSet.GetFirstHediffOfDef(TorannMagicDefOf.TM_RangerBondHD, false));
+                        }
+                        this.Pawn.needs.mood.thoughts.memories.TryGainMemory(TorannMagicDefOf.RangerPetDied, null);
+                        this.bondedPet = null;
                     }
-                    this.Pawn.needs.mood.thoughts.memories.TryGainMemory(TorannMagicDefOf.RangerPetDied, null);
-                    this.bondedPet = null;
-                }
-                else if (this.bondedPet.Faction != null && this.bondedPet.Faction != this.Pawn.Faction)
-                {
-                    //sold? punish evil
-                    this.Pawn.needs.mood.thoughts.memories.TryGainMemory(TorannMagicDefOf.RangerSoldBondedPet, null);
-                    this.bondedPet = null;
-                }
-                else if(!this.bondedPet.health.hediffSet.HasHediff(TorannMagicDefOf.TM_RangerBondHD))
-                {
-                    HediffComp_RangerBond.ApplyPetBond(Pawn,bondedPet,.5f);
+                    else if (this.bondedPet.Faction != null && this.bondedPet.Faction != this.Pawn.Faction)
+                    {
+                        //sold? punish evil
+                        this.Pawn.needs.mood.thoughts.memories.TryGainMemory(TorannMagicDefOf.RangerSoldBondedPet, null);
+                        this.bondedPet = null;
+                    }
+                    else if(!this.bondedPet.health.hediffSet.HasHediff(TorannMagicDefOf.TM_RangerBondHD))
+                    {
+                        HediffComp_RangerBond.ApplyPetBond(Pawn,bondedPet,.5f);
+                    }
                 }
             }
-            if (this.Pawn.needs?.mood?.thoughts?.memories != null)
+            if (physicalBody && this.Pawn.needs?.mood?.thoughts?.memories != null)
             {
                 if (this.Pawn.needs.mood.thoughts.memories.NumMemoriesOfDef(ThoughtDef.Named("RangerSoldBondedPet")) > 0)
                 {
@@ -4495,7 +4533,7 @@ namespace TorannMagic
                 }
             }
 
-            if(MightData.MightAbilityPoints < 0)
+            if(physicalBody && MightData.MightAbilityPoints < 0)
             {
                 MightData.MightAbilityPoints = 0;
             }      
@@ -4540,7 +4578,7 @@ namespace TorannMagic
             this.arcaneRes = 1 + _arcaneRes;
             this.mightPwr = 1 + _arcaneDmg;
 
-            if (this.IsMightUser && !TM_Calc.IsCrossClass(this.Pawn, false))
+            if (physicalBody && this.IsMightUser && !TM_Calc.IsCrossClass(this.Pawn, false))
             {
                 if (_maxSP != 0 && !this.Pawn.health.hediffSet.HasHediff(HediffDef.Named("TM_HediffEnchantment_maxEnergy")))
                 {
@@ -4661,6 +4699,8 @@ namespace TorannMagic
             Scribe_Values.Look<bool>(ref this.mightPowersInitialized, "mightPowersInitialized", false, false);
             Scribe_Collections.Look<Thing>(ref this.combatItems, "combatItems", LookMode.Reference);
             Scribe_Deep.Look(ref this.equipmentContainer, "equipmentContainer", new object[0]);
+            Scribe_Deep.Look(ref specializedWeapon, "TM_specializedWeapon");
+            specializedWeapon ??= new();
             Scribe_References.Look<Pawn>(ref this.bondedPet, "bondedPet", false);
             Scribe_Values.Look<bool>(ref this.skill_GearRepair, "skill_GearRepair", false, false);
             Scribe_Values.Look<bool>(ref this.skill_InnerHealing, "skill_InnerHealing", false, false);
@@ -5151,46 +5191,14 @@ namespace TorannMagic
                         this.AddPawnAbility(TorannMagicDefOf.TM_60mmMortar);                        
                     }
                 }
-                if (this.equipmentContainer != null && this.equipmentContainer.Count > 0)
+                try
                 {
-                    //Thing outThing = new Thing();
-                    try
-                    {
-                        //Log.Message("primary is " + this.Pawn.equipment.Primary);
-                        //Log.Message("equipment container is " + this.equipmentContainer[0]);                        
-                        for (int i = 0; i < this.Pawn.equipment.AllEquipmentListForReading.Count; i++)
-                        {
-                            ThingWithComps t = this.Pawn.equipment.AllEquipmentListForReading[i];
-                            if (t.def.defName.Contains("Spec_Base"))
-                            {
-                                t.Destroy(DestroyMode.Vanish);
-                            }
-                        }
-                        if(ModCheck.Validate.SimpleSidearms.IsInitialized())
-                        {
-                            ModCheck.SS.ClearWeaponMemory(this.Pawn);
-                        }
-                        if (this.specWpnRegNum == -1)
-                        {
-                            if (this.MightData.MightPowersSS.FirstOrDefault<MightPower>((MightPower x) => x.abilityDef == TorannMagicDefOf.TM_PistolSpec).learned)
-                            {
-                                TM_Action.DoAction_PistolSpecCopy(this.Pawn, this.equipmentContainer[0]);
-                            }
-                            else if (this.MightData.MightPowersSS.FirstOrDefault<MightPower>((MightPower x) => x.abilityDef == TorannMagicDefOf.TM_RifleSpec).learned)
-                            {
-                                TM_Action.DoAction_RifleSpecCopy(this.Pawn, this.equipmentContainer[0]);
-                            }
-                            else if (this.MightData.MightPowersSS.FirstOrDefault<MightPower>((MightPower x) => x.abilityDef == TorannMagicDefOf.TM_ShotgunSpec).learned)
-                            {
-                                TM_Action.DoAction_ShotgunSpecCopy(this.Pawn, this.equipmentContainer[0]);
-                            }
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        Log.Message("exception on load: " + ex);
-                        //do nothing
-                    }
+                    if (ClassProgression.SuperSoldierWeaponReload.Rebuild(this) && ModCheck.Validate.SimpleSidearms.IsInitialized())
+                        ModCheck.SS.ClearWeaponMemory(this.Pawn);
+                }
+                catch (Exception ex)
+                {
+                    Log.Message("Specialized weapon reload retained existing equipment after failure: " + ex);
                 }
                 this.UpdateAutocastDef();
                 this.InitializeSkill();

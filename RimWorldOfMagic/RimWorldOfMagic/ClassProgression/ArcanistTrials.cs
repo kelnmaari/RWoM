@@ -30,7 +30,7 @@ namespace TorannMagic.ClassProgression
         }
         static DisciplineProgress Owned(Pawn pawn, Spell spell)
         {
-            if (pawn == null || pawn.Dead || !pawn.Spawned || pawn.Faction == null || pawn.story?.traits?.HasTrait(TorannMagicDefOf.Faceless) == true
+            if (pawn == null || pawn.Dead || CastingBody(pawn)?.Spawned != true || pawn.Faction == null || pawn.story?.traits?.HasTrait(TorannMagicDefOf.Faceless) == true
                 || !ClassIdentity.TryGetState(pawn, out var state) || (state.Vocation & Vocation.Mage) == 0) return null;
             var path = state.Find("rwom.arcanist");
             var stage = spell == Spell.Missile || spell == Spell.Blink ? InitiationStage.Foundation : InitiationStage.Adept;
@@ -52,12 +52,18 @@ namespace TorannMagic.ClassProgression
             internal IntVec3 origin, destination;
             internal bool used;
         }
+        private static Pawn CastingBody(Pawn caster)
+        {
+            if (caster == null || caster.Spawned) return caster;
+            return SpiritRebirthState.TryGet(caster, out var state) && state.HasValidHost(caster) ? state.Host : null;
+        }
         public static Movement CaptureMove(PawnAbility ability, Thing target, Spell spell)
         {
             var path = Owned(ability, spell);
-            if (path == null || target == null || !target.Spawned || target.Map != ability.Pawn.Map
-                || (spell != Spell.Blink && spell != Spell.Summon) || (spell == Spell.Blink ? target != ability.Pawn : target.def.category != ThingCategory.Item)) return null;
-            return new Movement { path = path, caster = ability.Pawn, map = target.Map, origin = target.Position, destination = ability.Pawn.Position };
+            var body = CastingBody(ability?.Pawn);
+            if (path == null || body == null || target == null || !target.Spawned || target.Map != body.Map
+                || (spell != Spell.Blink && spell != Spell.Summon) || (spell == Spell.Blink ? target != body : target.def.category != ThingCategory.Item)) return null;
+            return new Movement { path = path, caster = body, map = target.Map, origin = target.Position, destination = body.Position };
         }
         public static void CompleteBlink(Movement move)
         {
@@ -100,9 +106,10 @@ namespace TorannMagic.ClassProgression
         {
             auras.TryGetValue(source, out var tag);
             var caster = source.pawn;
+            var emitter = source.TryGetComp<HediffComp_Aura>()?.ProjectedHost ?? caster;
             var path = source.def == TorannMagicDefOf.TM_Shadow_AuraHD && tag?.casterId == caster?.thingIDNumber
                 && (effect == TorannMagicDefOf.Shadow || effect == TorannMagicDefOf.Shadow_I || effect == TorannMagicDefOf.Shadow_II || effect == TorannMagicDefOf.Shadow_III)
-                && recipient != null && recipient != caster && !recipient.Dead && recipient.Spawned && recipient.Map == caster.Map && recipient.Faction == caster.Faction
+                && recipient != null && recipient != emitter && !recipient.Dead && recipient.Spawned && recipient.Map == emitter.Map && recipient.Faction == emitter.Faction
                 && !recipient.IsPrisoner && !recipient.IsSlave && !recipient.RaceProps.Animal && caster.health.hediffSet.hediffs.Contains(source) ? Owned(caster, Spell.Shadow) : null;
             float before = path != null ? recipient.health.hediffSet.GetFirstHediffOfDef(effect)?.Severity ?? 0 : 0;
             IceTrials.ApplyAura(source, recipient, effect);
@@ -119,6 +126,11 @@ namespace TorannMagic.ClassProgression
             return previous;
         }
         public static void EndLaunch(Tag previous) => launching = previous;
+        internal static void StampHostedMissile(Projectile_AbilityBase missile, MagicAbility ability)
+        {
+            projectiles.Remove(missile);
+            if (Owned(ability, Spell.Missile) != null) projectiles.Add(missile, new Tag { casterId = ability.Pawn.thingIDNumber });
+        }
         public static void Launched(Projectile_AbilityBase projectile, Thing caster, AbilityUser.AbilityDef ability)
         {
             var tag = launching; launching = null; projectiles.Remove(projectile);
@@ -150,7 +162,7 @@ namespace TorannMagic.ClassProgression
             impact = null;
             var hit = new Hit { previous = source };
             var pawn = victim as Pawn; var caster = source.caster;
-            if (source.victim == victim && damage.Instigator == caster && damage.Def?.defName == "TM_MagicMissile" && pawn != null && !pawn.Dead && pawn.Spawned && pawn.Map == caster.Map
+            if (source.victim == victim && damage.Instigator == caster && damage.Def?.defName == "TM_MagicMissile" && pawn != null && !pawn.Dead && pawn.Spawned && pawn.Map == CastingBody(caster)?.Map
                 && !pawn.IsPrisoner && !pawn.IsSlave && pawn.HostileTo(caster) && (pawn.Faction == null ? pawn.InAggroMentalState : pawn.Faction != caster.Faction && pawn.Faction.HostileTo(caster.Faction)))
                 hit.path = Owned(caster, Spell.Missile);
             return hit;

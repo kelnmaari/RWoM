@@ -48,6 +48,17 @@ internal static class SpiritTerminalLossTests
             Check.Same(owner, c.Original.holdingOwner, "same actual stone custody remains");
             RuntimeLog.AssertClean();
         }, false));
+        yield return new("SpiritMapLoss.RetryAfterNativeDestroy", r => SpiritCaravanLossNativeTests.Run(r, (c, stone) =>
+        {
+            var method = typeof(SpiritRebirthState).Assembly.GetType("TorannMagic.ClassProgression.SpiritRebirthTerminalLoss")!
+                .GetMethod("TryDiscardOnTerminalLoss", BindingFlags.Static | BindingFlags.NonPublic)!;
+            using var observation = new DestroyBoundary(pawn => { if (pawn == c.Original) throw new InvalidOperationException("map retry probe"); }, true);
+            Check.Equal("Completed", method.Invoke(null, [c.Original, stone.GetDirectlyHeldThings()])!.ToString(), "authorized native continuation finished");
+            var problems = (List<string>)typeof(RuntimeLog).GetField("Problems", BindingFlags.Static | BindingFlags.NonPublic)!.GetValue(null)!;
+            Check.Equal(1, problems.Count, "one diagnostic for the injected failure");
+            Check.Equal(true, problems[0].Contains("map retry probe"), "original diagnostic retained");
+            RuntimeLog.Clear();
+        }));
         yield return new("SpiritTerminalLoss.NativePartialFailureClearsGuardAndPropagates", r => SpiritCaravanLossNativeTests.Run(r, (c, stone) =>
         {
             var owner = stone.GetDirectlyHeldThings(); var injected = new InvalidOperationException("injected terminal post-destroy failure"); int calls = 0;

@@ -333,6 +333,18 @@ namespace TorannMagic.ModOptions
             }
         }
 
+        [DebugAction("RWoM", "T: Give mage foundation (new progression)...", actionType = DebugActionType.ToolMapForPawns, allowedGameStates = AllowedGameStates.PlayingOnMap)]
+        public static void GiveMageFoundation(Pawn pawn)
+        {
+            if (!ClassProgression.ClassProgressionFeature.Enabled || pawn?.story?.traits == null) return;
+            var options = ClassProgression.ClassInitiation.FoundationProfiles.OrderBy(p => p.label)
+                .Select(p => new FloatMenuOption(p.LabelCap, () => {
+                    if (!ClassProgression.ClassInitiation.TryGrantStartingFoundation(pawn, p.legacyTrait))
+                        Messages.Message("Requires a fresh pawn with no existing class or progression.", MessageTypeDefOf.RejectInput, false);
+                })).ToList();
+            if (options.Count > 0) Find.WindowStack.Add(new FloatMenu(options));
+        }
+
         [DebugAction("RWoM", "T: Give Class...", actionType = DebugActionType.ToolMapForPawns, allowedGameStates = AllowedGameStates.PlayingOnMap)]
         public static void GiveClass(Pawn pawn)
         {
@@ -401,7 +413,7 @@ namespace TorannMagic.ModOptions
         /// comp to re-run its own assignment (the same ResolveFactionChange path the
         /// game uses when a pawn joins the colony with a class).
         /// </summary>
-        private static void ApplyClassTrait(Pawn pawn, TraitDef classTrait, int traitDegree, int customIndex, TorannMagic.TMDefs.TM_CustomClass customClass, bool isMage, bool logGrant = true)
+        internal static bool ApplyClassTrait(Pawn pawn, TraitDef classTrait, int traitDegree, int customIndex, TorannMagic.TMDefs.TM_CustomClass customClass, bool isMage, bool logGrant = true)
         {
             try
             {
@@ -458,13 +470,11 @@ namespace TorannMagic.ModOptions
                     }
                 }
 
-                // Only re-init the side the new class belongs to: the other comp's
-                // data stays null until its own class trait appears, and its
-                // AssignAbilities would dereference it and throw. Spirit classes
-                // are always re-initialized: their traits are not in the builtin
-                // magic-trait index, so a stale IsMagicUser cache would skip the
-                // grant and later drop the grimoire entry point.
-                if (compMagic != null && (compMagic.IsMagicUser || spiritClass || possessedClass))
+                // A direct dev trait insertion does not run the normal GainTrait hooks.
+                // Resolve identity before discarding and rebuilding either data owner.
+                Utils.TM_PawnTracker.ResolveComps(pawn);
+                if (isMage && compMagic?.IsMagicUser != true) return false;
+                if (compMagic != null && compMagic.IsMagicUser)
                 {
                     if (customClass != null)
                     {
@@ -506,6 +516,8 @@ namespace TorannMagic.ModOptions
                 {
                     compMight.ResolveStamina();
                 }
+                if (classTrait == TorannMagicDefOf.Lich && !ClassProgression.ClassIdentity.TryGetState(pawn,out _) &&
+                    !ClassProgression.LichTransformation.GiveClassicDebugForm(compMagic)) return false;
 
                 // the spirit class bypasses GainTrait, and the active gene state
                 // must follow debug class changes just like gameplay ones
@@ -515,10 +527,12 @@ namespace TorannMagic.ModOptions
                 {
                     Compatibility.TM_Log.Message("Classes", $"Debug: granted class '{ClassTraitLabel(classTrait)}' to {pawn.LabelShortCap}.");
                 }
+                return true;
             }
             catch (Exception ex)
             {
                 Compatibility.TM_Log.Error("Classes", "Debug GiveClass failed: " + ex);
+                return false;
             }
         }
 

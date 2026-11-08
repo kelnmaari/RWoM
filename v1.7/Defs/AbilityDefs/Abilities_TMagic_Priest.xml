@@ -5,7 +5,7 @@
   
   <ThingDef ParentName="BaseBullet" Class="AbilityUser.ProjectileDef_Ability">
    <defName>TM_Projectile_Priest</defName>
-   <thingClass>AbilityUser.Projectile_Ability</thingClass>
+   <thingClass>TorannMagic.ClassProgression.Projectile_SpiritNativeAbility</thingClass>
    <label>priest projectile</label>
    <graphicData>
 		<texPath>Spells/invis</texPath>

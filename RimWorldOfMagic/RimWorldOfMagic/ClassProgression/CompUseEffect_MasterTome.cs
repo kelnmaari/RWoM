@@ -7,12 +7,12 @@ namespace TorannMagic.ClassProgression
     public sealed class CompUseEffect_MasterTome : CompUseEffect
     {
         public override AcceptanceReport CanBeUsedBy(Pawn pawn)
-            => ClassInitiation.CanUseMaster(pawn, parent, out _)
+            => WandererLessons.Accepts(pawn, parent) || ClassInitiation.CanUseMaster(pawn, parent, out _)
                 ? (AcceptanceReport)true : (AcceptanceReport)"TM_ProgressionBookUnavailable".Translate();
 
         public override void DoEffect(Pawn pawn)
         {
-            if (!ClassInitiation.CanUseMaster(pawn, parent, out _) || !ClassInitiation.CompleteBook(pawn, parent))
+            if ((!WandererLessons.Accepts(pawn, parent) && !ClassInitiation.CanUseMaster(pawn, parent, out _)) || !ClassInitiation.CompleteBook(pawn, parent))
                 Messages.Message("TM_ProgressionBookUnavailable".Translate(), pawn, MessageTypeDefOf.RejectInput, false);
         }
     }

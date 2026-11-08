@@ -29,8 +29,20 @@ namespace TorannMagic.ClassProgression
             if (power == null || DefDatabase<TMAbilityDef>.GetNamedSilentFail("TM_GladiatorSweep") == null ||
                 !ClassIdentity.Component(pawn).State.TryAdvanceAfterTrial(path.ClassId, InitiationStage.Adept, Trial)) return false;
             path.Attack = attack;
-            if (attack == GladiatorAttack.Cleave) power.learned = true;
-            else JobDriver_GladiatorInitiation.Restore(comp);
+            if (attack == GladiatorAttack.Cleave)
+            {
+                power.learned = true;
+            }
+            else
+            {
+                // The Sweep owner must be learned like the Cleave one, or the
+                // grimoire (which renders owners, not runtime abilities) never
+                // shows the chosen attack.
+                var sweep = comp?.ExistingMightData?.MightPowersG?.FirstOrDefault(
+                    p => p?.TMabilityDefs?.Any(d => d.defName == "TM_GladiatorSweep") == true);
+                if (sweep != null) sweep.learned = true;
+                JobDriver_GladiatorInitiation.Restore(comp);
+            }
             return true;
         }
 

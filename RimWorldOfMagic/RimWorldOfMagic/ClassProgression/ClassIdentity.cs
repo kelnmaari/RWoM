@@ -68,6 +68,10 @@ namespace TorannMagic.ClassProgression
             return pawn?.story?.traits?.HasTrait(TorannMagicDefOf.Priest) == true;
         }
 
+        public static bool IsChaosMage(Pawn pawn)
+            => TryGetState(pawn, out var state) ? state.Find("rwom.chaos")?.Domain == DisciplineDomain.Magic
+                : pawn?.story?.traits?.HasTrait(TorannMagicDefOf.ChaosMage) == true;
+
         public static bool IsFireMage(Pawn pawn)
         {
             if (TryGetState(pawn, out var state))
@@ -329,6 +333,11 @@ namespace TorannMagic.ClassProgression
         public static string Stages(ClassProgressionState state)
             => string.Join("\n", state.Disciplines.Where(p => p != null).Select(p =>
                 DisplayLabel(p) + ": " + ("TM_ProgressionStage_" + p.Stage).Translate()));
+
+        internal static string SummaryWithStages(ClassProgressionState state)
+            => state.Disciplines.Count == 0 ? Summary(state) : string.Join(" / ",
+                state.Disciplines.Where(p => p != null).Select(p => DisplayLabel(p)
+                    + " (" + ("TM_ProgressionStage_" + p.Stage).Translate() + ")"));
 
         private static string DisplayLabel(DisciplineProgress path)
             => path.ClassId == "rwom.necromancer" && path.Domain == DisciplineDomain.Magic

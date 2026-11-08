@@ -45,7 +45,9 @@ namespace TorannMagic.ClassProgression
         }
         private static DisciplineProgress Owned(Pawn caster, InitiationStage stage, TMAbilityDef ability)
         {
-            if (caster == null || caster.Dead || !caster.Spawned || caster.Faction == null
+            if (caster == null || caster.Dead || caster.Faction == null ||
+                (!caster.Spawned && !((ability == TorannMagicDefOf.TM_Icebolt || ability == TorannMagicDefOf.TM_Snowball || ability == TorannMagicDefOf.TM_Rainmaker || ability == TorannMagicDefOf.TM_Soothe) &&
+                    SpiritRebirthState.TryGet(caster,out var spirit) && spirit.HasValidHost(caster) && spirit.Host.Spawned))
                 || caster.story?.traits?.HasTrait(TorannMagicDefOf.Faceless) == true
                 || !ClassIdentity.TryGetState(caster, out var state) || (state.Vocation & Vocation.Mage) == 0) return null;
             var path = state.Find("rwom.ice");
@@ -59,7 +61,7 @@ namespace TorannMagic.ClassProgression
             var path = Owned(caster, spell == Spell.Icebolt ? InitiationStage.Foundation : InitiationStage.Adept,
                 spell == Spell.Icebolt ? TorannMagicDefOf.TM_Icebolt : TorannMagicDefOf.TM_Snowball);
             if (path == null || victim == null || victim.Dead || victim.thingIDNumber <= 0 || !victim.Spawned
-                || caster.Map != victim.Map || victim.IsPrisoner || victim.IsSlave || !victim.HostileTo(caster)
+                || caster.MapHeld != victim.Map || victim.IsPrisoner || victim.IsSlave || !victim.HostileTo(caster)
                 || (victim.Faction == null ? !victim.InAggroMentalState : victim.Faction == caster.Faction || !victim.Faction.HostileTo(caster.Faction))) return null;
             return new Snapshot { path = path, victimId = victim.thingIDNumber, spell = spell };
         }
@@ -85,11 +87,12 @@ namespace TorannMagic.ClassProgression
         public static void ApplyAura(Hediff source, Pawn recipient, HediffDef effect)
         {
             var caster = source?.pawn;
+            var emitter = source?.TryGetComp<HediffComp_Aura>()?.ProjectedHost ?? caster;
             var path = source?.def == TorannMagicDefOf.TM_SoothingBreeze_AuraHD
                 && (effect == TorannMagicDefOf.SoothingBreeze || effect == TorannMagicDefOf.SoothingBreeze_I
                     || effect == TorannMagicDefOf.SoothingBreeze_II || effect == TorannMagicDefOf.SoothingBreeze_III)
-                && recipient != caster && recipient != null && !recipient.Dead && recipient.Spawned
-                && recipient.Map == caster?.Map && recipient.Faction == caster?.Faction && !recipient.IsPrisoner && !recipient.IsSlave
+                && recipient != emitter && recipient != null && !recipient.Dead && recipient.Spawned
+                && recipient.Map == emitter?.Map && recipient.Faction == emitter?.Faction && !recipient.IsPrisoner && !recipient.IsSlave
                 && caster.health.hediffSet.hediffs.Contains(source)
                 ? Owned(caster, InitiationStage.Foundation, TorannMagicDefOf.TM_Soothe) : null;
             if (path == null) { HealthUtility.AdjustSeverity(recipient, effect, 1f); return; }
@@ -100,7 +103,7 @@ namespace TorannMagic.ClassProgression
         }
         public static void TransitionWeather(Pawn caster, Map map, WeatherDef weather)
         {
-            var path = caster?.Map == map ? Owned(caster, InitiationStage.Adept, TorannMagicDefOf.TM_Rainmaker) : null;
+            var path = caster?.MapHeld == map ? Owned(caster, InitiationStage.Adept, TorannMagicDefOf.TM_Rainmaker) : null;
             var before = map.weatherManager.curWeather;
             map.weatherManager.TransitionTo(weather);
             if (path != null && before != weather && map.weatherManager.curWeather == weather) path.RecordCompletedTrial(MasteryTrialId);

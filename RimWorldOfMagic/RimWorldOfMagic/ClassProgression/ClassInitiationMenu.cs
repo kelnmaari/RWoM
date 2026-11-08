@@ -27,6 +27,13 @@ namespace TorannMagic.ClassProgression
         public static bool Begin(Pawn pawn, Thing book, string profileId)
         {
             if (!ClassInitiation.CanUseFoundation(pawn, book, profileId, out _)) return false;
+            if (profileId == "rwom.shadow" || ClassProgressionState.Elemental(profileId))
+            {
+                var usable = book.TryGetComp<CompUsable>();
+                if (usable == null || !usable.CanBeUsedBy(pawn)) return false;
+                usable.TryStartUseJob(pawn, LocalTargetInfo.Invalid);
+                return true;
+            }
             var def = DefDatabase<JobDef>.GetNamedSilentFail(profileId == "rwom.warlock" ? "TM_InitiateWarlock"
                 : profileId == "rwom.succubus" ? "TM_InitiateSuccubus" : "");
             if (def == null || pawn.jobs == null || book.IsForbidden(pawn)) return false;

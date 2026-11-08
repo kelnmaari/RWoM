@@ -189,7 +189,11 @@ namespace TorannMagic.Compatibility
             // Needs, health and cross references must all finish loading first.
             LongEventHandler.ExecuteWhenFinished(() =>
             {
-                try { TM_LegacyRecovery.Repair(__instance); }
+                try
+                {
+                    ClassProgression.LegacyClassConversion.TryImport(__instance);
+                    TM_LegacyRecovery.Repair(__instance);
+                }
                 catch (Exception e) { TM_Log.Warning("SaveRecovery", "Pawn recovery incomplete: " + e); }
             });
         }

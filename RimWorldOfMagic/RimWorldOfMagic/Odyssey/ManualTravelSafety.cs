@@ -134,7 +134,18 @@ namespace TorannMagic.Odyssey
                 horizon=ClassProgression.PsionicDashCast.Horizon(pawn,target.Cell,ability.Def==TorannMagicDefOf.TM_PsionicStorm);
             IntVec3 destination = target.Cell;
             var passage = ability.Verb as ClassProgression.Verb_BladePassage;
-            if (passage != null && !passage.TryDestination(target, out destination)) return null;
+            if (passage != null && !passage.TryDestination(target, out destination))
+            {
+                // A refused passage used to fail silently: the targeting would
+                // not confirm and the player never learned why.
+                if (context == AbilityContext.Player && pawn.Spawned && LanguageDatabase.activeLanguage != null)
+                {
+                    // Same language guard as the commander notice: Translate
+                    // logs and throws when no language pack is active.
+                    Messages.Message("TM_BladePassageRefused".Translate(pawn.LabelShort), pawn, MessageTypeDefOf.RejectInput, false);
+                }
+                return null;
+            }
             bool submitted = Submit(pawn, job, map, destination, context == AbilityContext.Player,
                 () => pawn.Spawned && pawn.Map == map && !pawn.Dead && ability.CanCastPowerCheck(context, out _)
                     && ability.Verb.CanHitTargetFrom(pawn.Position, target)

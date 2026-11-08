@@ -86,7 +86,7 @@ namespace TorannMagic.Guidance
             if (device.def.defName == "TM_MagicalOxygen")
             {
                 paragraphs.Add("TM_OxygenModeDesc".Translate());
-                if (Odyssey.VgeOxygenBridge.Available(device)) paragraphs.Add("TM_OxygenOutputDesc".Translate());
+                if (device.GetComp<Odyssey.CompMagicalOxygen>()?.PipeNetworkAvailable == true) paragraphs.Add("TM_OxygenOutputDesc".Translate());
             }
             if (device.def.defName == "TableGemcutting" || device.def.defName == "TM_Portal")
             {

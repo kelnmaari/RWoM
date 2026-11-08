@@ -12,6 +12,44 @@ internal static class LegacyRecoveryTests
 {
     public static IEnumerable<TestCase> Cases()
     {
+        foreach (var trait in TM_ClassGroups.MagicEntriesField.Select(e => e.trait)
+            .Concat(TM_ClassGroups.MightEntriesField.Select(e => e.trait)))
+            yield return new("LegacyRecovery.EmptyClassicStarter." + trait, f =>
+            {
+                Prepare(f);
+                var def = DefDatabase<TraitDef>.GetNamed(trait);
+                bool mage = TM_ClassGroups.MagicEntriesField.Any(e => e.trait == trait);
+                var p = PawnWithComps(mage, !mage);
+                p.pawn.story.traits.allTraits.Add(new Trait(def));
+                if (mage)
+                {
+                    var data = p.magic.MagicData;
+                    foreach (var power in data.AllMagicPowers) power.learned = false;
+                    data.MagicUserLevel = 12; data.MagicUserXP = 73; data.MagicAbilityPoints = 4;
+                    TM_ClassState.RestoreCurrentMagicRuntime(p.magic);
+                    Check.Equal(1, data.AllMagicPowers.Count(x => x.learned), "exactly one starter recovered");
+                    var starter = data.AllMagicPowers.Single(x => x.learned);
+                    Check.Equal(true, TM_ClassState.IsMagicPowerAuthorized(p.magic, starter), "starter belongs to current class");
+                    TM_ClassState.RestoreCurrentMagicRuntime(p.magic);
+                    Check.Equal(1, data.AllMagicPowers.Count(x => x.learned), "repeat does not unlock next spell");
+                    Check.Equal(12, data.MagicUserLevel, "level retained");
+                    Check.Equal(73, data.MagicUserXP, "XP retained");
+                    Check.Equal(4, data.MagicAbilityPoints, "points retained");
+                }
+                else
+                {
+                    var data = p.might.MightData;
+                    foreach (var power in data.AllMightPowers) power.learned = false;
+                    data.MightUserLevel = 12; data.MightUserXP = 73; data.MightAbilityPoints = 4;
+                    TM_ClassState.RestoreCurrentMightRuntime(p.might);
+                    Check.Equal(1, data.AllMightPowers.Count(x => x.learned), "exactly one martial starter recovered");
+                    TM_ClassState.RestoreCurrentMightRuntime(p.might);
+                    Check.Equal(1, data.AllMightPowers.Count(x => x.learned), "repeat does not unlock next skill");
+                    Check.Equal(12, data.MightUserLevel, "level retained");
+                    Check.Equal(73, data.MightUserXP, "XP retained");
+                    Check.Equal(4, data.MightAbilityPoints, "points retained");
+                }
+            });
         yield return new("LegacyRecovery.ManualRepairReportsSkippedReason", f =>
         {
             Prepare(f); var p = PawnWithComps(false, false);
@@ -21,6 +59,25 @@ internal static class LegacyRecoveryTests
             Check.Equal(true, output.Any(x => x.Text.Contains("status=skipped") && x.Text.Contains("no class trait")), "unclassed pawn must not produce a success report");
             output.Clear(); TorannMagic.ModOptions.TM_DebugTools.RepairMissingClassData(null!);
             Check.Equal(true, output.Any(x => x.Text.Contains("status=skipped") && x.Text.Contains("no pawn")), "null pawn has explicit reason");
+        });
+        yield return new("LegacyRecovery.EmptyStarterPreservesStagedAndStandalone", f =>
+        {
+            Prepare(f);
+            var p = PawnWithComps(true, false);
+            p.pawn.story.traits.allTraits.Add(new Trait(TorannMagicDefOf.InnerFire));
+            foreach (var power in p.magic.MagicData.AllMagicPowers) power.learned = false;
+            var standalone = p.magic.MagicData.MagicPowersStandalone.First();
+            standalone.learned = true;
+            TM_ClassState.RestoreCurrentMagicRuntime(p.magic);
+            Check.Equal(false, p.magic.MagicData.MagicPowersIF.Any(x => x.learned), "known standalone spell prevents empty-class recovery");
+            standalone.learned = false;
+            p.magic.AbilityData.Powers.Clear();
+            p.magic.AbilityData.AllPowers = null;
+            var staged = new TorannMagic.ClassProgression.CompClassProgression { parent = p.pawn };
+            p.pawn.AllComps.Add(staged);
+            Set(staged, "state", new TorannMagic.ClassProgression.ClassProgressionState());
+            TM_ClassState.RestoreCurrentMagicRuntime(p.magic);
+            Check.Equal(false, p.magic.MagicData.MagicPowersIF.Any(x => x.learned), "saved staged data is never unlocked by classic fallback");
         });
         yield return new("LegacyRecovery.ManualRepairReportsIncompleteAndFailure", f =>
         {

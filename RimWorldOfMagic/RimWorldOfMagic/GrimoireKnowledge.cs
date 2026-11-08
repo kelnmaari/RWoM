@@ -87,6 +87,8 @@ namespace TorannMagic
         // (TM_X_pwr/eff/ver). Global stat skills have no suffix and are skipped.
         public static void SyncRank(Pawn pawn, Verse.Def def, string skillLabel, int rank)
         {
+            if (def == TorannMagicDefOf.TM_MindOverBody && skillLabel == "TM_MindOverBody_pwr")
+                ClassProgression.MonkMartialPath.RefreshTraining(pawn);
             int role = RoleOf(skillLabel);
             if (def == null || role < 0) return;
             AbilityKnowledgeComp knowledge = pawn?.TryGetComp<AbilityKnowledgeComp>();

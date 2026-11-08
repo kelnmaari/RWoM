@@ -60,4 +60,7 @@
   <TM_MasterTomeGolemancer.label>精通典籍：魔像师</TM_MasterTomeGolemancer.label>
   <TM_MasterTomeGolemancer.description>供完成精通试炼的魔像师使用的稀有典籍。阅读后完成晋阶并消耗典籍。可通过商人和任务奖励获得，无法制作。</TM_MasterTomeGolemancer.description>
   <TM_MasterTomeGolemancer.comps.1.useLabel>阅读{0_label}</TM_MasterTomeGolemancer.comps.1.useLabel>
+  <TM_MasterTomeChaos.label>混沌法师大师之书</TM_MasterTomeChaos.label>
+  <TM_MasterTomeChaos.description>混沌法师进阶用的稀有典籍。阅读前须通过使用不同法术组合的试炼。商人可能出售，也可作为任务奖励获得。</TM_MasterTomeChaos.description>
+  <TM_MasterTomeChaos.comps.1.useLabel>阅读{0_label}</TM_MasterTomeChaos.comps.1.useLabel>
 </LanguageData>

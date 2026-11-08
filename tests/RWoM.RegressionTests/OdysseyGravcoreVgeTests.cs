@@ -32,7 +32,7 @@ internal static partial class OdysseyBeaconTests
             var vge2=Assembly.LoadFrom(Path.Combine(workshop,"3799737423/1.7/Assemblies/VanillaGravshipExpanded2.dll"));
             registry.Add(vge); registry.Add(vge2); registry.Add(Assembly.LoadFrom(Environment.GetEnvironmentVariable("RWOM_VGE_ADAPTER")!));
             var defs=new XmlDocument(); defs.Load(Path.Combine(f.Repository,"v1.7/Odyssey/Defs/Buildings_Gravcore.xml"));
-            var patch=new XmlDocument(); patch.Load(Path.Combine(f.Repository,"v1.7/VGECompat/Patches/MagicalGravcore.xml"));
+            var patch=new XmlDocument(); patch.Load(Path.Combine(f.Repository,"TorannMagic.Integrations/v1.7/VGECompat/Patches/MagicalGravcore.xml"));
             foreach(XmlNode n in patch.SelectNodes("Patch/Operation")!)
                 Check.Equal(true,DirectXmlToObject.ObjectFromXml<PatchOperation>(n,false).Apply(defs),"native VGE patch applies");
             XmlNode engine=defs.SelectSingleNode("Defs/ThingDef[defName='TM_MagicalGravEngine']")!;

@@ -480,7 +480,7 @@ namespace TorannMagic
                             //    MagicCardUtility.PowersGUIHandler(inRect3, pawn.GetCompAbilityUserMagic(), pawn.GetCompAbilityUserMagic().MagicData.MagicPowersC, pawn.GetCompAbilityUserMagic().MagicData.MagicPowerSkill_Prediction, pawn.GetCompAbilityUserMagic().MagicData.MagicPowerSkill_AlterFate, pawn.GetCompAbilityUserMagic().MagicData.MagicPowerSkill_AccelerateTime, pawn.GetCompAbilityUserMagic().MagicData.MagicPowerSkill_ReverseTime, pawn.GetCompAbilityUserMagic().MagicData.MagicPowerSkill_ChronostaticField, null, TexButton.TMTex_SkillPointUsed);
                             //}
                         }
-                        else if (pawn.story.traits.HasTrait(TorannMagicDefOf.ChaosMage))
+                        else if (TorannMagic.ClassProgression.ClassIdentity.IsChaosMage(pawn))
                         {
                             Rect inRect3 = new Rect(rect.x, rect11.y, MagicCardUtility.PowersColumnWidth, MagicCardUtility.PowersColumnHeight);
                             List<MagicPower> CMList = new List<MagicPower>();

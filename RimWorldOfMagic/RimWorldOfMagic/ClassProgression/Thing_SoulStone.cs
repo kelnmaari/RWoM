@@ -4,7 +4,6 @@ using Verse;
 
 namespace TorannMagic.ClassProgression
 {
-    // Item presentation only; generation and implantation activation remain separate.
     // The container owns the original pawn, never a progression snapshot or clone.
     public sealed class Thing_SoulStone : ThingWithComps, IThingHolder, IThingHolderTickable
     {
@@ -22,6 +21,11 @@ namespace TorannMagic.ClassProgression
             string details = "TM_SoulStoneContainedSpirit".Translate(spirit.LabelShort).ToString()
                 + "\n" + "TM_SoulStoneRecoveryDebt".Translate().ToString();
             return inherited.NullOrEmpty() ? details : inherited + "\n" + details;
+        }
+        public override IEnumerable<FloatMenuOption> GetFloatMenuOptions(Pawn pawn)
+        {
+            foreach (var option in base.GetFloatMenuOptions(pawn)) yield return option;
+            foreach (var option in SoulStoneImplant.Orders(pawn,this)) yield return option;
         }
         public ThingOwner GetDirectlyHeldThings() => contents;
         public bool ShouldTickContents => false;
@@ -52,7 +56,11 @@ namespace TorannMagic.ClassProgression
                 else source.Remove(original);
                 if (!contents.TryAdd(original, false)) return false;
                 committed = state.TryEnterStone(original, this, expectedHost, hostDied);
-                if (committed) SpiritRebirthHealthForm.TryRefreshPending(original);
+                if (committed)
+                {
+                    original.GetCompAbilityUserMagic()?.RestoreSavedCooldowns();
+                    SpiritRebirthHealthForm.TryRefreshPending(original);
+                }
                 return committed;
             }
             finally
@@ -85,7 +93,7 @@ namespace TorannMagic.ClassProgression
             if (Destroyed || !ReferenceEquals(ContainedSpirit, original)
                 || !SpiritRebirthState.TryGet(original, out var state) || !state.HasValidStone(original)
                 || !ReferenceEquals(state.Stone, this) || candidate == null || candidate == original
-                || candidate.Dead || candidate.Destroyed || target == null || target.Count != 0
+                || SpiritSummonedHost.IsSummoned(candidate) || candidate.Dead || candidate.Destroyed || target == null || target.Count != 0
                 || !ReferenceEquals(target.Owner, destination)
                 || !ReferenceEquals(candidate.health?.hediffSet?.GetFirstHediffOfDef(TorannMagicDefOf.TM_SpiritPossessionHD)
                     ?.TryGetComp<HediffComp_SpiritPossession>(), destination)) return false;
@@ -96,7 +104,11 @@ namespace TorannMagic.ClassProgression
                 contents.Remove(original);
                 if (!target.TryAdd(original, false)) return false;
                 committed = state.TryEnterHost(original, candidate);
-                if (committed) SpiritRebirthHealthForm.TryRefreshPending(original);
+                if (committed)
+                {
+                    original.GetCompAbilityUserMagic()?.RestoreSavedCooldowns();
+                    SpiritRebirthHealthForm.TryRefreshPending(original);
+                }
                 return committed;
             }
             finally

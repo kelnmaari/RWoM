@@ -12,6 +12,8 @@ namespace TorannMagic
         // slots and is rebuilt on load, so it cannot be the progression authority.
         public static List<MagicPower> ActivePowers(CompAbilityUserMagic comp)
         {
+            if (comp?.ExistingMagicData != null && ClassProgression.ChaosDiscipline.Path(comp.Pawn) is ClassProgression.DisciplineProgress path)
+                return ClassProgression.ChaosDiscipline.Active(comp,path);
             if (comp?.MagicData == null || (comp.Pawn?.story?.traits?.HasTrait(TorannMagicDefOf.ChaosMage) != true
                 && comp.customClass?.classMageAbilities?.Contains(TorannMagicDefOf.TM_ChaosTradition) != true))
                 return new List<MagicPower>();

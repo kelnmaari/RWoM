@@ -29,6 +29,11 @@ internal static class VpeAutocastTests
             Check.Equal(false, (bool)helper.GetMethod("IsCasting")!.Invoke(null, [pawn])!, "ordinary non-VEF warmup is unaffected");
             Check.Equal(optionalBefore.Length, AppDomain.CurrentDomain.GetAssemblies().Count(a => a.GetName().Name == "VEF" || a.GetName().Name == "VanillaPsycastsExpanded"), "ordinary ownership check never loads optional assemblies");
         });
+        if (Environment.GetEnvironmentVariable("RWOM_TEST_CORE_ASSEMBLY") == "disabled")
+        {
+            Console.WriteLine("CAPABILITY SKIPPED: VEF/VPE adapter requires Core; Content-alone ownership check remains active.");
+            yield break;
+        }
         if (!File.Exists(VefPath) || !File.Exists("C:/Program Files (x86)/Steam/steamapps/workshop/content/294100/2842502659/1.7/Assemblies/VanillaPsycastsExpanded.dll")) yield break;
         foreach (bool player in new[] { false, true })
         foreach (bool warmup in new[] { false, true })
@@ -37,8 +42,19 @@ internal static class VpeAutocastTests
             yield return new($"VpeAutocast.DispatchPreservesExternalCast.Player{p}.Warmup{w}", f => Dispatch(p, w));
         }
     }
+    internal static IDisposable IntegrationOwnershipScope()
+    {
+        var core = Assembly.LoadFrom(Environment.GetEnvironmentVariable("RWOM_TEST_CORE_ASSEMBLY")!);
+        var adapter = Assembly.LoadFrom(Environment.GetEnvironmentVariable("RWOM_INTEGRATIONS_ASSEMBLY")!);
+        var callback = (Func<Pawn,bool>)Delegate.CreateDelegate(typeof(Func<Pawn,bool>), adapter.GetType("TorannMagic.Integrations.VefCastOwnership",true)!.GetMethod("IsCasting")!);
+        var api = core.GetType("TorannMagic.Core.CastOwnership",true)!;
+        Check.Equal(true,(bool)api.GetMethod("Register")!.Invoke(null,["test.vef",callback])!,"test adapter registered");
+        return new Cleanup(() => api.GetMethod("Unregister")!.Invoke(null,["test.vef",callback]));
+    }
+    sealed class Cleanup(Action action) : IDisposable { public void Dispose() => action(); }
     private static void Dispatch(bool player, bool warmup)
     {
+        using var ownership = IntegrationOwnershipScope();
         var assembly = AssemblyLoadContext.Default.LoadFromAssemblyPath(VefPath);
         var driver = assembly.GetType("VEF.Abilities.JobDriver_GotoTargetAndCastAbilityOnce", true)!;
         var verbType = assembly.GetType("VEF.Abilities.Verb_CastAbility", true)!;

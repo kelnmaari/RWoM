@@ -23,8 +23,11 @@ namespace TorannMagic
                 effVal = comp.MagicData.MagicPowerSkill_ChaosTradition.FirstOrDefault((MagicPowerSkill x) => x.label == "TM_ChaosTradition_eff").level;
 
 
-                TM_Action.ClearSustainedMagicHediffs(comp);                
-                TM_Calc.AssignChaosMagicPowers(comp);
+                if (ClassProgression.ChaosDiscipline.Path(comp.Pawn) is ClassProgression.DisciplineProgress path)
+                {
+                    if (!ClassProgression.ChaosDiscipline.Deal(comp, path)) return false;
+                }
+                else { TM_Action.ClearSustainedMagicHediffs(comp); TM_Calc.AssignChaosMagicPowers(comp); }
 
                 if(effVal >= 3)
                 {

@@ -86,7 +86,7 @@ Range: 21</description>
     <iconPath>UI/spite</iconPath>
     <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
-      <verbClass>TorannMagic.Verb_SB</verbClass>
+      <verbClass>TorannMagic.ClassProgression.Verb_DeathKnightSpite</verbClass>
       <tooltipShowProjectileDamage>true</tooltipShowProjectileDamage>
       <tooltipShowExtraDamages>false</tooltipShowExtraDamages>
       <tooltipShowHediffsToApply>false</tooltipShowHediffsToApply>
@@ -125,7 +125,7 @@ Range: 24</description>
     <iconPath>UI/spite</iconPath>
     <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
-      <verbClass>TorannMagic.Verb_SB</verbClass>
+      <verbClass>TorannMagic.ClassProgression.Verb_DeathKnightSpite</verbClass>
       <tooltipShowProjectileDamage>true</tooltipShowProjectileDamage>
       <tooltipShowExtraDamages>false</tooltipShowExtraDamages>
       <tooltipShowHediffsToApply>false</tooltipShowHediffsToApply>
@@ -164,7 +164,7 @@ Range: 27</description>
     <iconPath>UI/spite</iconPath>
     <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
-      <verbClass>TorannMagic.Verb_SB</verbClass>
+      <verbClass>TorannMagic.ClassProgression.Verb_DeathKnightSpite</verbClass>
       <tooltipShowProjectileDamage>true</tooltipShowProjectileDamage>
       <tooltipShowExtraDamages>false</tooltipShowExtraDamages>
       <tooltipShowHediffsToApply>false</tooltipShowHediffsToApply>
@@ -203,7 +203,7 @@ Range: 30</description>
     <iconPath>UI/spite</iconPath>
     <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
     <verbProperties Class="AbilityUser.VerbProperties_Ability">
-      <verbClass>TorannMagic.Verb_SB</verbClass>
+      <verbClass>TorannMagic.ClassProgression.Verb_DeathKnightSpite</verbClass>
       <tooltipShowProjectileDamage>true</tooltipShowProjectileDamage>
       <tooltipShowExtraDamages>false</tooltipShowExtraDamages>
       <tooltipShowHediffsToApply>false</tooltipShowHediffsToApply>

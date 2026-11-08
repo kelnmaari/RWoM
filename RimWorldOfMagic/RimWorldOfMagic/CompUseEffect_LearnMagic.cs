@@ -1,4 +1,4 @@
-﻿using RimWorld;
+using RimWorld;
 using Verse;
 using System.Collections.Generic;
 using UnityEngine;
@@ -10,12 +10,14 @@ namespace TorannMagic
 	{
         public override IEnumerable<FloatMenuOption> CompFloatMenuOptions(Pawn selPawn)
         {
+            if (parent?.def?.defName == "BookOfShadow")
+                foreach (var form in ClassProgression.JobDriver_GladiatorInitiation.Choices(selPawn, parent)) yield return form;
             foreach (var option in ClassProgression.ClassInitiationMenu.Options(selPawn, parent)) yield return option;
         }
         public override AcceptanceReport CanBeUsedBy(Pawn user)
         {
             if (!ClassProgression.ClassIdentity.TryGetState(user, out _)) return base.CanBeUsedBy(user);
-            return ClassProgression.ClassInitiation.CanUseFoundation(user, parent, out _)
+            return ClassProgression.WandererLessons.Accepts(user, parent) || ClassProgression.ClassInitiation.CanUseFoundation(user, parent, out _)
                 || ClassProgression.ClassInitiation.CanUseAdept(user, parent, out _)
                 || ClassProgression.ClassInitiation.CanUseMaster(user, parent, out _)
                 ? (AcceptanceReport)true : (AcceptanceReport)"TM_ProgressionBookUnavailable".Translate();
