@@ -56,6 +56,14 @@ namespace TorannMagic
                 }, null), new HarmonyMethod(typeof(TorannMagicMod), "SetGuestStatusForUndead_Prefix", null), null);
             SafePatch(harmonyInstance, AccessTools.Method(typeof(IncidentWorker_SelfTame), "Candidates"), null,
                  new HarmonyMethod(patchType, nameof(SelfTame_Candidates_Patch)), null);
+            // The ability targeter demands line of sight to the center cell
+            // whenever this flag is set, and the JecsLite verb hardcodes it
+            // true — which made player-directed casts of no-sight spells
+            // (Blink and the other requiresLineOfSight=false abilities)
+            // require sight while AI paths did not. Mirror the spell's own
+            // flag so the targeter matches the cast-time LOS rules.
+            SafePatch(harmonyInstance, AccessTools.Method(typeof(Verb_UseAbility), "HighlightFieldRadiusAroundTarget"), null,
+                new HarmonyMethod(patchType, nameof(VerbUseAbility_TargeterLOS_Postfix)), null);
             SafePatch(harmonyInstance, AccessTools.Method(typeof(IncidentWorker_DiseaseHuman), "PotentialVictimCandidates"), null,
                  new HarmonyMethod(patchType, nameof(DiseaseHuman_Candidates_Patch)), null);
             SafePatch(harmonyInstance, AccessTools.Method(typeof(IncidentWorker_DiseaseAnimal), "PotentialVictimCandidates"), null,  //calls the same patch as human, which includes hediff for undead animals
@@ -70,6 +78,17 @@ namespace TorannMagic
                  null, null);
             SafePatch(harmonyInstance, AccessTools.Method(typeof(AutoUndrafter), "ShouldAutoUndraft"), new HarmonyMethod(patchType, nameof(AutoUndrafter_Undead_Prefix)),
                  null, null);
+            // Undead corpse storage: TM_AllowUndeadCorpse is the SOLE storage
+            // gate for necromancy-raised corpses. The vanilla colonist/
+            // stranger/slave corpse filters match by the dead pawn's faction,
+            // so without this exclusion an enabled undead toggle could never
+            // re-admit a corpse those filters reject ("no configured spot").
+            SafePatch(harmonyInstance, AccessTools.Method(typeof(SpecialThingFilterWorker_CorpsesColonist), "Matches"), null,
+                new HarmonyMethod(patchType, nameof(CorpseFilter_ExcludeUndead_Postfix)), null);
+            SafePatch(harmonyInstance, AccessTools.Method(typeof(SpecialThingFilterWorker_CorpsesStranger), "Matches"), null,
+                new HarmonyMethod(patchType, nameof(CorpseFilter_ExcludeUndead_Postfix)), null);
+            SafePatch(harmonyInstance, AccessTools.Method(typeof(SpecialThingFilterWorker_CorpsesSlave), "Matches"), null,
+                new HarmonyMethod(patchType, nameof(CorpseFilter_ExcludeUndead_Postfix)), null);
             //SafePatch(harmonyInstance, AccessTools.Method(typeof(PawnUtility), "IsTravelingInTransportPodWorldObject"), null,
             //     new HarmonyMethod(patchType, nameof(IsTravelingInTeleportPod_Postfix)));
 
@@ -3588,6 +3607,40 @@ namespace TorannMagic
                 return false;
             }
             return true;
+        }
+
+        // Storage/butcher filters: corpses of necromancy-raised undead answer
+        // only to the undead corpse toggles, not to the vanilla colonist/
+        // stranger/slave corpse toggles (those key on the dead pawn's faction,
+        // so an enabled undead toggle could never re-admit such a corpse).
+        public static void CorpseFilter_ExcludeUndead_Postfix(Thing t, ref bool __result)
+        {
+            if (!__result || !(t is Corpse corpse) || corpse.InnerPawn == null)
+            {
+                return;
+            }
+            var hediffs = corpse.InnerPawn.health?.hediffSet;
+            if (hediffs == null)
+            {
+                return;
+            }
+            if ((TorannMagicDefOf.TM_UndeadHD != null && hediffs.HasHediff(TorannMagicDefOf.TM_UndeadHD))
+                || (TorannMagicDefOf.TM_UndeadAnimalHD != null && hediffs.HasHediff(TorannMagicDefOf.TM_UndeadAnimalHD)))
+            {
+                __result = false;
+            }
+        }
+
+        // The ability targeter demands line of sight to the center cell
+        // whenever needLOSToCenter is set, and the JecsLite verb hardcodes it
+        // true — which made player-directed casts of no-sight spells (Blink
+        // and the other requiresLineOfSight=false abilities) require sight
+        // while AI paths did not. Mirror the spell's own flag so the targeter
+        // matches the cast-time LOS rules for every ability.
+        public static void VerbUseAbility_TargeterLOS_Postfix(Verb_UseAbility __instance, ref bool needLOSToCenter)
+        {
+            if (!needLOSToCenter || __instance?.UseAbilityProps == null) return;
+            needLOSToCenter = __instance.UseAbilityProps.requireLineOfSight;
         }
 
         [HarmonyPatch(typeof(PawnRenderer), "GetBodyPos")]

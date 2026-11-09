@@ -36,6 +36,12 @@ namespace TorannMagic
 
         // Learned entries whose def fails to resolve (removed or renamed spell).
         // Never throws; the list is recomputed per frame (knowledge lists are small).
+        // The pawn's persisted spell knowledge, when loaded and reconciled.
+        // Read-only gateway for restore paths: entries are only written by
+        // legitimate learning, so a learned entry is authoritative ownership.
+        public static AbilityKnowledgeComp ActiveKnowledge(Pawn pawn)
+            => AbilityKnowledgeComp.ActiveFor(pawn);
+
         public static List<SpellKnowledge> SleepingSpells(Pawn pawn)
             => SleepingSpells(AbilityKnowledgeComp.ActiveFor(pawn));
 

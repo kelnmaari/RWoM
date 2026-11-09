@@ -16,8 +16,16 @@ namespace TorannMagic.ClassProgression
             var previous=equipment.Primary;
             // Never replace ordinary equipment, or guess among unrelated stored items.
             if(previous!=null && previous.def?.defName?.Contains("Spec_Base")!=true) return false;
+            // A failed cycle leaves the binding's copy reference unresolved while
+            // the pawn still wears an orphan proxy; hand the stashed original back
+            // instead of stacking a fresh copy on a broken slot.
+            if(previous!=null && comp.specializedWeapon.CopyLost) return RestoreOriginal(comp);
             var original=comp.specializedWeapon.ForReload(previous,container);
             if(original==null || original.Destroyed) return false;
+            // A proxy whose holder disagrees with the tracker survives every
+            // Contains-keyed removal, so the slot must be reclaimed before the
+            // factory or its AddEquipment call leaks the fresh copy.
+            if(previous!=null && !Detach(previous,equipment,container)) return false;
             Action<Pawn,ThingWithComps> factory=null;
             foreach(var power in comp.MightData.MightPowersSS.Where(p=>p.learned))
             {
@@ -33,7 +41,6 @@ namespace TorannMagic.ClassProgression
             int registry=comp.specWpnRegNum;
             int originalCondition=original.HitPoints;
             bool committed=false;
-            if(previous!=null) equipment.Remove(previous);
             try
             {
                 if(previous!=null) original.HitPoints=previous.HitPoints;
@@ -61,6 +68,33 @@ namespace TorannMagic.ClassProgression
             }
         }
 
+        // 1.7 ThingOwner.Remove/Contains key on holdingOwner, so a proxy that
+        // an earlier failure left with a stale holder stays equipped through
+        // every removal path while the Primary getter keeps serving it from
+        // the tracker list. Reclaim the physical membership from both the
+        // tracker and the stash container, then detach wherever it now lives.
+        private static bool Detach(ThingWithComps proxy,Pawn_EquipmentTracker equipment,ThingOwner<ThingWithComps> container)
+        {
+            var held=equipment.GetDirectlyHeldThings();
+            if(held!=null) foreach(Thing item in held) if(item==proxy)
+            {
+                proxy.holdingOwner=held;
+                held.Remove(proxy);
+                break;
+            }
+            if(container!=null) foreach(Thing item in container) if(item==proxy)
+            {
+                proxy.holdingOwner=container;
+                container.Remove(proxy);
+                break;
+            }
+            if(proxy.holdingOwner!=null)
+            {
+                proxy.holdingOwner.Remove(proxy);
+            }
+            return equipment.Primary!=proxy;
+        }
+
         private static bool RestoreOriginal(CompAbilityUserMight comp)
         {
             var equipment=comp.Pawn.equipment;var container=comp.equipmentContainer;
@@ -69,7 +103,7 @@ namespace TorannMagic.ClassProgression
             var original=comp.specializedWeapon.ForReload(previous,container);
             if(original==null || original.Destroyed) return false;
             int condition=original.HitPoints;bool committed=false;
-            if(previous!=null) equipment.Remove(previous);
+            if(previous!=null && !Detach(previous,equipment,container)) return false;
             try
             {
                 if(previous!=null) original.HitPoints=previous.HitPoints;

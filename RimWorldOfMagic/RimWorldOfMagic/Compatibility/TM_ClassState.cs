@@ -483,7 +483,25 @@ namespace TorannMagic
         {
             var data = comp.MagicData;
             return data.MagicPowersStandalone.Contains(power) || data.MagicPowersCustomStandalone.Contains(power) || IsIndependentCustomCantrip(comp, power) ||
-                MagicClasses(comp.Pawn, data).Any(c => Matches(c.Abilities, power.TMabilityDefs));
+                MagicClasses(comp.Pawn, data).Any(c => Matches(c.Abilities, power.TMabilityDefs)) ||
+                KnowledgeLearned(comp.Pawn, power.TMabilityDefs);
+        }
+
+        // A scroll legitimately learned while another class owned the power
+        // (a Brightmage reading Heal) keeps its knowledge entry across saves,
+        // and the entry is only written by legitimate learning, so it is the
+        // source of truth for keeping the ability on the bar. Unlearned
+        // off-class powers stay unauthorized.
+        private static bool KnowledgeLearned(Pawn pawn, List<AbilityUser.AbilityDef> defs)
+        {
+            var knowledge = GrimoireKnowledge.ActiveKnowledge(pawn);
+            if (knowledge == null || !knowledge.ReadyForQuery || defs == null) return false;
+            foreach (var def in defs.OfType<TMAbilityDef>())
+            {
+                var entry = knowledge.Find(SpellIds.Of(def));
+                if (entry != null && entry.learned) return true;
+            }
+            return false;
         }
 
         // Custom powers with upgrade records live outside CustomStandalone even
